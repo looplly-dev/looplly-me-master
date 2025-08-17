@@ -47,48 +47,59 @@ export const useAuthLogic = () => {
         
         if (session?.user) {
           console.log('User found in session, fetching profile for:', session.user.id);
-          // Fetch user profile
-          const { data: profile, error } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('user_id', session.user.id)
-            .single();
+          // Fetch user profile with error handling
+          try {
+            const { data: profile, error } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('user_id', session.user.id)
+              .single();
 
-          console.log('Profile fetch result:', profile, 'Error:', error);
-          
-          if (profile) {
-            console.log('Setting authenticated user state');
-            const user: User = {
-              id: session.user.id,
-              mobile: profile.mobile,
-              countryCode: profile.country_code,
-              email: session.user.email,
-              firstName: profile.first_name,
-              lastName: profile.last_name,
-              isVerified: false, // Always start as unverified for OTP flow
-              profileComplete: profile.profile_complete,
-              profile: profile.profile_complete ? {
-                sec: profile.sec as 'A' | 'B' | 'C1' | 'C2' | 'D' | 'E',
-                gender: profile.gender as 'male' | 'female' | 'other',
-                dateOfBirth: new Date(profile.date_of_birth),
-                address: profile.address,
-                gpsEnabled: false,
+            console.log('Profile fetch result:', profile, 'Error:', error);
+            
+            if (profile) {
+              console.log('Setting authenticated user state');
+              const user: User = {
+                id: session.user.id,
+                mobile: profile.mobile,
+                countryCode: profile.country_code,
+                email: session.user.email,
                 firstName: profile.first_name,
                 lastName: profile.last_name,
-                email: session.user.email
-              } : undefined
-            };
+                isVerified: false, // Always start as unverified for OTP flow
+                profileComplete: profile.profile_complete,
+                profile: profile.profile_complete ? {
+                  sec: profile.sec as 'A' | 'B' | 'C1' | 'C2' | 'D' | 'E',
+                  gender: profile.gender as 'male' | 'female' | 'other',
+                  dateOfBirth: new Date(profile.date_of_birth),
+                  address: profile.address,
+                  gpsEnabled: false,
+                  firstName: profile.first_name,
+                  lastName: profile.last_name,
+                  email: session.user.email
+                } : undefined
+              };
 
-            // For new registrations, don't require OTP yet - let them complete the flow
-            // OTP will be required on subsequent logins
-            setAuthState({
-              user,
-              isAuthenticated: true,
-              isLoading: false,
-              step: user.profileComplete ? 'dashboard' : 'profile-setup'
-            });
-          } else {
-            console.log('No profile found, user needs to complete setup');
+              // For new registrations, don't require OTP yet - let them complete the flow
+              // OTP will be required on subsequent logins
+              setAuthState({
+                user,
+                isAuthenticated: true,
+                isLoading: false,
+                step: user.profileComplete ? 'dashboard' : 'profile-setup'
+              });
+            } else {
+              console.log('No profile found, user needs to complete setup');
+              setAuthState({
+                user: null,
+                isAuthenticated: false,
+                isLoading: false,
+                step: 'login'
+              });
+            }
+          } catch (profileError) {
+            console.error('Profile fetch failed:', profileError);
+            // If profile fetch fails, log user out to prevent infinite loading
             setAuthState({
               user: null,
               isAuthenticated: false,
