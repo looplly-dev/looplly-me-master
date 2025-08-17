@@ -235,10 +235,10 @@ export default function ProfileSetup() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="address">Address *</Label>
+                <Label htmlFor="address">Home Address *</Label>
                 <Input
                   id="address"
-                  placeholder="Your address"
+                  placeholder="Your home address"
                   value={formData.address}
                   onChange={(e) => setFormData({...formData, address: e.target.value})}
                   className="h-12"
@@ -262,8 +262,8 @@ export default function ProfileSetup() {
                 <div className="flex items-center gap-3">
                   <MapPin className="h-5 w-5 text-primary" />
                   <div>
-                    <Label htmlFor="gps" className="font-medium">Enable GPS</Label>
-                    <p className="text-xs text-muted-foreground">For location-based surveys</p>
+                    <Label htmlFor="gps" className="font-medium">Enable GPS Location</Label>
+                    <p className="text-xs text-muted-foreground">Boosts your rep score for location-based surveys</p>
                   </div>
                 </div>
                 <Switch

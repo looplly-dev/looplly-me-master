@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
@@ -23,6 +24,7 @@ interface ProfileData {
   householdIncome: string;
   ethnicity: string;
   sec: string;
+  gpsEnabled: boolean;
 }
 
 export default function MultiStepProfileSetup({ onBack, onComplete }: MultiStepProfileSetupProps) {
@@ -35,13 +37,14 @@ export default function MultiStepProfileSetup({ onBack, onComplete }: MultiStepP
     address: '',
     householdIncome: '',
     ethnicity: '',
-    sec: ''
+    sec: '',
+    gpsEnabled: false
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { completeProfile } = useAuth();
   const { toast } = useToast();
 
-  const handleInputChange = (field: keyof ProfileData, value: string) => {
+  const handleInputChange = (field: keyof ProfileData, value: string | boolean) => {
     setProfileData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -145,13 +148,29 @@ export default function MultiStepProfileSetup({ onBack, onComplete }: MultiStepP
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="address">Address</Label>
+        <Label htmlFor="address">Home Address</Label>
         <Textarea
           id="address"
           value={profileData.address}
           onChange={(e) => handleInputChange('address', e.target.value)}
-          placeholder="Enter your address"
+          placeholder="Enter your home address"
           rows={3}
+        />
+      </div>
+
+      <div className="flex items-center justify-between p-4 rounded-xl bg-secondary/50">
+        <div className="flex items-center gap-3">
+          <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+            📍
+          </div>
+          <div>
+            <Label className="font-medium">Enable GPS Location</Label>
+            <p className="text-xs text-muted-foreground">Boosts your rep score for location-based surveys</p>
+          </div>
+        </div>
+        <Switch 
+          checked={profileData.gpsEnabled}
+          onCheckedChange={(checked) => handleInputChange('gpsEnabled', checked)}
         />
       </div>
     </div>
