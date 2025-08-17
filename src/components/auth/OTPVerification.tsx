@@ -114,7 +114,9 @@ export default function OTPVerification({ onBack }: OTPVerificationProps) {
           </CardTitle>
           <p className="text-muted-foreground">
             We've sent a 6-digit code to<br />
-            <span className="font-semibold text-foreground">{authState.user?.mobile}</span>
+            <span className="font-semibold text-foreground">
+              {authState.user?.countryCode} {authState.user?.mobile}
+            </span>
           </p>
         </CardHeader>
         <CardContent>

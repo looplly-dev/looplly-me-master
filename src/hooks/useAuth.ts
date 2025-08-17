@@ -83,7 +83,7 @@ export const useAuthLogic = () => {
               user,
               isAuthenticated: true,
               isLoading: false,
-              step: profile.profile_complete ? 'dashboard' : 'profile-setup'
+              step: profile.profile_complete ? 'dashboard' : 'otp-verification'
             });
           } else {
             console.log('No profile found, user needs to complete setup');
@@ -165,8 +165,12 @@ export const useAuthLogic = () => {
 
   const verifyOTP = async (code: string): Promise<boolean> => {
     console.log('Verifying OTP:', code);
-    // For demo purposes, auto-verify
-    return true;
+    // For demo purposes, accept any 6-digit code
+    if (code === '123456' || code.length === 6) {
+      setAuthState(prev => ({ ...prev, step: 'profile-setup' }));
+      return true;
+    }
+    return false;
   };
 
   const completeProfile = async (profile: any): Promise<boolean> => {
@@ -187,7 +191,9 @@ export const useAuthLogic = () => {
         return false;
       }
       
-      console.log('Profile completion successful');
+      // After profile completion, redirect to earn page (dashboard)
+      setAuthState(prev => ({ ...prev, step: 'dashboard' }));
+      console.log('Profile completion successful, redirecting to dashboard');
       return true;
     } catch (error) {
       console.error('Profile completion error:', error);
