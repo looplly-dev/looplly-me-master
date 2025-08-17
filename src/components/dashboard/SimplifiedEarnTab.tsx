@@ -83,6 +83,16 @@ export default function SimplifiedEarnTab() {
     });
   };
 
+  const handleDataOptOut = (type: 'shopping' | 'appUsage') => {
+    setDataOptIns(prev => ({ ...prev, [type]: false }));
+    
+    const earnings = type === 'shopping' ? 0.10 : 0.08;
+    toast({
+      title: 'Opted Out',
+      description: `You've stopped earning $${earnings.toFixed(2)}/month from ${type === 'shopping' ? 'shopping behavior' : 'app usage'} data sharing.`,
+    });
+  };
+
   // Get available tasks (simplified view)
   const availableTasks = activities.filter(a => a.status === 'available');
   const completedTasks = activities.filter(a => a.status === 'completed');
@@ -91,7 +101,8 @@ export default function SimplifiedEarnTab() {
   const surveyCount = availableTasks.filter(a => a.activity_type === 'survey').length;
   const videoCount = availableTasks.filter(a => a.activity_type === 'video').length;
   const taskCount = availableTasks.filter(a => a.activity_type === 'task').length;
-  const dataCount = 2; // Data sharing is always available (2 options)
+  // Only show data dot if there are items to opt into
+  const dataCount = (!dataOptIns.shopping || !dataOptIns.appUsage) ? 1 : 0;
 
   return (
     <div className="p-4 pb-20 space-y-6">
@@ -436,9 +447,14 @@ export default function SimplifiedEarnTab() {
                       <div className="text-right">
                         <p className="text-sm font-semibold text-success">$0.10/month</p>
                         {dataOptIns.shopping ? (
-                          <Badge variant="outline" className="text-success border-success text-xs">
-                            Active
-                          </Badge>
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            className="text-xs h-6 px-3 text-muted-foreground border-muted-foreground/30 hover:bg-muted/50"
+                            onClick={() => handleDataOptOut('shopping')}
+                          >
+                            Opt-out
+                          </Button>
                         ) : (
                           <Button 
                             size="sm" 
@@ -460,9 +476,14 @@ export default function SimplifiedEarnTab() {
                       <div className="text-right">
                         <p className="text-sm font-semibold text-success">$0.08/month</p>
                         {dataOptIns.appUsage ? (
-                          <Badge variant="outline" className="text-success border-success text-xs">
-                            Active
-                          </Badge>
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            className="text-xs h-6 px-3 text-muted-foreground border-muted-foreground/30 hover:bg-muted/50"
+                            onClick={() => handleDataOptOut('appUsage')}
+                          >
+                            Opt-out
+                          </Button>
                         ) : (
                           <Button 
                             size="sm" 
