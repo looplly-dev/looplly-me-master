@@ -33,6 +33,8 @@ export default function Register({ onBack, onSuccess }: RegisterProps) {
       password: '',
       confirmPassword: '',
       email: '',
+      firstName: '',
+      lastName: '',
       acceptTerms: false
     },
     validateFn: validateRegistration
@@ -106,6 +108,33 @@ export default function Register({ onBack, onSuccess }: RegisterProps) {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="firstName">First Name *</Label>
+                <Input
+                  id="firstName"
+                  type="text"
+                  placeholder="First name"
+                  value={formData.firstName || ''}
+                  onChange={(e) => updateField('firstName', e.target.value)}
+                  className="h-12"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="lastName">Last Name *</Label>
+                <Input
+                  id="lastName"
+                  type="text"
+                  placeholder="Last name"
+                  value={formData.lastName || ''}
+                  onChange={(e) => updateField('lastName', e.target.value)}
+                  className="h-12"
+                  required
+                />
+              </div>
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="country-mobile">Mobile Number *</Label>
               <div className="flex gap-2">

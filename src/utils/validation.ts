@@ -10,6 +10,8 @@ export interface RegistrationData {
   password: string;
   confirmPassword: string;
   email?: string;
+  firstName?: string;
+  lastName?: string;
   acceptTerms: boolean;
 }
 
@@ -26,6 +28,14 @@ export interface ProfileData {
 
 export const validateRegistration = (data: RegistrationData): ValidationResult => {
   const errors: string[] = [];
+
+  if (!data.firstName?.trim()) {
+    errors.push('First name is required');
+  }
+
+  if (!data.lastName?.trim()) {
+    errors.push('Last name is required');
+  }
 
   if (!data.mobile.trim()) {
     errors.push('Mobile number is required');

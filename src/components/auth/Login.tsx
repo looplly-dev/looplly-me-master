@@ -3,9 +3,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { Eye, EyeOff } from 'lucide-react';
+import { countries } from '@/data/countries';
+import { getCountryByDialCode, getDefaultCountry, formatCountryDisplay, formatCountryOption } from '@/utils/countries';
 
 interface LoginProps {
   onForgotPassword: () => void;
@@ -13,7 +16,10 @@ interface LoginProps {
 }
 
 export default function Login({ onForgotPassword, onRegister }: LoginProps) {
+  const defaultCountry = getDefaultCountry();
+  
   const [formData, setFormData] = useState({
+    countryCode: defaultCountry.dialCode,
     mobile: '',
     password: ''
   });
@@ -56,6 +62,8 @@ export default function Login({ onForgotPassword, onRegister }: LoginProps) {
     }
   };
 
+  const selectedCountry = getCountryByDialCode(formData.countryCode);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5 flex items-center justify-center p-4">
       <Card className="w-full max-w-md shadow-2xl border-0 bg-card/95 backdrop-blur-sm">
@@ -71,16 +79,37 @@ export default function Login({ onForgotPassword, onRegister }: LoginProps) {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="mobile">Mobile Number</Label>
-              <Input
-                id="mobile"
-                type="tel"
-                placeholder="Enter your mobile number"
-                value={formData.mobile}
-                onChange={(e) => setFormData({...formData, mobile: e.target.value})}
-                className="h-12"
-                required
-              />
+              <Label htmlFor="country-mobile">Mobile Number</Label>
+              <div className="flex gap-2">
+                <Select 
+                  value={formData.countryCode} 
+                  onValueChange={(value) => setFormData({...formData, countryCode: value})}
+                >
+                  <SelectTrigger className="w-24 h-12">
+                     <SelectValue>
+                       {selectedCountry ? formatCountryDisplay(selectedCountry) : '🇿🇦 +27'}
+                     </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent className="max-h-60">
+                     {countries.map((country) => (
+                       <SelectItem key={country.code} value={country.dialCode}>
+                         <span className="flex items-center gap-2">
+                           {formatCountryOption(country)}
+                         </span>
+                       </SelectItem>
+                     ))}
+                  </SelectContent>
+                </Select>
+                <Input
+                  id="mobile"
+                  type="tel"
+                  placeholder="Mobile number"
+                  value={formData.mobile}
+                  onChange={(e) => setFormData({...formData, mobile: e.target.value})}
+                  className="flex-1 h-12"
+                  required
+                />
+              </div>
             </div>
 
             <div className="space-y-2">
