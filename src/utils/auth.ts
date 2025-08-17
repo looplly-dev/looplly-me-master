@@ -31,7 +31,7 @@ export const registerUser = async (params: RegistrationParams): Promise<{ succes
         data: {
           first_name: params.firstName || '',
           last_name: params.lastName || '',
-          mobile: params.mobile,
+          mobile: `${params.countryCode}${params.mobile}`,
           country_code: params.countryCode
         }
       }
