@@ -182,24 +182,8 @@ export const useAuthLogic = () => {
         return false;
       }
 
-      // Calculate age from date of birth
-      const today = new Date();
-      const birthDate = new Date(profile.dateOfBirth);
-      let age = today.getFullYear() - birthDate.getFullYear();
-      const monthDiff = today.getMonth() - birthDate.getMonth();
-      
-      // Adjust age if birthday hasn't occurred this year
-      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-        age--;
-      }
-      
-      console.log('Calculated age:', age, 'for birth date:', profile.dateOfBirth);
-      
-      // Check age restriction
-      if (age < 16) {
-        console.log('User is under 16, rejecting profile completion');
-        return false;
-      }
+      // Age validation removed for now
+      console.log('Skipping age validation, proceeding with profile completion');
 
       const { error } = await supabase
         .from('profiles')
