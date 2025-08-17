@@ -6,6 +6,9 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { countries } from '@/data/countries';
+import { getCountryByDialCode, getDefaultCountry, formatCountryDisplay, formatCountryOption } from '@/utils/countries';
+import { useFormValidation } from '@/hooks/useFormValidation';
+import { validateRegistration, RegistrationData } from '@/utils/validation';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
@@ -16,14 +19,25 @@ interface RegisterProps {
 }
 
 export default function Register({ onBack, onSuccess }: RegisterProps) {
-  const [formData, setFormData] = useState({
-    countryCode: '+27', // Default to South Africa
-    mobile: '',
-    password: '',
-    confirmPassword: '',
-    email: '',
-    acceptTerms: false
+  const defaultCountry = getDefaultCountry();
+  
+  const {
+    formData,
+    errors,
+    updateField,
+    validate
+  } = useFormValidation<RegistrationData>({
+    initialData: {
+      countryCode: defaultCountry.dialCode,
+      mobile: '',
+      password: '',
+      confirmPassword: '',
+      email: '',
+      acceptTerms: false
+    },
+    validateFn: validateRegistration
   });
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -33,28 +47,11 @@ export default function Register({ onBack, onSuccess }: RegisterProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.mobile || !formData.password || !formData.confirmPassword) {
+    const validation = validate();
+    if (!validation.isValid) {
       toast({
-        title: 'Error',
-        description: 'Please fill in all required fields',
-        variant: 'destructive'
-      });
-      return;
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      toast({
-        title: 'Error',
-        description: 'Passwords do not match',
-        variant: 'destructive'
-      });
-      return;
-    }
-
-    if (!formData.acceptTerms) {
-      toast({
-        title: 'Error',
-        description: 'Please accept the terms and privacy policy',
+        title: 'Validation Error',
+        description: validation.errors.join(', '),
         variant: 'destructive'
       });
       return;
@@ -88,7 +85,7 @@ export default function Register({ onBack, onSuccess }: RegisterProps) {
     }
   };
 
-  const selectedCountry = countries.find(c => c.dialCode === formData.countryCode);
+  const selectedCountry = getCountryByDialCode(formData.countryCode);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5 flex items-center justify-center p-4">
@@ -114,21 +111,21 @@ export default function Register({ onBack, onSuccess }: RegisterProps) {
               <div className="flex gap-2">
                 <Select 
                   value={formData.countryCode} 
-                  onValueChange={(value) => setFormData({...formData, countryCode: value})}
+                  onValueChange={(value) => updateField('countryCode', value)}
                 >
                   <SelectTrigger className="w-24 h-12">
                      <SelectValue>
-                       {selectedCountry ? `${selectedCountry.flag} ${selectedCountry.dialCode}` : '🇿🇦 +27'}
+                       {selectedCountry ? formatCountryDisplay(selectedCountry) : '🇿🇦 +27'}
                      </SelectValue>
                   </SelectTrigger>
                   <SelectContent className="max-h-60">
-                    {countries.map((country) => (
-                      <SelectItem key={country.code} value={country.dialCode}>
-                        <span className="flex items-center gap-2">
-                          {country.flag} {country.dialCode} {country.name}
-                        </span>
-                      </SelectItem>
-                    ))}
+                     {countries.map((country) => (
+                       <SelectItem key={country.code} value={country.dialCode}>
+                         <span className="flex items-center gap-2">
+                           {formatCountryOption(country)}
+                         </span>
+                       </SelectItem>
+                     ))}
                   </SelectContent>
                 </Select>
                 <Input
@@ -136,7 +133,7 @@ export default function Register({ onBack, onSuccess }: RegisterProps) {
                   type="tel"
                   placeholder="Mobile number"
                   value={formData.mobile}
-                  onChange={(e) => setFormData({...formData, mobile: e.target.value})}
+                  onChange={(e) => updateField('mobile', e.target.value)}
                   className="flex-1 h-12"
                   required
                 />
@@ -151,7 +148,7 @@ export default function Register({ onBack, onSuccess }: RegisterProps) {
                   type={showPassword ? 'text' : 'password'}
                   placeholder="Enter password"
                   value={formData.password}
-                  onChange={(e) => setFormData({...formData, password: e.target.value})}
+                  onChange={(e) => updateField('password', e.target.value)}
                   className="h-12 pr-10"
                   required
                 />
@@ -175,7 +172,7 @@ export default function Register({ onBack, onSuccess }: RegisterProps) {
                   type={showConfirmPassword ? 'text' : 'password'}
                   placeholder="Confirm password"
                   value={formData.confirmPassword}
-                  onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
+                  onChange={(e) => updateField('confirmPassword', e.target.value)}
                   className="h-12 pr-10"
                   required
                 />
@@ -198,7 +195,7 @@ export default function Register({ onBack, onSuccess }: RegisterProps) {
                 type="email"
                 placeholder="Email address"
                 value={formData.email}
-                onChange={(e) => setFormData({...formData, email: e.target.value})}
+                onChange={(e) => updateField('email', e.target.value)}
                 className="h-12"
               />
             </div>
@@ -207,7 +204,7 @@ export default function Register({ onBack, onSuccess }: RegisterProps) {
               <Checkbox
                 id="terms"
                 checked={formData.acceptTerms}
-                onCheckedChange={(checked) => setFormData({...formData, acceptTerms: checked as boolean})}
+                onCheckedChange={(checked) => updateField('acceptTerms', checked as boolean)}
               />
               <Label
                 htmlFor="terms"

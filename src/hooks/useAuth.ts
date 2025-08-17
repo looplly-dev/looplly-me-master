@@ -2,6 +2,8 @@ import { useState, useEffect, createContext, useContext } from 'react';
 import { User as SupabaseUser, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { User, AuthState } from '@/types/auth';
+import { registerUser, loginUser, logoutUser, resetUserPassword } from '@/utils/auth';
+import { updateUserProfile, fetchUserProfile } from '@/utils/profile';
 
 const AuthContext = createContext<{
   authState: AuthState;
@@ -120,24 +122,20 @@ export const useAuthLogic = () => {
   const register = async (data: any): Promise<boolean> => {
     try {
       console.log('Registering user with data:', data);
-      const { error } = await supabase.auth.signUp({
-        email: data.email || `${data.mobile}@temp.com`,
+      const result = await registerUser({
+        mobile: data.mobile,
+        countryCode: data.countryCode,
         password: data.password,
-        phone: `${data.countryCode}${data.mobile}`,
-        options: {
-          data: {
-            first_name: data.firstName || '',
-            last_name: data.lastName || '',
-            mobile: data.mobile,
-            country_code: data.countryCode
-          }
-        }
+        email: data.email,
+        firstName: data.firstName,
+        lastName: data.lastName
       });
 
-      if (error) {
-        console.error('Registration error:', error);
-        throw error;
+      if (!result.success) {
+        console.error('Registration error:', result.error);
+        throw result.error;
       }
+      
       console.log('Registration successful');
       return true;
     } catch (error) {
@@ -149,17 +147,13 @@ export const useAuthLogic = () => {
   const login = async (mobile: string, password: string): Promise<boolean> => {
     try {
       console.log('Logging in user with mobile:', mobile);
-      // For now, use email-based login since mobile auth requires additional setup
-      const email = `${mobile}@temp.com`;
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
+      const result = await loginUser({ mobile, password });
 
-      if (error) {
-        console.error('Login error:', error);
-        throw error;
+      if (!result.success) {
+        console.error('Login error:', result.error);
+        throw result.error;
       }
+      
       console.log('Login successful');
       return true;
     } catch (error) {
@@ -182,28 +176,16 @@ export const useAuthLogic = () => {
         return false;
       }
 
-      // Age validation removed for now
+      // Age validation removed
       console.log('Skipping age validation, proceeding with profile completion');
 
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          first_name: profile.firstName,
-          last_name: profile.lastName,
-          gender: profile.gender,
-          date_of_birth: profile.dateOfBirth,
-          address: profile.address,
-          household_income: profile.householdIncome,
-          ethnicity: profile.ethnicity,
-          sec: profile.sec,
-          profile_complete: true
-        })
-        .eq('user_id', session.user.id);
-
-      if (error) {
-        console.error('Profile completion error:', error);
-        throw error;
+      const success = await updateUserProfile(session.user.id, profile);
+      
+      if (!success) {
+        console.error('Profile completion failed');
+        return false;
       }
+      
       console.log('Profile completion successful');
       return true;
     } catch (error) {
@@ -244,18 +226,19 @@ export const useAuthLogic = () => {
 
   const logout = async () => {
     console.log('Logging out user');
-    await supabase.auth.signOut();
+    await logoutUser();
   };
 
   const forgotPassword = async (mobile: string): Promise<boolean> => {
     try {
       console.log('Initiating forgot password for mobile:', mobile);
-      const email = `${mobile}@temp.com`;
-      const { error } = await supabase.auth.resetPasswordForEmail(email);
-      if (error) {
-        console.error('Forgot password error:', error);
-        throw error;
+      const result = await resetUserPassword(mobile);
+      
+      if (!result.success) {
+        console.error('Forgot password error:', result.error);
+        throw result.error;
       }
+      
       console.log('Password reset email sent');
       return true;
     } catch (error) {
