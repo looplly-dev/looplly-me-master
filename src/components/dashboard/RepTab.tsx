@@ -39,7 +39,7 @@ export default function RepTab() {
 
   const badges = [
     { name: 'OTP Verified', icon: Shield, color: 'text-success', earned: authState.user?.isVerified || false, points: '+15' },
-    { name: 'GPS Enabled', icon: MapPin, color: 'text-primary', earned: true, points: '+10' },
+    { name: 'GPS Enabled', icon: MapPin, color: 'text-primary', earned: authState.user?.profile?.gpsEnabled || false, points: '+10' },
     { name: '5-day Streak', icon: Flame, color: 'text-warning', earned: true, points: '+25' },
     { name: 'First Survey', icon: Target, color: 'text-accent', earned: true, points: '+20' },
     { name: 'KYC Verified', icon: CheckCircle, color: 'text-success', earned: false, points: '+30' },
