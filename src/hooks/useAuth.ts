@@ -133,6 +133,7 @@ export const useAuthLogic = () => {
 
       if (!result.success) {
         console.error('Registration error:', result.error);
+        // Re-throw the error with proper structure for the component to handle
         throw result.error;
       }
       

@@ -76,10 +76,17 @@ export default function Register({ onBack, onSuccess }: RegisterProps) {
           variant: 'destructive'
         });
       }
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Registration catch block error:', error);
+      let errorMessage = 'Something went wrong. Please try again.';
+      
+      if (error?.code === 'user_already_exists' || error?.message?.includes('User already registered')) {
+        errorMessage = 'An account with this email already exists. Please try logging in instead.';
+      }
+      
       toast({
         title: 'Error',
-        description: 'Something went wrong. Please try again.',
+        description: errorMessage,
         variant: 'destructive'
       });
     } finally {
