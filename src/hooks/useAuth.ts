@@ -185,7 +185,15 @@ export const useAuthLogic = () => {
       // Calculate age from date of birth
       const today = new Date();
       const birthDate = new Date(profile.dateOfBirth);
-      const age = today.getFullYear() - birthDate.getFullYear();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+      
+      // Adjust age if birthday hasn't occurred this year
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+      
+      console.log('Calculated age:', age, 'for birth date:', profile.dateOfBirth);
       
       // Check age restriction
       if (age < 16) {
