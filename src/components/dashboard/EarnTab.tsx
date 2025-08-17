@@ -38,9 +38,21 @@ export default function EarnTab() {
     if (checkInDone) return;
     
     setCheckInDone(true);
+    
+    // Add check-in transaction
+    addTransaction({
+      type: 'bonus',
+      amount: 0.50,
+      currency: 'USD',
+      description: 'Daily check-in bonus',
+      source: 'daily_checkin',
+      status: 'completed',
+      metadata: { streak: 1 }
+    });
+
     toast({
       title: 'Daily Bonus!',
-      description: `You earned $0.50! Streak: ${userStats.checkInStreak + 1} days`,
+      description: `You earned $0.50! Keep your streak going!`,
     });
   };
 
@@ -107,7 +119,7 @@ export default function EarnTab() {
               <div>
                 <h3 className="font-semibold">Daily Check-in</h3>
                 <p className="text-sm text-muted-foreground">
-                  Streak: {userStats.checkInStreak} days
+                  Daily streak: 1 day
                 </p>
               </div>
             </div>
@@ -143,149 +155,174 @@ export default function EarnTab() {
         </TabsList>
 
         <TabsContent value="surveys" className="space-y-4 mt-4">
-          {mockSurveys.map((survey) => (
-            <Card key={survey.id} className="border-l-4 border-l-primary/50">
-              <CardContent className="p-4">
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <FileText className="h-4 w-4 text-primary" />
-                      <h3 className="font-semibold text-sm">{survey.title}</h3>
-                    </div>
-                    <p className="text-xs text-muted-foreground mb-2">
-                      {survey.description}
-                    </p>
-                    <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                      <span className="flex items-center gap-1">
-                        <Clock className="h-3 w-3" />
-                        {survey.estimatedMinutes} min
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Coins className="h-3 w-3" />
-                        ${survey.reward.toFixed(2)}
-                      </span>
-                      {survey.rating && (
-                        <span className="flex items-center gap-1">
-                          <Star className="h-3 w-3 fill-warning text-warning" />
-                          {survey.rating.average.toFixed(1)} ({survey.rating.count})
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  <div className="flex flex-col items-end gap-2">
-                    {getStatusBadge(survey.status)}
-                    {survey.status === 'available' && (
-                      <Button
-                        size="sm"
-                        onClick={() => handleStartTask('survey', survey.title, survey.reward)}
-                        className="text-xs h-8"
-                      >
-                        Start
-                      </Button>
-                    )}
-                    {survey.status === 'ineligible' && (
-                      <p className="text-xs text-muted-foreground text-right">
-                        Profile mismatch
-                      </p>
-                    )}
-                  </div>
-                </div>
+          {activities.filter(a => a.activity_type === 'survey').length === 0 ? (
+            <Card className="border-primary/50 bg-primary/5">
+              <CardContent className="p-6 text-center">
+                <FileText className="h-12 w-12 mx-auto mb-4 text-primary/50" />
+                <h3 className="font-semibold mb-2">No Surveys Available</h3>
+                <p className="text-sm text-muted-foreground">
+                  Check back later for new survey opportunities!
+                </p>
               </CardContent>
             </Card>
-          ))}
-        </TabsContent>
-
-        <TabsContent value="videos" className="space-y-4 mt-4">
-          {mockVideos.map((video) => (
-            <Card key={video.id} className="border-l-4 border-l-accent/50">
-              <CardContent className="p-4">
-                <div className="flex items-start gap-3">
-                  <div className="text-2xl">{video.thumbnail}</div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Play className="h-4 w-4 text-accent" />
-                      <h3 className="font-semibold text-sm">{video.title}</h3>
-                    </div>
-                    <p className="text-xs text-muted-foreground mb-2">
-                      {video.description}
-                    </p>
-                    <div className="flex items-center justify-between">
+          ) : (
+            activities.filter(a => a.activity_type === 'survey').map((activity) => (
+              <Card key={activity.id} className="border-l-4 border-l-primary/50">
+                <CardContent className="p-4">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <FileText className="h-4 w-4 text-primary" />
+                        <h3 className="font-semibold text-sm">{activity.title}</h3>
+                      </div>
+                      <p className="text-xs text-muted-foreground mb-2">
+                        {activity.description}
+                      </p>
                       <div className="flex items-center gap-4 text-xs text-muted-foreground">
                         <span className="flex items-center gap-1">
                           <Clock className="h-3 w-3" />
-                          {video.estimatedMinutes} min
+                          {activity.time_estimate || 5} min
                         </span>
                         <span className="flex items-center gap-1">
                           <Coins className="h-3 w-3" />
-                          ${video.reward.toFixed(2)}
+                          ${activity.reward_amount.toFixed(2)}
                         </span>
                       </div>
-                      {video.status === 'available' ? (
+                    </div>
+                    <div className="flex flex-col items-end gap-2">
+                      {getStatusBadge(activity.status)}
+                      {activity.status === 'available' && (
+                        <Button
+                          size="sm"
+                          onClick={() => handleStartTask('survey', activity.title, activity.reward_amount)}
+                          className="text-xs h-8"
+                        >
+                          Start
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          )}
+        </TabsContent>
+
+        <TabsContent value="videos" className="space-y-4 mt-4">
+          {activities.filter(a => a.activity_type === 'video').length === 0 ? (
+            <Card className="border-accent/50 bg-accent/5">
+              <CardContent className="p-6 text-center">
+                <Play className="h-12 w-12 mx-auto mb-4 text-accent/50" />
+                <h3 className="font-semibold mb-2">No Videos Available</h3>
+                <p className="text-sm text-muted-foreground">
+                  Video opportunities will appear here when available!
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            activities.filter(a => a.activity_type === 'video').map((activity) => (
+              <Card key={activity.id} className="border-l-4 border-l-accent/50">
+                <CardContent className="p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="text-2xl">🎥</div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <Play className="h-4 w-4 text-accent" />
+                        <h3 className="font-semibold text-sm">{activity.title}</h3>
+                      </div>
+                      <p className="text-xs text-muted-foreground mb-2">
+                        {activity.description}
+                      </p>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                          <span className="flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            {activity.time_estimate || 2} min
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Coins className="h-3 w-3" />
+                            ${activity.reward_amount.toFixed(2)}
+                          </span>
+                        </div>
+                        {activity.status === 'available' ? (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleStartTask('video', activity.title, activity.reward_amount)}
+                            className="text-xs h-8"
+                          >
+                            Watch
+                          </Button>
+                        ) : (
+                          <Badge variant="outline" className="text-success border-success">
+                            Watched
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          )}
+        </TabsContent>
+
+        <TabsContent value="tasks" className="space-y-4 mt-4">
+          {activities.filter(a => a.activity_type === 'task').length === 0 ? (
+            <Card className="border-warning/50 bg-warning/5">
+              <CardContent className="p-6 text-center">
+                <Zap className="h-12 w-12 mx-auto mb-4 text-warning/50" />
+                <h3 className="font-semibold mb-2">No Tasks Available</h3>
+                <p className="text-sm text-muted-foreground">
+                  Micro-tasks will be posted here when available!
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            activities.filter(a => a.activity_type === 'task').map((activity) => (
+              <Card key={activity.id} className="border-l-4 border-l-warning/50">
+                <CardContent className="p-4">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <Zap className="h-4 w-4 text-warning" />
+                        <h3 className="font-semibold text-sm">{activity.title}</h3>
+                      </div>
+                      <p className="text-xs text-muted-foreground mb-2">
+                        {activity.description}
+                      </p>
+                      <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                        <span className="flex items-center gap-1">
+                          <Clock className="h-3 w-3" />
+                          {activity.time_estimate || 1} min
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Coins className="h-3 w-3" />
+                          ${activity.reward_amount.toFixed(2)}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-end gap-2">
+                      {activity.status === 'available' ? (
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => handleStartTask('video', video.title, video.reward)}
+                          onClick={() => handleStartTask('task', activity.title, activity.reward_amount)}
                           className="text-xs h-8"
                         >
-                          Watch
+                          Start
                         </Button>
                       ) : (
                         <Badge variant="outline" className="text-success border-success">
-                          Watched
+                          Done
                         </Badge>
                       )}
                     </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </TabsContent>
-
-        <TabsContent value="tasks" className="space-y-4 mt-4">
-          {mockMicroTasks.map((task) => (
-            <Card key={task.id} className="border-l-4 border-l-warning/50">
-              <CardContent className="p-4">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Zap className="h-4 w-4 text-warning" />
-                      <h3 className="font-semibold text-sm">{task.title}</h3>
-                    </div>
-                    <p className="text-xs text-muted-foreground mb-2">
-                      {task.description}
-                    </p>
-                    <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                      <span className="flex items-center gap-1">
-                        <Clock className="h-3 w-3" />
-                        {task.estimatedMinutes} min
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Coins className="h-3 w-3" />
-                        ${task.reward.toFixed(2)}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex flex-col items-end gap-2">
-                    {task.status === 'available' ? (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleStartTask('task', task.title, task.reward)}
-                        className="text-xs h-8"
-                      >
-                        Start
-                      </Button>
-                    ) : (
-                      <Badge variant="outline" className="text-success border-success">
-                        Done
-                      </Badge>
-                    )}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                </CardContent>
+              </Card>
+            ))
+          )}
         </TabsContent>
 
         <TabsContent value="data" className="space-y-4 mt-4">
