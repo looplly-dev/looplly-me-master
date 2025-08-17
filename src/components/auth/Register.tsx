@@ -17,7 +17,7 @@ interface RegisterProps {
 
 export default function Register({ onBack, onSuccess }: RegisterProps) {
   const [formData, setFormData] = useState({
-    countryCode: '+1',
+    countryCode: '+27', // Default to South Africa
     mobile: '',
     password: '',
     confirmPassword: '',
@@ -117,9 +117,9 @@ export default function Register({ onBack, onSuccess }: RegisterProps) {
                   onValueChange={(value) => setFormData({...formData, countryCode: value})}
                 >
                   <SelectTrigger className="w-24 h-12">
-                    <SelectValue>
-                      {selectedCountry ? `${selectedCountry.flag} ${selectedCountry.dialCode}` : '+1'}
-                    </SelectValue>
+                     <SelectValue>
+                       {selectedCountry ? `${selectedCountry.flag} ${selectedCountry.dialCode}` : '🇿🇦 +27'}
+                     </SelectValue>
                   </SelectTrigger>
                   <SelectContent className="max-h-60">
                     {countries.map((country) => (
