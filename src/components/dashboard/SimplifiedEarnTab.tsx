@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -26,6 +26,8 @@ import {
 import { useBalance } from '@/hooks/useBalance';
 import { useEarningActivities } from '@/hooks/useEarningActivities';
 import { useTransactions } from '@/hooks/useTransactions';
+import { useAuth } from '@/hooks/useAuth';
+import { addMissingDemoActivities } from '@/utils/addMissingDemoActivities';
 
 export default function SimplifiedEarnTab() {
   const [checkInDone, setCheckInDone] = useState(false);
@@ -35,8 +37,24 @@ export default function SimplifiedEarnTab() {
   });
   const { toast } = useToast();
   const { balance } = useBalance();
-  const { activities, addActivity } = useEarningActivities();
+  const { activities, addActivity, refetch } = useEarningActivities();
   const { addTransaction } = useTransactions();
+  const { authState } = useAuth();
+
+  // Add missing demo activities for existing users
+  useEffect(() => {
+    const checkAndAddMissingActivities = async () => {
+      if (authState.user?.id) {
+        await addMissingDemoActivities(authState.user.id);
+        // Refresh activities to show the new one
+        refetch();
+      }
+    };
+
+    if (authState.user?.id) {
+      checkAndAddMissingActivities();
+    }
+  }, [authState.user?.id, refetch]);
 
   // Progress to next goal (simplified for basic users)
   const nextGoal = 5.00; // First withdrawal goal
