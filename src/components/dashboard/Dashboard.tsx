@@ -14,6 +14,7 @@ import SupportTab from './SupportTab';
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState('earn');
   const [showSettings, setShowSettings] = useState(false);
+  const [showSupport, setShowSupport] = useState(false);
   const { authState, logout } = useAuth();
 
   const handleLogout = () => {
@@ -24,9 +25,44 @@ export default function Dashboard() {
     setShowSettings(true);
   };
 
+  const handleSupportClick = () => {
+    setShowSupport(true);
+  };
+
   const handleBackFromSettings = () => {
     setShowSettings(false);
   };
+
+  const handleBackFromSupport = () => {
+    setShowSupport(false);
+  };
+
+  // Show support page
+  if (showSupport) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5">
+        <div className="bg-card/95 backdrop-blur-sm border-b sticky top-0 z-40">
+          <div className="max-w-md mx-auto px-4 py-4 flex items-center justify-between">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleBackFromSupport}
+              className="text-muted-foreground hover:text-primary"
+            >
+              ← Back
+            </Button>
+            <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              Support
+            </h1>
+            <div className="w-8" /> {/* Spacer */}
+          </div>
+        </div>
+        <div className="max-w-md mx-auto">
+          <SupportTab />
+        </div>
+      </div>
+    );
+  }
 
   // Show settings page
   if (showSettings) {
@@ -72,6 +108,14 @@ export default function Dashboard() {
             <Button
               variant="ghost"
               size="sm"
+              onClick={handleSupportClick}
+              className="text-muted-foreground hover:text-primary"
+            >
+              <HelpCircle className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={handleSettingsClick}
               className="text-muted-foreground hover:text-primary"
             >
@@ -107,14 +151,11 @@ export default function Dashboard() {
           <TabsContent value="rep" className="mt-0">
             <RepTab />
           </TabsContent>
-          <TabsContent value="support" className="mt-0">
-            <SupportTab />
-          </TabsContent>
 
           {/* Bottom Navigation */}
           <div className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-sm border-t">
             <div className="max-w-md mx-auto">
-              <TabsList className="grid w-full grid-cols-6 h-16 bg-transparent">
+              <TabsList className="grid w-full grid-cols-5 h-16 bg-transparent">
                 <TabsTrigger 
                   value="earn" 
                   className="flex-col gap-1 h-full data-[state=active]:bg-primary/10 data-[state=active]:text-primary"
@@ -149,13 +190,6 @@ export default function Dashboard() {
                 >
                   <Trophy className="h-4 w-4" />
                   <span className="text-xs">Rep</span>
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="support" 
-                  className="flex-col gap-1 h-full data-[state=active]:bg-primary/10 data-[state=active]:text-primary"
-                >
-                  <HelpCircle className="h-4 w-4" />
-                  <span className="text-xs">Support</span>
                 </TabsTrigger>
               </TabsList>
             </div>
