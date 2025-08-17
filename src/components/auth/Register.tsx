@@ -218,7 +218,7 @@ export default function Register({ onBack, onSuccess }: RegisterProps) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email">Email (Optional)</Label>
+              <Label htmlFor="email">Email *</Label>
               <Input
                 id="email"
                 type="email"
@@ -226,6 +226,7 @@ export default function Register({ onBack, onSuccess }: RegisterProps) {
                 value={formData.email}
                 onChange={(e) => updateField('email', e.target.value)}
                 className="h-12"
+                required
               />
             </div>
 

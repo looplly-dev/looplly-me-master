@@ -9,7 +9,7 @@ export interface RegistrationData {
   mobile: string;
   password: string;
   confirmPassword: string;
-  email?: string;
+  email: string;
   firstName?: string;
   lastName?: string;
   acceptTerms: boolean;
@@ -57,7 +57,9 @@ export const validateRegistration = (data: RegistrationData): ValidationResult =
     errors.push('Please accept the terms and privacy policy');
   }
 
-  if (data.email && data.email.trim() && !isValidEmail(data.email)) {
+  if (!data.email?.trim()) {
+    errors.push('Email is required');
+  } else if (!isValidEmail(data.email)) {
     errors.push('Please enter a valid email address');
   }
 
