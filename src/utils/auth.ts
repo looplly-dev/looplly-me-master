@@ -17,25 +17,22 @@ export interface LoginParams {
 
 export const registerUser = async (params: RegistrationParams): Promise<{ success: boolean; error?: any }> => {
   try {
-    console.log('Registering user with data:', params);
+    console.log('Registering user with phone:', params);
     
     // Format mobile number consistently 
     const fullMobile = `${params.countryCode}${params.mobile}`;
     
-    // Use email if provided, otherwise use temporary email with emailRedirectTo
-    const email = params.email || `${params.mobile}@temp.com`;
-    
+    // Use phone-based auth instead of email
     const { error } = await supabase.auth.signUp({
-      email,
+      phone: fullMobile,
       password: params.password,
-      phone: fullMobile, // Set the phone field in Supabase auth
       options: {
-        emailRedirectTo: `${window.location.origin}/`,
         data: {
           first_name: params.firstName || '',
           last_name: params.lastName || '',
           mobile: fullMobile,
-          country_code: params.countryCode
+          country_code: params.countryCode,
+          email: params.email || ''
         }
       }
     });
@@ -60,36 +57,9 @@ export const loginUser = async (params: LoginParams): Promise<{ success: boolean
     // Format the mobile number to match what's stored
     const fullMobile = params.mobile.startsWith('+') ? params.mobile : `+44${params.mobile}`;
     
-    // Try to find the user by phone number
-    const { data: userData, error: userError } = await supabase
-      .from('profiles')
-      .select('user_id')
-      .eq('mobile', fullMobile)
-      .maybeSingle();
-
-    if (userError) {
-      console.error('Error querying profiles:', userError);
-      return { success: false, error: { message: 'Invalid mobile number or password' } };
-    }
-
-    if (!userData) {
-      console.log('No profile found for mobile:', fullMobile);
-      return { success: false, error: { message: 'Invalid mobile number or password' } };
-    }
-
-    // Get the user's actual email from auth.users
-    const { data: authUser, error: authError } = await supabase
-      .rpc('get_user_email', { user_uuid: userData.user_id });
-
-    if (authError || !authUser) {
-      console.error('Could not find user email:', authError);
-      return { success: false, error: { message: 'Invalid mobile number or password' } };
-    }
-
-    console.log('Found user email:', authUser, 'for user_id:', userData.user_id);
-
+    // Use phone-based login instead of email lookup
     const { error } = await supabase.auth.signInWithPassword({
-      email: authUser,
+      phone: fullMobile,
       password: params.password
     });
 
