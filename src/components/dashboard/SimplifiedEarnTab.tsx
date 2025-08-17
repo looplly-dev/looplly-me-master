@@ -73,6 +73,12 @@ export default function SimplifiedEarnTab() {
   const availableTasks = activities.filter(a => a.status === 'available');
   const completedTasks = activities.filter(a => a.status === 'completed');
 
+  // Count available items per category for notification dots
+  const surveyCount = availableTasks.filter(a => a.activity_type === 'survey').length;
+  const videoCount = availableTasks.filter(a => a.activity_type === 'video').length;
+  const taskCount = availableTasks.filter(a => a.activity_type === 'task').length;
+  const dataCount = 2; // Data sharing is always available (2 options)
+
   return (
     <div className="p-4 pb-20 space-y-6">
       {/* Enhanced Balance Card with Progress */}
@@ -192,10 +198,30 @@ export default function SimplifiedEarnTab() {
           <CardContent>
             <Tabs defaultValue="surveys" className="w-full">
               <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="surveys" className="text-xs">Surveys</TabsTrigger>
-                <TabsTrigger value="videos" className="text-xs">Videos</TabsTrigger>
-                <TabsTrigger value="tasks" className="text-xs">Tasks</TabsTrigger>
-                <TabsTrigger value="data" className="text-xs">Data</TabsTrigger>
+                <TabsTrigger value="surveys" className="text-xs relative">
+                  Surveys
+                  {surveyCount > 0 && (
+                    <span className="absolute -top-1 -right-1 h-2 w-2 bg-primary rounded-full" />
+                  )}
+                </TabsTrigger>
+                <TabsTrigger value="videos" className="text-xs relative">
+                  Videos
+                  {videoCount > 0 && (
+                    <span className="absolute -top-1 -right-1 h-2 w-2 bg-accent rounded-full" />
+                  )}
+                </TabsTrigger>
+                <TabsTrigger value="tasks" className="text-xs relative">
+                  Tasks
+                  {taskCount > 0 && (
+                    <span className="absolute -top-1 -right-1 h-2 w-2 bg-warning rounded-full" />
+                  )}
+                </TabsTrigger>
+                <TabsTrigger value="data" className="text-xs relative">
+                  Data
+                  {dataCount > 0 && (
+                    <span className="absolute -top-1 -right-1 h-2 w-2 bg-success rounded-full" />
+                  )}
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="surveys" className="space-y-3 mt-4">
