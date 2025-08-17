@@ -25,23 +25,115 @@ export const useAuth = () => {
   return context;
 };
 
-// Real Supabase authentication functions
+// Mock authentication functions
 export const useAuthLogic = () => {
   const [authState, setAuthState] = useState<AuthState>({
     user: null,
     isAuthenticated: false,
-    isLoading: false, // Start with false to avoid spinning
+    isLoading: false,
     step: 'login'
   });
-  const [session, setSession] = useState<Session | null>(null);
 
   console.log('useAuthLogic - Current authState:', authState);
 
-  // Force clear session and reset auth state
-  const clearSession = async () => {
-    console.log('Clearing session and resetting auth state');
-    await supabase.auth.signOut();
-    setSession(null);
+  // Mock user data
+  const mockUser: User = {
+    id: 'mock-user-123',
+    mobile: '+447708997235',
+    countryCode: '+44',
+    email: 'nadia.gaspari1@outlook.com',
+    firstName: 'Nadia',
+    lastName: 'Gaspari',
+    isVerified: true,
+    profileComplete: true,
+    profile: {
+      sec: 'B' as const,
+      gender: 'female' as const,
+      dateOfBirth: new Date('1990-01-01'),
+      address: '123 Mock Street, London, UK',
+      gpsEnabled: true,
+      firstName: 'Nadia',
+      lastName: 'Gaspari',
+      email: 'nadia.gaspari1@outlook.com'
+    }
+  };
+
+  useEffect(() => {
+    // Auto-login with mock user after 1 second
+    const timer = setTimeout(() => {
+      setAuthState({
+        user: mockUser,
+        isAuthenticated: true,
+        isLoading: false,
+        step: 'dashboard'
+      });
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  const register = async (data: any): Promise<boolean> => {
+    console.log('Mock registration with data:', data);
+    // Simulate registration delay
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    setAuthState({
+      user: mockUser,
+      isAuthenticated: true,
+      isLoading: false,
+      step: 'dashboard'
+    });
+    return true;
+  };
+
+  const login = async (mobile: string, password: string): Promise<boolean> => {
+    console.log('Mock login with mobile:', mobile);
+    // Simulate login delay
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    setAuthState({
+      user: mockUser,
+      isAuthenticated: true,
+      isLoading: false,
+      step: 'dashboard'
+    });
+    return true;
+  };
+
+  const verifyOTP = async (code: string): Promise<boolean> => {
+    console.log('Mock OTP verification:', code);
+    // Accept any 6-digit code
+    if (code.length === 6) {
+      setAuthState(prev => ({ 
+        ...prev, 
+        user: prev.user ? { ...prev.user, isVerified: true } : mockUser,
+        step: 'dashboard' 
+      }));
+      return true;
+    }
+    return false;
+  };
+
+  const completeProfile = async (profile: any): Promise<boolean> => {
+    console.log('Mock profile completion:', profile);
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    setAuthState(prev => ({ 
+      ...prev, 
+      user: prev.user ? { ...prev.user, profileComplete: true, profile } : mockUser,
+      step: 'dashboard' 
+    }));
+    return true;
+  };
+
+  const updateCommunicationPreferences = async (preferences: any): Promise<boolean> => {
+    console.log('Mock communication preferences update:', preferences);
+    await new Promise(resolve => setTimeout(resolve, 500));
+    return true;
+  };
+
+  const logout = async () => {
+    console.log('Mock logout');
     setAuthState({
       user: null,
       isAuthenticated: false,
@@ -50,240 +142,15 @@ export const useAuthLogic = () => {
     });
   };
 
-  useEffect(() => {
-    // Clear any existing problematic session on mount
-    clearSession();
-  }, []);
-
-  useEffect(() => {
-    console.log('useAuthLogic - Setting up auth listener');
-    // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log('Auth state change event:', event, 'Session:', !!session);
-        setSession(session);
-        
-        if (session?.user && event === 'SIGNED_IN') {
-          console.log('User signed in, checking for profile');
-          // Only fetch profile for actual sign-ins, not on app load
-          try {
-            const { data: profile } = await supabase
-              .from('profiles')
-              .select('*')
-              .eq('user_id', session.user.id)
-              .maybeSingle();
-
-            if (profile) {
-              const user: User = {
-                id: session.user.id,
-                mobile: profile.mobile,
-                countryCode: profile.country_code,
-                email: session.user.email,
-                firstName: profile.first_name,
-                lastName: profile.last_name,
-                isVerified: false,
-                profileComplete: profile.profile_complete,
-                profile: profile.profile_complete ? {
-                  sec: profile.sec as 'A' | 'B' | 'C1' | 'C2' | 'D' | 'E',
-                  gender: profile.gender as 'male' | 'female' | 'other',
-                  dateOfBirth: new Date(profile.date_of_birth),
-                  address: profile.address,
-                  gpsEnabled: false,
-                  firstName: profile.first_name,
-                  lastName: profile.last_name,
-                  email: session.user.email
-                } : undefined
-              };
-
-              setAuthState({
-                user,
-                isAuthenticated: true,
-                isLoading: false,
-                step: user.profileComplete ? 'dashboard' : 'profile-setup'
-              });
-            } else {
-              console.log('No profile found, staying logged out');
-              await supabase.auth.signOut();
-              setAuthState({
-                user: null,
-                isAuthenticated: false,
-                isLoading: false,
-                step: 'login'
-              });
-            }
-          } catch (error) {
-            console.error('Profile fetch failed:', error);
-            await supabase.auth.signOut();
-            setAuthState({
-              user: null,
-              isAuthenticated: false,
-              isLoading: false,
-              step: 'login'
-            });
-          }
-        } else {
-          console.log('No session or signed out');
-          setAuthState({
-            user: null,
-            isAuthenticated: false,
-            isLoading: false,
-            step: 'login'
-          });
-        }
-      }
-    );
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  const register = async (data: any): Promise<boolean> => {
-    try {
-      console.log('Registering user with data:', data);
-      const result = await registerUser({
-        mobile: data.mobile,
-        countryCode: data.countryCode,
-        password: data.password,
-        email: data.email,
-        firstName: data.firstName,
-        lastName: data.lastName
-      });
-
-      if (!result.success) {
-        console.error('Registration error:', result.error);
-        // Re-throw the error with proper structure for the component to handle
-        throw result.error;
-      }
-      
-      console.log('Registration successful');
-      return true;
-    } catch (error) {
-      console.error('Registration error:', error);
-      return false;
-    }
-  };
-
-  const login = async (mobile: string, password: string): Promise<boolean> => {
-    try {
-      console.log('Logging in user with mobile:', mobile);
-      const result = await loginUser({ mobile, password });
-
-      if (!result.success) {
-        console.error('Login error:', result.error);
-        return false;
-      }
-      
-      console.log('Login successful - triggering OTP verification');
-      // After successful login, always require OTP verification
-      setAuthState(prev => ({ 
-        ...prev, 
-        step: 'otp-verification' 
-      }));
-      return true;
-    } catch (error) {
-      console.error('Login error:', error);
-      return false;
-    }
-  };
-
-  const verifyOTP = async (code: string): Promise<boolean> => {
-    console.log('Verifying OTP:', code);
-    // For demo purposes, accept specific codes
-    if (code === '123456' || code.length === 6) {
-      // Mark user as verified and proceed to next step
-      setAuthState(prev => ({ 
-        ...prev, 
-        user: prev.user ? { ...prev.user, isVerified: true } : null,
-        step: prev.user?.profileComplete ? 'dashboard' : 'profile-setup' 
-      }));
-      return true;
-    }
-    return false;
-  };
-
-  const completeProfile = async (profile: any): Promise<boolean> => {
-    try {
-      console.log('Completing profile with data:', profile);
-      if (!session?.user) {
-        console.log('No session found for profile completion');
-        return false;
-      }
-
-      // Age validation removed
-      console.log('Skipping age validation, proceeding with profile completion');
-
-      const success = await updateUserProfile(session.user.id, profile);
-      
-      if (!success) {
-        console.error('Profile completion failed');
-        return false;
-      }
-      
-      // After profile completion, redirect to earn page (dashboard)
-      setAuthState(prev => ({ ...prev, step: 'dashboard' }));
-      console.log('Profile completion successful, redirecting to dashboard');
-      return true;
-    } catch (error) {
-      console.error('Profile completion error:', error);
-      return false;
-    }
-  };
-
-  const updateCommunicationPreferences = async (preferences: any): Promise<boolean> => {
-    try {
-      console.log('Updating communication preferences:', preferences);
-      if (!session?.user) {
-        console.log('No session found for communication preferences update');
-        return false;
-      }
-
-      const { error } = await supabase
-        .from('communication_preferences')
-        .update({
-          sms_enabled: preferences.sms,
-          whatsapp_enabled: preferences.whatsapp,
-          push_enabled: preferences.push,
-          email_enabled: preferences.email
-        })
-        .eq('user_id', session.user.id);
-
-      if (error) {
-        console.error('Communication preferences error:', error);
-        throw error;
-      }
-      console.log('Communication preferences updated successfully');
-      return true;
-    } catch (error) {
-      console.error('Communication preferences error:', error);
-      return false;
-    }
-  };
-
-  const logout = async () => {
-    console.log('Logging out user');
-    await logoutUser();
-  };
-
   const forgotPassword = async (mobile: string): Promise<boolean> => {
-    try {
-      console.log('Initiating forgot password for mobile:', mobile);
-      const result = await resetUserPassword(mobile);
-      
-      if (!result.success) {
-        console.error('Forgot password error:', result.error);
-        throw result.error;
-      }
-      
-      console.log('Password reset email sent');
-      return true;
-    } catch (error) {
-      console.error('Forgot password error:', error);
-      return false;
-    }
+    console.log('Mock forgot password for mobile:', mobile);
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    return true;
   };
 
   const resetPassword = async (mobile: string, otp: string, password: string): Promise<boolean> => {
-    console.log('Resetting password for mobile:', mobile);
-    // This would require additional OTP verification logic
+    console.log('Mock reset password for mobile:', mobile);
+    await new Promise(resolve => setTimeout(resolve, 1000));
     return true;
   };
 
