@@ -53,7 +53,7 @@ export const useAuthLogic = () => {
               .from('profiles')
               .select('*')
               .eq('user_id', session.user.id)
-              .single();
+              .maybeSingle();
 
             console.log('Profile fetch result:', profile, 'Error:', error);
             
