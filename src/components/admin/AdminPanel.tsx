@@ -6,8 +6,9 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Settings, Plus, Search, Users, FileText } from 'lucide-react';
+import ProtectedRoute from '@/components/auth/ProtectedRoute';
 
-export default function AdminPanel() {
+function AdminPanelContent() {
   const [activeTab, setActiveTab] = useState('create');
 
   return (
@@ -125,5 +126,13 @@ export default function AdminPanel() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function AdminPanel() {
+  return (
+    <ProtectedRoute requiredRole="admin">
+      <AdminPanelContent />
+    </ProtectedRoute>
   );
 }

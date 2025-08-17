@@ -5,6 +5,8 @@ import { User, AuthState } from '@/types/auth';
 import { registerUser, loginUser, logoutUser, resetUserPassword } from '@/utils/auth';
 import { updateUserProfile, fetchUserProfile } from '@/utils/profile';
 import { createDemoEarningActivities } from '@/utils/demoData';
+import { rateLimiter, withRateLimit } from '@/utils/rateLimiter';
+import { auditActions } from '@/utils/auditLogger';
 
 const AuthContext = createContext<{
   authState: AuthState;
@@ -83,6 +85,14 @@ export const useAuthLogic = () => {
               isLoading: false,
               step: !profile?.profile_complete ? 'profile-setup' : 'dashboard'
             });
+            
+            // Audit log successful login
+            if (event === 'SIGNED_IN') {
+              await auditActions.login(session.user.id, { 
+                method: 'email_password',
+                profile_complete: profile?.profile_complete 
+              });
+            }
           } catch (error) {
             console.error('Error processing auth state:', error);
             setAuthState({
@@ -111,7 +121,7 @@ export const useAuthLogic = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const register = async (data: any): Promise<boolean> => {
+  const register = withRateLimit('registration', async (data: any): Promise<boolean> => {
     console.log('Registering user with data:', data);
     setAuthState(prev => ({ ...prev, isLoading: true }));
     
@@ -149,9 +159,9 @@ export const useAuthLogic = () => {
       setAuthState(prev => ({ ...prev, isLoading: false }));
       return false;
     }
-  };
+  });
 
-  const login = async (email: string, password: string): Promise<boolean> => {
+  const login = withRateLimit('login', async (email: string, password: string): Promise<boolean> => {
     console.log('Logging in user with email:', email);
     setAuthState(prev => ({ ...prev, isLoading: true }));
     
@@ -170,7 +180,7 @@ export const useAuthLogic = () => {
       setAuthState(prev => ({ ...prev, isLoading: false }));
       return false;
     }
-  };
+  });
 
   const verifyOTP = async (code: string): Promise<boolean> => {
     console.log('Verifying OTP:', code);

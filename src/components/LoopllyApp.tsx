@@ -12,7 +12,7 @@ import AdminPanel from './admin/AdminPanel';
 
 export default function LoopllyApp() {
   const [authFlow, setAuthFlow] = useState<'login' | 'register' | 'forgot' | 'profile' | 'communication' | 'otp'>('login');
-  const [isAdmin, setIsAdmin] = useState(false);
+  // Removed isAdmin state - now handled by role-based authentication
   const { authState } = useAuth();
 
   console.log('LoopllyApp - Current authState:', authState);
@@ -28,17 +28,8 @@ export default function LoopllyApp() {
     );
   }
 
-  // Admin login check (simple demo)
-  if (isAdmin) {
-    console.log('LoopllyApp - Showing admin panel');
-    return <AdminPanel />;
-  }
-
-  // Handle admin route
-  if (window.location.pathname === '/admin') {
-    console.log('LoopllyApp - Admin route detected');
-    return <AdminPanel />;
-  }
+  // Admin route is now handled by App.tsx routing and ProtectedRoute
+  // Removed insecure admin checks
 
   // If user is authenticated, handle post-login flow
   if (authState.isAuthenticated) {
