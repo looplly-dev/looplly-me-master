@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { 
@@ -73,23 +74,18 @@ export default function SimplifiedEarnTab() {
     });
   };
 
-  const handleDataOptIn = (type: 'shopping' | 'appUsage') => {
-    setDataOptIns(prev => ({ ...prev, [type]: true }));
+  const handleDataToggle = (type: 'shopping' | 'appUsage', checked: boolean) => {
+    setDataOptIns(prev => ({ ...prev, [type]: checked }));
     
     const earnings = type === 'shopping' ? 0.10 : 0.08;
-    toast({
-      title: '🎉 Successfully Opted In!',
-      description: `You'll now earn $${earnings.toFixed(2)}/month from ${type === 'shopping' ? 'shopping behavior' : 'app usage'} data sharing.`,
-    });
-  };
-
-  const handleDataOptOut = (type: 'shopping' | 'appUsage') => {
-    setDataOptIns(prev => ({ ...prev, [type]: false }));
+    const action = checked ? 'Opted In' : 'Opted Out';
+    const description = checked 
+      ? `You'll now earn $${earnings.toFixed(2)}/month from ${type === 'shopping' ? 'shopping behavior' : 'app usage'} data sharing.`
+      : `You've stopped earning $${earnings.toFixed(2)}/month from ${type === 'shopping' ? 'shopping behavior' : 'app usage'} data sharing.`;
     
-    const earnings = type === 'shopping' ? 0.10 : 0.08;
     toast({
-      title: 'Opted Out',
-      description: `You've stopped earning $${earnings.toFixed(2)}/month from ${type === 'shopping' ? 'shopping behavior' : 'app usage'} data sharing.`,
+      title: checked ? '🎉 Successfully Opted In!' : 'Opted Out',
+      description,
     });
   };
 
@@ -444,58 +440,28 @@ export default function SimplifiedEarnTab() {
                         <p className="font-medium text-sm">Shopping Behavior</p>
                         <p className="text-xs text-muted-foreground">Purchase pattern analysis</p>
                       </div>
-                      <div className="text-right">
-                        <p className="text-sm font-semibold text-success">$0.10/month</p>
-                        {dataOptIns.shopping ? (
-                          <Button 
-                            size="sm" 
-                            variant="outline" 
-                            className="text-xs h-6 px-3 text-muted-foreground border-muted-foreground/30 hover:bg-muted/50"
-                            onClick={() => handleDataOptOut('shopping')}
-                          >
-                            Opt-out
-                          </Button>
-                        ) : (
-                          <Button 
-                            size="sm" 
-                            variant="default" 
-                            className="text-xs h-6 px-3"
-                            onClick={() => handleDataOptIn('shopping')}
-                          >
-                            Opt-in
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center justify-between p-3 bg-background/50 rounded-lg">
-                      <div>
-                        <p className="font-medium text-sm">App Usage Patterns</p>
-                        <p className="text-xs text-muted-foreground">Digital behavior insights</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-sm font-semibold text-success">$0.08/month</p>
-                        {dataOptIns.appUsage ? (
-                          <Button 
-                            size="sm" 
-                            variant="outline" 
-                            className="text-xs h-6 px-3 text-muted-foreground border-muted-foreground/30 hover:bg-muted/50"
-                            onClick={() => handleDataOptOut('appUsage')}
-                          >
-                            Opt-out
-                          </Button>
-                        ) : (
-                          <Button 
-                            size="sm" 
-                            variant="default" 
-                            className="text-xs h-6 px-3"
-                            onClick={() => handleDataOptIn('appUsage')}
-                          >
-                            Opt-in
-                          </Button>
-                        )}
-                      </div>
-                    </div>
+                       <div className="flex flex-col items-end gap-1">
+                         <p className="text-sm font-semibold text-success">$0.10/month</p>
+                         <Switch
+                           checked={dataOptIns.shopping}
+                           onCheckedChange={(checked) => handleDataToggle('shopping', checked)}
+                         />
+                       </div>
+                     </div>
+                     
+                     <div className="flex items-center justify-between p-3 bg-background/50 rounded-lg">
+                       <div>
+                         <p className="font-medium text-sm">App Usage Patterns</p>
+                         <p className="text-xs text-muted-foreground">Digital behavior insights</p>
+                       </div>
+                       <div className="flex flex-col items-end gap-1">
+                         <p className="text-sm font-semibold text-success">$0.08/month</p>
+                         <Switch
+                           checked={dataOptIns.appUsage}
+                           onCheckedChange={(checked) => handleDataToggle('appUsage', checked)}
+                         />
+                       </div>
+                     </div>
                   </div>
                   
                   <div className="mt-4 p-3 bg-info/5 rounded-lg">
