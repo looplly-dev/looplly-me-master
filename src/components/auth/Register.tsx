@@ -80,7 +80,7 @@ export default function Register({ onBack, onSuccess }: RegisterProps) {
     } catch (error: any) {
       console.error('Registration catch block error:', error);
       
-      if (error?.code === 'user_already_exists' || error?.message?.includes('User already registered')) {
+      if (error?.code === 'user_already_exists' || error?.message?.includes('User already registered') || error?.name === 'AuthApiError') {
         toast({
           title: 'Cleaning up conflict...',
           description: 'Removing existing account data. Please try again in a moment.',
