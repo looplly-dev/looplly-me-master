@@ -125,10 +125,8 @@ export const useAuthLogic = () => {
     console.log('Checking for existing session...');
     supabase.auth.getSession().then(({ data: { session } }) => {
       console.log('Initial session check result:', !!session);
-      if (!session) {
-        console.log('No initial session, setting loading to false');
-        setAuthState(prev => ({ ...prev, isLoading: false }));
-      }
+      // Always set loading to false after initial check
+      setAuthState(prev => ({ ...prev, isLoading: false }));
     });
 
     return () => subscription.unsubscribe();
