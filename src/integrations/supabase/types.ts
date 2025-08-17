@@ -14,7 +14,123 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      communication_preferences: {
+        Row: {
+          created_at: string | null
+          email_enabled: boolean | null
+          id: string
+          push_enabled: boolean | null
+          sms_enabled: boolean | null
+          updated_at: string | null
+          user_id: string
+          whatsapp_enabled: boolean | null
+        }
+        Insert: {
+          created_at?: string | null
+          email_enabled?: boolean | null
+          id?: string
+          push_enabled?: boolean | null
+          sms_enabled?: boolean | null
+          updated_at?: string | null
+          user_id: string
+          whatsapp_enabled?: boolean | null
+        }
+        Update: {
+          created_at?: string | null
+          email_enabled?: boolean | null
+          id?: string
+          push_enabled?: boolean | null
+          sms_enabled?: boolean | null
+          updated_at?: string | null
+          user_id?: string
+          whatsapp_enabled?: boolean | null
+        }
+        Relationships: []
+      }
+      otp_verifications: {
+        Row: {
+          created_at: string | null
+          expires_at: string
+          id: string
+          mobile: string
+          otp_code: string
+          user_id: string
+          verified: boolean | null
+        }
+        Insert: {
+          created_at?: string | null
+          expires_at: string
+          id?: string
+          mobile: string
+          otp_code: string
+          user_id: string
+          verified?: boolean | null
+        }
+        Update: {
+          created_at?: string | null
+          expires_at?: string
+          id?: string
+          mobile?: string
+          otp_code?: string
+          user_id?: string
+          verified?: boolean | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          address: string | null
+          country_code: string
+          created_at: string | null
+          date_of_birth: string | null
+          ethnicity: string | null
+          first_name: string
+          gender: string | null
+          household_income: string | null
+          id: string
+          last_name: string
+          mobile: string
+          profile_complete: boolean | null
+          sec: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          address?: string | null
+          country_code?: string
+          created_at?: string | null
+          date_of_birth?: string | null
+          ethnicity?: string | null
+          first_name: string
+          gender?: string | null
+          household_income?: string | null
+          id?: string
+          last_name: string
+          mobile: string
+          profile_complete?: boolean | null
+          sec?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          address?: string | null
+          country_code?: string
+          created_at?: string | null
+          date_of_birth?: string | null
+          ethnicity?: string | null
+          first_name?: string
+          gender?: string | null
+          household_income?: string | null
+          id?: string
+          last_name?: string
+          mobile?: string
+          profile_complete?: boolean | null
+          sec?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
