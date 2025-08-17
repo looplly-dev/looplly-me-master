@@ -228,6 +228,19 @@ export default function SimplifiedEarnTab() {
                               <Clock className="h-4 w-4" />
                               {activity.time_estimate || 5} min
                             </span>
+                            <div className="flex items-center gap-1">
+                              {[...Array(5)].map((_, i) => (
+                                <Star
+                                  key={i}
+                                  className={`h-3 w-3 ${
+                                    i < (activity.metadata?.rating || 4.2) ? 'text-warning fill-current' : 'text-muted-foreground/30'
+                                  }`}
+                                />
+                              ))}
+                              <span className="text-xs text-muted-foreground ml-1">
+                                {activity.metadata?.rating || '4.2'}
+                              </span>
+                            </div>
                           </div>
                         </div>
                         <Button
@@ -273,6 +286,19 @@ export default function SimplifiedEarnTab() {
                               <Clock className="h-4 w-4" />
                               {activity.time_estimate || 3} min
                             </span>
+                            <div className="flex items-center gap-1">
+                              {[...Array(5)].map((_, i) => (
+                                <Star
+                                  key={i}
+                                  className={`h-3 w-3 ${
+                                    i < (activity.metadata?.rating || 4.1) ? 'text-warning fill-current' : 'text-muted-foreground/30'
+                                  }`}
+                                />
+                              ))}
+                              <span className="text-xs text-muted-foreground ml-1">
+                                {activity.metadata?.rating || '4.1'}
+                              </span>
+                            </div>
                           </div>
                         </div>
                         <Button
@@ -318,6 +344,19 @@ export default function SimplifiedEarnTab() {
                               <Clock className="h-4 w-4" />
                               {activity.time_estimate || 2} min
                             </span>
+                            <div className="flex items-center gap-1">
+                              {[...Array(5)].map((_, i) => (
+                                <Star
+                                  key={i}
+                                  className={`h-3 w-3 ${
+                                    i < (activity.metadata?.rating || 4.5) ? 'text-warning fill-current' : 'text-muted-foreground/30'
+                                  }`}
+                                />
+                              ))}
+                              <span className="text-xs text-muted-foreground ml-1">
+                                {activity.metadata?.rating || '4.5'}
+                              </span>
+                            </div>
                           </div>
                         </div>
                         <Button
