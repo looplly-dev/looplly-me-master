@@ -28,6 +28,7 @@ export const registerUser = async (params: RegistrationParams): Promise<{ succes
     const { error } = await supabase.auth.signUp({
       email,
       password: params.password,
+      phone: fullMobile, // Set the phone field in Supabase auth
       options: {
         emailRedirectTo: `${window.location.origin}/`,
         data: {
