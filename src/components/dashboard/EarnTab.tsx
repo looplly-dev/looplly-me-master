@@ -16,11 +16,16 @@ import {
   AlertCircle,
   Star
 } from 'lucide-react';
-import { mockSurveys, mockVideos, mockMicroTasks, userStats } from '@/data/mockData';
+import { useBalance } from '@/hooks/useBalance';
+import { useEarningActivities } from '@/hooks/useEarningActivities';
+import { useTransactions } from '@/hooks/useTransactions';
 
 export default function EarnTab() {
   const [checkInDone, setCheckInDone] = useState(false);
   const { toast } = useToast();
+  const { balance } = useBalance();
+  const { activities, addActivity } = useEarningActivities();
+  const { addTransaction } = useTransactions();
 
   const handleStartTask = (type: string, title: string, reward: number) => {
     toast({
@@ -69,22 +74,22 @@ export default function EarnTab() {
           <div className="flex items-center justify-between mb-4">
             <div>
               <p className="text-white/80 text-sm">Current Balance</p>
-              <p className="text-3xl font-bold">{userStats.currentBalance}</p>
+              <p className="text-3xl font-bold">${balance?.available_balance?.toFixed(2) || '0.00'}</p>
               <p className="text-white/80 text-sm">USD</p>
             </div>
             <Coins className="h-12 w-12 text-white/60" />
           </div>
           <div className="grid grid-cols-3 gap-4 pt-4 border-t border-white/20">
             <div className="text-center">
-              <p className="text-xl font-bold">{userStats.surveysCompleted}</p>
+              <p className="text-xl font-bold">{activities.filter(a => a.activity_type === 'survey' && a.status === 'completed').length}</p>
               <p className="text-white/80 text-xs">Surveys</p>
             </div>
             <div className="text-center">
-              <p className="text-xl font-bold">{userStats.videosWatched}</p>
+              <p className="text-xl font-bold">{activities.filter(a => a.activity_type === 'video' && a.status === 'completed').length}</p>
               <p className="text-white/80 text-xs">Videos</p>
             </div>
             <div className="text-center">
-              <p className="text-xl font-bold">{userStats.tasksCompleted}</p>
+              <p className="text-xl font-bold">{activities.filter(a => a.activity_type === 'task' && a.status === 'completed').length}</p>
               <p className="text-white/80 text-xs">Tasks</p>
             </div>
           </div>
