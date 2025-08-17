@@ -79,12 +79,13 @@ export const useAuthLogic = () => {
               } : undefined
             };
 
-            // Always require OTP verification after login/registration
+            // For new registrations, don't require OTP yet - let them complete the flow
+            // OTP will be required on subsequent logins
             setAuthState({
               user,
               isAuthenticated: true,
               isLoading: false,
-              step: 'otp-verification'
+              step: user.profileComplete ? 'dashboard' : 'profile-setup'
             });
           } else {
             console.log('No profile found, user needs to complete setup');
@@ -156,7 +157,12 @@ export const useAuthLogic = () => {
         throw result.error;
       }
       
-      console.log('Login successful');
+      console.log('Login successful - triggering OTP verification');
+      // After successful login, always require OTP verification
+      setAuthState(prev => ({ 
+        ...prev, 
+        step: 'otp-verification' 
+      }));
       return true;
     } catch (error) {
       console.error('Login error:', error);
