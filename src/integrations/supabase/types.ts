@@ -47,6 +47,60 @@ export type Database = {
         }
         Relationships: []
       }
+      earning_activities: {
+        Row: {
+          activity_type: string
+          completed_at: string | null
+          created_at: string
+          description: string | null
+          expires_at: string | null
+          external_id: string | null
+          id: string
+          metadata: Json | null
+          provider: string | null
+          reward_amount: number
+          status: string
+          time_estimate: number | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          activity_type: string
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          expires_at?: string | null
+          external_id?: string | null
+          id?: string
+          metadata?: Json | null
+          provider?: string | null
+          reward_amount: number
+          status?: string
+          time_estimate?: number | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          activity_type?: string
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          expires_at?: string | null
+          external_id?: string | null
+          id?: string
+          metadata?: Json | null
+          provider?: string | null
+          reward_amount?: number
+          status?: string
+          time_estimate?: number | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       otp_verifications: {
         Row: {
           created_at: string | null
@@ -127,6 +181,156 @@ export type Database = {
           profile_complete?: boolean | null
           sec?: string | null
           updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      referrals: {
+        Row: {
+          created_at: string
+          id: string
+          qualified_at: string | null
+          referral_code: string
+          referred_id: string
+          referrer_id: string
+          reward_amount: number | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          qualified_at?: string | null
+          referral_code: string
+          referred_id: string
+          referrer_id: string
+          reward_amount?: number | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          qualified_at?: string | null
+          referral_code?: string
+          referred_id?: string
+          referrer_id?: string
+          reward_amount?: number | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      transactions: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          description: string
+          id: string
+          metadata: Json | null
+          source: string
+          status: string
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency?: string
+          description: string
+          id?: string
+          metadata?: Json | null
+          source: string
+          status?: string
+          type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          description?: string
+          id?: string
+          metadata?: Json | null
+          source?: string
+          status?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_balances: {
+        Row: {
+          available_balance: number
+          created_at: string
+          lifetime_withdrawn: number
+          pending_balance: number
+          total_earned: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          available_balance?: number
+          created_at?: string
+          lifetime_withdrawn?: number
+          pending_balance?: number
+          total_earned?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          available_balance?: number
+          created_at?: string
+          lifetime_withdrawn?: number
+          pending_balance?: number
+          total_earned?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      withdrawal_requests: {
+        Row: {
+          amount: number
+          created_at: string
+          destination: string
+          fee_amount: number | null
+          id: string
+          method: string
+          processed_at: string | null
+          status: string
+          transaction_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          destination: string
+          fee_amount?: number | null
+          id?: string
+          method: string
+          processed_at?: string | null
+          status?: string
+          transaction_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          destination?: string
+          fee_amount?: number | null
+          id?: string
+          method?: string
+          processed_at?: string | null
+          status?: string
+          transaction_id?: string | null
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
