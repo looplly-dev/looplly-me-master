@@ -28,6 +28,10 @@ import { useTransactions } from '@/hooks/useTransactions';
 
 export default function SimplifiedEarnTab() {
   const [checkInDone, setCheckInDone] = useState(false);
+  const [dataOptIns, setDataOptIns] = useState({
+    shopping: false,
+    appUsage: false
+  });
   const { toast } = useToast();
   const { balance } = useBalance();
   const { activities, addActivity } = useEarningActivities();
@@ -66,6 +70,16 @@ export default function SimplifiedEarnTab() {
     toast({
       title: '✨ Task Started!',
       description: `Great choice! Complete "${title}" to earn $${reward.toFixed(2)}`,
+    });
+  };
+
+  const handleDataOptIn = (type: 'shopping' | 'appUsage') => {
+    setDataOptIns(prev => ({ ...prev, [type]: true }));
+    
+    const earnings = type === 'shopping' ? 0.10 : 0.08;
+    toast({
+      title: '🎉 Successfully Opted In!',
+      description: `You'll now earn $${earnings.toFixed(2)}/month from ${type === 'shopping' ? 'shopping behavior' : 'app usage'} data sharing.`,
     });
   };
 
@@ -421,9 +435,20 @@ export default function SimplifiedEarnTab() {
                       </div>
                       <div className="text-right">
                         <p className="text-sm font-semibold text-success">$0.10/month</p>
-                        <Badge variant="secondary" className="text-xs">
-                          Opt-in
-                        </Badge>
+                        {dataOptIns.shopping ? (
+                          <Badge variant="outline" className="text-success border-success text-xs">
+                            Active
+                          </Badge>
+                        ) : (
+                          <Button 
+                            size="sm" 
+                            variant="default" 
+                            className="text-xs h-6 px-3"
+                            onClick={() => handleDataOptIn('shopping')}
+                          >
+                            Opt-in
+                          </Button>
+                        )}
                       </div>
                     </div>
                     
@@ -434,9 +459,20 @@ export default function SimplifiedEarnTab() {
                       </div>
                       <div className="text-right">
                         <p className="text-sm font-semibold text-success">$0.08/month</p>
-                        <Badge variant="secondary" className="text-xs">
-                          Opt-in
-                        </Badge>
+                        {dataOptIns.appUsage ? (
+                          <Badge variant="outline" className="text-success border-success text-xs">
+                            Active
+                          </Badge>
+                        ) : (
+                          <Button 
+                            size="sm" 
+                            variant="default" 
+                            className="text-xs h-6 px-3"
+                            onClick={() => handleDataOptIn('appUsage')}
+                          >
+                            Opt-in
+                          </Button>
+                        )}
                       </div>
                     </div>
                   </div>
