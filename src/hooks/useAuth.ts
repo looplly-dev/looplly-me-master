@@ -37,6 +37,24 @@ export const useAuthLogic = () => {
 
   console.log('useAuthLogic - Current authState:', authState);
 
+  // Force clear session and reset auth state
+  const clearSession = async () => {
+    console.log('Clearing session and resetting auth state');
+    await supabase.auth.signOut();
+    setSession(null);
+    setAuthState({
+      user: null,
+      isAuthenticated: false,
+      isLoading: false,
+      step: 'login'
+    });
+  };
+
+  useEffect(() => {
+    // Clear any existing problematic session on mount
+    clearSession();
+  }, []);
+
   useEffect(() => {
     console.log('useAuthLogic - Setting up auth listener');
     // Set up auth state listener
@@ -45,20 +63,17 @@ export const useAuthLogic = () => {
         console.log('Auth state change event:', event, 'Session:', !!session);
         setSession(session);
         
-        if (session?.user) {
-          console.log('User found in session, fetching profile for:', session.user.id);
-          // Fetch user profile with error handling
+        if (session?.user && event === 'SIGNED_IN') {
+          console.log('User signed in, checking for profile');
+          // Only fetch profile for actual sign-ins, not on app load
           try {
-            const { data: profile, error } = await supabase
+            const { data: profile } = await supabase
               .from('profiles')
               .select('*')
               .eq('user_id', session.user.id)
               .maybeSingle();
 
-            console.log('Profile fetch result:', profile, 'Error:', error);
-            
             if (profile) {
-              console.log('Setting authenticated user state');
               const user: User = {
                 id: session.user.id,
                 mobile: profile.mobile,
@@ -66,7 +81,7 @@ export const useAuthLogic = () => {
                 email: session.user.email,
                 firstName: profile.first_name,
                 lastName: profile.last_name,
-                isVerified: false, // Always start as unverified for OTP flow
+                isVerified: false,
                 profileComplete: profile.profile_complete,
                 profile: profile.profile_complete ? {
                   sec: profile.sec as 'A' | 'B' | 'C1' | 'C2' | 'D' | 'E',
@@ -80,8 +95,6 @@ export const useAuthLogic = () => {
                 } : undefined
               };
 
-              // For new registrations, don't require OTP yet - let them complete the flow
-              // OTP will be required on subsequent logins
               setAuthState({
                 user,
                 isAuthenticated: true,
@@ -89,8 +102,7 @@ export const useAuthLogic = () => {
                 step: user.profileComplete ? 'dashboard' : 'profile-setup'
               });
             } else {
-              console.log('No profile found, logging out user and redirecting to registration');
-              // If no profile exists, log out the user and redirect to login/registration
+              console.log('No profile found, staying logged out');
               await supabase.auth.signOut();
               setAuthState({
                 user: null,
@@ -99,9 +111,9 @@ export const useAuthLogic = () => {
                 step: 'login'
               });
             }
-          } catch (profileError) {
-            console.error('Profile fetch failed:', profileError);
-            // If profile fetch fails, log user out to prevent infinite loading
+          } catch (error) {
+            console.error('Profile fetch failed:', error);
+            await supabase.auth.signOut();
             setAuthState({
               user: null,
               isAuthenticated: false,
@@ -110,7 +122,7 @@ export const useAuthLogic = () => {
             });
           }
         } else {
-          console.log('No session found, setting unauthenticated state');
+          console.log('No session or signed out');
           setAuthState({
             user: null,
             isAuthenticated: false,
@@ -120,14 +132,6 @@ export const useAuthLogic = () => {
         }
       }
     );
-
-    // Check for existing session
-    console.log('Checking for existing session...');
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log('Initial session check result:', !!session);
-      // Always set loading to false after initial check
-      setAuthState(prev => ({ ...prev, isLoading: false }));
-    });
 
     return () => subscription.unsubscribe();
   }, []);
