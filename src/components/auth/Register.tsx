@@ -66,7 +66,7 @@ export default function Register({ onBack, onSuccess }: RegisterProps) {
       if (success) {
         toast({
           title: 'Account Created!',
-          description: 'Your account has been created successfully. Please login.',
+          description: 'Registration successful! You can now log in.',
         });
         onSuccess();
       } else {
