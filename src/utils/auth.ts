@@ -54,10 +54,29 @@ export const loginUser = async (params: LoginParams): Promise<{ success: boolean
   try {
     console.log('Logging in user with mobile:', params.mobile);
     
-    // For now, use email-based login since mobile auth requires additional setup
-    const email = `${params.mobile}@temp.com`;
+    // Try to find the user by phone number to get their actual email
+    const { data: userData, error: userError } = await supabase
+      .from('profiles')
+      .select('user_id')
+      .eq('mobile', params.mobile)
+      .single();
+
+    if (userError || !userData) {
+      console.error('User not found:', userError);
+      return { success: false, error: { message: 'Invalid mobile number or password' } };
+    }
+
+    // Get the user's actual email from auth.users
+    const { data: authUser, error: authError } = await supabase
+      .rpc('get_user_email', { user_uuid: userData.user_id });
+
+    if (authError || !authUser) {
+      console.error('Could not find user email:', authError);
+      return { success: false, error: { message: 'Invalid mobile number or password' } };
+    }
+
     const { error } = await supabase.auth.signInWithPassword({
-      email,
+      email: authUser,
       password: params.password
     });
 
