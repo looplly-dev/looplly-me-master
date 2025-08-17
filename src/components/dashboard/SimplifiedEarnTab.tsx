@@ -10,11 +10,13 @@ import {
   Star,
   TrendingUp,
   Target,
-  Gift,
+  Trophy,
   Sparkles,
   ArrowRight,
   HelpCircle,
-  Trophy
+  Shield,
+  Zap,
+  Award
 } from 'lucide-react';
 import { useBalance } from '@/hooks/useBalance';
 import { useEarningActivities } from '@/hooks/useEarningActivities';
@@ -37,20 +39,21 @@ export default function SimplifiedEarnTab() {
     
     setCheckInDone(true);
     
+    // Add Rep increase instead of money
     addTransaction({
       type: 'bonus',
-      amount: 0.50,
-      currency: 'USD',
-      description: 'Daily check-in bonus',
+      amount: 0, // No money reward
+      currency: 'REP',
+      description: 'Daily check-in Rep boost',
       source: 'daily_checkin',
       status: 'completed',
-      metadata: { streak: 1 }
+      metadata: { rep_gained: 25, streak: 1 }
     });
 
-    // Enhanced success feedback
+    // Enhanced success feedback for Rep
     toast({
-      title: '🎉 Daily Bonus Earned!',
-      description: `+$0.50 added to your balance! Keep your streak going!`,
+      title: '🎉 Rep Boosted!',
+      description: `+25 Rep earned! Your reputation unlocks better opportunities!`,
     });
   };
 
@@ -105,18 +108,18 @@ export default function SimplifiedEarnTab() {
       </Card>
 
       {/* Daily Check-in - More Prominent */}
-      <Card className="border-success/30 bg-gradient-to-r from-success/5 to-success/10">
+      <Card className="border-primary/30 bg-gradient-to-r from-primary/5 to-primary/10">
         <CardContent className="p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="p-3 bg-success/20 rounded-xl">
-                <Gift className="h-6 w-6 text-success" />
+              <div className="p-3 bg-primary/20 rounded-xl">
+                <Trophy className="h-6 w-6 text-primary" />
               </div>
               <div>
-                <h3 className="font-bold text-lg">Daily Bonus</h3>
+                <h3 className="font-bold text-lg">Daily Rep Boost</h3>
                 <p className="text-sm text-muted-foreground flex items-center gap-1">
                   <Star className="h-3 w-3 text-warning" />
-                  Free money every day!
+                  Build your reputation daily!
                 </p>
               </div>
             </div>
@@ -125,17 +128,17 @@ export default function SimplifiedEarnTab() {
               size="lg"
               onClick={handleCheckIn}
               disabled={checkInDone}
-              className={checkInDone ? "" : "bg-success hover:bg-success/90 shadow-success"}
+              className={checkInDone ? "" : "bg-primary hover:bg-primary/90"}
             >
               {checkInDone ? (
                 <>
                   <CheckCircle className="h-5 w-5 mr-2" />
-                  Done Today!
+                  Boosted Today!
                 </>
               ) : (
                 <>
                   <Sparkles className="h-5 w-5 mr-2" />
-                  Earn $0.50
+                  +25 Rep
                 </>
               )}
             </Button>
@@ -253,6 +256,61 @@ export default function SimplifiedEarnTab() {
           </Card>
         )}
       </div>
+
+      {/* Rep Importance Section */}
+      <Card className="border-accent/30 bg-gradient-to-r from-accent/5 to-warning/5">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-accent">
+            <Shield className="h-5 w-5" />
+            Why Rep Matters
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 gap-3">
+            <div className="flex items-start gap-3 p-3 bg-background/50 rounded-lg">
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <Zap className="h-4 w-4 text-primary" />
+              </div>
+              <div>
+                <h4 className="font-semibold text-sm mb-1">Higher Paying Tasks</h4>
+                <p className="text-xs text-muted-foreground">
+                  Higher Rep unlocks premium surveys and tasks worth $2-$10 each
+                </p>
+              </div>
+            </div>
+            
+            <div className="flex items-start gap-3 p-3 bg-background/50 rounded-lg">
+              <div className="p-2 bg-success/10 rounded-lg">
+                <Trophy className="h-4 w-4 text-success" />
+              </div>
+              <div>
+                <h4 className="font-semibold text-sm mb-1">Priority Access</h4>
+                <p className="text-xs text-muted-foreground">
+                  Get first access to new earning opportunities before others
+                </p>
+              </div>
+            </div>
+            
+            <div className="flex items-start gap-3 p-3 bg-background/50 rounded-lg">
+              <div className="p-2 bg-accent/10 rounded-lg">
+                <Award className="h-4 w-4 text-accent" />
+              </div>
+              <div>
+                <h4 className="font-semibold text-sm mb-1">Trust & Credibility</h4>
+                <p className="text-xs text-muted-foreground">
+                  Brands prefer working with high-Rep users for market research
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="p-3 bg-info/5 rounded-lg border border-info/20">
+            <p className="text-xs text-info font-medium">
+              💡 <strong>Pro Tip:</strong> Check in daily and complete quality tasks to build Rep fast. Higher Rep = Higher earnings!
+            </p>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
