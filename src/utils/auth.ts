@@ -59,11 +59,29 @@ export const loginUser = async (params: LoginParams): Promise<{ success: boolean
       .from('profiles')
       .select('user_id')
       .eq('mobile', params.mobile)
-      .single();
+      .maybeSingle();
 
-    if (userError || !userData) {
-      console.error('User not found:', userError);
+    if (userError) {
+      console.error('Error querying profiles:', userError);
       return { success: false, error: { message: 'Invalid mobile number or password' } };
+    }
+
+    if (!userData) {
+      console.log('No profile found, attempting direct email login');
+      // If no profile exists, try direct email login
+      const email = `${params.mobile}@temp.com`;
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password: params.password
+      });
+
+      if (error) {
+        console.error('Direct login error:', error);
+        return { success: false, error: { message: 'Invalid mobile number or password' } };
+      }
+      
+      console.log('Direct login successful');
+      return { success: true };
     }
 
     // Get the user's actual email from auth.users
