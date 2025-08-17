@@ -65,7 +65,7 @@ export const useAuthLogic = () => {
               email: session.user.email,
               firstName: profile.first_name,
               lastName: profile.last_name,
-              isVerified: true,
+              isVerified: false, // Always start as unverified for OTP flow
               profileComplete: profile.profile_complete,
               profile: profile.profile_complete ? {
                 sec: profile.sec as 'A' | 'B' | 'C1' | 'C2' | 'D' | 'E',
@@ -79,11 +79,12 @@ export const useAuthLogic = () => {
               } : undefined
             };
 
+            // Always require OTP verification after login/registration
             setAuthState({
               user,
               isAuthenticated: true,
               isLoading: false,
-              step: profile.profile_complete ? 'dashboard' : 'otp-verification'
+              step: 'otp-verification'
             });
           } else {
             console.log('No profile found, user needs to complete setup');
@@ -165,9 +166,14 @@ export const useAuthLogic = () => {
 
   const verifyOTP = async (code: string): Promise<boolean> => {
     console.log('Verifying OTP:', code);
-    // For demo purposes, accept any 6-digit code
+    // For demo purposes, accept specific codes
     if (code === '123456' || code.length === 6) {
-      setAuthState(prev => ({ ...prev, step: 'profile-setup' }));
+      // Mark user as verified and proceed to next step
+      setAuthState(prev => ({ 
+        ...prev, 
+        user: prev.user ? { ...prev.user, isVerified: true } : null,
+        step: prev.user?.profileComplete ? 'dashboard' : 'profile-setup' 
+      }));
       return true;
     }
     return false;

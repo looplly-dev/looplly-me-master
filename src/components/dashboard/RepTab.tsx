@@ -19,8 +19,10 @@ import {
   AlertTriangle
 } from 'lucide-react';
 import { userStats } from '@/data/mockData';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function RepTab() {
+  const { authState } = useAuth();
   const getLevel = (score: number) => {
     if (score >= 80) return { name: 'Platinum', color: 'text-purple-600', icon: '💎' };
     if (score >= 50) return { name: 'Gold', color: 'text-yellow-600', icon: '🥇' };
@@ -36,7 +38,7 @@ export default function RepTab() {
   const progressToNext = ((userStats.reputation.score % 25) / 25) * 100;
 
   const badges = [
-    { name: 'OTP Verified', icon: Shield, color: 'text-success', earned: true, points: '+15' },
+    { name: 'OTP Verified', icon: Shield, color: 'text-success', earned: authState.user?.isVerified || false, points: '+15' },
     { name: 'GPS Enabled', icon: MapPin, color: 'text-primary', earned: true, points: '+10' },
     { name: '5-day Streak', icon: Flame, color: 'text-warning', earned: true, points: '+25' },
     { name: 'First Survey', icon: Target, color: 'text-accent', earned: true, points: '+20' },
