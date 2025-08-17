@@ -40,10 +40,14 @@ export const useAuthLogic = () => {
   console.log('useAuthLogic - Current authState:', authState);
 
   useEffect(() => {
+    let mounted = true;
+    
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log('Auth state changed:', event, session);
+        
+        if (!mounted) return;
         
         if (session?.user) {
           try {
@@ -57,6 +61,8 @@ export const useAuthLogic = () => {
             if (error && error.code !== 'PGRST116') {
               console.error('Error fetching profile:', error);
             }
+
+            if (!mounted) return;
 
             const user: User = {
               id: session.user.id,
@@ -79,6 +85,7 @@ export const useAuthLogic = () => {
               } : undefined
             };
 
+            console.log('Setting auth state with user:', user);
             setAuthState({
               user,
               isAuthenticated: true,
@@ -86,15 +93,18 @@ export const useAuthLogic = () => {
               step: !profile?.profile_complete ? 'profile-setup' : 'dashboard'
             });
             
-            // Audit log successful login
+            // Audit log successful login (non-blocking)
             if (event === 'SIGNED_IN') {
-              await auditActions.login(session.user.id, { 
-                method: 'email_password',
-                profile_complete: profile?.profile_complete 
-              });
+              setTimeout(() => {
+                auditActions.login(session.user.id, { 
+                  method: 'email_password',
+                  profile_complete: profile?.profile_complete 
+                }).catch(console.error);
+              }, 0);
             }
           } catch (error) {
             console.error('Error processing auth state:', error);
+            if (!mounted) return;
             setAuthState({
               user: null,
               isAuthenticated: false,
@@ -103,6 +113,7 @@ export const useAuthLogic = () => {
             });
           }
         } else {
+          if (!mounted) return;
           setAuthState({
             user: null,
             isAuthenticated: false,
@@ -115,10 +126,14 @@ export const useAuthLogic = () => {
 
     // Check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('Initial session check:', session);
       // The auth state change listener will handle this
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const register = withRateLimit('registration', async (data: any): Promise<boolean> => {
