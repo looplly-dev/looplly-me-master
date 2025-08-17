@@ -43,7 +43,9 @@ export default function Login({ onForgotPassword, onRegister }: LoginProps) {
     setIsSubmitting(true);
     
     try {
-      const success = await login(formData.mobile, formData.password);
+      // Pass the mobile number with country code
+      const fullMobile = `${formData.countryCode}${formData.mobile}`;
+      const success = await login(fullMobile, formData.password);
       if (!success) {
         toast({
           title: 'Login Failed',

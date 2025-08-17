@@ -181,7 +181,7 @@ export const useAuthLogic = () => {
       return true;
     } catch (error) {
       console.error('Login error:', error);
-      return false;
+      throw error;
     }
   };
 

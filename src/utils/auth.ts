@@ -19,19 +19,21 @@ export const registerUser = async (params: RegistrationParams): Promise<{ succes
   try {
     console.log('Registering user with data:', params);
     
+    // Format mobile number consistently 
+    const fullMobile = `${params.countryCode}${params.mobile}`;
+    
     // Use email if provided, otherwise use temporary email with emailRedirectTo
     const email = params.email || `${params.mobile}@temp.com`;
     
     const { error } = await supabase.auth.signUp({
       email,
       password: params.password,
-      phone: `${params.countryCode}${params.mobile}`,
       options: {
         emailRedirectTo: `${window.location.origin}/`,
         data: {
           first_name: params.firstName || '',
           last_name: params.lastName || '',
-          mobile: `${params.countryCode}${params.mobile}`,
+          mobile: fullMobile,
           country_code: params.countryCode
         }
       }
@@ -54,11 +56,14 @@ export const loginUser = async (params: LoginParams): Promise<{ success: boolean
   try {
     console.log('Logging in user with mobile:', params.mobile);
     
-    // Try to find the user by phone number to get their actual email
+    // Format the mobile number to match what's stored
+    const fullMobile = params.mobile.startsWith('+') ? params.mobile : `+44${params.mobile}`;
+    
+    // Try to find the user by phone number
     const { data: userData, error: userError } = await supabase
       .from('profiles')
       .select('user_id')
-      .eq('mobile', params.mobile)
+      .eq('mobile', fullMobile)
       .maybeSingle();
 
     if (userError) {
@@ -67,21 +72,8 @@ export const loginUser = async (params: LoginParams): Promise<{ success: boolean
     }
 
     if (!userData) {
-      console.log('No profile found, attempting direct email login');
-      // If no profile exists, try direct email login
-      const email = `${params.mobile}@temp.com`;
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password: params.password
-      });
-
-      if (error) {
-        console.error('Direct login error:', error);
-        return { success: false, error: { message: 'Invalid mobile number or password' } };
-      }
-      
-      console.log('Direct login successful');
-      return { success: true };
+      console.log('No profile found for mobile:', fullMobile);
+      return { success: false, error: { message: 'Invalid mobile number or password' } };
     }
 
     // Get the user's actual email from auth.users
@@ -100,14 +92,14 @@ export const loginUser = async (params: LoginParams): Promise<{ success: boolean
 
     if (error) {
       console.error('Login error:', error);
-      return { success: false, error };
+      return { success: false, error: { message: 'Invalid mobile number or password' } };
     }
     
     console.log('Login successful');
     return { success: true };
   } catch (error) {
     console.error('Login failed:', error);
-    return { success: false, error };
+    return { success: false, error: { message: 'Something went wrong. Please try again.' } };
   }
 };
 
