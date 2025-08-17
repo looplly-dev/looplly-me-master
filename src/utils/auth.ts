@@ -85,6 +85,8 @@ export const loginUser = async (params: LoginParams): Promise<{ success: boolean
       return { success: false, error: { message: 'Invalid mobile number or password' } };
     }
 
+    console.log('Found user email:', authUser, 'for user_id:', userData.user_id);
+
     const { error } = await supabase.auth.signInWithPassword({
       email: authUser,
       password: params.password

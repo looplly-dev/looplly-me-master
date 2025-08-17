@@ -45,7 +45,9 @@ export default function Login({ onForgotPassword, onRegister }: LoginProps) {
     try {
       // Pass the mobile number with country code
       const fullMobile = `${formData.countryCode}${formData.mobile}`;
+      console.log('Attempting login with:', fullMobile);
       const success = await login(fullMobile, formData.password);
+      
       if (!success) {
         toast({
           title: 'Login Failed',
@@ -53,10 +55,11 @@ export default function Login({ onForgotPassword, onRegister }: LoginProps) {
           variant: 'destructive'
         });
       }
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Login component error:', error);
       toast({
         title: 'Error',
-        description: 'Something went wrong. Please try again.',
+        description: error?.message || 'Something went wrong. Please try again.',
         variant: 'destructive'
       });
     } finally {

@@ -169,7 +169,7 @@ export const useAuthLogic = () => {
 
       if (!result.success) {
         console.error('Login error:', result.error);
-        throw result.error;
+        return false;
       }
       
       console.log('Login successful - triggering OTP verification');
@@ -181,7 +181,7 @@ export const useAuthLogic = () => {
       return true;
     } catch (error) {
       console.error('Login error:', error);
-      throw error;
+      return false;
     }
   };
 
