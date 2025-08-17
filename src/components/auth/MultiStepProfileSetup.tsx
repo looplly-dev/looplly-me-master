@@ -81,7 +81,7 @@ export default function MultiStepProfileSetup({ onBack, onComplete }: MultiStepP
           title: "Profile completed!",
           description: "Welcome to Looplly! Your profile has been set up successfully.",
         });
-        onComplete();
+        // Don't call onComplete() - let the auth state update handle the redirect
       } else {
         toast({
           title: "Error",
