@@ -3,19 +3,22 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/hooks/useAuth';
 import { Coins, Wallet, User, Users, Trophy, LogOut, Settings, HelpCircle } from 'lucide-react';
-import EarnTab from './EarnTab';
+import SimplifiedEarnTab from './SimplifiedEarnTab';
 import WalletTab from './WalletTab';
 import ProfileTab from './ProfileTab';
 import SettingsTab from './SettingsTab';
 import ReferTab from './ReferTab';
 import RepTab from './RepTab';
-import SupportTab from './SupportTab';
+import SimplifiedSupportTab from './SimplifiedSupportTab';
+import { OnboardingTour } from '@/components/ui/onboarding-tour';
+import { useOnboarding } from '@/hooks/useOnboarding';
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState('earn');
   const [showSettings, setShowSettings] = useState(false);
   const [showSupport, setShowSupport] = useState(false);
   const { authState, logout } = useAuth();
+  const { showOnboarding, completeOnboarding, skipOnboarding } = useOnboarding();
 
   const handleLogout = () => {
     logout();
@@ -58,7 +61,7 @@ export default function Dashboard() {
           </div>
         </div>
         <div className="max-w-md mx-auto">
-          <SupportTab />
+          <SimplifiedSupportTab />
         </div>
       </div>
     );
@@ -137,7 +140,7 @@ export default function Dashboard() {
       <div className="max-w-md mx-auto">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsContent value="earn" className="mt-0">
-            <EarnTab />
+            <SimplifiedEarnTab />
           </TabsContent>
           <TabsContent value="wallet" className="mt-0">
             <WalletTab />
@@ -196,6 +199,13 @@ export default function Dashboard() {
           </div>
         </Tabs>
       </div>
+
+      {/* Onboarding Tour */}
+      <OnboardingTour
+        isVisible={showOnboarding}
+        onComplete={completeOnboarding}
+        onSkip={skipOnboarding}
+      />
     </div>
   );
 }

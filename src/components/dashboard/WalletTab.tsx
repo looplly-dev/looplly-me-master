@@ -2,6 +2,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { SkeletonLoader } from '@/components/ui/skeleton-loader';
+import { ContextualHelp } from '@/components/ui/contextual-help';
 import { 
   Wallet, 
   TrendingUp, 
@@ -24,7 +26,8 @@ export default function WalletTab() {
   if (balanceLoading) {
     return (
       <div className="p-4 pb-20 space-y-6">
-        <div className="h-32 bg-muted animate-pulse rounded-lg" />
+        <SkeletonLoader variant="balance" />
+        <SkeletonLoader variant="card" count={2} />
       </div>
     );
   }
@@ -141,13 +144,19 @@ export default function WalletTab() {
         </Card>
       )}
 
-      {/* Redeem Info */}
+      {/* Redeem Info with Help */}
       <Card className="border-warning/50 bg-warning/5">
         <CardContent className="p-4">
           <div className="flex gap-3">
             <AlertCircle className="h-5 w-5 text-warning flex-shrink-0 mt-0.5" />
-            <div>
-              <h3 className="font-semibold text-sm mb-1">Payment Requirements</h3>
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-1">
+                <h3 className="font-semibold text-sm">Payment Requirements</h3>
+                <ContextualHelp 
+                  content="We verify profiles to ensure secure payments and prevent fraud. This protects both you and other users in our community."
+                  position="top"
+                />
+              </div>
               <p className="text-xs text-muted-foreground">
                 • Complete profile required for all withdrawals<br />
                 • PayPal & Crypto: Minimum $10.00<br />
@@ -168,16 +177,16 @@ export default function WalletTab() {
         <CardContent className="p-0">
           {transactionsLoading ? (
             <div className="p-4">
-              <div className="space-y-3">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="h-16 bg-muted animate-pulse rounded" />
-                ))}
-              </div>
+              <SkeletonLoader variant="transaction" count={3} />
             </div>
           ) : transactions.length === 0 ? (
             <div className="p-8 text-center text-muted-foreground">
-              <p>No transactions yet</p>
-              <p className="text-xs mt-1">Start earning to see your transaction history!</p>
+              <Wallet className="h-12 w-12 mx-auto mb-3 text-muted-foreground/50" />
+              <p className="font-semibold mb-1">No transactions yet</p>
+              <p className="text-xs mb-4">Start earning to see your transaction history!</p>
+              <Button size="sm" onClick={() => window.location.hash = '#earn'}>
+                Start Earning
+              </Button>
             </div>
           ) : (
             <div className="space-y-0">
