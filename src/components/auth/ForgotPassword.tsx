@@ -12,8 +12,8 @@ interface ForgotPasswordProps {
 }
 
 export default function ForgotPassword({ onBack }: ForgotPasswordProps) {
-  const [step, setStep] = useState<'mobile' | 'otp' | 'reset'>('mobile');
-  const [mobile, setMobile] = useState('');
+  const [step, setStep] = useState<'email' | 'otp' | 'reset'>('email');
+  const [email, setEmail] = useState('');
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [passwords, setPasswords] = useState({
     password: '',
@@ -25,16 +25,16 @@ export default function ForgotPassword({ onBack }: ForgotPasswordProps) {
   const { forgotPassword, resetPassword } = useAuth();
   const { toast } = useToast();
 
-  const handleMobileSubmit = async (e: React.FormEvent) => {
+  const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!mobile) return;
+    if (!email) return;
 
     setIsSubmitting(true);
     try {
-      await forgotPassword(mobile);
+      await forgotPassword(email);
       toast({
         title: 'Code Sent',
-        description: 'Reset code sent to your mobile number',
+        description: 'Reset code sent to your email address',
       });
       setStep('otp');
     } catch (error) {
@@ -91,7 +91,7 @@ export default function ForgotPassword({ onBack }: ForgotPasswordProps) {
 
     setIsSubmitting(true);
     try {
-      await resetPassword(mobile, otp.join(''), passwords.password);
+      await resetPassword(email, otp.join(''), passwords.password);
       toast({
         title: 'Success',
         description: 'Password reset successfully! Please login.',
@@ -124,27 +124,27 @@ export default function ForgotPassword({ onBack }: ForgotPasswordProps) {
             <Key className="h-8 w-8 text-white" />
           </div>
           <CardTitle className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-            {step === 'mobile' && 'Reset Password'}
+            {step === 'email' && 'Reset Password'}
             {step === 'otp' && 'Verify Code'}
             {step === 'reset' && 'New Password'}
           </CardTitle>
           <p className="text-muted-foreground">
-            {step === 'mobile' && 'Enter your mobile number to reset password'}
-            {step === 'otp' && 'Enter the 6-digit code sent to your mobile'}
+            {step === 'email' && 'Enter your email address to reset password'}
+            {step === 'otp' && 'Enter the 6-digit code sent to your email'}
             {step === 'reset' && 'Create a new password for your account'}
           </p>
         </CardHeader>
         <CardContent>
-          {step === 'mobile' && (
-            <form onSubmit={handleMobileSubmit} className="space-y-6">
+          {step === 'email' && (
+            <form onSubmit={handleEmailSubmit} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="mobile">Mobile Number</Label>
+                <Label htmlFor="email">Email Address</Label>
                 <Input
-                  id="mobile"
-                  type="tel"
-                  placeholder="Enter your mobile number"
-                  value={mobile}
-                  onChange={(e) => setMobile(e.target.value)}
+                  id="email"
+                  type="email"
+                  placeholder="Enter your email address"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   className="h-12"
                   required
                 />

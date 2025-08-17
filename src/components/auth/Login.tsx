@@ -3,12 +3,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { Eye, EyeOff } from 'lucide-react';
-import { countries } from '@/data/countries';
-import { getCountryByDialCode, getDefaultCountry, formatCountryDisplay, formatCountryOption } from '@/utils/countries';
 
 interface LoginProps {
   onForgotPassword: () => void;
@@ -16,11 +13,9 @@ interface LoginProps {
 }
 
 export default function Login({ onForgotPassword, onRegister }: LoginProps) {
-  const defaultCountry = getDefaultCountry();
   
   const [formData, setFormData] = useState({
-    countryCode: defaultCountry.dialCode,
-    mobile: '',
+    email: '',
     password: ''
   });
   const [showPassword, setShowPassword] = useState(false);
@@ -31,7 +26,7 @@ export default function Login({ onForgotPassword, onRegister }: LoginProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.mobile || !formData.password) {
+    if (!formData.email || !formData.password) {
       toast({
         title: 'Error',
         description: 'Please fill in all fields',
@@ -43,15 +38,13 @@ export default function Login({ onForgotPassword, onRegister }: LoginProps) {
     setIsSubmitting(true);
     
     try {
-      // Pass the mobile number with country code
-      const fullMobile = `${formData.countryCode}${formData.mobile}`;
-      console.log('Attempting login with:', fullMobile);
-      const success = await login(fullMobile, formData.password);
+      console.log('Attempting login with:', formData.email);
+      const success = await login(formData.email, formData.password);
       
       if (!success) {
         toast({
           title: 'Login Failed',
-          description: 'Invalid mobile number or password',
+          description: 'Invalid email or password',
           variant: 'destructive'
         });
       }
@@ -66,8 +59,6 @@ export default function Login({ onForgotPassword, onRegister }: LoginProps) {
       setIsSubmitting(false);
     }
   };
-
-  const selectedCountry = getCountryByDialCode(formData.countryCode);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5 flex items-center justify-center p-4">
@@ -84,37 +75,16 @@ export default function Login({ onForgotPassword, onRegister }: LoginProps) {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="country-mobile">Mobile Number</Label>
-              <div className="flex gap-2">
-                <Select 
-                  value={formData.countryCode} 
-                  onValueChange={(value) => setFormData({...formData, countryCode: value})}
-                >
-                  <SelectTrigger className="w-24 h-12">
-                     <SelectValue>
-                       {selectedCountry ? formatCountryDisplay(selectedCountry) : '🇿🇦 +27'}
-                     </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent className="max-h-60">
-                     {countries.map((country) => (
-                       <SelectItem key={country.code} value={country.dialCode}>
-                         <span className="flex items-center gap-2">
-                           {formatCountryOption(country)}
-                         </span>
-                       </SelectItem>
-                     ))}
-                  </SelectContent>
-                </Select>
-                <Input
-                  id="mobile"
-                  type="tel"
-                  placeholder="Mobile number"
-                  value={formData.mobile}
-                  onChange={(e) => setFormData({...formData, mobile: e.target.value})}
-                  className="flex-1 h-12"
-                  required
-                />
-              </div>
+              <Label htmlFor="email">Email Address</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="Enter your email"
+                value={formData.email}
+                onChange={(e) => setFormData({...formData, email: e.target.value})}
+                className="h-12"
+                required
+              />
             </div>
 
             <div className="space-y-2">

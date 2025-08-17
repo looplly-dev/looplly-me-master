@@ -5,34 +5,34 @@ export interface RegistrationParams {
   mobile: string;
   countryCode: string;
   password: string;
-  email?: string;
+  email: string;
   firstName?: string;
   lastName?: string;
 }
 
 export interface LoginParams {
-  mobile: string;
+  email: string;
   password: string;
 }
 
 export const registerUser = async (params: RegistrationParams): Promise<{ success: boolean; error?: any }> => {
   try {
-    console.log('Registering user with phone:', params);
+    console.log('Registering user with email:', params.email);
     
-    // Format mobile number consistently 
+    // Format mobile number for metadata storage
     const fullMobile = `${params.countryCode}${params.mobile}`;
     
-    // Use phone-based auth instead of email
+    // Use email-based auth instead of phone
     const { error } = await supabase.auth.signUp({
-      phone: fullMobile,
+      email: params.email,
       password: params.password,
       options: {
+        emailRedirectTo: `${window.location.origin}/`,
         data: {
           first_name: params.firstName || '',
           last_name: params.lastName || '',
           mobile: fullMobile,
-          country_code: params.countryCode,
-          email: params.email || ''
+          country_code: params.countryCode
         }
       }
     });
@@ -52,20 +52,17 @@ export const registerUser = async (params: RegistrationParams): Promise<{ succes
 
 export const loginUser = async (params: LoginParams): Promise<{ success: boolean; error?: any }> => {
   try {
-    console.log('Logging in user with mobile:', params.mobile);
+    console.log('Logging in user with email:', params.email);
     
-    // Format the mobile number to match what's stored
-    const fullMobile = params.mobile.startsWith('+') ? params.mobile : `+44${params.mobile}`;
-    
-    // Use phone-based login instead of email lookup
+    // Use email-based login
     const { error } = await supabase.auth.signInWithPassword({
-      phone: fullMobile,
+      email: params.email,
       password: params.password
     });
 
     if (error) {
       console.error('Login error:', error);
-      return { success: false, error: { message: 'Invalid mobile number or password' } };
+      return { success: false, error: { message: 'Invalid email or password' } };
     }
     
     console.log('Login successful');
@@ -81,10 +78,9 @@ export const logoutUser = async (): Promise<void> => {
   await supabase.auth.signOut();
 };
 
-export const resetUserPassword = async (mobile: string): Promise<{ success: boolean; error?: any }> => {
+export const resetUserPassword = async (email: string): Promise<{ success: boolean; error?: any }> => {
   try {
-    console.log('Initiating forgot password for mobile:', mobile);
-    const email = `${mobile}@temp.com`;
+    console.log('Initiating forgot password for email:', email);
     const { error } = await supabase.auth.resetPasswordForEmail(email);
     
     if (error) {

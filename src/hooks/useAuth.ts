@@ -4,17 +4,18 @@ import { supabase } from '@/integrations/supabase/client';
 import { User, AuthState } from '@/types/auth';
 import { registerUser, loginUser, logoutUser, resetUserPassword } from '@/utils/auth';
 import { updateUserProfile, fetchUserProfile } from '@/utils/profile';
+import { createDemoEarningActivities } from '@/utils/demoData';
 
 const AuthContext = createContext<{
   authState: AuthState;
-  login: (mobile: string, password: string) => Promise<boolean>;
+  login: (email: string, password: string) => Promise<boolean>;
   verifyOTP: (code: string) => Promise<boolean>;
   register: (data: any) => Promise<boolean>;
   completeProfile: (profile: any) => Promise<boolean>;
   updateCommunicationPreferences: (preferences: any) => Promise<boolean>;
   logout: () => void;
-  forgotPassword: (mobile: string) => Promise<boolean>;
-  resetPassword: (mobile: string, otp: string, password: string) => Promise<boolean>;
+  forgotPassword: (email: string) => Promise<boolean>;
+  resetPassword: (email: string, otp: string, password: string) => Promise<boolean>;
 } | null>(null);
 
 export const useAuth = () => {
@@ -119,12 +120,24 @@ export const useAuthLogic = () => {
         mobile: data.mobile,
         countryCode: data.countryCode,
         password: data.password,
+        email: data.email,
         firstName: data.firstName,
-        lastName: data.lastName,
-        email: data.email
+        lastName: data.lastName
       });
 
       if (result.success) {
+        // Create demo earning activities for new users
+        setTimeout(async () => {
+          try {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session?.user) {
+              await createDemoEarningActivities(session.user.id);
+            }
+          } catch (error) {
+            console.error('Error creating demo activities:', error);
+          }
+        }, 2000);
+        
         return true;
       } else {
         console.error('Registration failed:', result.error);
@@ -138,12 +151,12 @@ export const useAuthLogic = () => {
     }
   };
 
-  const login = async (mobile: string, password: string): Promise<boolean> => {
-    console.log('Logging in user with mobile:', mobile);
+  const login = async (email: string, password: string): Promise<boolean> => {
+    console.log('Logging in user with email:', email);
     setAuthState(prev => ({ ...prev, isLoading: true }));
     
     try {
-      const result = await loginUser({ mobile, password });
+      const result = await loginUser({ email, password });
       
       if (result.success) {
         return true;
@@ -231,11 +244,11 @@ export const useAuthLogic = () => {
     await logoutUser();
   };
 
-  const forgotPassword = async (mobile: string): Promise<boolean> => {
-    console.log('Initiating password reset for mobile:', mobile);
+  const forgotPassword = async (email: string): Promise<boolean> => {
+    console.log('Initiating password reset for email:', email);
     
     try {
-      const result = await resetUserPassword(mobile);
+      const result = await resetUserPassword(email);
       return result.success;
     } catch (error) {
       console.error('Forgot password error:', error);
@@ -243,8 +256,8 @@ export const useAuthLogic = () => {
     }
   };
 
-  const resetPassword = async (mobile: string, otp: string, password: string): Promise<boolean> => {
-    console.log('Resetting password for mobile:', mobile);
+  const resetPassword = async (email: string, otp: string, password: string): Promise<boolean> => {
+    console.log('Resetting password for email:', email);
     // In a real implementation, this would verify OTP and reset password
     // For now, we'll simulate success
     await new Promise(resolve => setTimeout(resolve, 1000));
