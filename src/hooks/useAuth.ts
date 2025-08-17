@@ -89,7 +89,9 @@ export const useAuthLogic = () => {
                 step: user.profileComplete ? 'dashboard' : 'profile-setup'
               });
             } else {
-              console.log('No profile found, user needs to complete setup');
+              console.log('No profile found, logging out user and redirecting to registration');
+              // If no profile exists, log out the user and redirect to login/registration
+              await supabase.auth.signOut();
               setAuthState({
                 user: null,
                 isAuthenticated: false,
