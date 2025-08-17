@@ -209,47 +209,46 @@ export default function SimplifiedEarnTab() {
                   </div>
                 ) : (
                   availableTasks.filter(a => a.activity_type === 'survey').map((activity) => (
-                    <div key={activity.id} className="p-4 border rounded-lg bg-gradient-to-r from-background to-primary/5">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <FileText className="h-4 w-4 text-primary" />
-                            <h3 className="font-semibold text-sm">{activity.title}</h3>
-                          </div>
-                          <p className="text-sm text-muted-foreground mb-2">
-                            {activity.description}
-                          </p>
-                          <div className="flex items-center gap-4 text-sm">
-                            <span className="flex items-center gap-1">
-                              <Coins className="h-4 w-4 text-success" />
-                              <span className="font-bold text-success">${activity.reward_amount.toFixed(2)}</span>
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <Clock className="h-4 w-4" />
-                              {activity.time_estimate || 5} min
-                            </span>
-                            <div className="flex items-center gap-1">
-                              {[...Array(5)].map((_, i) => (
-                                <Star
-                                  key={i}
-                                  className={`h-3 w-3 ${
-                                    i < (activity.metadata?.rating || 4.2) ? 'text-warning fill-current' : 'text-muted-foreground/30'
-                                  }`}
-                                />
-                              ))}
-                              <span className="text-xs text-muted-foreground ml-1">
-                                {activity.metadata?.rating || '4.2'}
-                              </span>
-                            </div>
+                    <div key={activity.id} className="p-4 border rounded-lg bg-background border-l-4 border-l-primary/50">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <FileText className="h-5 w-5 text-primary" />
+                          <div>
+                            <h3 className="font-semibold">{activity.title}</h3>
+                            <p className="text-sm text-muted-foreground">
+                              {activity.description}
+                            </p>
                           </div>
                         </div>
-                        <Button
-                          onClick={() => handleStartTask(activity.activity_type, activity.title, activity.reward_amount)}
-                          className="ml-4"
-                        >
-                          Start
-                          <ArrowRight className="h-4 w-4 ml-1" />
-                        </Button>
+                        <div className="flex flex-col items-end gap-2">
+                          <Badge variant="outline" className="text-primary border-primary text-xs">
+                            Available
+                          </Badge>
+                          <Button
+                            onClick={() => handleStartTask(activity.activity_type, activity.title, activity.reward_amount)}
+                          >
+                            Start
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-4 text-sm">
+                        <span className="flex items-center gap-1">
+                          <Clock className="h-4 w-4" />
+                          {activity.time_estimate || 5} min
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Coins className="h-4 w-4 text-success" />
+                          <span className="font-bold text-success">${activity.reward_amount.toFixed(2)}</span>
+                        </span>
+                        <div className="flex items-center gap-1">
+                          <Star className="h-4 w-4 text-warning fill-current" />
+                          <span className="font-medium">
+                            {activity.metadata?.rating || '4.2'}
+                          </span>
+                          <span className="text-muted-foreground">
+                            ({activity.metadata?.reviews || '284'})
+                          </span>
+                        </div>
                       </div>
                     </div>
                   ))
@@ -267,47 +266,46 @@ export default function SimplifiedEarnTab() {
                   </div>
                 ) : (
                   availableTasks.filter(a => a.activity_type === 'video').map((activity) => (
-                    <div key={activity.id} className="p-4 border rounded-lg bg-gradient-to-r from-background to-accent/5">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <Play className="h-4 w-4 text-accent" />
-                            <h3 className="font-semibold text-sm">{activity.title}</h3>
-                          </div>
-                          <p className="text-sm text-muted-foreground mb-2">
-                            {activity.description}
-                          </p>
-                          <div className="flex items-center gap-4 text-sm">
-                            <span className="flex items-center gap-1">
-                              <Coins className="h-4 w-4 text-success" />
-                              <span className="font-bold text-success">${activity.reward_amount.toFixed(2)}</span>
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <Clock className="h-4 w-4" />
-                              {activity.time_estimate || 3} min
-                            </span>
-                            <div className="flex items-center gap-1">
-                              {[...Array(5)].map((_, i) => (
-                                <Star
-                                  key={i}
-                                  className={`h-3 w-3 ${
-                                    i < (activity.metadata?.rating || 4.1) ? 'text-warning fill-current' : 'text-muted-foreground/30'
-                                  }`}
-                                />
-                              ))}
-                              <span className="text-xs text-muted-foreground ml-1">
-                                {activity.metadata?.rating || '4.1'}
-                              </span>
-                            </div>
+                    <div key={activity.id} className="p-4 border rounded-lg bg-background border-l-4 border-l-accent/50">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <Play className="h-5 w-5 text-accent" />
+                          <div>
+                            <h3 className="font-semibold">{activity.title}</h3>
+                            <p className="text-sm text-muted-foreground">
+                              {activity.description}
+                            </p>
                           </div>
                         </div>
-                        <Button
-                          onClick={() => handleStartTask(activity.activity_type, activity.title, activity.reward_amount)}
-                          className="ml-4"
-                        >
-                          Start
-                          <ArrowRight className="h-4 w-4 ml-1" />
-                        </Button>
+                        <div className="flex flex-col items-end gap-2">
+                          <Badge variant="outline" className="text-accent border-accent text-xs">
+                            Available
+                          </Badge>
+                          <Button
+                            onClick={() => handleStartTask(activity.activity_type, activity.title, activity.reward_amount)}
+                          >
+                            Start
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-4 text-sm">
+                        <span className="flex items-center gap-1">
+                          <Clock className="h-4 w-4" />
+                          {activity.time_estimate || 3} min
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Coins className="h-4 w-4 text-success" />
+                          <span className="font-bold text-success">${activity.reward_amount.toFixed(2)}</span>
+                        </span>
+                        <div className="flex items-center gap-1">
+                          <Star className="h-4 w-4 text-warning fill-current" />
+                          <span className="font-medium">
+                            {activity.metadata?.rating || '4.1'}
+                          </span>
+                          <span className="text-muted-foreground">
+                            ({activity.metadata?.reviews || '156'})
+                          </span>
+                        </div>
                       </div>
                     </div>
                   ))
@@ -325,47 +323,46 @@ export default function SimplifiedEarnTab() {
                   </div>
                 ) : (
                   availableTasks.filter(a => a.activity_type === 'task').map((activity) => (
-                    <div key={activity.id} className="p-4 border rounded-lg bg-gradient-to-r from-background to-warning/5">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <Zap className="h-4 w-4 text-warning" />
-                            <h3 className="font-semibold text-sm">{activity.title}</h3>
-                          </div>
-                          <p className="text-sm text-muted-foreground mb-2">
-                            {activity.description}
-                          </p>
-                          <div className="flex items-center gap-4 text-sm">
-                            <span className="flex items-center gap-1">
-                              <Coins className="h-4 w-4 text-success" />
-                              <span className="font-bold text-success">${activity.reward_amount.toFixed(2)}</span>
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <Clock className="h-4 w-4" />
-                              {activity.time_estimate || 2} min
-                            </span>
-                            <div className="flex items-center gap-1">
-                              {[...Array(5)].map((_, i) => (
-                                <Star
-                                  key={i}
-                                  className={`h-3 w-3 ${
-                                    i < (activity.metadata?.rating || 4.5) ? 'text-warning fill-current' : 'text-muted-foreground/30'
-                                  }`}
-                                />
-                              ))}
-                              <span className="text-xs text-muted-foreground ml-1">
-                                {activity.metadata?.rating || '4.5'}
-                              </span>
-                            </div>
+                    <div key={activity.id} className="p-4 border rounded-lg bg-background border-l-4 border-l-warning/50">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <Zap className="h-5 w-5 text-warning" />
+                          <div>
+                            <h3 className="font-semibold">{activity.title}</h3>
+                            <p className="text-sm text-muted-foreground">
+                              {activity.description}
+                            </p>
                           </div>
                         </div>
-                        <Button
-                          onClick={() => handleStartTask(activity.activity_type, activity.title, activity.reward_amount)}
-                          className="ml-4"
-                        >
-                          Start
-                          <ArrowRight className="h-4 w-4 ml-1" />
-                        </Button>
+                        <div className="flex flex-col items-end gap-2">
+                          <Badge variant="outline" className="text-warning border-warning text-xs">
+                            Available
+                          </Badge>
+                          <Button
+                            onClick={() => handleStartTask(activity.activity_type, activity.title, activity.reward_amount)}
+                          >
+                            Start
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-4 text-sm">
+                        <span className="flex items-center gap-1">
+                          <Clock className="h-4 w-4" />
+                          {activity.time_estimate || 2} min
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Coins className="h-4 w-4 text-success" />
+                          <span className="font-bold text-success">${activity.reward_amount.toFixed(2)}</span>
+                        </span>
+                        <div className="flex items-center gap-1">
+                          <Star className="h-4 w-4 text-warning fill-current" />
+                          <span className="font-medium">
+                            {activity.metadata?.rating || '4.5'}
+                          </span>
+                          <span className="text-muted-foreground">
+                            ({activity.metadata?.reviews || '92'})
+                          </span>
+                        </div>
                       </div>
                     </div>
                   ))
