@@ -44,75 +44,86 @@ export const useAuthLogic = () => {
     
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
         console.log('Auth state changed:', event, session);
         
         if (!mounted) return;
         
         if (session?.user) {
-          try {
-            // Fetch user profile from our profiles table
-            const { data: profile, error } = await supabase
-              .from('profiles')
-              .select('*')
-              .eq('user_id', session.user.id)
-              .single();
-
-            if (error && error.code !== 'PGRST116') {
-              console.error('Error fetching profile:', error);
-            }
-
+          console.log('Processing user session...');
+          
+          // Use setTimeout to avoid blocking the auth state change
+          setTimeout(async () => {
             if (!mounted) return;
-
-            const user: User = {
-              id: session.user.id,
-              mobile: profile?.mobile || session.user.phone || '',
-              countryCode: profile?.country_code || '+1',
-              email: session.user.email || undefined,
-              firstName: profile?.first_name || '',
-              lastName: profile?.last_name || '',
-              isVerified: session.user.email_confirmed_at !== null,
-              profileComplete: profile?.profile_complete || false,
-              profile: profile ? {
-                sec: (profile.sec as 'A' | 'B' | 'C1' | 'C2' | 'D' | 'E') || 'B',
-                gender: (profile.gender as 'male' | 'female' | 'other') || 'other',
-                dateOfBirth: profile.date_of_birth ? new Date(profile.date_of_birth) : new Date(),
-                address: profile.address || '',
-                gpsEnabled: true,
-                firstName: profile.first_name,
-                lastName: profile.last_name,
-                email: session.user.email || ''
-              } : undefined
-            };
-
-            console.log('Setting auth state with user:', user);
-            setAuthState({
-              user,
-              isAuthenticated: true,
-              isLoading: false,
-              step: !profile?.profile_complete ? 'profile-setup' : 'dashboard'
-            });
             
-            // Audit log successful login (non-blocking)
-            if (event === 'SIGNED_IN') {
-              setTimeout(() => {
-                auditActions.login(session.user.id, { 
-                  method: 'email_password',
-                  profile_complete: profile?.profile_complete 
-                }).catch(console.error);
-              }, 0);
+            try {
+              // Fetch user profile from our profiles table
+              console.log('Fetching profile for user:', session.user.id);
+              const { data: profile, error } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('user_id', session.user.id)
+                .single();
+
+              if (error && error.code !== 'PGRST116') {
+                console.error('Error fetching profile:', error);
+              }
+
+              console.log('Profile fetched:', profile);
+
+              if (!mounted) return;
+
+              const user: User = {
+                id: session.user.id,
+                mobile: profile?.mobile || session.user.phone || '',
+                countryCode: profile?.country_code || '+1',
+                email: session.user.email || undefined,
+                firstName: profile?.first_name || '',
+                lastName: profile?.last_name || '',
+                isVerified: session.user.email_confirmed_at !== null,
+                profileComplete: profile?.profile_complete || false,
+                profile: profile ? {
+                  sec: (profile.sec as 'A' | 'B' | 'C1' | 'C2' | 'D' | 'E') || 'B',
+                  gender: (profile.gender as 'male' | 'female' | 'other') || 'other',
+                  dateOfBirth: profile.date_of_birth ? new Date(profile.date_of_birth) : new Date(),
+                  address: profile.address || '',
+                  gpsEnabled: true,
+                  firstName: profile.first_name,
+                  lastName: profile.last_name,
+                  email: session.user.email || ''
+                } : undefined
+              };
+
+              console.log('Setting auth state with user:', user);
+              setAuthState({
+                user,
+                isAuthenticated: true,
+                isLoading: false,
+                step: !profile?.profile_complete ? 'profile-setup' : 'dashboard'
+              });
+              
+              // Audit log successful login (non-blocking)
+              if (event === 'SIGNED_IN') {
+                setTimeout(() => {
+                  auditActions.login(session.user.id, { 
+                    method: 'email_password',
+                    profile_complete: profile?.profile_complete 
+                  }).catch(console.error);
+                }, 0);
+              }
+            } catch (error) {
+              console.error('Error processing auth state:', error);
+              if (!mounted) return;
+              setAuthState({
+                user: null,
+                isAuthenticated: false,
+                isLoading: false,
+                step: 'login'
+              });
             }
-          } catch (error) {
-            console.error('Error processing auth state:', error);
-            if (!mounted) return;
-            setAuthState({
-              user: null,
-              isAuthenticated: false,
-              isLoading: false,
-              step: 'login'
-            });
-          }
+          }, 0);
         } else {
+          console.log('No session, setting unauthenticated state');
           if (!mounted) return;
           setAuthState({
             user: null,
