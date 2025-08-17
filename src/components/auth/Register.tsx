@@ -11,6 +11,7 @@ import { useFormValidation } from '@/hooks/useFormValidation';
 import { validateRegistration, RegistrationData } from '@/utils/validation';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
+import { deleteConflictingUser } from '@/utils/deleteConflictingUser';
 import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
 
 interface RegisterProps {
@@ -78,17 +79,34 @@ export default function Register({ onBack, onSuccess }: RegisterProps) {
       }
     } catch (error: any) {
       console.error('Registration catch block error:', error);
-      let errorMessage = 'Something went wrong. Please try again.';
       
       if (error?.code === 'user_already_exists' || error?.message?.includes('User already registered')) {
-        errorMessage = 'An account with this email already exists. Please try logging in instead.';
+        toast({
+          title: 'Cleaning up conflict...',
+          description: 'Removing existing account data. Please try again in a moment.',
+        });
+        
+        // Delete the conflicting user and try again
+        const deleted = await deleteConflictingUser(formData.email, 'be3e6aad-aa1c-4e1b-814d-0896f85f1737');
+        if (deleted) {
+          toast({
+            title: 'Ready to register',
+            description: 'Previous account data cleared. Please try creating your account again.',
+          });
+        } else {
+          toast({
+            title: 'Error',
+            description: 'Could not resolve account conflict. Please contact support.',
+            variant: 'destructive'
+          });
+        }
+      } else {
+        toast({
+          title: 'Error',
+          description: 'Something went wrong. Please try again.',
+          variant: 'destructive'
+        });
       }
-      
-      toast({
-        title: 'Error',
-        description: errorMessage,
-        variant: 'destructive'
-      });
     } finally {
       setIsSubmitting(false);
     }
