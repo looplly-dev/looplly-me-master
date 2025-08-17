@@ -1,16 +1,20 @@
 import { supabase } from '@/integrations/supabase/client';
 
 export const addMissingDemoActivities = async (userId: string) => {
-  // Check if any demo activities already exist for this user to avoid duplicates
-  const { data: existingActivities } = await supabase
+  // Check if any demo activities already exist for this user to prevent duplicates
+  const { data: existingActivities, error } = await supabase
     .from('earning_activities')
-    .select('title')
-    .eq('user_id', userId);
+    .select('id')
+    .eq('user_id', userId)
+    .limit(1);
 
-  const existingTitles = existingActivities?.map(a => a.title) || [];
+  if (error) {
+    console.error('Error checking existing activities:', error);
+    return false;
+  }
 
-  // If the user already has demo activities, don't add more
-  if (existingTitles.length > 0) {
+  // If the user already has any activities, don't add more
+  if (existingActivities && existingActivities.length > 0) {
     return true;
   }
 

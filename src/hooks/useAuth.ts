@@ -162,17 +162,8 @@ export const useAuthLogic = () => {
       });
 
       if (result.success) {
-        // Create demo earning activities for new users
-        setTimeout(async () => {
-          try {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (session?.user) {
-              await createDemoEarningActivities(session.user.id);
-            }
-          } catch (error) {
-            console.error('Error creating demo activities:', error);
-          }
-        }, 2000);
+        // Demo activities will be created by the SimplifiedEarnTab component
+        // when the user first visits the earn page to avoid duplicates
         
         return true;
       } else {
