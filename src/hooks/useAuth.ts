@@ -30,7 +30,7 @@ export const useAuthLogic = () => {
   const [authState, setAuthState] = useState<AuthState>({
     user: null,
     isAuthenticated: false,
-    isLoading: true,
+    isLoading: false, // Start with false to avoid spinning
     step: 'login'
   });
   const [session, setSession] = useState<Session | null>(null);
