@@ -220,10 +220,7 @@ export default function SimplifiedEarnTab() {
                             </p>
                           </div>
                         </div>
-                        <div className="flex flex-col items-end gap-2">
-                          <Badge variant="outline" className="text-primary border-primary text-xs">
-                            Available
-                          </Badge>
+                        <div className="flex flex-col items-end">
                           <Button
                             onClick={() => handleStartTask(activity.activity_type, activity.title, activity.reward_amount)}
                           >
@@ -277,10 +274,7 @@ export default function SimplifiedEarnTab() {
                             </p>
                           </div>
                         </div>
-                        <div className="flex flex-col items-end gap-2">
-                          <Badge variant="outline" className="text-accent border-accent text-xs">
-                            Available
-                          </Badge>
+                        <div className="flex flex-col items-end">
                           <Button
                             onClick={() => handleStartTask(activity.activity_type, activity.title, activity.reward_amount)}
                           >
@@ -334,10 +328,7 @@ export default function SimplifiedEarnTab() {
                             </p>
                           </div>
                         </div>
-                        <div className="flex flex-col items-end gap-2">
-                          <Badge variant="outline" className="text-warning border-warning text-xs">
-                            Available
-                          </Badge>
+                        <div className="flex flex-col items-end">
                           <Button
                             onClick={() => handleStartTask(activity.activity_type, activity.title, activity.reward_amount)}
                           >
