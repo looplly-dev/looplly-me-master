@@ -19,11 +19,15 @@ export const registerUser = async (params: RegistrationParams): Promise<{ succes
   try {
     console.log('Registering user with data:', params);
     
+    // Use email if provided, otherwise use temporary email with emailRedirectTo
+    const email = params.email || `${params.mobile}@temp.com`;
+    
     const { error } = await supabase.auth.signUp({
-      email: params.email || `${params.mobile}@temp.com`,
+      email,
       password: params.password,
       phone: `${params.countryCode}${params.mobile}`,
       options: {
+        emailRedirectTo: `${window.location.origin}/`,
         data: {
           first_name: params.firstName || '',
           last_name: params.lastName || '',
