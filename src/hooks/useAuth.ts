@@ -33,21 +33,29 @@ export const useAuthLogic = () => {
   });
   const [session, setSession] = useState<Session | null>(null);
 
+  console.log('useAuthLogic - Current authState:', authState);
+
   useEffect(() => {
+    console.log('useAuthLogic - Setting up auth listener');
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log('Auth state change event:', event, 'Session:', !!session);
         setSession(session);
         
         if (session?.user) {
+          console.log('User found in session, fetching profile for:', session.user.id);
           // Fetch user profile
-          const { data: profile } = await supabase
+          const { data: profile, error } = await supabase
             .from('profiles')
             .select('*')
             .eq('user_id', session.user.id)
             .single();
 
+          console.log('Profile fetch result:', profile, 'Error:', error);
+          
           if (profile) {
+            console.log('Setting authenticated user state');
             const user: User = {
               id: session.user.id,
               mobile: profile.mobile,
@@ -75,8 +83,17 @@ export const useAuthLogic = () => {
               isLoading: false,
               step: profile.profile_complete ? 'dashboard' : 'profile'
             });
+          } else {
+            console.log('No profile found, user needs to complete setup');
+            setAuthState({
+              user: null,
+              isAuthenticated: false,
+              isLoading: false,
+              step: 'profile'
+            });
           }
         } else {
+          console.log('No session found, setting unauthenticated state');
           setAuthState({
             user: null,
             isAuthenticated: false,
@@ -88,8 +105,11 @@ export const useAuthLogic = () => {
     );
 
     // Check for existing session
+    console.log('Checking for existing session...');
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('Initial session check result:', !!session);
       if (!session) {
+        console.log('No initial session, setting loading to false');
         setAuthState(prev => ({ ...prev, isLoading: false }));
       }
     });
@@ -99,6 +119,7 @@ export const useAuthLogic = () => {
 
   const register = async (data: any): Promise<boolean> => {
     try {
+      console.log('Registering user with data:', data);
       const { error } = await supabase.auth.signUp({
         email: data.email || `${data.mobile}@temp.com`,
         password: data.password,
@@ -113,7 +134,11 @@ export const useAuthLogic = () => {
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Registration error:', error);
+        throw error;
+      }
+      console.log('Registration successful');
       return true;
     } catch (error) {
       console.error('Registration error:', error);
@@ -123,6 +148,7 @@ export const useAuthLogic = () => {
 
   const login = async (mobile: string, password: string): Promise<boolean> => {
     try {
+      console.log('Logging in user with mobile:', mobile);
       // For now, use email-based login since mobile auth requires additional setup
       const email = `${mobile}@temp.com`;
       const { error } = await supabase.auth.signInWithPassword({
@@ -130,7 +156,11 @@ export const useAuthLogic = () => {
         password
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Login error:', error);
+        throw error;
+      }
+      console.log('Login successful');
       return true;
     } catch (error) {
       console.error('Login error:', error);
@@ -139,13 +169,18 @@ export const useAuthLogic = () => {
   };
 
   const verifyOTP = async (code: string): Promise<boolean> => {
+    console.log('Verifying OTP:', code);
     // For demo purposes, auto-verify
     return true;
   };
 
   const completeProfile = async (profile: any): Promise<boolean> => {
     try {
-      if (!session?.user) return false;
+      console.log('Completing profile with data:', profile);
+      if (!session?.user) {
+        console.log('No session found for profile completion');
+        return false;
+      }
 
       // Calculate age from date of birth
       const today = new Date();
@@ -154,6 +189,7 @@ export const useAuthLogic = () => {
       
       // Check age restriction
       if (age < 16) {
+        console.log('User is under 16, rejecting profile completion');
         return false;
       }
 
@@ -172,7 +208,11 @@ export const useAuthLogic = () => {
         })
         .eq('user_id', session.user.id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Profile completion error:', error);
+        throw error;
+      }
+      console.log('Profile completion successful');
       return true;
     } catch (error) {
       console.error('Profile completion error:', error);
@@ -182,7 +222,11 @@ export const useAuthLogic = () => {
 
   const updateCommunicationPreferences = async (preferences: any): Promise<boolean> => {
     try {
-      if (!session?.user) return false;
+      console.log('Updating communication preferences:', preferences);
+      if (!session?.user) {
+        console.log('No session found for communication preferences update');
+        return false;
+      }
 
       const { error } = await supabase
         .from('communication_preferences')
@@ -194,7 +238,11 @@ export const useAuthLogic = () => {
         })
         .eq('user_id', session.user.id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Communication preferences error:', error);
+        throw error;
+      }
+      console.log('Communication preferences updated successfully');
       return true;
     } catch (error) {
       console.error('Communication preferences error:', error);
@@ -203,14 +251,20 @@ export const useAuthLogic = () => {
   };
 
   const logout = async () => {
+    console.log('Logging out user');
     await supabase.auth.signOut();
   };
 
   const forgotPassword = async (mobile: string): Promise<boolean> => {
     try {
+      console.log('Initiating forgot password for mobile:', mobile);
       const email = `${mobile}@temp.com`;
       const { error } = await supabase.auth.resetPasswordForEmail(email);
-      if (error) throw error;
+      if (error) {
+        console.error('Forgot password error:', error);
+        throw error;
+      }
+      console.log('Password reset email sent');
       return true;
     } catch (error) {
       console.error('Forgot password error:', error);
@@ -219,6 +273,7 @@ export const useAuthLogic = () => {
   };
 
   const resetPassword = async (mobile: string, otp: string, password: string): Promise<boolean> => {
+    console.log('Resetting password for mobile:', mobile);
     // This would require additional OTP verification logic
     return true;
   };
