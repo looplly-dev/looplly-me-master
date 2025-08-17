@@ -37,6 +37,17 @@ export const createDemoEarningActivities = async (userId: string) => {
     },
     {
       user_id: userId,
+      activity_type: 'task' as const,
+      title: 'Enroll in Qual Study',
+      description: 'Join a focus group or research study in your area - higher rewards for in-person participation',
+      reward_amount: 75.00,
+      time_estimate: 90,
+      status: 'available' as const,
+      provider: 'Research Partners',
+      metadata: { platform: 'in-person', category: 'research', difficulty: 'easy', rating: '4.8', reviews: '127' }
+    },
+    {
+      user_id: userId,
       activity_type: 'survey' as const,
       title: 'Food & Dining Habits',
       description: 'Tell us about your eating habits and restaurant preferences',
