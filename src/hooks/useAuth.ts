@@ -83,7 +83,7 @@ export const useAuthLogic = () => {
               user,
               isAuthenticated: true,
               isLoading: false,
-              step: profile.profile_complete ? 'dashboard' : 'profile'
+              step: profile.profile_complete ? 'dashboard' : 'otp-verification'
             });
           } else {
             console.log('No profile found, user needs to complete setup');
@@ -91,7 +91,7 @@ export const useAuthLogic = () => {
               user: null,
               isAuthenticated: false,
               isLoading: false,
-              step: 'profile'
+              step: 'login'
             });
           }
         } else {

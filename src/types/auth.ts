@@ -25,7 +25,7 @@ export interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  step: 'login' | 'otp' | 'profile' | 'dashboard';
+  step: 'login' | 'otp-verification' | 'profile-setup' | 'communication-preferences' | 'dashboard';
 }
 
 export interface Country {

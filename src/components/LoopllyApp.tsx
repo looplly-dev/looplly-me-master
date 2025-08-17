@@ -40,37 +40,39 @@ export default function LoopllyApp() {
     return <AdminPanel />;
   }
 
-  // If user is authenticated and has completed profile, show dashboard
-  if (authState.isAuthenticated && authState.step === 'dashboard') {
+  // If user is authenticated, handle post-login flow
+  if (authState.isAuthenticated) {
+    // Check if user needs OTP verification after login
+    if (authState.step === 'otp-verification') {
+      console.log('LoopllyApp - Showing OTP verification');
+      return <OTPVerification onBack={() => {}} />;
+    }
+    
+    // Check if user needs to complete profile
+    if (authState.step === 'profile-setup') {
+      console.log('LoopllyApp - Showing profile setup');
+      return (
+        <MultiStepProfileSetup 
+          onBack={() => {}}
+          onComplete={() => {}}
+        />
+      );
+    }
+    
+    // Check if user needs to set communication preferences
+    if (authState.step === 'communication-preferences') {
+      console.log('LoopllyApp - Showing communication preferences');
+      return (
+        <CommunicationPreferences 
+          onBack={() => {}}
+          onComplete={() => {}}
+        />
+      );
+    }
+    
+    // User has completed all steps, show dashboard
     console.log('LoopllyApp - Showing dashboard');
     return <Dashboard />;
-  }
-
-  // Multi-step onboarding flow
-  if (authState.step === 'profile' || authFlow === 'profile') {
-    console.log('LoopllyApp - Showing profile setup');
-    return (
-      <MultiStepProfileSetup 
-        onBack={() => setAuthFlow('login')}
-        onComplete={() => setAuthFlow('communication')}
-      />
-    );
-  }
-
-  if (authFlow === 'communication') {
-    console.log('LoopllyApp - Showing communication preferences');
-    return (
-      <CommunicationPreferences 
-        onBack={() => setAuthFlow('profile')}
-        onComplete={() => setAuthFlow('otp')}
-      />
-    );
-  }
-
-  // If user needs OTP verification
-  if (authState.step === 'otp' || authFlow === 'otp') {
-    console.log('LoopllyApp - Showing OTP verification');
-    return <OTPVerification onBack={() => setAuthFlow('communication')} />;
   }
 
   // Auth screens
@@ -79,7 +81,7 @@ export default function LoopllyApp() {
     return (
       <Register
         onBack={() => setAuthFlow('login')}
-        onSuccess={() => setAuthFlow('profile')}
+        onSuccess={() => setAuthFlow('login')}
       />
     );
   }
