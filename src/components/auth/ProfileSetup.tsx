@@ -69,22 +69,7 @@ export default function ProfileSetup() {
       parseInt(formData.dobDay)
     );
 
-    // Calculate age from date of birth
-    const today = new Date();
-    let age = today.getFullYear() - dateOfBirth.getFullYear();
-    const monthDiff = today.getMonth() - dateOfBirth.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dateOfBirth.getDate())) {
-      age--;
-    }
-
-    if (age < 16) {
-      toast({
-        title: 'Age Restriction',
-        description: 'You must be at least 16 years old to use Looplly',
-        variant: 'destructive'
-      });
-      return;
-    }
+    // Age validation removed
 
     setIsSubmitting(true);
     

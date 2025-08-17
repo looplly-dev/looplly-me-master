@@ -81,8 +81,8 @@ export default function MultiStepProfileSetup({ onBack, onComplete }: MultiStepP
         onComplete();
       } else {
         toast({
-          title: "Age Restriction",
-          description: "You must be at least 16 years old to use this platform.",
+          title: "Error",
+          description: "Failed to complete profile. Please try again.",
           variant: "destructive",
         });
       }
