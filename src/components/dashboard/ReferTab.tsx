@@ -43,7 +43,7 @@ export default function ReferTab() {
   return (
     <div className="p-4 pb-20 space-y-6">
       {/* Referral Earnings */}
-      <Card className="bg-gradient-to-r from-accent to-primary text-white border-0 shadow-lg">
+      <Card className="bg-primary text-white border-0 shadow-lg">
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-4">
             <div>

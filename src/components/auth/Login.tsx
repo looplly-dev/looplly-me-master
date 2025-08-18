@@ -64,10 +64,10 @@ export default function Login({ onForgotPassword, onRegister }: LoginProps) {
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5 flex items-center justify-center p-4">
       <Card className="w-full max-w-md shadow-2xl border-0 bg-card/95 backdrop-blur-sm">
         <CardHeader className="text-center pb-6">
-          <div className="mx-auto mb-4 w-16 h-16 bg-gradient-to-r from-primary to-accent rounded-2xl flex items-center justify-center">
+          <div className="mx-auto mb-4 w-16 h-16 bg-primary rounded-2xl flex items-center justify-center">
             <span className="text-2xl font-bold text-white">L</span>
           </div>
-          <CardTitle className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+          <CardTitle className="text-3xl font-bold text-primary">
             Welcome back
           </CardTitle>
           <p className="text-muted-foreground">Sign in to continue earning</p>

@@ -106,10 +106,10 @@ export default function OTPVerification({ onBack }: OTPVerificationProps) {
           >
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <div className="mx-auto mb-4 w-16 h-16 bg-gradient-to-r from-primary to-accent rounded-2xl flex items-center justify-center">
+          <div className="mx-auto mb-4 w-16 h-16 bg-primary rounded-2xl flex items-center justify-center">
             <Shield className="h-8 w-8 text-white" />
           </div>
-          <CardTitle className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+          <CardTitle className="text-2xl font-bold text-primary">
             Verify Your Number
           </CardTitle>
           <p className="text-muted-foreground">

@@ -16,7 +16,7 @@ function AdminPanelContent() {
       <div className="max-w-4xl mx-auto space-y-6">
         <Card>
           <CardHeader className="text-center">
-            <div className="mx-auto mb-4 w-12 h-12 bg-gradient-to-r from-primary to-accent rounded-xl flex items-center justify-center">
+            <div className="mx-auto mb-4 w-12 h-12 bg-primary rounded-xl flex items-center justify-center">
               <Settings className="h-6 w-6 text-white" />
             </div>
             <CardTitle>Admin Panel</CardTitle>

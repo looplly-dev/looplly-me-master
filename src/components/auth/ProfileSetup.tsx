@@ -107,10 +107,10 @@ export default function ProfileSetup() {
       <div className="max-w-md mx-auto">
         <Card className="shadow-2xl border-0 bg-card/95 backdrop-blur-sm">
           <CardHeader className="text-center pb-6">
-            <div className="mx-auto mb-4 w-16 h-16 bg-gradient-to-r from-primary to-accent rounded-2xl flex items-center justify-center">
+            <div className="mx-auto mb-4 w-16 h-16 bg-primary rounded-2xl flex items-center justify-center">
               <User className="h-8 w-8 text-white" />
             </div>
-            <CardTitle className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+            <CardTitle className="text-2xl font-bold text-primary">
               Complete Your Profile
             </CardTitle>
             <p className="text-muted-foreground">

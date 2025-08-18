@@ -74,7 +74,7 @@ export default function ProfileTab() {
       <Card>
         <CardContent className="p-6">
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 bg-gradient-to-r from-primary to-accent rounded-full flex items-center justify-center">
+            <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center">
               <User className="h-8 w-8 text-white" />
             </div>
             <div className="flex-1">

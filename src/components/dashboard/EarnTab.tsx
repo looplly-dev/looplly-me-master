@@ -81,7 +81,7 @@ export default function EarnTab() {
   return (
     <div className="p-4 pb-20 space-y-6">
       {/* Balance Card */}
-      <Card className="bg-gradient-to-r from-primary to-accent text-white border-0 shadow-lg">
+      <Card className="bg-primary text-white border-0 shadow-lg">
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-4">
             <div>

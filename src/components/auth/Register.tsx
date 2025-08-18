@@ -126,7 +126,7 @@ export default function Register({ onBack, onSuccess }: RegisterProps) {
           >
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <CardTitle className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+          <CardTitle className="text-2xl font-bold text-primary">
             Create Account
           </CardTitle>
           <p className="text-muted-foreground">Join Looplly and start earning</p>

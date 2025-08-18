@@ -120,10 +120,10 @@ export default function ForgotPassword({ onBack }: ForgotPasswordProps) {
           >
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <div className="mx-auto mb-4 w-16 h-16 bg-gradient-to-r from-primary to-accent rounded-2xl flex items-center justify-center">
+          <div className="mx-auto mb-4 w-16 h-16 bg-primary rounded-2xl flex items-center justify-center">
             <Key className="h-8 w-8 text-white" />
           </div>
-          <CardTitle className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+          <CardTitle className="text-2xl font-bold text-primary">
             {step === 'email' && 'Reset Password'}
             {step === 'otp' && 'Verify Code'}
             {step === 'reset' && 'New Password'}

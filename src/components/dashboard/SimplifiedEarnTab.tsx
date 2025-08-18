@@ -121,7 +121,7 @@ export default function SimplifiedEarnTab() {
   return (
     <div className="p-4 pb-20 space-y-6">
       {/* Enhanced Balance Card with Progress */}
-      <Card className="bg-gradient-to-r from-primary to-accent text-white border-0 shadow-lg overflow-hidden relative">
+      <Card className="bg-primary text-white border-0 shadow-lg overflow-hidden relative">
         <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -mr-10 -mt-10" />
         <CardContent className="p-6 relative">
           <div className="flex items-center justify-between mb-4">

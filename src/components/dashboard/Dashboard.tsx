@@ -54,7 +54,7 @@ export default function Dashboard() {
             >
               ← Back
             </Button>
-            <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+            <h1 className="text-xl font-bold text-primary">
               Support
             </h1>
             <div className="w-8" /> {/* Spacer */}
@@ -81,7 +81,7 @@ export default function Dashboard() {
             >
               ← Back
             </Button>
-            <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+            <h1 className="text-xl font-bold text-primary">
               Settings
             </h1>
             <div className="w-8" /> {/* Spacer */}
@@ -100,7 +100,7 @@ export default function Dashboard() {
       <div className="bg-card/95 backdrop-blur-sm border-b sticky top-0 z-40">
         <div className="max-w-md mx-auto px-4 py-4 flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+            <h1 className="text-xl font-bold text-primary">
               Looplly
             </h1>
             <p className="text-sm text-muted-foreground">
