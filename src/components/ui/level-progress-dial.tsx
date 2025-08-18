@@ -65,22 +65,13 @@ export function LevelProgressDial({
             cy="50"
             r="45"
             fill="none"
-            stroke={`url(#${gradientId})`}
+            stroke="hsl(var(--primary))"
             strokeWidth="6"
             strokeLinecap="round"
             strokeDasharray={strokeDasharray}
             strokeDashoffset={strokeDashoffset}
             className="transition-all duration-700 ease-out"
           />
-          
-          {/* Premium Gradient Definition */}
-          <defs>
-            {/* Single Premium Gradient */}
-            <linearGradient id="premium-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="hsl(var(--premium-start))" />
-              <stop offset="100%" stopColor="hsl(var(--premium-end))" />
-            </linearGradient>
-          </defs>
         </svg>
 
         {/* Level Number - Center */}
