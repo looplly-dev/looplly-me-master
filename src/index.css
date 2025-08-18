@@ -17,27 +17,27 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 220 13% 9%;
 
-    /* Vibrant Cultural Colors */
-    --primary: 182 100% 42%; /* Vibrant teal/turquoise */
+    /* Accessible Multicultural Colors */
+    --primary: 25 100% 50%; /* Bold accessible orange */
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 182 90% 52%;
+    --primary-glow: 25 90% 60%;
 
-    /* Success/Earnings - Rich emerald */
-    --success: 155 85% 45%;
+    /* Success/Earnings - Accessible emerald */
+    --success: 155 80% 40%;
     --success-foreground: 0 0% 100%;
-    --success-glow: 155 75% 55%;
+    --success-glow: 155 70% 50%;
 
-    /* Warning - Golden yellow */
-    --warning: 45 100% 55%;
+    /* Warning - Bright golden yellow */
+    --warning: 45 100% 50%;
     --warning-foreground: 20 14% 4%;
 
-    /* Vibrant accent - Bold magenta */
-    --accent: 320 100% 60%;
+    /* Vibrant accent - Teal (moved from primary) */
+    --accent: 182 85% 45%;
     --accent-foreground: 0 0% 100%;
 
-    /* Premium - Electric vibrant */
-    --premium: 182 100% 42%; /* Vibrant teal */
-    --premium-glow: 182 90% 52%; /* Brighter teal for effects */
+    /* Premium - Bold orange */
+    --premium: 25 100% 50%; /* Bold orange */
+    --premium-glow: 25 90% 60%; /* Brighter orange for effects */
 
     --secondary: 210 40% 96%;
     --secondary-foreground: 220 13% 9%;
@@ -107,22 +107,22 @@ All colors MUST be HSL.
     --popover: 220 13% 9%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 182 100% 52%; /* Bright teal for dark mode */
+    --primary: 25 95% 65%; /* Bright accessible orange for dark mode */
     --primary-foreground: 220 13% 9%;
-    --primary-glow: 182 90% 62%;
+    --primary-glow: 25 85% 75%;
 
-    --secondary: 215 28% 17%;
+    --secondary: 220 100% 25%; /* Deep blue secondary */
     --secondary-foreground: 210 40% 98%;
 
     --muted: 215 28% 17%;
     --muted-foreground: 215 20% 65%;
 
-    --accent: 320 100% 70%; /* Bright magenta for dark mode */
+    --accent: 182 80% 55%; /* Teal accent for dark mode */
     --accent-foreground: 220 13% 9%;
 
     /* Dark mode premium colors */
-    --premium: 182 100% 52%; /* Bright teal */
-    --premium-glow: 182 90% 62%; /* More vibrant glow */
+    --premium: 25 95% 65%; /* Bright orange */
+    --premium-glow: 25 85% 75%; /* More vibrant orange glow */
 
     --destructive: 0 63% 31%;
     --destructive-foreground: 210 40% 98%;
