@@ -17,27 +17,27 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 220 13% 9%;
 
-    /* Modern professional colors */
-    --primary: 213 94% 35%; /* Premium blue */
-    --primary-foreground: 210 40% 98%;
-    --primary-glow: 213 84% 45%;
+    /* Vibrant Cultural Colors */
+    --primary: 182 100% 42%; /* Vibrant teal/turquoise */
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 182 90% 52%;
 
-    /* Success/Earnings - Money green */
-    --success: 142 76% 36%;
-    --success-foreground: 210 40% 98%;
-    --success-glow: 142 66% 46%;
+    /* Success/Earnings - Rich emerald */
+    --success: 155 85% 45%;
+    --success-foreground: 0 0% 100%;
+    --success-glow: 155 75% 55%;
 
-    /* Warning - Alert amber */
-    --warning: 45 93% 47%;
+    /* Warning - Golden yellow */
+    --warning: 45 100% 55%;
     --warning-foreground: 20 14% 4%;
 
-    /* Premium accent - sophisticated orange */
-    --accent: 25 95% 55%;
-    --accent-foreground: 210 40% 98%;
+    /* Vibrant accent - Bold magenta */
+    --accent: 320 100% 60%;
+    --accent-foreground: 0 0% 100%;
 
-    /* Single color premium */
-    --premium: 213 94% 35%; /* Premium blue */
-    --premium-glow: 213 84% 45%; /* Brighter blue for effects */
+    /* Premium - Electric vibrant */
+    --premium: 182 100% 42%; /* Vibrant teal */
+    --premium-glow: 182 90% 52%; /* Brighter teal for effects */
 
     --secondary: 210 40% 96%;
     --secondary-foreground: 220 13% 9%;
@@ -52,15 +52,15 @@ All colors MUST be HSL.
     --input: 214 32% 91%;
     --ring: 213 94% 35%;
 
-    /* Market-specific colors */
-    --crypto: 280 100% 70%; /* Purple for crypto */
-    --crypto-foreground: 210 40% 98%;
+    /* Vibrant market-specific colors */
+    --crypto: 280 100% 70%; /* Electric purple for crypto */
+    --crypto-foreground: 0 0% 100%;
 
-    --mpesa: 142 90% 32%; /* Enhanced M-Pesa green */
-    --mpesa-foreground: 210 40% 98%;
+    --mpesa: 155 85% 45%; /* Rich emerald for M-Pesa */
+    --mpesa-foreground: 0 0% 100%;
 
-    --info: 199 89% 48%;
-    --info-foreground: 210 40% 98%;
+    --info: 220 100% 65%; /* Electric blue */
+    --info-foreground: 0 0% 100%;
 
     /* Single color gradients */
     --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
@@ -107,9 +107,9 @@ All colors MUST be HSL.
     --popover: 220 13% 9%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 213 94% 45%;
+    --primary: 182 100% 52%; /* Bright teal for dark mode */
     --primary-foreground: 220 13% 9%;
-    --primary-glow: 213 84% 55%;
+    --primary-glow: 182 90% 62%;
 
     --secondary: 215 28% 17%;
     --secondary-foreground: 210 40% 98%;
@@ -117,12 +117,12 @@ All colors MUST be HSL.
     --muted: 215 28% 17%;
     --muted-foreground: 215 20% 65%;
 
-    --accent: 25 95% 65%;
+    --accent: 320 100% 70%; /* Bright magenta for dark mode */
     --accent-foreground: 220 13% 9%;
 
     /* Dark mode premium colors */
-    --premium: 213 94% 45%; /* Premium blue */
-    --premium-glow: 213 84% 55%; /* More vibrant glow */
+    --premium: 182 100% 52%; /* Bright teal */
+    --premium-glow: 182 90% 62%; /* More vibrant glow */
 
     --destructive: 0 63% 31%;
     --destructive-foreground: 210 40% 98%;
@@ -131,20 +131,20 @@ All colors MUST be HSL.
     --input: 215 28% 17%;
     --ring: 213 94% 45%;
 
-    --success: 142 76% 46%;
+    --success: 155 85% 55%; /* Rich emerald for dark mode */
     --success-foreground: 220 13% 9%;
-    --success-glow: 142 66% 56%;
+    --success-glow: 155 75% 65%;
 
-    --warning: 45 93% 57%;
+    --warning: 45 100% 65%; /* Golden yellow for dark mode */
     --warning-foreground: 220 13% 9%;
 
-    --info: 199 89% 58%;
+    --info: 220 100% 75%; /* Electric blue for dark mode */
     --info-foreground: 220 13% 9%;
 
-    --crypto: 280 100% 80%;
+    --crypto: 280 100% 80%; /* Electric purple for dark mode */
     --crypto-foreground: 220 13% 9%;
 
-    --mpesa: 142 80% 42%;
+    --mpesa: 155 85% 55%; /* Rich emerald for dark mode */
     --mpesa-foreground: 220 13% 9%;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
