@@ -21,6 +21,10 @@ const buttonVariants = cva(
         success: "bg-gradient-to-r from-success to-success-glow text-success-foreground hover:scale-105 shadow-lg hover:shadow-xl",
         earn: "bg-gradient-to-r from-success via-accent to-primary text-white hover:scale-105 shadow-lg hover:shadow-xl animate-pulse",
         mobile: "h-14 bg-gradient-to-r from-primary to-primary-glow text-primary-foreground hover:scale-105 shadow-lg hover:shadow-xl text-base font-bold",
+        multicultural: "bg-gradient-to-r from-teal via-magenta to-accent text-white hover:shadow-2xl hover:shadow-magenta/25 transition-all duration-300 hover:scale-105",
+        celebration: "bg-gradient-to-r from-achievement to-coral text-white hover:shadow-xl hover:shadow-achievement/30 transition-all duration-300 hover:scale-105",
+        cultural: "bg-gradient-to-r from-cultural to-primary text-white hover:shadow-lg hover:shadow-cultural/25 transition-all duration-300 hover:scale-105",
+        ocean: "bg-gradient-to-r from-teal to-teal-glow text-white hover:shadow-xl hover:shadow-teal/30 transition-all duration-300 hover:scale-105",
       },
       size: {
         default: "h-12 px-6 py-3",
