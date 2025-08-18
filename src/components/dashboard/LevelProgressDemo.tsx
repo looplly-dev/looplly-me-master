@@ -1,28 +1,43 @@
 import { LevelProgressDial } from '@/components/ui/level-progress-dial';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export function LevelProgressDemo() {
   return (
-    <div className="min-h-screen bg-primary flex items-center justify-center p-8 relative overflow-hidden">
-      <div className="flex flex-col items-center gap-12">
-        
-        {/* Single Modern Progress Display */}
-        <div className="flex flex-col items-center gap-6 bg-white/15 backdrop-blur-sm rounded-2xl p-8 border border-white/30 shadow-2xl">
-          <h1 className="text-2xl font-bold text-white/90">Level Progress</h1>
-          <LevelProgressDial
-            currentLevel={67}
-            progress={67}
-            pointsToNext={33}
-            membershipTier="Premium Member"
-            size="lg"
-          />
-          <p className="text-white/70 text-sm">Continue earning to reach the next level</p>
-        </div>
-
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        <Card className="border-border/50 shadow-lg">
+          <CardHeader className="text-center pb-4">
+            <CardTitle className="text-foreground">Your Progress</CardTitle>
+            <p className="text-muted-foreground text-sm">
+              Track your achievements and level advancement
+            </p>
+          </CardHeader>
+          
+          <CardContent className="flex flex-col items-center space-y-6">
+            <LevelProgressDial
+              currentLevel={67}
+              progress={67}
+              pointsToNext={33}
+              membershipTier="Premium Member"
+              size="lg"
+              maxLevel={100}
+              showHelp={true}
+            />
+            
+            {/* Additional Progress Info */}
+            <div className="text-center space-y-2">
+              <p className="text-sm text-muted-foreground">
+                Keep earning points to unlock new features and rewards
+              </p>
+              <div className="flex justify-center gap-4 text-xs text-muted-foreground">
+                <span>• Higher earning rates</span>
+                <span>• Exclusive opportunities</span>
+                <span>• Priority support</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
-
-      {/* Clean Subtle Background Effects */}
-      <div className="absolute top-20 left-20 w-32 h-32 bg-white/3 rounded-full blur-xl animate-pulse"></div>
-      <div className="absolute bottom-40 right-32 w-24 h-24 bg-white/5 rounded-full blur-lg animate-pulse delay-1000"></div>
     </div>
   );
 }
