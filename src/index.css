@@ -17,8 +17,8 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 220 13% 9%;
 
-    /* African market inspired colors - vibrant yet trustworthy */
-    --primary: 213 94% 35%; /* Trust blue */
+    /* Modern professional colors */
+    --primary: 213 94% 35%; /* Premium blue */
     --primary-foreground: 210 40% 98%;
     --primary-glow: 213 84% 45%;
 
@@ -31,30 +31,14 @@ All colors MUST be HSL.
     --warning: 45 93% 47%;
     --warning-foreground: 20 14% 4%;
 
-    /* Accent - Enhanced vibrant orange for energy */
-    --accent: 25 100% 50%;
+    /* Premium accent - sophisticated orange */
+    --accent: 25 95% 55%;
     --accent-foreground: 210 40% 98%;
 
-    /* Rich Teal - Deep ocean inspiration */
-    --teal: 180 100% 25%;
-    --teal-foreground: 210 40% 98%;
-    --teal-glow: 180 85% 35%;
-
-    /* Vibrant Magenta - Cultural celebration */
-    --magenta: 320 100% 50%;
-    --magenta-foreground: 210 40% 98%;
-
-    /* Coral - Warm orange variant */
-    --coral: 15 95% 60%;
-    --coral-foreground: 210 40% 98%;
-
-    /* Sunny Yellow - Achievement color */
-    --achievement: 45 100% 55%;
-    --achievement-foreground: 20 14% 4%;
-
-    /* Cultural Purple - Enhanced premium */
-    --cultural: 260 100% 65%;
-    --cultural-foreground: 210 40% 98%;
+    /* Premium gradient endpoints */
+    --premium-start: 213 94% 35%; /* Blue start */
+    --premium-end: 25 95% 55%; /* Orange end */
+    --premium-glow: 213 84% 55%; /* Brighter blue for effects */
 
     --secondary: 210 40% 96%;
     --secondary-foreground: 220 13% 9%;
@@ -79,24 +63,18 @@ All colors MUST be HSL.
     --info: 199 89% 48%;
     --info-foreground: 210 40% 98%;
 
-    /* Enhanced gradients for multicultural financial app */
-    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    /* Modern premium gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
+    --gradient-premium: linear-gradient(135deg, hsl(var(--premium-start)), hsl(var(--premium-end)));
     --gradient-success: linear-gradient(135deg, hsl(var(--success)), hsl(var(--success-glow)));
     --gradient-money: linear-gradient(135deg, hsl(var(--success)), hsl(var(--accent)));
-    --gradient-crypto: linear-gradient(135deg, hsl(var(--crypto)), hsl(var(--primary)));
-    --gradient-warm: linear-gradient(135deg, hsl(var(--accent)), hsl(var(--warning)));
-    
-    /* New multicultural gradients */
-    --gradient-multicultural: linear-gradient(135deg, hsl(var(--teal)), hsl(var(--magenta)), hsl(var(--accent)));
-    --gradient-celebration: linear-gradient(135deg, hsl(var(--achievement)), hsl(var(--accent)), hsl(var(--magenta)));
-    --gradient-sunset: linear-gradient(135deg, hsl(var(--accent)), hsl(var(--coral)), hsl(var(--teal)));
-    --gradient-cultural: linear-gradient(135deg, hsl(var(--cultural)), hsl(var(--primary)));
-    --gradient-ocean: linear-gradient(135deg, hsl(var(--teal)), hsl(var(--teal-glow)));
-    --gradient-reward: linear-gradient(135deg, hsl(var(--magenta)), hsl(var(--achievement)));
+    --gradient-subtle: linear-gradient(135deg, hsl(var(--primary) / 0.1), hsl(var(--accent) / 0.1));
 
-    /* Shadows */
+    /* Elegant shadows */
     --shadow-card: 0 2px 10px -2px hsl(220 13% 9% / 0.1);
-    --shadow-button: 0 4px 14px -4px hsl(var(--primary) / 0.3);
+    --shadow-premium: 0 10px 30px -10px hsl(var(--primary) / 0.3);
+    --shadow-glow: 0 0 40px hsl(var(--premium-glow) / 0.4);
+    --shadow-elegant: 0 20px 60px -20px hsl(var(--accent) / 0.3);
     --shadow-success: 0 4px 14px -4px hsl(var(--success) / 0.3);
 
     /* Animations */
@@ -142,25 +120,13 @@ All colors MUST be HSL.
     --muted: 215 28% 17%;
     --muted-foreground: 215 20% 65%;
 
-    --accent: 25 100% 60%;
+    --accent: 25 95% 65%;
     --accent-foreground: 220 13% 9%;
 
-    /* Dark mode vibrant colors */
-    --teal: 180 90% 35%;
-    --teal-foreground: 220 13% 9%;
-    --teal-glow: 180 75% 45%;
-
-    --magenta: 320 90% 60%;
-    --magenta-foreground: 220 13% 9%;
-
-    --coral: 15 85% 65%;
-    --coral-foreground: 220 13% 9%;
-
-    --achievement: 45 95% 65%;
-    --achievement-foreground: 220 13% 9%;
-
-    --cultural: 260 90% 75%;
-    --cultural-foreground: 220 13% 9%;
+    /* Dark mode premium colors */
+    --premium-start: 213 94% 45%; /* Brighter blue start */
+    --premium-end: 25 95% 65%; /* Enhanced orange end */
+    --premium-glow: 213 84% 65%; /* More vibrant glow */
 
     --destructive: 0 63% 31%;
     --destructive-foreground: 210 40% 98%;

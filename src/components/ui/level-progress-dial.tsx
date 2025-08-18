@@ -21,16 +21,8 @@ export function LevelProgressDial({
   const strokeDasharray = circumference;
   const strokeDashoffset = circumference - (progress / 100) * circumference;
 
-  // Get gradient based on membership tier
-  const getGradientId = (tier: string) => {
-    if (tier.includes('Silver')) return 'ocean-gradient';
-    if (tier.includes('Gold')) return 'celebration-gradient';
-    if (tier.includes('Platinum')) return 'cultural-gradient';
-    if (tier.includes('Diamond')) return 'multicultural-gradient';
-    return 'default-gradient';
-  };
-
-  const gradientId = getGradientId(membershipTier);
+  // Use single premium gradient for all tiers
+  const gradientId = 'premium-gradient';
 
   const sizeClasses = {
     sm: 'w-24 h-24',
@@ -81,38 +73,12 @@ export function LevelProgressDial({
             className="transition-all duration-700 ease-out"
           />
           
-          {/* Multicultural Gradient Definitions */}
+          {/* Premium Gradient Definition */}
           <defs>
-            {/* Ocean Gradient - Silver */}
-            <linearGradient id="ocean-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="hsl(var(--teal))" />
-              <stop offset="100%" stopColor="hsl(var(--teal-glow))" />
-            </linearGradient>
-            
-            {/* Celebration Gradient - Gold */}
-            <linearGradient id="celebration-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="hsl(var(--achievement))" />
-              <stop offset="50%" stopColor="hsl(var(--accent))" />
-              <stop offset="100%" stopColor="hsl(var(--magenta))" />
-            </linearGradient>
-            
-            {/* Cultural Gradient - Platinum */}
-            <linearGradient id="cultural-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="hsl(var(--cultural))" />
-              <stop offset="100%" stopColor="hsl(var(--primary))" />
-            </linearGradient>
-            
-            {/* Multicultural Gradient - Diamond */}
-            <linearGradient id="multicultural-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="hsl(var(--teal))" />
-              <stop offset="50%" stopColor="hsl(var(--magenta))" />
-              <stop offset="100%" stopColor="hsl(var(--accent))" />
-            </linearGradient>
-            
-            {/* Default Gradient */}
-            <linearGradient id="default-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="hsl(var(--primary))" />
-              <stop offset="100%" stopColor="hsl(var(--accent))" />
+            {/* Single Premium Gradient */}
+            <linearGradient id="premium-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="hsl(var(--premium-start))" />
+              <stop offset="100%" stopColor="hsl(var(--premium-end))" />
             </linearGradient>
           </defs>
         </svg>

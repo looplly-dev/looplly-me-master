@@ -2,7 +2,7 @@ import { LevelProgressDial } from '@/components/ui/level-progress-dial';
 
 export function LevelProgressDemo() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-accent via-coral to-teal flex items-center justify-center p-8 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-premium-start to-premium-end flex items-center justify-center p-8 relative overflow-hidden">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-12 items-center">
         
         {/* Silver Tier */}
@@ -85,11 +85,10 @@ export function LevelProgressDemo() {
         </div>
       </div>
 
-      {/* Floating Accent Elements */}
-      <div className="absolute top-20 left-20 w-32 h-32 bg-magenta/20 rounded-full blur-xl animate-pulse"></div>
-      <div className="absolute bottom-40 right-32 w-24 h-24 bg-achievement/30 rounded-full blur-lg animate-pulse delay-1000"></div>
-      <div className="absolute top-1/2 left-10 w-16 h-16 bg-cultural/25 rounded-full blur-md animate-pulse delay-500"></div>
-      <div className="absolute bottom-20 left-1/3 w-20 h-20 bg-teal-glow/20 rounded-full blur-lg animate-pulse delay-700"></div>
+      {/* Subtle Floating Elements */}
+      <div className="absolute top-20 left-20 w-32 h-32 bg-white/5 rounded-full blur-xl animate-pulse"></div>
+      <div className="absolute bottom-40 right-32 w-24 h-24 bg-white/8 rounded-full blur-lg animate-pulse delay-1000"></div>
+      <div className="absolute top-1/2 left-10 w-16 h-16 bg-white/3 rounded-full blur-md animate-pulse delay-500"></div>
     </div>
   );
 }
