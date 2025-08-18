@@ -54,6 +54,27 @@ export default {
 					DEFAULT: 'hsl(var(--mpesa))',
 					foreground: 'hsl(var(--mpesa-foreground))'
 				},
+				teal: {
+					DEFAULT: 'hsl(var(--teal))',
+					foreground: 'hsl(var(--teal-foreground))',
+					glow: 'hsl(var(--teal-glow))'
+				},
+				magenta: {
+					DEFAULT: 'hsl(var(--magenta))',
+					foreground: 'hsl(var(--magenta-foreground))'
+				},
+				coral: {
+					DEFAULT: 'hsl(var(--coral))',
+					foreground: 'hsl(var(--coral-foreground))'
+				},
+				achievement: {
+					DEFAULT: 'hsl(var(--achievement))',
+					foreground: 'hsl(var(--achievement-foreground))'
+				},
+				cultural: {
+					DEFAULT: 'hsl(var(--cultural))',
+					foreground: 'hsl(var(--cultural-foreground))'
+				},
 				destructive: {
 					DEFAULT: 'hsl(var(--destructive))',
 					foreground: 'hsl(var(--destructive-foreground))'
