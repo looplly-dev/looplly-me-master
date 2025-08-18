@@ -89,36 +89,40 @@ export default function RepTab() {
   return (
     <div className="p-4 pb-20 space-y-6">
       {/* Reputation Score */}
-      <Card className="bg-gradient-to-r from-primary via-accent to-primary text-white border-0 shadow-lg">
+      <Card className="border-border/50 shadow-lg">
         <CardContent className="p-6">
           <div className="text-center">
             <div className="text-6xl mb-2">{level.icon}</div>
-            <h2 className="text-2xl font-bold mb-1">{level.name} Member</h2>
-            <p className="text-white/80 text-sm mb-4">Reputation Score</p>
+            <h2 className="text-2xl font-bold mb-1 text-foreground">{level.name} Member</h2>
+            <p className="text-muted-foreground text-sm mb-4">Reputation Score</p>
             
             <div className="relative w-32 h-32 mx-auto mb-4">
               <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 36 36">
                 <path
                   d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                   fill="none"
-                  stroke="rgba(255,255,255,0.2)"
+                  stroke="hsl(var(--muted))"
                   strokeWidth="2"
+                  opacity="0.3"
                 />
                 <path
                   d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                   fill="none"
-                  stroke="white"
+                  stroke="hsl(var(--primary))"
                   strokeWidth="2"
                   strokeDasharray={`${userStats.reputation.score}, 100`}
                   strokeLinecap="round"
+                  style={{
+                    filter: 'drop-shadow(0 0 8px hsl(var(--primary) / 0.3))'
+                  }}
                 />
               </svg>
               <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-3xl font-bold">{userStats.reputation.score}</span>
+                <span className="text-3xl font-bold text-foreground">{userStats.reputation.score}</span>
               </div>
             </div>
             
-            <p className="text-white/90 text-sm">
+            <p className="text-muted-foreground text-sm">
               {100 - userStats.reputation.score} points to {userStats.reputation.score >= 80 ? 'max level' : 'next level'}
             </p>
           </div>
