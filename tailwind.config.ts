@@ -55,8 +55,7 @@ export default {
 					foreground: 'hsl(var(--mpesa-foreground))'
 				},
 				premium: {
-					start: 'hsl(var(--premium-start))',
-					end: 'hsl(var(--premium-end))',
+					DEFAULT: 'hsl(var(--premium))',
 					glow: 'hsl(var(--premium-glow))'
 				},
 				destructive: {
