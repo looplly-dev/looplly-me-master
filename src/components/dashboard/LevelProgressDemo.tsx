@@ -2,7 +2,7 @@ import { LevelProgressDial } from '@/components/ui/level-progress-dial';
 
 export function LevelProgressDemo() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary to-accent flex items-center justify-center p-8 relative overflow-hidden">
+    <div className="min-h-screen bg-primary flex items-center justify-center p-8 relative overflow-hidden">
       <div className="flex flex-col items-center gap-12">
         
         {/* Single Modern Progress Display */}
