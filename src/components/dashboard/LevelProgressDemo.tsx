@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export function LevelProgressDemo() {
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4 font-sans">
       <div className="w-full max-w-md">
         <Card className="border-border/50 shadow-lg">
           <CardHeader className="text-center pb-4">
