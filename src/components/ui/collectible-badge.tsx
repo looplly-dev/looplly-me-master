@@ -1,8 +1,32 @@
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Star, CheckCircle } from 'lucide-react';
+import { 
+  Shield, 
+  MapPin, 
+  CheckCircle, 
+  Star, 
+  Users, 
+  Flame, 
+  Trophy, 
+  Award, 
+  Crown, 
+  Target, 
+  Zap 
+} from 'lucide-react';
 
-// All badges now use star icons with tier-based styling
+const iconMap = {
+  Shield,
+  MapPin,
+  CheckCircle,
+  Star,
+  Users,
+  Flame,
+  Trophy,
+  Award,
+  Crown,
+  Target,
+  Zap
+};
 
 interface CollectibleBadgeProps {
   badge: {
@@ -20,7 +44,7 @@ interface CollectibleBadgeProps {
 }
 
 export function CollectibleBadge({ badge, size = 'md' }: CollectibleBadgeProps) {
-  // All badges use Star icon with tier-based styling
+  const IconComponent = iconMap[badge.icon as keyof typeof iconMap] || Shield;
   
   const sizeClasses = {
     sm: 'w-16 h-16',
@@ -82,11 +106,6 @@ export function CollectibleBadge({ badge, size = 'md' }: CollectibleBadgeProps) 
     }
   };
 
-  const getStarState = () => {
-    if (badge.earned) return 'fill-white text-white';
-    return 'text-white/60 hover:text-white/80';
-  };
-
   const getLockedState = () => {
     if (badge.earned) return '';
     return 'opacity-60 saturate-50 hover:opacity-80 hover:saturate-75';
@@ -112,15 +131,13 @@ export function CollectibleBadge({ badge, size = 'md' }: CollectibleBadgeProps) 
             {/* 3D depth effect */}
             <div className="absolute inset-1 rounded-full bg-gradient-to-t from-black/10 to-transparent" />
             
-            {/* Star icon container */}
+            {/* Icon container */}
             <div className="absolute inset-0 flex items-center justify-center">
-              <Star 
+              <IconComponent 
                 className={cn(
                   iconSizes[size],
-                  'drop-shadow-lg transition-all duration-300',
-                  getStarState()
+                  'text-white drop-shadow-lg transition-all duration-300'
                 )} 
-                strokeWidth={badge.earned ? 0 : 1.5}
               />
             </div>
 
@@ -155,7 +172,7 @@ export function CollectibleBadge({ badge, size = 'md' }: CollectibleBadgeProps) 
         <TooltipContent side="top" className="max-w-xs">
           <div className="text-center">
             <div className="flex items-center justify-center gap-2 mb-2">
-              <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+              <IconComponent className="h-4 w-4 text-primary" />
               <p className="font-semibold text-sm">{badge.name}</p>
             </div>
             
