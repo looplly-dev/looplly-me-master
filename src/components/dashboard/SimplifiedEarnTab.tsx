@@ -210,7 +210,7 @@ export default function SimplifiedEarnTab() {
   const videoCount = availableTasks.filter(a => a.activity_type === 'video').length;
   const taskCount = availableTasks.filter(a => a.activity_type === 'task').length;
   // Only show data dot if there are items to opt into
-  const dataCount = (!dataOptIns.shopping || !dataOptIns.appUsage) ? 1 : 0;
+  const dataCount = (!dataOptIns.shopping || !dataOptIns.appUsage) ? (2 - (dataOptIns.shopping ? 1 : 0) - (dataOptIns.appUsage ? 1 : 0)) : 0;
 
 
   return (
@@ -336,7 +336,7 @@ export default function SimplifiedEarnTab() {
                 <TabsTrigger value="surveys" className="text-xs relative">
                   Surveys
                   {surveyCount > 0 && (
-                    <span className="absolute -top-1 -right-1 h-5 w-5 bg-primary text-white text-xs rounded-full flex items-center justify-center font-medium">
+                    <span className="absolute -top-1 -right-1 h-5 w-5 bg-primary text-white text-xs rounded-full flex items-center justify-center font-medium z-10">
                       {surveyCount}
                     </span>
                   )}
@@ -344,7 +344,7 @@ export default function SimplifiedEarnTab() {
                 <TabsTrigger value="videos" className="text-xs relative">
                   Videos
                   {videoCount > 0 && (
-                    <span className="absolute -top-1 -right-1 h-5 w-5 bg-accent text-white text-xs rounded-full flex items-center justify-center font-medium">
+                    <span className="absolute -top-1 -right-1 h-5 w-5 bg-accent text-white text-xs rounded-full flex items-center justify-center font-medium z-10">
                       {videoCount}
                     </span>
                   )}
@@ -352,7 +352,7 @@ export default function SimplifiedEarnTab() {
                 <TabsTrigger value="tasks" className="text-xs relative">
                   Tasks
                   {taskCount > 0 && (
-                    <span className="absolute -top-1 -right-1 h-5 w-5 bg-warning text-white text-xs rounded-full flex items-center justify-center font-medium">
+                    <span className="absolute -top-1 -right-1 h-5 w-5 bg-warning text-white text-xs rounded-full flex items-center justify-center font-medium z-10">
                       {taskCount}
                     </span>
                   )}
@@ -360,7 +360,7 @@ export default function SimplifiedEarnTab() {
                 <TabsTrigger value="data" className="text-xs relative">
                   Data
                   {dataCount > 0 && (
-                    <span className="absolute -top-1 -right-1 h-5 w-5 bg-success text-white text-xs rounded-full flex items-center justify-center font-medium">
+                    <span className="absolute -top-1 -right-1 h-5 w-5 bg-success text-white text-xs rounded-full flex items-center justify-center font-medium z-10">
                       {dataCount}
                     </span>
                   )}
