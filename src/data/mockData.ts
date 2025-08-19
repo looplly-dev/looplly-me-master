@@ -378,13 +378,25 @@ export const mockCommunityPosts: CommunityPost[] = [
   }
 ];
 
+// Enhanced user stats with endless reputation and streaks
 export const userStats = {
-  totalEarnings: '$24.50',
+  totalEarnings: '$186.25',
   currentBalance: '$12.50',
-  surveysCompleted: 12,
-  videosWatched: 8,
-  tasksCompleted: 15,
-  checkInStreak: 7,
+  surveysCompleted: 47,
+  videosWatched: 23,
+  tasksCompleted: 35,
+  streaks: {
+    currentStreak: 32, // Current daily streak
+    longestStreak: 89,
+    daysUntilMonthlyMilestone: 28, // 60 - 32 = 28
+    monthsUntilYearly: 11, // 12 months total
+    milestones: {
+      weekly: { achieved: true, count: 4 },
+      monthly: { achieved: true, count: 1 },
+      quarterly: { achieved: false, count: 0 },
+      yearly: { achieved: false, count: 0 }
+    }
+  },
   referrals: {
     invited: 3,
     joined: 2,
@@ -392,35 +404,42 @@ export const userStats = {
     earnings: '$1.50'
   },
   reputation: {
-    score: 67,
-    level: 'Gold',
-    badges: ['OTP Verified', 'GPS Enabled', '5-day Streak', 'First Survey'],
+    score: 1247, // Endless scoring system
+    level: 'Diamond I',
+    tier: 'Diamond',
+    prestige: 1,
+    nextLevelThreshold: 2000, // Next tier at 2000
     history: [
-      { action: 'OTP Verification completed', points: +15, date: '2024-01-15' },
-      { action: 'GPS location enabled', points: +10, date: '2024-01-14' },
-      { action: 'First survey completed', points: +20, date: '2024-01-13' },
-      { action: 'Daily check-in streak: 5 days', points: +25, date: '2024-01-12' },
-      { action: 'Survey rejected: Inconsistent responses', points: -15, date: '2024-01-11' },
-      { action: 'Survey rejected: Speeding (completed in 2min)', points: -10, date: '2024-01-10' },
-      { action: 'High-quality survey completed', points: +25, date: '2024-01-09' },
-      { action: 'Profile incomplete warning', points: -5, date: '2024-01-08' }
+      { action: 'Monthly Streak Milestone', points: +50, date: '2024-01-15' },
+      { action: 'Survey Completed', points: +15, date: '2024-01-15' },
+      { action: 'Daily Streak (Day 32)', points: +25, date: '2024-01-14' },
+      { action: 'KYC Verification Complete', points: +50, date: '2024-01-12' },
+      { action: 'Quality Bonus', points: +10, date: '2024-01-10' },
+      { action: 'Speed Penalty', points: -5, date: '2024-01-08' }
     ],
     qualityMetrics: {
-      surveysCompleted: 12,
-      surveysRejected: 3,
-      averageTime: '8.5 min',
-      consistencyScore: 85,
-      speedingRate: 8 // percentage
+      surveysCompleted: 47,
+      surveysRejected: 2,
+      averageTime: '3m 45s',
+      consistencyScore: 94,
+      speedingRate: 4 // percentage - much improved
     }
   },
   kyc: {
-    verified: false,
-    status: 'pending',
+    verified: true,
+    status: 'verified',
     provider: 'Soulbase Identity'
+  },
+  verification: {
+    otpVerified: true,
+    gpsEnabled: true,
+    kycVerified: true,
+    cryptoToken: false,
+    communicationsEnabled: true
   },
   permissions: {
     sms: true,
-    whatsapp: false,
+    whatsapp: true,
     email: true,
     pushNotifications: true
   },
@@ -429,9 +448,154 @@ export const userStats = {
     { id: '2', amount: '$2.50', method: 'M-Pesa', date: '2024-01-13', status: 'processing' }
   ],
   community: {
-    postsCreated: 3,
-    totalVotes: 42,
-    reputationFromPosts: 8,
+    postsCreated: 5,
+    totalVotes: 23,
+    reputationFromPosts: 15,
     moderationPenalties: 0
   }
+};
+
+// Collectible badges system
+export const badgeSystem = {
+  coreVerification: [
+    { 
+      id: 'otp_verified', 
+      name: 'OTP Verified', 
+      description: 'Mobile number verified via SMS', 
+      tier: 'Bronze', 
+      repPoints: 15, 
+      earned: true,
+      rarity: 'Common',
+      icon: 'Shield'
+    },
+    { 
+      id: 'gps_enabled', 
+      name: 'Location Guardian', 
+      description: 'GPS sharing enabled while using app', 
+      tier: 'Bronze', 
+      repPoints: 10, 
+      earned: true,
+      rarity: 'Common',
+      icon: 'MapPin'
+    },
+    { 
+      id: 'kyc_verified', 
+      name: 'Identity Champion', 
+      description: 'Full KYC verification completed', 
+      tier: 'Silver', 
+      repPoints: 50, 
+      earned: true,
+      rarity: 'Rare',
+      icon: 'CheckCircle'
+    },
+    { 
+      id: 'crypto_token', 
+      name: 'Crypto Pioneer', 
+      description: 'Soulbase crypto token connected', 
+      tier: 'Gold', 
+      repPoints: 100, 
+      earned: false,
+      rarity: 'Epic',
+      icon: 'Star'
+    },
+    { 
+      id: 'comms_enabled', 
+      name: 'Communication Pro', 
+      description: 'WhatsApp notifications enabled', 
+      tier: 'Bronze', 
+      repPoints: 20, 
+      earned: true,
+      rarity: 'Common',
+      icon: 'Users'
+    }
+  ],
+  streakAchievements: [
+    { 
+      id: 'week_warrior', 
+      name: 'Week Warrior', 
+      description: '7-day daily streak completed', 
+      tier: 'Bronze', 
+      repPoints: 25, 
+      earned: true,
+      rarity: 'Common',
+      icon: 'Flame',
+      requirement: 7
+    },
+    { 
+      id: 'month_master', 
+      name: 'Month Master', 
+      description: '30-day daily streak completed', 
+      tier: 'Silver', 
+      repPoints: 75, 
+      earned: true,
+      rarity: 'Rare',
+      icon: 'Trophy',
+      requirement: 30
+    },
+    { 
+      id: 'quarter_champion', 
+      name: 'Quarter Champion', 
+      description: '90-day daily streak completed', 
+      tier: 'Gold', 
+      repPoints: 150, 
+      earned: false,
+      rarity: 'Epic',
+      icon: 'Award',
+      requirement: 90
+    },
+    { 
+      id: 'semi_annual_star', 
+      name: 'Semi-Annual Star', 
+      description: '180-day daily streak completed', 
+      tier: 'Platinum', 
+      repPoints: 300, 
+      earned: false,
+      rarity: 'Epic',
+      icon: 'Star',
+      requirement: 180
+    },
+    { 
+      id: 'annual_legend', 
+      name: 'Annual Legend', 
+      description: '365-day daily streak completed', 
+      tier: 'Diamond', 
+      repPoints: 500, 
+      earned: false,
+      rarity: 'Legendary',
+      icon: 'Crown',
+      requirement: 365
+    }
+  ],
+  qualityAchievements: [
+    { 
+      id: 'survey_ace', 
+      name: 'Survey Ace', 
+      description: '100+ surveys with 95%+ quality score', 
+      tier: 'Gold', 
+      repPoints: 100, 
+      earned: false,
+      rarity: 'Epic',
+      icon: 'Target'
+    },
+    { 
+      id: 'speed_demon', 
+      name: 'Speed Demon', 
+      description: 'Fast but accurate survey completion', 
+      tier: 'Silver', 
+      repPoints: 50, 
+      earned: true,
+      rarity: 'Rare',
+      icon: 'Zap'
+    },
+    { 
+      id: 'community_contributor', 
+      name: 'Community Hero', 
+      description: 'Active community space participation', 
+      tier: 'Silver', 
+      repPoints: 40, 
+      earned: true,
+      rarity: 'Rare',
+      icon: 'Users'
+    }
+  ]
 };

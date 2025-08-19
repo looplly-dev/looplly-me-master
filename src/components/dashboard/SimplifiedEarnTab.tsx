@@ -66,21 +66,31 @@ export default function SimplifiedEarnTab() {
     
     setCheckInDone(true);
     
-    // Add Rep increase instead of money
+    // Calculate progressive Rep reward based on streak from userStats
+    const { userStats } = require('@/data/mockData');
+    const currentStreak = userStats.streaks.currentStreak + 1;
+    const repReward = currentStreak >= 30 ? 25 : currentStreak >= 14 ? 15 : currentStreak >= 7 ? 10 : 5;
+    
+    // Add Rep increase with progressive rewards
     addTransaction({
       type: 'bonus',
       amount: 0, // No money reward
       currency: 'REP',
-      description: 'Daily check-in Rep boost',
+      description: `Daily streak Rep boost (Day ${currentStreak})`,
       source: 'daily_checkin',
       status: 'completed',
-      metadata: { rep_gained: 25, streak: 1 }
+      metadata: { rep_gained: repReward, streak: currentStreak }
     });
 
-    // Enhanced success feedback for Rep
+    // Enhanced success feedback with milestone info
+    const milestoneMessage = currentStreak === 7 ? ' Week Warrior badge unlocked!' :
+                           currentStreak === 30 ? ' Month Master badge unlocked!' :
+                           currentStreak === 90 ? ' Quarter Champion badge unlocked!' :
+                           currentStreak >= 30 ? ` ${currentStreak - 30} days until next milestone!` : '';
+    
     toast({
-      title: '🎉 Rep Boosted!',
-      description: `+25 Rep earned! Your reputation unlocks better opportunities!`,
+      title: '🔥 Streak Extended!',
+      description: `+${repReward} Rep earned! Day ${currentStreak} streak.${milestoneMessage}`,
     });
   };
 

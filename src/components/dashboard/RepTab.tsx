@@ -18,34 +18,39 @@ import {
   CheckCircle,
   AlertTriangle
 } from 'lucide-react';
-import { userStats } from '@/data/mockData';
+import { userStats, badgeSystem } from '@/data/mockData';
 import { useAuth } from '@/hooks/useAuth';
+import { CollectibleBadge } from '@/components/ui/collectible-badge';
+import { StreakProgress } from '@/components/ui/streak-progress';
 
 export default function RepTab() {
   const { authState } = useAuth();
+  // Endless reputation system with tiers and prestige
   const getLevel = (score: number) => {
-    if (score >= 80) return { name: 'Platinum', color: 'text-purple-600', icon: '💎' };
-    if (score >= 50) return { name: 'Gold', color: 'text-yellow-600', icon: '🥇' };
-    if (score >= 25) return { name: 'Silver', color: 'text-gray-500', icon: '🥈' };
-    return { name: 'Bronze', color: 'text-amber-600', icon: '🥉' };
+    if (score >= 2000) return { name: 'Elite', tier: 'Elite', color: 'text-gradient', icon: '👑', min: 2000, max: Infinity };
+    if (score >= 1000) return { name: 'Diamond', tier: 'Diamond', color: 'text-cyan-600', icon: '💎', min: 1000, max: 1999 };
+    if (score >= 500) return { name: 'Platinum', tier: 'Platinum', color: 'text-purple-600', icon: '⭐', min: 500, max: 999 };
+    if (score >= 250) return { name: 'Gold', tier: 'Gold', color: 'text-yellow-600', icon: '🥇', min: 250, max: 499 };
+    if (score >= 100) return { name: 'Silver', tier: 'Silver', color: 'text-gray-500', icon: '🥈', min: 100, max: 249 };
+    return { name: 'Bronze', tier: 'Bronze', color: 'text-amber-600', icon: '🥉', min: 0, max: 99 };
   };
 
   const level = getLevel(userStats.reputation.score);
-  const nextLevelThreshold = userStats.reputation.score >= 80 ? 100 : 
-    userStats.reputation.score >= 50 ? 80 : 
-    userStats.reputation.score >= 25 ? 50 : 25;
+  
+  // Calculate prestige level within tier
+  const prestigeLevel = Math.floor((userStats.reputation.score - level.min) / Math.max(1, Math.floor((level.max - level.min + 1) / 3))) + 1;
+  const prestigeName = prestigeLevel > 3 ? 'III' : prestigeLevel === 3 ? 'III' : prestigeLevel === 2 ? 'II' : 'I';
+  
+  const nextLevelThreshold = level.max === Infinity ? userStats.reputation.score + 1000 : level.max + 1;
+  const progressToNext = level.max === Infinity 
+    ? 100 
+    : ((userStats.reputation.score - level.min) / (level.max - level.min + 1)) * 100;
 
-  const progressToNext = ((userStats.reputation.score % 25) / 25) * 100;
-
-  const badges = [
-    { name: 'OTP Verified', icon: Shield, color: 'text-success', earned: authState.user?.isVerified || false, points: '+15' },
-    { name: 'GPS Enabled', icon: MapPin, color: 'text-primary', earned: authState.user?.profile?.gpsEnabled || false, points: '+10' },
-    { name: '5-day Streak', icon: Flame, color: 'text-warning', earned: true, points: '+25' },
-    { name: 'First Survey', icon: Target, color: 'text-accent', earned: true, points: '+20' },
-    { name: 'KYC Verified', icon: CheckCircle, color: 'text-success', earned: false, points: '+30' },
-    { name: 'Crypto Token', icon: Star, color: 'text-crypto', earned: false, points: '+50' },
-    { name: 'Data Sharing', icon: TrendingUp, color: 'text-info', earned: true, points: '+15' },
-    { name: 'Comm Enabled', icon: Users, color: 'text-accent', earned: true, points: '+18' },
+  // Combine all badge categories into one array
+  const allBadges = [
+    ...badgeSystem.coreVerification,
+    ...badgeSystem.streakAchievements,
+    ...badgeSystem.qualityAchievements
   ];
 
   const tips = [
@@ -181,46 +186,14 @@ export default function RepTab() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 gap-3">
-            {badges.map((badge) => {
-              const IconComponent = badge.icon;
-              return (
-                <div
-                  key={badge.name}
-                  className={`p-3 rounded-lg border-2 ${
-                    badge.earned 
-                      ? 'bg-gradient-to-br from-primary/5 to-accent/5 border-primary/30' 
-                      : 'bg-gray-50 border-gray-200'
-                  }`}
-                >
-                  <div className="text-center">
-                    <IconComponent 
-                      className={`h-6 w-6 mx-auto mb-2 ${
-                        badge.earned ? badge.color : 'text-gray-400'
-                      }`} 
-                    />
-                    <p className={`text-xs font-medium ${
-                      badge.earned ? 'text-foreground' : 'text-gray-500'
-                    }`}>
-                      {badge.name}
-                    </p>
-                    <p className={`text-xs ${
-                      badge.earned ? 'text-success' : 'text-gray-400'
-                    }`}>
-                      {badge.points}
-                    </p>
-                    {badge.earned ? (
-                      <Badge variant="outline" className="text-success border-success mt-1 text-xs">
-                        Earned
-                      </Badge>
-                    ) : (
-                      <Badge variant="secondary" className="mt-1 text-xs">
-                        {badge.name === 'KYC Verified' || badge.name === 'Crypto Token' ? 'Available' : 'Locked'}
-                      </Badge>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
+            {allBadges.map((badge) => (
+              <CollectibleBadge 
+                key={badge.id} 
+                badge={badge} 
+                size="md" 
+                showDetails={false}
+              />
+            ))}
           </div>
         </CardContent>
       </Card>
@@ -438,7 +411,7 @@ export default function RepTab() {
               <p className="text-xs text-muted-foreground">Surveys Done</p>
             </div>
             <div className="text-center p-3 bg-accent/5 rounded-lg">
-              <p className="text-xl font-bold text-accent">{userStats.checkInStreak}</p>
+              <p className="text-xl font-bold text-accent">{userStats.streaks.currentStreak}</p>
               <p className="text-xs text-muted-foreground">Day Streak</p>
             </div>
             <div className="text-center p-3 bg-success/5 rounded-lg">
