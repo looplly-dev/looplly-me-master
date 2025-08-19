@@ -183,6 +183,43 @@ export const useAuthLogic = () => {
     setAuthState(prev => ({ ...prev, isLoading: true }));
     
     try {
+      // Check for demo/mock login
+      if (email === 'demo@looplly.com' && password === 'demo123') {
+        console.log('Using mock login for demo user');
+        
+        // Create mock user directly
+        const mockUser: User = {
+          id: '12345678-1234-1234-1234-123456789012',
+          mobile: '+1234567890',
+          countryCode: '+1',
+          email: 'demo@looplly.com',
+          firstName: 'Demo',
+          lastName: 'User',
+          isVerified: true,
+          profileComplete: true,
+          profile: {
+            sec: 'B' as const,
+            gender: 'other' as const,
+            dateOfBirth: new Date('1990-01-01'),
+            address: '123 Demo Street, Demo City',
+            gpsEnabled: true,
+            firstName: 'Demo',
+            lastName: 'User',
+            email: 'demo@looplly.com'
+          }
+        };
+
+        setAuthState({
+          user: mockUser,
+          isAuthenticated: true,
+          isLoading: false,
+          step: 'dashboard'
+        });
+        
+        return true;
+      }
+      
+      // For other emails, try real Supabase authentication
       const result = await loginUser({ email, password });
       
       if (result.success) {
