@@ -42,17 +42,17 @@ export default function SimplifiedEarnTab() {
   const { addTransaction } = useTransactions();
   const { authState } = useAuth();
 
-  // Add missing demo activities for existing users (skip for mock users)
+  // Add missing demo activities for existing users
   useEffect(() => {
     const checkAndAddMissingActivities = async () => {
-      if (authState.user?.id && authState.user.id !== 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11') {
+      if (authState.user?.id) {
         await addMissingDemoActivities(authState.user.id);
         // Refresh activities to show the new one
         refetch();
       }
     };
 
-    if (authState.user?.id && authState.user.id !== 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11') {
+    if (authState.user?.id) {
       checkAndAddMissingActivities();
     }
   }, [authState.user?.id, refetch]);

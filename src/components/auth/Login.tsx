@@ -132,50 +132,6 @@ export default function Login({ onForgotPassword, onRegister }: LoginProps) {
               {isSubmitting ? 'Signing In...' : 'Sign In'}
             </Button>
 
-            {/* Mock Login Button for Testing */}
-            <Button 
-              type="button"
-              variant="outline" 
-              size="mobile" 
-              className="w-full border-dashed"
-              onClick={async () => {
-                setIsSubmitting(true);
-                try {
-                  // Mock successful login
-                  const mockUser = {
-                    id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', // Valid UUID
-                    email: 'demo@example.com',
-                    user_metadata: {
-                      name: 'Demo User',
-                      avatar_url: null
-                    }
-                  };
-                  
-                  // Store mock user in localStorage for persistence
-                  localStorage.setItem('mock_auth_user', JSON.stringify(mockUser));
-                  localStorage.setItem('mock_auth_session', JSON.stringify({
-                    access_token: 'mock-token',
-                    user: mockUser
-                  }));
-                  
-                  // Reload to trigger auth state change
-                  window.location.reload();
-                  
-                  toast({
-                    title: 'Success',
-                    description: 'Logged in with mock data',
-                  });
-                } catch (error) {
-                  console.error('Mock login error:', error);
-                } finally {
-                  setIsSubmitting(false);
-                }
-              }}
-              disabled={isSubmitting}
-            >
-              🎭 Demo Login (Mock Data)
-            </Button>
-
             <div className="text-center">
               <span className="text-muted-foreground">Don't have an account? </span>
               <Button
