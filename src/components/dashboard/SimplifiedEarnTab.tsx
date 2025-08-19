@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { useToast } from '@/hooks/use-toast';
 import { 
   Coins, 
@@ -21,7 +22,11 @@ import {
   Award,
   FileText,
   Play,
-  Clock
+  Clock,
+  Gift,
+  Rocket,
+  Heart,
+  ChevronRight
 } from 'lucide-react';
 import { useBalance } from '@/hooks/useBalance';
 import { useEarningActivities } from '@/hooks/useEarningActivities';
@@ -129,6 +134,50 @@ export default function SimplifiedEarnTab() {
   // Only show data dot if there are items to opt into
   const dataCount = (!dataOptIns.shopping || !dataOptIns.appUsage) ? 1 : 0;
 
+  // Promotional slides data
+  const promoSlides = [
+    {
+      title: "🎯 Earn More with Surveys",
+      subtitle: "Premium surveys now available",
+      description: "Answer questions about your shopping habits and earn up to $2.50 per survey",
+      buttonText: "Start Earning",
+      bgGradient: "from-primary/10 to-primary/5",
+      borderColor: "border-primary/30",
+      icon: <FileText className="h-6 w-6 text-primary" />,
+      amount: "$2.50"
+    },
+    {
+      title: "🎁 Daily Bonus Multiplier",
+      subtitle: "Limited time offer",
+      description: "Complete 3 tasks today and get 2x rewards on your next task",
+      buttonText: "Get 2x Bonus",
+      bgGradient: "from-warning/10 to-warning/5",
+      borderColor: "border-warning/30",
+      icon: <Gift className="h-6 w-6 text-warning" />,
+      amount: "2x"
+    },
+    {
+      title: "🚀 Weekly Challenge",
+      subtitle: "7 days to complete",
+      description: "Complete 15 activities this week and unlock exclusive $5 bonus reward",
+      buttonText: "Join Challenge",
+      bgGradient: "from-success/10 to-success/5",
+      borderColor: "border-success/30",
+      icon: <Rocket className="h-6 w-6 text-success" />,
+      amount: "$5"
+    },
+    {
+      title: "💝 Refer & Earn",
+      subtitle: "Share the love",
+      description: "Invite friends and earn $3 for each friend who completes their first task",
+      buttonText: "Invite Friends",
+      bgGradient: "from-pink-500/10 to-pink-500/5",
+      borderColor: "border-pink-500/30",
+      icon: <Heart className="h-6 w-6 text-pink-500" />,
+      amount: "$3"
+    }
+  ];
+
   return (
     <div className="p-4 pb-20 space-y-6">
       {/* Enhanced Balance Card with Progress */}
@@ -166,6 +215,52 @@ export default function SimplifiedEarnTab() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Promotional Slides Carousel */}
+      <div className="relative">
+        <Carousel className="w-full">
+          <CarouselContent className="-ml-2 md:-ml-4">
+            {promoSlides.map((slide, index) => (
+              <CarouselItem key={index} className="pl-2 md:pl-4 basis-[85%] md:basis-[60%]">
+                <Card className={`${slide.bgGradient} ${slide.borderColor} border overflow-hidden relative`}>
+                  <div className="absolute top-0 right-0 w-16 h-16 bg-white/5 rounded-full -mr-8 -mt-8" />
+                  <CardContent className="p-4 relative">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-white/10 rounded-lg">
+                          {slide.icon}
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-bold text-lg leading-tight">{slide.title}</h3>
+                          <p className="text-sm text-muted-foreground">{slide.subtitle}</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-2xl font-bold text-primary">{slide.amount}</p>
+                      </div>
+                    </div>
+                    
+                    <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
+                      {slide.description}
+                    </p>
+                    
+                    <Button 
+                      size="sm" 
+                      className="w-full bg-white/10 hover:bg-white/20 border-white/20"
+                      variant="outline"
+                    >
+                      {slide.buttonText}
+                      <ChevronRight className="h-4 w-4 ml-1" />
+                    </Button>
+                  </CardContent>
+                </Card>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          <CarouselPrevious className="left-2" />
+          <CarouselNext className="right-2" />
+        </Carousel>
+      </div>
 
       {/* Daily Check-in - More Prominent */}
       <Card className="border-primary/30 bg-gradient-to-r from-primary/5 to-primary/10">
