@@ -54,37 +54,37 @@ export function CollectibleBadge({ badge, size = 'md', showDetails = false }: Co
   };
 
   const containerClasses = {
-    sm: 'p-2',
-    md: 'p-3',
-    lg: 'p-4'
+    sm: 'p-2 min-h-[80px]',
+    md: 'p-3 min-h-[100px]',
+    lg: 'p-4 min-h-[120px]'
   };
 
   const rarityColors = {
-    Common: 'border-gray-300 bg-gray-50',
-    Rare: 'border-blue-300 bg-blue-50',
-    Epic: 'border-purple-300 bg-purple-50',
-    Legendary: 'border-yellow-300 bg-gradient-to-br from-yellow-50 to-orange-50'
+    Common: 'border-muted bg-gradient-to-br from-muted/30 to-muted/50 shadow-sm',
+    Rare: 'border-primary/40 bg-gradient-to-br from-primary/10 to-primary/20 shadow-md shadow-primary/20',
+    Epic: 'border-accent/50 bg-gradient-to-br from-accent/15 to-accent/30 shadow-lg shadow-accent/30',
+    Legendary: 'border-warning/60 bg-gradient-to-br from-warning/20 to-warning/40 shadow-xl shadow-warning/40 animate-pulse'
   };
 
   const tierColors = {
-    Bronze: 'text-amber-600',
-    Silver: 'text-gray-600',
-    Gold: 'text-yellow-600',
-    Platinum: 'text-purple-600',
-    Diamond: 'text-cyan-600'
+    Bronze: 'text-amber-600 drop-shadow-sm',
+    Silver: 'text-gray-600 drop-shadow-sm',
+    Gold: 'text-yellow-600 drop-shadow-sm',
+    Platinum: 'text-purple-600 drop-shadow-sm',
+    Diamond: 'text-cyan-600 drop-shadow-sm'
   };
 
   return (
     <div
       className={cn(
-        'rounded-lg border-2 transition-all',
+        'rounded-xl border transition-all duration-300 hover:scale-105 cursor-pointer relative overflow-hidden group',
         containerClasses[size],
         badge.earned 
           ? cn(
-              'border-primary/30 bg-gradient-to-br from-primary/5 to-accent/5',
+              'border-2 hover:shadow-lg',
               rarityColors[badge.rarity as keyof typeof rarityColors]
             )
-          : 'bg-gray-50 border-gray-200 opacity-60'
+          : 'bg-muted/50 border-muted opacity-70 hover:opacity-85'
       )}
     >
       <div className="text-center">
@@ -121,12 +121,12 @@ export function CollectibleBadge({ badge, size = 'md', showDetails = false }: Co
           +{badge.repPoints} Rep
         </p>
         
-        <div className="flex gap-1 justify-center mt-1">
+        <div className="flex gap-1 justify-center mt-2">
           <Badge 
             variant={badge.earned ? "default" : "secondary"} 
             className={cn(
-              'text-xs',
-              badge.earned ? 'bg-success/10 text-success border-success' : ''
+              'text-xs px-2 py-0.5',
+              badge.earned ? 'bg-success/20 text-success border-success/50' : 'bg-muted text-muted-foreground'
             )}
           >
             {badge.earned ? 'Earned' : 'Locked'}
@@ -135,16 +135,30 @@ export function CollectibleBadge({ badge, size = 'md', showDetails = false }: Co
           <Badge 
             variant="outline" 
             className={cn(
-              'text-xs',
-              badge.rarity === 'Legendary' ? 'border-yellow-300 text-yellow-700' :
-              badge.rarity === 'Epic' ? 'border-purple-300 text-purple-700' :
-              badge.rarity === 'Rare' ? 'border-blue-300 text-blue-700' :
-              'border-gray-300 text-gray-700'
+              'text-xs px-2 py-0.5 font-medium',
+              badge.rarity === 'Legendary' ? 'border-warning/60 text-warning bg-warning/10' :
+              badge.rarity === 'Epic' ? 'border-accent/60 text-accent bg-accent/10' :
+              badge.rarity === 'Rare' ? 'border-primary/60 text-primary bg-primary/10' :
+              'border-muted-foreground/40 text-muted-foreground bg-muted/30'
             )}
           >
             {badge.rarity}
           </Badge>
         </div>
+        
+        {/* Hover tooltip overlay */}
+        {!showDetails && (
+          <div className="absolute inset-0 bg-background/95 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-xl p-2 flex flex-col justify-center">
+            <p className="text-xs text-muted-foreground text-center leading-tight">
+              {badge.description}
+            </p>
+            {badge.requirement && (
+              <p className="text-xs text-accent text-center mt-1 font-medium">
+                Requires: {badge.requirement}+
+              </p>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -16,15 +17,20 @@ import {
   Minus,
   Clock,
   CheckCircle,
-  AlertTriangle
+  AlertTriangle,
+  Settings,
+  Maximize2,
+  Minimize2
 } from 'lucide-react';
 import { userStats, badgeSystem } from '@/data/mockData';
 import { useAuth } from '@/hooks/useAuth';
 import { CollectibleBadge } from '@/components/ui/collectible-badge';
 import { StreakProgress } from '@/components/ui/streak-progress';
+import { CollapsibleSection } from '@/components/ui/collapsible-section';
 
 export default function RepTab() {
   const { authState } = useAuth();
+  const [isCompactView, setIsCompactView] = useState(false);
   // Endless reputation system with tiers and prestige
   const getLevel = (score: number) => {
     if (score >= 2000) return { name: 'Elite', tier: 'Elite', color: 'text-gradient', icon: '👑', min: 2000, max: Infinity };
@@ -92,104 +98,150 @@ export default function RepTab() {
   ];
 
   return (
-    <div className="p-4 pb-20 space-y-6">
-      {/* Enhanced Reputation Score */}
-      <Card className="border-border/50 shadow-lg">
-        <CardContent className="p-6">
+    <div className="p-4 pb-20 space-y-4">
+      {/* View Toggle Controls */}
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold text-foreground">Reputation</h1>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setIsCompactView(!isCompactView)}
+          className="flex items-center gap-2"
+        >
+          {isCompactView ? (
+            <>
+              <Maximize2 className="h-4 w-4" />
+              Detailed View
+            </>
+          ) : (
+            <>
+              <Minimize2 className="h-4 w-4" />
+              Compact View
+            </>
+          )}
+        </Button>
+      </div>
+      {/* Enhanced Reputation Score - Always Visible */}
+      <Card className="border-primary/20 shadow-lg bg-gradient-to-br from-primary/5 to-accent/5">
+        <CardContent className={isCompactView ? "p-4" : "p-6"}>
           <div className="text-center">
-            <div className="text-6xl mb-2">{level.icon}</div>
-            <h2 className="text-2xl font-bold mb-1 text-foreground">
+            <div className={isCompactView ? "text-4xl mb-1" : "text-6xl mb-2"}>{level.icon}</div>
+            <h2 className={isCompactView ? "text-xl font-bold mb-1" : "text-2xl font-bold mb-1"}>
               {level.name} {prestigeName}
             </h2>
             <p className="text-muted-foreground text-sm mb-4">
-              Reputation Score • {level.tier} Tier
+              {userStats.reputation.score} Rep • {level.tier} Tier
             </p>
             
-            <div className="relative w-32 h-32 mx-auto mb-4">
-              <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 36 36">
-                <path
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  fill="none"
-                  stroke="hsl(var(--muted))"
-                  strokeWidth="2"
-                  opacity="0.3"
-                />
-                <path
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  fill="none"
-                  stroke="hsl(var(--primary))"
-                  strokeWidth="2"
-                  strokeDasharray={`${Math.min(progressToNext, 100)}, 100`}
-                  strokeLinecap="round"
-                  style={{
-                    filter: 'drop-shadow(0 0 8px hsl(var(--primary) / 0.3))'
-                  }}
-                />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-3xl font-bold text-foreground">{userStats.reputation.score}</span>
+            {!isCompactView && (
+              <>
+                <div className="relative w-32 h-32 mx-auto mb-4">
+                  <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 36 36">
+                    <path
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                      fill="none"
+                      stroke="hsl(var(--muted))"
+                      strokeWidth="2"
+                      opacity="0.3"
+                    />
+                    <path
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                      fill="none"
+                      stroke="hsl(var(--primary))"
+                      strokeWidth="2"
+                      strokeDasharray={`${Math.min(progressToNext, 100)}, 100`}
+                      strokeLinecap="round"
+                      style={{
+                        filter: 'drop-shadow(0 0 8px hsl(var(--primary) / 0.3))'
+                      }}
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-3xl font-bold text-foreground">{userStats.reputation.score}</span>
+                  </div>
+                </div>
+                
+                <p className="text-muted-foreground text-sm">
+                  {level.max === Infinity 
+                    ? 'Elite Level - Endless Progression!' 
+                    : `${nextLevelThreshold - userStats.reputation.score} points to next tier`
+                  }
+                </p>
+              </>
+            )}
+            
+            {isCompactView && (
+              <div className="flex justify-center items-center gap-4">
+                <div className="text-center">
+                  <p className="text-2xl font-bold">{userStats.reputation.score}</p>
+                  <p className="text-xs text-muted-foreground">Current</p>
+                </div>
+                <Progress value={progressToNext} className="w-20 h-2" />
+                <div className="text-center">
+                  <p className="text-lg font-semibold">{level.max === Infinity ? '∞' : nextLevelThreshold}</p>
+                  <p className="text-xs text-muted-foreground">Next</p>
+                </div>
               </div>
-            </div>
-            
-            <p className="text-muted-foreground text-sm">
-              {level.max === Infinity 
-                ? 'Elite Level - Endless Progression!' 
-                : `${nextLevelThreshold - userStats.reputation.score} points to next tier`
-              }
-            </p>
+            )}
           </div>
         </CardContent>
       </Card>
 
-      {/* Enhanced Level Progress with New Tiers */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <TrendingUp className="h-5 w-5" />
-            Endless Progression System
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
+      {/* Tier Progression */}
+      <CollapsibleSection
+        title="Tier Progression" 
+        icon={<TrendingUp className="h-5 w-5" />}
+        defaultOpen={!isCompactView}
+        compactContent={
+          <div className="flex items-center justify-center gap-2">
+            <span className="text-sm text-muted-foreground">Current:</span>
+            <Badge variant="default" className="text-sm">{level.name} {prestigeName}</Badge>
+            <span className="text-sm text-muted-foreground">•</span>
+            <span className="text-sm">{Math.round(progressToNext)}% to next</span>
+          </div>
+        }
+      >
+        <div className="space-y-4">
           <div className="grid grid-cols-3 gap-2 text-center">
-            <div className={`p-2 rounded-lg ${userStats.reputation.score >= 0 ? 'bg-amber-100 text-amber-800' : 'bg-gray-100 text-gray-500'}`}>
-              <div className="text-lg">🥉</div>
+            <div className={`p-3 rounded-xl transition-all ${userStats.reputation.score >= 0 ? 'bg-gradient-to-br from-amber-100 to-amber-200 text-amber-800 shadow-sm' : 'bg-muted/50 text-muted-foreground'}`}>
+              <div className="text-lg mb-1">🥉</div>
               <div className="text-xs font-medium">Bronze</div>
-              <div className="text-xs">0-99</div>
+              <div className="text-xs opacity-75">0-99</div>
             </div>
-            <div className={`p-2 rounded-lg ${userStats.reputation.score >= 100 ? 'bg-gray-100 text-gray-600' : 'bg-gray-50 text-gray-400'}`}>
-              <div className="text-lg">🥈</div>
+            <div className={`p-3 rounded-xl transition-all ${userStats.reputation.score >= 100 ? 'bg-gradient-to-br from-gray-100 to-gray-200 text-gray-700 shadow-sm' : 'bg-muted/50 text-muted-foreground'}`}>
+              <div className="text-lg mb-1">🥈</div>
               <div className="text-xs font-medium">Silver</div>
-              <div className="text-xs">100-249</div>
+              <div className="text-xs opacity-75">100-249</div>
             </div>
-            <div className={`p-2 rounded-lg ${userStats.reputation.score >= 250 ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-50 text-gray-400'}`}>
-              <div className="text-lg">🥇</div>
+            <div className={`p-3 rounded-xl transition-all ${userStats.reputation.score >= 250 ? 'bg-gradient-to-br from-yellow-100 to-yellow-200 text-yellow-800 shadow-sm' : 'bg-muted/50 text-muted-foreground'}`}>
+              <div className="text-lg mb-1">🥇</div>
               <div className="text-xs font-medium">Gold</div>
-              <div className="text-xs">250-499</div>
+              <div className="text-xs opacity-75">250-499</div>
             </div>
-            <div className={`p-2 rounded-lg ${userStats.reputation.score >= 500 ? 'bg-purple-100 text-purple-800' : 'bg-gray-50 text-gray-400'}`}>
-              <div className="text-lg">⭐</div>
+            <div className={`p-3 rounded-xl transition-all ${userStats.reputation.score >= 500 ? 'bg-gradient-to-br from-purple-100 to-purple-200 text-purple-800 shadow-sm' : 'bg-muted/50 text-muted-foreground'}`}>
+              <div className="text-lg mb-1">⭐</div>
               <div className="text-xs font-medium">Platinum</div>
-              <div className="text-xs">500-999</div>
+              <div className="text-xs opacity-75">500-999</div>
             </div>
-            <div className={`p-2 rounded-lg ${userStats.reputation.score >= 1000 ? 'bg-cyan-100 text-cyan-800' : 'bg-gray-50 text-gray-400'}`}>
-              <div className="text-lg">💎</div>
+            <div className={`p-3 rounded-xl transition-all ${userStats.reputation.score >= 1000 ? 'bg-gradient-to-br from-cyan-100 to-cyan-200 text-cyan-800 shadow-sm' : 'bg-muted/50 text-muted-foreground'}`}>
+              <div className="text-lg mb-1">💎</div>
               <div className="text-xs font-medium">Diamond</div>
-              <div className="text-xs">1000-1999</div>
+              <div className="text-xs opacity-75">1000-1999</div>
             </div>
-            <div className={`p-2 rounded-lg ${userStats.reputation.score >= 2000 ? 'bg-gradient-to-br from-yellow-100 to-orange-100 text-orange-800' : 'bg-gray-50 text-gray-400'}`}>
-              <div className="text-lg">👑</div>
+            <div className={`p-3 rounded-xl transition-all ${userStats.reputation.score >= 2000 ? 'bg-gradient-to-br from-warning/20 to-warning/40 text-warning-foreground shadow-md' : 'bg-muted/50 text-muted-foreground'}`}>
+              <div className="text-lg mb-1">👑</div>
               <div className="text-xs font-medium">Elite</div>
-              <div className="text-xs">2000+</div>
+              <div className="text-xs opacity-75">2000+</div>
             </div>
           </div>
           
-          <div className="space-y-2">
+          <div className="space-y-3">
             <div className="flex justify-between text-sm">
               <span>Progress to {level.max === Infinity ? 'Next Milestone' : 'Next Tier'}</span>
-              <span>{Math.round(progressToNext)}%</span>
+              <span className="font-medium">{Math.round(progressToNext)}%</span>
             </div>
-            <Progress value={progressToNext} className="h-2" />
-            <p className="text-xs text-muted-foreground">
+            <Progress value={progressToNext} className="h-3" />
+            <p className="text-sm text-muted-foreground">
               {level.max === Infinity 
                 ? 'You\'ve reached Elite status! Keep earning for prestige levels.' 
                 : `${nextLevelThreshold - userStats.reputation.score} Rep to unlock ${
@@ -201,306 +253,306 @@ export default function RepTab() {
               }
             </p>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </CollapsibleSection>
 
       {/* Daily Streak Progress */}
-      <StreakProgress 
-        currentStreak={userStats.streaks.currentStreak}
-        longestStreak={userStats.streaks.longestStreak}
-        daysUntilMonthlyMilestone={userStats.streaks.daysUntilMonthlyMilestone}
-        monthsUntilYearly={userStats.streaks.monthsUntilYearly}
-        milestones={userStats.streaks.milestones}
-      />
+      <CollapsibleSection
+        title="Daily Streak Progress"
+        icon={<Flame className="h-5 w-5" />}
+        defaultOpen={!isCompactView}
+        compactContent={
+          <div className="flex items-center justify-center gap-4">
+            <div className="text-center">
+              <p className="text-lg font-bold text-primary">{userStats.streaks.currentStreak}</p>
+              <p className="text-xs text-muted-foreground">Current</p>
+            </div>
+            <div className="text-center">
+              <p className="text-lg font-bold text-accent">{userStats.streaks.longestStreak}</p>
+              <p className="text-xs text-muted-foreground">Best</p>
+            </div>
+          </div>
+        }
+      >
+        <StreakProgress 
+          currentStreak={userStats.streaks.currentStreak}
+          longestStreak={userStats.streaks.longestStreak}
+          daysUntilMonthlyMilestone={userStats.streaks.daysUntilMonthlyMilestone}
+          monthsUntilYearly={userStats.streaks.monthsUntilYearly}
+          milestones={userStats.streaks.milestones}
+        />
+      </CollapsibleSection>
 
       {/* Collectible Badges & Achievements */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Star className="h-5 w-5" />
-            Collectible Badges & Achievements
-          </CardTitle>
-          <p className="text-sm text-muted-foreground">
-            Earn badges to boost your reputation and unlock special perks
-          </p>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {/* Core Verification Badges */}
-            <div>
-              <h4 className="text-sm font-semibold mb-3 text-foreground">Core Verification</h4>
-              <div className="grid grid-cols-2 gap-3">
-                {badgeSystem.coreVerification.map((badge) => (
-                  <CollectibleBadge 
-                    key={badge.id} 
-                    badge={badge} 
-                    size="md" 
-                    showDetails={false}
-                  />
-                ))}
+      <CollapsibleSection
+        title="Badge Collection"
+        icon={<Star className="h-5 w-5" />}
+        defaultOpen={!isCompactView}
+        priority="high"
+        compactContent={
+          <div className="flex justify-center gap-2">
+            {allBadges.filter(b => b.earned).slice(0, 6).map((badge) => (
+              <div key={badge.id} className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
+                <span className="text-xs">{badge.icon}</span>
               </div>
-            </div>
-
-            {/* Streak Achievement Badges */}
-            <div>
-              <h4 className="text-sm font-semibold mb-3 text-foreground">Streak Achievements</h4>
-              <div className="grid grid-cols-2 gap-3">
-                {badgeSystem.streakAchievements.map((badge) => (
-                  <CollectibleBadge 
-                    key={badge.id} 
-                    badge={badge} 
-                    size="md" 
-                    showDetails={false}
-                  />
-                ))}
+            ))}
+            {allBadges.filter(b => b.earned).length > 6 && (
+              <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                <span className="text-xs font-bold">+{allBadges.filter(b => b.earned).length - 6}</span>
               </div>
-            </div>
-
-            {/* Quality Achievement Badges */}
-            <div>
-              <h4 className="text-sm font-semibold mb-3 text-foreground">Quality Achievements</h4>
-              <div className="grid grid-cols-2 gap-3">
-                {badgeSystem.qualityAchievements.map((badge) => (
-                  <CollectibleBadge 
-                    key={badge.id} 
-                    badge={badge} 
-                    size="md" 
-                    showDetails={false}
-                  />
-                ))}
-              </div>
+            )}
+          </div>
+        }
+      >
+        <div className="space-y-6">
+          {/* Core Verification Badges */}
+          <div>
+            <h4 className="text-sm font-semibold mb-3 text-foreground flex items-center gap-2">
+              <Shield className="h-4 w-4" />
+              Core Verification
+              <Badge variant="outline" className="text-xs">
+                {badgeSystem.coreVerification.filter(b => b.earned).length}/{badgeSystem.coreVerification.length}
+              </Badge>
+            </h4>
+            <div className="grid grid-cols-3 lg:grid-cols-4 gap-3">
+              {badgeSystem.coreVerification.map((badge) => (
+                <CollectibleBadge 
+                  key={badge.id} 
+                  badge={badge} 
+                  size="sm" 
+                  showDetails={false}
+                />
+              ))}
             </div>
           </div>
-        </CardContent>
-      </Card>
+
+          {/* Streak Achievement Badges */}
+          <div>
+            <h4 className="text-sm font-semibold mb-3 text-foreground flex items-center gap-2">
+              <Flame className="h-4 w-4" />
+              Streak Achievements
+              <Badge variant="outline" className="text-xs">
+                {badgeSystem.streakAchievements.filter(b => b.earned).length}/{badgeSystem.streakAchievements.length}
+              </Badge>
+            </h4>
+            <div className="grid grid-cols-3 lg:grid-cols-4 gap-3">
+              {badgeSystem.streakAchievements.map((badge) => (
+                <CollectibleBadge 
+                  key={badge.id} 
+                  badge={badge} 
+                  size="sm" 
+                  showDetails={false}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Quality Achievement Badges */}
+          <div>
+            <h4 className="text-sm font-semibold mb-3 text-foreground flex items-center gap-2">
+              <Award className="h-4 w-4" />
+              Quality Achievements
+              <Badge variant="outline" className="text-xs">
+                {badgeSystem.qualityAchievements.filter(b => b.earned).length}/{badgeSystem.qualityAchievements.length}
+              </Badge>
+            </h4>
+            <div className="grid grid-cols-3 lg:grid-cols-4 gap-3">
+              {badgeSystem.qualityAchievements.map((badge) => (
+                <CollectibleBadge 
+                  key={badge.id} 
+                  badge={badge} 
+                  size="sm" 
+                  showDetails={false}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      </CollapsibleSection>
 
       {/* Survey Quality Metrics */}
-      <Card className="border-warning/50 bg-warning/5">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <AlertTriangle className="h-5 w-5 text-warning" />
-            Data Quality Score
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 gap-4 mb-4">
-            <div className="text-center p-3 bg-background/50 rounded-lg">
-              <p className="text-xl font-bold text-success">{userStats.reputation.qualityMetrics.consistencyScore}%</p>
-              <p className="text-xs text-muted-foreground">Consistency</p>
+      <CollapsibleSection
+        title="Data Quality Score"
+        icon={<CheckCircle className="h-5 w-5" />}
+        defaultOpen={!isCompactView}
+        priority="medium"
+        compactContent={
+          <div className="flex justify-center gap-6">
+            <div className="text-center">
+              <p className="text-lg font-bold text-success">{userStats.reputation.qualityMetrics.consistencyScore}%</p>
+              <p className="text-xs text-muted-foreground">Quality</p>
             </div>
-            <div className="text-center p-3 bg-background/50 rounded-lg">
-              <p className="text-xl font-bold text-primary">{userStats.reputation.qualityMetrics.averageTime}</p>
-              <p className="text-xs text-muted-foreground">Avg. Time</p>
+            <div className="text-center">
+              <p className="text-lg font-bold text-primary">
+                {Math.round((userStats.reputation.qualityMetrics.surveysCompleted / (userStats.reputation.qualityMetrics.surveysCompleted + userStats.reputation.qualityMetrics.surveysRejected)) * 100)}%
+              </p>
+              <p className="text-xs text-muted-foreground">Success</p>
+            </div>
+          </div>
+        }
+      >
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="text-center p-4 bg-gradient-to-br from-success/10 to-success/20 rounded-xl border border-success/20">
+              <p className="text-2xl font-bold text-success">{userStats.reputation.qualityMetrics.consistencyScore}%</p>
+              <p className="text-sm text-muted-foreground">Consistency</p>
+            </div>
+            <div className="text-center p-4 bg-gradient-to-br from-primary/10 to-primary/20 rounded-xl border border-primary/20">
+              <p className="text-2xl font-bold text-primary">{userStats.reputation.qualityMetrics.averageTime}</p>
+              <p className="text-sm text-muted-foreground">Avg. Time</p>
             </div>
           </div>
           
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span>Surveys Completed</span>
-              <span className="text-success">{userStats.reputation.qualityMetrics.surveysCompleted}</span>
+          <div className="space-y-3">
+            <div className="flex justify-between items-center p-3 bg-secondary/30 rounded-lg">
+              <span className="text-sm font-medium">Surveys Completed</span>
+              <Badge variant="default" className="bg-success/20 text-success">
+                {userStats.reputation.qualityMetrics.surveysCompleted}
+              </Badge>
             </div>
-            <div className="flex justify-between text-sm">
-              <span>Surveys Rejected</span>
-              <span className="text-destructive">{userStats.reputation.qualityMetrics.surveysRejected}</span>
+            <div className="flex justify-between items-center p-3 bg-secondary/30 rounded-lg">
+              <span className="text-sm font-medium">Surveys Rejected</span>
+              <Badge variant="destructive" className="bg-destructive/20">
+                {userStats.reputation.qualityMetrics.surveysRejected}
+              </Badge>
             </div>
-            <div className="flex justify-between text-sm">
-              <span>Success Rate</span>
-              <span className="text-primary">
+            <div className="flex justify-between items-center p-3 bg-secondary/30 rounded-lg">
+              <span className="text-sm font-medium">Success Rate</span>
+              <Badge variant="default" className="bg-primary/20 text-primary">
                 {Math.round((userStats.reputation.qualityMetrics.surveysCompleted / (userStats.reputation.qualityMetrics.surveysCompleted + userStats.reputation.qualityMetrics.surveysRejected)) * 100)}%
-              </span>
+              </Badge>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </CollapsibleSection>
 
       {/* Reputation History */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Clock className="h-5 w-5" />
-            Reputation History
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {userStats.reputation.history.map((entry, index) => (
-              <div key={index} className="flex items-center gap-3 p-3 bg-secondary/30 rounded-lg">
-                <div className={`p-1.5 rounded-full ${
-                  entry.points > 0 ? 'bg-success/10' : 'bg-destructive/10'
-                }`}>
-                  {entry.points > 0 ? (
-                    <Plus className="h-3 w-3 text-success" />
-                  ) : (
-                    <Minus className="h-3 w-3 text-destructive" />
-                  )}
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium">{entry.action}</p>
-                  <p className="text-xs text-muted-foreground">{entry.date}</p>
-                </div>
-                <div className={`text-sm font-semibold ${
-                  entry.points > 0 ? 'text-success' : 'text-destructive'
-                }`}>
-                  {entry.points > 0 ? '+' : ''}{entry.points}
-                </div>
-              </div>
-            ))}
+      <CollapsibleSection
+        title="Reputation History"
+        icon={<Clock className="h-5 w-5" />}
+        defaultOpen={false}
+        compactContent={
+          <div className="text-center">
+            <p className="text-sm text-muted-foreground">
+              {userStats.reputation.history.length} recent activities
+            </p>
           </div>
-        </CardContent>
-      </Card>
+        }
+      >
+        <div className="space-y-3 max-h-64 overflow-y-auto">
+          {userStats.reputation.history.map((entry, index) => (
+            <div key={index} className="flex items-center gap-3 p-3 bg-secondary/30 rounded-lg transition-all hover:bg-secondary/50">
+              <div className={`p-2 rounded-full ${
+                entry.points > 0 ? 'bg-success/20 text-success' : 'bg-destructive/20 text-destructive'
+              }`}>
+                {entry.points > 0 ? (
+                  <Plus className="h-4 w-4" />
+                ) : (
+                  <Minus className="h-4 w-4" />
+                )}
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium">{entry.action}</p>
+                <p className="text-xs text-muted-foreground">{entry.date}</p>
+              </div>
+              <Badge variant={entry.points > 0 ? "default" : "destructive"} className="text-sm">
+                {entry.points > 0 ? '+' : ''}{entry.points}
+              </Badge>
+            </div>
+          ))}
+        </div>
+      </CollapsibleSection>
 
       {/* Reputation Benefits */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Trophy className="h-5 w-5" />
-            Reputation Benefits
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="flex items-center gap-3 p-3 bg-success/5 rounded-lg">
-            <div className="w-2 h-2 bg-success rounded-full"></div>
-            <span className="text-sm">Higher-paying survey opportunities</span>
+      <CollapsibleSection
+        title="Reputation Benefits"
+        icon={<Trophy className="h-5 w-5" />}
+        defaultOpen={false}
+        compactContent={
+          <div className="text-center">
+            <p className="text-sm text-muted-foreground">
+              5 exclusive benefits unlocked
+            </p>
           </div>
-          <div className="flex items-center gap-3 p-3 bg-primary/5 rounded-lg">
-            <div className="w-2 h-2 bg-primary rounded-full"></div>
-            <span className="text-sm">Priority access to new features</span>
+        }
+      >
+        <div className="space-y-3">
+          <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-success/10 to-success/20 rounded-lg border border-success/20">
+            <div className="w-3 h-3 bg-success rounded-full"></div>
+            <span className="text-sm font-medium">Higher-paying survey opportunities</span>
+            <CheckCircle className="h-4 w-4 text-success ml-auto" />
           </div>
-          <div className="flex items-center gap-3 p-3 bg-accent/5 rounded-lg">
-            <div className="w-2 h-2 bg-accent rounded-full"></div>
-            <span className="text-sm">Exclusive Gold+ member surveys</span>
+          <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-primary/10 to-primary/20 rounded-lg border border-primary/20">
+            <div className="w-3 h-3 bg-primary rounded-full"></div>
+            <span className="text-sm font-medium">Priority access to new features</span>
+            <CheckCircle className="h-4 w-4 text-primary ml-auto" />
           </div>
-          <div className="flex items-center gap-3 p-3 bg-warning/5 rounded-lg">
-            <div className="w-2 h-2 bg-warning rounded-full"></div>
-            <span className="text-sm">Faster payment processing</span>
+          <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-accent/10 to-accent/20 rounded-lg border border-accent/20">
+            <div className="w-3 h-3 bg-accent rounded-full"></div>
+            <span className="text-sm font-medium">Exclusive Gold+ member surveys</span>
+            <CheckCircle className="h-4 w-4 text-accent ml-auto" />
           </div>
-          <div className="flex items-center gap-3 p-3 bg-crypto/5 rounded-lg">
-            <div className="w-2 h-2 bg-crypto rounded-full"></div>
-            <span className="text-sm">Premium crypto verification access</span>
+          <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-warning/10 to-warning/20 rounded-lg border border-warning/20">
+            <div className="w-3 h-3 bg-warning rounded-full"></div>
+            <span className="text-sm font-medium">Faster payment processing</span>
+            <CheckCircle className="h-4 w-4 text-warning ml-auto" />
           </div>
-        </CardContent>
-      </Card>
+          <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-crypto/10 to-crypto/20 rounded-lg border border-crypto/20">
+            <div className="w-3 h-3 bg-crypto rounded-full"></div>
+            <span className="text-sm font-medium">Premium crypto verification access</span>
+            <CheckCircle className="h-4 w-4 text-crypto ml-auto" />
+          </div>
+        </div>
+      </CollapsibleSection>
 
       {/* Improvement Action Plan */}
-      <Card className="border-primary/50 bg-primary/5">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-primary">
-            <Target className="h-5 w-5" />
-            Action Plan to Improve
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {tips.map((tip, index) => (
-              <div key={index} className={`p-3 rounded-lg border-l-4 ${
-                tip.priority === 'high' ? 'border-destructive bg-destructive/5' :
-                tip.priority === 'medium' ? 'border-warning bg-warning/5' :
-                'border-info bg-info/5'
-              }`}>
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      {tip.priority === 'high' && <AlertTriangle className="h-3 w-3 text-destructive" />}
-                      <h4 className="font-semibold text-sm">{tip.title}</h4>
-                      <Badge variant="outline" className="text-xs">
-                        {tip.points}
-                      </Badge>
-                    </div>
-                    <p className="text-xs text-muted-foreground">{tip.description}</p>
+      <CollapsibleSection
+        title="Action Plan to Improve"
+        icon={<Target className="h-5 w-5" />}
+        defaultOpen={!isCompactView}
+        priority="high"
+        compactContent={
+          <div className="text-center">
+            <p className="text-sm text-muted-foreground">
+              {tips.filter(t => t.priority === 'high').length} high priority actions
+            </p>
+          </div>
+        }
+      >
+        <div className="space-y-3">
+          {tips.map((tip, index) => (
+            <div key={index} className={`p-4 rounded-xl border transition-all hover:shadow-md ${
+              tip.priority === 'high' ? 'border-destructive/30 bg-gradient-to-r from-destructive/5 to-destructive/10' :
+              tip.priority === 'medium' ? 'border-warning/30 bg-gradient-to-r from-warning/5 to-warning/10' :
+              'border-info/30 bg-gradient-to-r from-info/5 to-info/10'
+            }`}>
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    {tip.priority === 'high' && <AlertTriangle className="h-4 w-4 text-destructive" />}
+                    {tip.priority === 'medium' && <Clock className="h-4 w-4 text-warning" />}
+                    {tip.priority === 'low' && <CheckCircle className="h-4 w-4 text-info" />}
+                    <h4 className="font-semibold text-sm">{tip.title}</h4>
+                    <Badge variant="outline" className="text-xs font-medium">
+                      {tip.points}
+                    </Badge>
                   </div>
-                  <Button size="sm" variant="outline" className="text-xs shrink-0">
-                    {tip.action}
-                  </Button>
+                  <p className="text-sm text-muted-foreground">{tip.description}</p>
                 </div>
+                <Button size="sm" variant="default" className="shrink-0">
+                  {tip.action}
+                </Button>
               </div>
-            ))}
-          </div>
-          
-          <div className="mt-4 p-3 bg-info/5 rounded-lg">
-            <p className="text-xs text-muted-foreground">
-              💡 <strong>Reputation Tips:</strong> Higher reputation unlocks better opportunities, faster payments, and premium features. Complete actions above to boost your score efficiently.
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Survey Quality Guide */}
-      <Card className="border-destructive/50 bg-destructive/5">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-destructive">
-            <Shield className="h-5 w-5" />
-            Avoid Survey Rejections
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            <div className="p-3 border-l-4 border-destructive bg-background/50 rounded-r-lg">
-              <h4 className="font-semibold text-sm text-destructive mb-1">Inconsistent Responses (-15 rep)</h4>
-              <p className="text-xs text-muted-foreground mb-2">
-                Example: Saying "Coca-Cola is my favorite brand" then later saying "I never drink Coca-Cola"
-              </p>
-              <p className="text-xs text-success">✓ Read questions carefully and stay consistent throughout</p>
             </div>
-            
-            <div className="p-3 border-l-4 border-warning bg-background/50 rounded-r-lg">
-              <h4 className="font-semibold text-sm text-warning mb-1">Speeding Through (-10 rep)</h4>
-              <p className="text-xs text-muted-foreground mb-2">
-                Completing surveys too quickly (under minimum expected time)
-              </p>
-              <p className="text-xs text-success">✓ Take time to read each question thoroughly</p>
-            </div>
-            
-            <div className="p-3 border-l-4 border-destructive bg-background/50 rounded-r-lg">
-              <h4 className="font-semibold text-sm text-destructive mb-1">False Demographics (-20 rep)</h4>
-              <p className="text-xs text-muted-foreground mb-2">
-                Lying about age, income, location, or other profile details
-              </p>
-              <p className="text-xs text-success">✓ Always provide truthful personal information</p>
-            </div>
-            
-            <div className="p-3 border-l-4 border-info bg-background/50 rounded-r-lg">
-              <h4 className="font-semibold text-sm text-info mb-1">Quality Bonus (+25 rep)</h4>
-              <p className="text-xs text-muted-foreground mb-2">
-                Thoughtful, detailed responses that pass all quality checks
-              </p>
-              <p className="text-xs text-success">✓ Provide detailed answers when asked for explanations</p>
-            </div>
-          </div>
-          
-          <div className="mt-4 p-3 bg-success/5 rounded-lg">
-            <p className="text-xs text-muted-foreground">
-              🎯 <strong>Remember:</strong> We pay for quality data. High reputation members earn more through premium surveys and faster payments. Take your time and be honest!
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Stats Summary */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Your Statistics</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="text-center p-3 bg-primary/5 rounded-lg">
-              <p className="text-xl font-bold text-primary">{userStats.surveysCompleted}</p>
-              <p className="text-xs text-muted-foreground">Surveys Done</p>
-            </div>
-            <div className="text-center p-3 bg-accent/5 rounded-lg">
-              <p className="text-xl font-bold text-accent">{userStats.streaks.currentStreak}</p>
-              <p className="text-xs text-muted-foreground">Day Streak</p>
-            </div>
-            <div className="text-center p-3 bg-success/5 rounded-lg">
-              <p className="text-xl font-bold text-success">{userStats.referrals.qualified}</p>
-              <p className="text-xs text-muted-foreground">Referrals</p>
-            </div>
-            <div className="text-center p-3 bg-warning/5 rounded-lg">
-              <p className="text-xl font-bold text-warning">{userStats.totalEarnings}</p>
-              <p className="text-xs text-muted-foreground">Total Earned</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          ))}
+        </div>
+        
+        <div className="mt-4 p-3 bg-info/5 rounded-lg">
+          <p className="text-xs text-muted-foreground">
+            💡 <strong>Reputation Tips:</strong> Higher reputation unlocks better opportunities, faster payments, and premium features. Complete actions above to boost your score efficiently.
+          </p>
+        </div>
+      </CollapsibleSection>
     </div>
   );
 }
