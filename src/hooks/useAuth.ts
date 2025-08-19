@@ -52,7 +52,7 @@ export const useAuthLogic = () => {
         try {
           const user = JSON.parse(mockUser);
           const mockUserData: User = {
-            id: user.id,
+            id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', // Valid UUID for mock user
             mobile: '+1234567890',
             countryCode: '+1',
             email: user.email,

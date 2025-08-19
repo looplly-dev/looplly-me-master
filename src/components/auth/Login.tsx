@@ -143,7 +143,7 @@ export default function Login({ onForgotPassword, onRegister }: LoginProps) {
                 try {
                   // Mock successful login
                   const mockUser = {
-                    id: 'mock-user-123',
+                    id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', // Valid UUID
                     email: 'demo@example.com',
                     user_metadata: {
                       name: 'Demo User',
