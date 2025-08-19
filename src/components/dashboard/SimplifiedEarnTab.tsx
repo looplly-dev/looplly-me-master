@@ -28,6 +28,7 @@ import { useEarningActivities } from '@/hooks/useEarningActivities';
 import { useTransactions } from '@/hooks/useTransactions';
 import { useAuth } from '@/hooks/useAuth';
 import { addMissingDemoActivities } from '@/utils/addMissingDemoActivities';
+import { userStats } from '@/data/mockData';
 
 export default function SimplifiedEarnTab() {
   const [checkInDone, setCheckInDone] = useState(false);
@@ -175,10 +176,10 @@ export default function SimplifiedEarnTab() {
                 <Trophy className="h-6 w-6 text-primary" />
               </div>
               <div>
-                <h3 className="font-bold text-lg">Daily Rep Boost</h3>
+                <h3 className="font-bold text-lg">Daily Streak Boost</h3>
                 <p className="text-sm text-muted-foreground flex items-center gap-1">
                   <Star className="h-3 w-3 text-warning" />
-                  Build your reputation daily!
+                  Day {userStats.streaks.currentStreak} • +{userStats.streaks.currentStreak >= 30 ? 25 : userStats.streaks.currentStreak >= 14 ? 15 : userStats.streaks.currentStreak >= 7 ? 10 : 5} Rep daily
                 </p>
               </div>
             </div>

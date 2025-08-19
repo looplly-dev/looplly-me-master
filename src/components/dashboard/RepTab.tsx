@@ -93,13 +93,17 @@ export default function RepTab() {
 
   return (
     <div className="p-4 pb-20 space-y-6">
-      {/* Reputation Score */}
+      {/* Enhanced Reputation Score */}
       <Card className="border-border/50 shadow-lg">
         <CardContent className="p-6">
           <div className="text-center">
             <div className="text-6xl mb-2">{level.icon}</div>
-            <h2 className="text-2xl font-bold mb-1 text-foreground">{level.name} Member</h2>
-            <p className="text-muted-foreground text-sm mb-4">Reputation Score</p>
+            <h2 className="text-2xl font-bold mb-1 text-foreground">
+              {level.name} {prestigeName}
+            </h2>
+            <p className="text-muted-foreground text-sm mb-4">
+              Reputation Score • {level.tier} Tier
+            </p>
             
             <div className="relative w-32 h-32 mx-auto mb-4">
               <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 36 36">
@@ -115,7 +119,7 @@ export default function RepTab() {
                   fill="none"
                   stroke="hsl(var(--primary))"
                   strokeWidth="2"
-                  strokeDasharray={`${userStats.reputation.score}, 100`}
+                  strokeDasharray={`${Math.min(progressToNext, 100)}, 100`}
                   strokeLinecap="round"
                   style={{
                     filter: 'drop-shadow(0 0 8px hsl(var(--primary) / 0.3))'
@@ -128,72 +132,144 @@ export default function RepTab() {
             </div>
             
             <p className="text-muted-foreground text-sm">
-              {100 - userStats.reputation.score} points to {userStats.reputation.score >= 80 ? 'max level' : 'next level'}
+              {level.max === Infinity 
+                ? 'Elite Level - Endless Progression!' 
+                : `${nextLevelThreshold - userStats.reputation.score} points to next tier`
+              }
             </p>
           </div>
         </CardContent>
       </Card>
 
-      {/* Level Progress */}
+      {/* Enhanced Level Progress with New Tiers */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <TrendingUp className="h-5 w-5" />
-            Level Progress
+            Endless Progression System
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-4 gap-2 text-center">
+          <div className="grid grid-cols-3 gap-2 text-center">
             <div className={`p-2 rounded-lg ${userStats.reputation.score >= 0 ? 'bg-amber-100 text-amber-800' : 'bg-gray-100 text-gray-500'}`}>
               <div className="text-lg">🥉</div>
               <div className="text-xs font-medium">Bronze</div>
-              <div className="text-xs">0-24</div>
+              <div className="text-xs">0-99</div>
             </div>
-            <div className={`p-2 rounded-lg ${userStats.reputation.score >= 25 ? 'bg-gray-100 text-gray-600' : 'bg-gray-50 text-gray-400'}`}>
+            <div className={`p-2 rounded-lg ${userStats.reputation.score >= 100 ? 'bg-gray-100 text-gray-600' : 'bg-gray-50 text-gray-400'}`}>
               <div className="text-lg">🥈</div>
               <div className="text-xs font-medium">Silver</div>
-              <div className="text-xs">25-49</div>
+              <div className="text-xs">100-249</div>
             </div>
-            <div className={`p-2 rounded-lg ${userStats.reputation.score >= 50 ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-50 text-gray-400'}`}>
+            <div className={`p-2 rounded-lg ${userStats.reputation.score >= 250 ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-50 text-gray-400'}`}>
               <div className="text-lg">🥇</div>
               <div className="text-xs font-medium">Gold</div>
-              <div className="text-xs">50-79</div>
+              <div className="text-xs">250-499</div>
             </div>
-            <div className={`p-2 rounded-lg ${userStats.reputation.score >= 80 ? 'bg-purple-100 text-purple-800' : 'bg-gray-50 text-gray-400'}`}>
-              <div className="text-lg">💎</div>
+            <div className={`p-2 rounded-lg ${userStats.reputation.score >= 500 ? 'bg-purple-100 text-purple-800' : 'bg-gray-50 text-gray-400'}`}>
+              <div className="text-lg">⭐</div>
               <div className="text-xs font-medium">Platinum</div>
-              <div className="text-xs">80-100</div>
+              <div className="text-xs">500-999</div>
+            </div>
+            <div className={`p-2 rounded-lg ${userStats.reputation.score >= 1000 ? 'bg-cyan-100 text-cyan-800' : 'bg-gray-50 text-gray-400'}`}>
+              <div className="text-lg">💎</div>
+              <div className="text-xs font-medium">Diamond</div>
+              <div className="text-xs">1000-1999</div>
+            </div>
+            <div className={`p-2 rounded-lg ${userStats.reputation.score >= 2000 ? 'bg-gradient-to-br from-yellow-100 to-orange-100 text-orange-800' : 'bg-gray-50 text-gray-400'}`}>
+              <div className="text-lg">👑</div>
+              <div className="text-xs font-medium">Elite</div>
+              <div className="text-xs">2000+</div>
             </div>
           </div>
           
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
-              <span>Progress to {userStats.reputation.score >= 80 ? 'Max Level' : 'Next Level'}</span>
-              <span>{userStats.reputation.score}%</span>
+              <span>Progress to {level.max === Infinity ? 'Next Milestone' : 'Next Tier'}</span>
+              <span>{Math.round(progressToNext)}%</span>
             </div>
-            <Progress value={userStats.reputation.score} className="h-2" />
+            <Progress value={progressToNext} className="h-2" />
+            <p className="text-xs text-muted-foreground">
+              {level.max === Infinity 
+                ? 'You\'ve reached Elite status! Keep earning for prestige levels.' 
+                : `${nextLevelThreshold - userStats.reputation.score} Rep to unlock ${
+                    userStats.reputation.score >= 1000 ? 'Elite' :
+                    userStats.reputation.score >= 500 ? 'Diamond' : 
+                    userStats.reputation.score >= 250 ? 'Platinum' :
+                    userStats.reputation.score >= 100 ? 'Gold' : 'Silver'
+                  } tier`
+              }
+            </p>
           </div>
         </CardContent>
       </Card>
 
-      {/* Badges */}
+      {/* Daily Streak Progress */}
+      <StreakProgress 
+        currentStreak={userStats.streaks.currentStreak}
+        longestStreak={userStats.streaks.longestStreak}
+        daysUntilMonthlyMilestone={userStats.streaks.daysUntilMonthlyMilestone}
+        monthsUntilYearly={userStats.streaks.monthsUntilYearly}
+        milestones={userStats.streaks.milestones}
+      />
+
+      {/* Collectible Badges & Achievements */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Star className="h-5 w-5" />
-            Badges & Achievements
+            Collectible Badges & Achievements
           </CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Earn badges to boost your reputation and unlock special perks
+          </p>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 gap-3">
-            {allBadges.map((badge) => (
-              <CollectibleBadge 
-                key={badge.id} 
-                badge={badge} 
-                size="md" 
-                showDetails={false}
-              />
-            ))}
+          <div className="space-y-4">
+            {/* Core Verification Badges */}
+            <div>
+              <h4 className="text-sm font-semibold mb-3 text-foreground">Core Verification</h4>
+              <div className="grid grid-cols-2 gap-3">
+                {badgeSystem.coreVerification.map((badge) => (
+                  <CollectibleBadge 
+                    key={badge.id} 
+                    badge={badge} 
+                    size="md" 
+                    showDetails={false}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Streak Achievement Badges */}
+            <div>
+              <h4 className="text-sm font-semibold mb-3 text-foreground">Streak Achievements</h4>
+              <div className="grid grid-cols-2 gap-3">
+                {badgeSystem.streakAchievements.map((badge) => (
+                  <CollectibleBadge 
+                    key={badge.id} 
+                    badge={badge} 
+                    size="md" 
+                    showDetails={false}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Quality Achievement Badges */}
+            <div>
+              <h4 className="text-sm font-semibold mb-3 text-foreground">Quality Achievements</h4>
+              <div className="grid grid-cols-2 gap-3">
+                {badgeSystem.qualityAchievements.map((badge) => (
+                  <CollectibleBadge 
+                    key={badge.id} 
+                    badge={badge} 
+                    size="md" 
+                    showDetails={false}
+                  />
+                ))}
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>
