@@ -120,9 +120,90 @@ export default function SimplifiedEarnTab() {
     });
   };
 
-  // Get available tasks (simplified view)
-  const availableTasks = activities.filter(a => a.status === 'available');
-  const completedTasks = activities.filter(a => a.status === 'completed');
+  // Get available tasks (simplified view) - add static mock data for display
+  const mockActivities = [
+    {
+      id: 'mock-survey-1',
+      activity_type: 'survey' as const,
+      title: 'Shopping Preferences Survey',
+      description: 'Share your online shopping habits and preferences',
+      reward_amount: 2.50,
+      time_estimate: 8,
+      status: 'available' as const,
+      provider: 'Research Co.',
+      metadata: { platform: 'web', rating: '4.6', reviews: '234' }
+    },
+    {
+      id: 'mock-survey-2',
+      activity_type: 'survey' as const,
+      title: 'Food & Dining Survey',
+      description: 'Tell us about your dining preferences and habits',
+      reward_amount: 1.75,
+      time_estimate: 5,
+      status: 'available' as const,
+      provider: 'Market Insights',
+      metadata: { platform: 'mobile', rating: '4.4', reviews: '89' }
+    },
+    {
+      id: 'mock-video-1',
+      activity_type: 'video' as const,
+      title: 'Product Demo: Smart Home',
+      description: 'Watch a 3-minute demo of the latest smart home technology',
+      reward_amount: 0.85,
+      time_estimate: 3,
+      status: 'available' as const,
+      provider: 'AdNetwork Pro',
+      metadata: { platform: 'mobile', rating: '4.2', reviews: '67' }
+    },
+    {
+      id: 'mock-video-2',
+      activity_type: 'video' as const,
+      title: 'New Car Features Video',
+      description: 'Learn about innovative features in electric vehicles',
+      reward_amount: 1.20,
+      time_estimate: 4,
+      status: 'available' as const,
+      provider: 'Auto Marketing',
+      metadata: { platform: 'web', rating: '4.5', reviews: '93' }
+    },
+    {
+      id: 'mock-task-1',
+      activity_type: 'task' as const,
+      title: 'App Store Review',
+      description: 'Download and write a review for a mobile app',
+      reward_amount: 1.25,
+      time_estimate: 5,
+      status: 'available' as const,
+      provider: 'AppLovin',
+      metadata: { platform: 'mobile', rating: '4.2', reviews: '89' }
+    },
+    {
+      id: 'mock-task-2',
+      activity_type: 'task' as const,
+      title: 'Website Testing',
+      description: 'Test a new e-commerce website and provide feedback',
+      reward_amount: 4.50,
+      time_estimate: 15,
+      status: 'available' as const,
+      provider: 'UX Testing Co.',
+      metadata: { platform: 'web', rating: '4.7', reviews: '145' }
+    },
+    {
+      id: 'mock-task-3',
+      activity_type: 'task' as const,
+      title: 'Social Media Engagement',
+      description: 'Follow and engage with brand social media accounts',
+      reward_amount: 0.75,
+      time_estimate: 3,
+      status: 'available' as const,
+      provider: 'Social Boost',
+      metadata: { platform: 'mobile', rating: '4.1', reviews: '56' }
+    }
+  ];
+
+  const allActivities = [...activities, ...mockActivities];
+  const availableTasks = allActivities.filter(a => a.status === 'available');
+  const completedTasks = allActivities.filter(a => a.status === 'completed');
 
   // Count available items per category for notification dots
   const surveyCount = availableTasks.filter(a => a.activity_type === 'survey').length;
