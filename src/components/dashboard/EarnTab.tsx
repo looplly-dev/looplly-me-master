@@ -14,7 +14,8 @@ import {
   CheckCircle, 
   XCircle, 
   AlertCircle,
-  Star
+  Star,
+  BarChart3
 } from 'lucide-react';
 import { useBalance } from '@/hooks/useBalance';
 import { useEarningActivities } from '@/hooks/useEarningActivities';
@@ -268,6 +269,44 @@ export default function EarnTab() {
         </TabsContent>
 
         <TabsContent value="tasks" className="space-y-4 mt-4">
+          {/* Quick Poll */}
+          <Card className="border-l-4 border-l-info/50 bg-info/5">
+            <CardContent className="p-4">
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <BarChart3 className="h-4 w-4 text-info" />
+                    <h3 className="font-semibold text-sm">Quick Poll: Favorite Social Media Platform</h3>
+                    <Badge variant="outline" className="text-xs">New</Badge>
+                  </div>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    Help us understand social media preferences - just one quick question!
+                  </p>
+                  <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                    <span className="flex items-center gap-1">
+                      <Clock className="h-3 w-3" />
+                      30 sec
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Coins className="h-3 w-3" />
+                      $0.15
+                    </span>
+                  </div>
+                </div>
+                <div className="flex flex-col items-end gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handleStartTask('poll', 'Quick Poll: Favorite Social Media Platform', 0.15)}
+                    className="text-xs h-8"
+                  >
+                    Vote
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           {activities.filter(a => a.activity_type === 'task').length === 0 ? (
             <Card className="border-warning/50 bg-warning/5">
               <CardContent className="p-6 text-center">
