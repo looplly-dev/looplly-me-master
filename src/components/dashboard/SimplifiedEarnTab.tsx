@@ -43,21 +43,7 @@ export default function SimplifiedEarnTab() {
   const { addTransaction } = useTransactions();
   const { authState } = useAuth();
 
-  // Add missing demo activities for existing users
-  useEffect(() => {
-    const checkAndAddMissingActivities = async () => {
-      if (authState.user?.id) {
-        await addMissingDemoActivities(authState.user.id);
-        await addMockEarningActivities(authState.user.id);
-        // Refresh activities to show the new ones
-        refetch();
-      }
-    };
-
-    if (authState.user?.id) {
-      checkAndAddMissingActivities();
-    }
-  }, [authState.user?.id, refetch]);
+  // Using static mock data - no database calls needed
 
   // Progress to next goal (simplified for basic users)
   const nextGoal = 5.00; // First withdrawal goal
