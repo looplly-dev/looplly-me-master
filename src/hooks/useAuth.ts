@@ -42,6 +42,27 @@ export const useAuthLogic = () => {
   useEffect(() => {
     let mounted = true;
     
+    // Check for mock user in localStorage first
+    const mockUser = localStorage.getItem('mockUser');
+    if (mockUser) {
+      try {
+        const user = JSON.parse(mockUser);
+        console.log('Found mock user in localStorage:', user);
+        if (mounted) {
+          setAuthState({
+            user,
+            isAuthenticated: true,
+            isLoading: false,
+            step: 'dashboard'
+          });
+        }
+        return;
+      } catch (error) {
+        console.error('Error parsing mock user from localStorage:', error);
+        localStorage.removeItem('mockUser');
+      }
+    }
+    
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
@@ -209,6 +230,9 @@ export const useAuthLogic = () => {
           }
         };
 
+        // Store mock user in localStorage
+        localStorage.setItem('mockUser', JSON.stringify(mockUser));
+
         setAuthState({
           user: mockUser,
           isAuthenticated: true,
@@ -305,6 +329,10 @@ export const useAuthLogic = () => {
 
   const logout = async () => {
     console.log('Logging out user');
+    
+    // Clear mock user from localStorage
+    localStorage.removeItem('mockUser');
+    
     await logoutUser();
   };
 

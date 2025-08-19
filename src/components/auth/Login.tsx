@@ -60,6 +60,24 @@ export default function Login({ onForgotPassword, onRegister }: LoginProps) {
     }
   };
 
+  const handleMockLogin = async () => {
+    setIsSubmitting(true);
+    try {
+      const success = await login('demo@looplly.com', 'demo123');
+      if (success) {
+        toast({
+          title: 'Demo Login Successful',
+          description: 'You are now logged in with mock data',
+          variant: 'default'
+        });
+      }
+    } catch (error) {
+      console.error('Mock login error:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5 flex items-center justify-center p-4">
       <Card className="w-full max-w-md shadow-2xl border-0 bg-card/95 backdrop-blur-sm">
@@ -130,6 +148,17 @@ export default function Login({ onForgotPassword, onRegister }: LoginProps) {
               disabled={isSubmitting}
             >
               {isSubmitting ? 'Signing In...' : 'Sign In'}
+            </Button>
+
+            <Button 
+              type="button" 
+              variant="outline" 
+              size="mobile" 
+              className="w-full"
+              disabled={isSubmitting}
+              onClick={handleMockLogin}
+            >
+              🎭 Demo Login (Mock Data)
             </Button>
 
             <div className="text-center">
