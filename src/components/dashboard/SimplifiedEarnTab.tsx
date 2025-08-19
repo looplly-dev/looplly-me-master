@@ -336,25 +336,33 @@ export default function SimplifiedEarnTab() {
                 <TabsTrigger value="surveys" className="text-xs relative">
                   Surveys
                   {surveyCount > 0 && (
-                    <span className="absolute -top-1 -right-1 h-2 w-2 bg-primary rounded-full" />
+                    <span className="absolute -top-1 -right-1 h-5 w-5 bg-primary text-white text-xs rounded-full flex items-center justify-center font-medium">
+                      {surveyCount}
+                    </span>
                   )}
                 </TabsTrigger>
                 <TabsTrigger value="videos" className="text-xs relative">
                   Videos
                   {videoCount > 0 && (
-                    <span className="absolute -top-1 -right-1 h-2 w-2 bg-accent rounded-full" />
+                    <span className="absolute -top-1 -right-1 h-5 w-5 bg-accent text-white text-xs rounded-full flex items-center justify-center font-medium">
+                      {videoCount}
+                    </span>
                   )}
                 </TabsTrigger>
                 <TabsTrigger value="tasks" className="text-xs relative">
                   Tasks
                   {taskCount > 0 && (
-                    <span className="absolute -top-1 -right-1 h-2 w-2 bg-warning rounded-full" />
+                    <span className="absolute -top-1 -right-1 h-5 w-5 bg-warning text-white text-xs rounded-full flex items-center justify-center font-medium">
+                      {taskCount}
+                    </span>
                   )}
                 </TabsTrigger>
                 <TabsTrigger value="data" className="text-xs relative">
                   Data
                   {dataCount > 0 && (
-                    <span className="absolute -top-1 -right-1 h-2 w-2 bg-success rounded-full" />
+                    <span className="absolute -top-1 -right-1 h-5 w-5 bg-success text-white text-xs rounded-full flex items-center justify-center font-medium">
+                      {dataCount}
+                    </span>
                   )}
                 </TabsTrigger>
               </TabsList>
