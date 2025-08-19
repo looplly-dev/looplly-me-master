@@ -42,7 +42,58 @@ export const useAuthLogic = () => {
   useEffect(() => {
     let mounted = true;
     
-    // Set up auth state listener
+    // Check for mock authentication first
+    const checkMockAuth = () => {
+      const mockUser = localStorage.getItem('mock_auth_user');
+      const mockSession = localStorage.getItem('mock_auth_session');
+      
+      if (mockUser && mockSession) {
+        console.log('Found mock authentication data');
+        try {
+          const user = JSON.parse(mockUser);
+          const mockUserData: User = {
+            id: user.id,
+            mobile: '+1234567890',
+            countryCode: '+1',
+            email: user.email,
+            firstName: user.user_metadata?.name?.split(' ')[0] || 'Demo',
+            lastName: user.user_metadata?.name?.split(' ')[1] || 'User',
+            isVerified: true,
+            profileComplete: true,
+            profile: {
+              sec: 'B' as const,
+              gender: 'other' as const,
+              dateOfBirth: new Date('1990-01-01'),
+              address: '123 Demo Street, Demo City',
+              gpsEnabled: true,
+              firstName: 'Demo',
+              lastName: 'User',
+              email: user.email
+            }
+          };
+          
+          setAuthState({
+            user: mockUserData,
+            isAuthenticated: true,
+            isLoading: false,
+            step: 'dashboard'
+          });
+          return true;
+        } catch (error) {
+          console.error('Error parsing mock auth data:', error);
+          localStorage.removeItem('mock_auth_user');
+          localStorage.removeItem('mock_auth_session');
+        }
+      }
+      return false;
+    };
+
+    // Check mock auth first
+    if (checkMockAuth()) {
+      return () => { mounted = false; };
+    }
+    
+    // Set up auth state listener for real Supabase auth
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         console.log('Auth state changed:', event, session);
@@ -268,6 +319,11 @@ export const useAuthLogic = () => {
 
   const logout = async () => {
     console.log('Logging out user');
+    
+    // Clear mock auth data if it exists
+    localStorage.removeItem('mock_auth_user');
+    localStorage.removeItem('mock_auth_session');
+    
     await logoutUser();
   };
 
