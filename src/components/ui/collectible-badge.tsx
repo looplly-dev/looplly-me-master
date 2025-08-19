@@ -1,5 +1,5 @@
-import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { 
   Shield, 
   MapPin, 
@@ -41,125 +41,134 @@ interface CollectibleBadgeProps {
     requirement?: number;
   };
   size?: 'sm' | 'md' | 'lg';
-  showDetails?: boolean;
 }
 
-export function CollectibleBadge({ badge, size = 'md', showDetails = false }: CollectibleBadgeProps) {
+export function CollectibleBadge({ badge, size = 'md' }: CollectibleBadgeProps) {
   const IconComponent = iconMap[badge.icon as keyof typeof iconMap] || Shield;
   
   const sizeClasses = {
-    sm: 'h-4 w-4',
-    md: 'h-6 w-6',
-    lg: 'h-8 w-8'
+    sm: 'w-16 h-16',
+    md: 'w-20 h-20', 
+    lg: 'w-24 h-24'
   };
 
-  const containerClasses = {
-    sm: 'p-2 min-h-[80px]',
-    md: 'p-3 min-h-[100px]',
-    lg: 'p-4 min-h-[120px]'
+  const iconSizes = {
+    sm: 'h-6 w-6',
+    md: 'h-8 w-8',
+    lg: 'h-10 w-10'
   };
 
-  const rarityColors = {
-    Common: 'border-muted bg-gradient-to-br from-muted/30 to-muted/50 shadow-sm',
-    Rare: 'border-primary/40 bg-gradient-to-br from-primary/10 to-primary/20 shadow-md shadow-primary/20',
-    Epic: 'border-accent/50 bg-gradient-to-br from-accent/15 to-accent/30 shadow-lg shadow-accent/30',
-    Legendary: 'border-warning/60 bg-gradient-to-br from-warning/20 to-warning/40 shadow-xl shadow-warning/40 animate-pulse'
+  const getCategoryGradient = (icon: string) => {
+    if (['Shield', 'CheckCircle', 'MapPin'].includes(icon)) {
+      return 'bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700';
+    }
+    if (['Flame', 'Target'].includes(icon)) {
+      return 'bg-gradient-to-br from-orange-500 via-red-500 to-red-600';
+    }
+    if (['Trophy', 'Award', 'Crown'].includes(icon)) {
+      return 'bg-gradient-to-br from-yellow-400 via-yellow-500 to-orange-500';
+    }
+    if (['Star', 'Zap'].includes(icon)) {
+      return 'bg-gradient-to-br from-purple-500 via-purple-600 to-indigo-600';
+    }
+    if (['Users'].includes(icon)) {
+      return 'bg-gradient-to-br from-green-500 via-emerald-500 to-teal-600';
+    }
+    return 'bg-gradient-to-br from-gray-500 via-gray-600 to-gray-700';
   };
 
-  const tierColors = {
-    Bronze: 'text-amber-600 drop-shadow-sm',
-    Silver: 'text-gray-600 drop-shadow-sm',
-    Gold: 'text-yellow-600 drop-shadow-sm',
-    Platinum: 'text-purple-600 drop-shadow-sm',
-    Diamond: 'text-cyan-600 drop-shadow-sm'
+  const getRarityGlow = (rarity: string, earned: boolean) => {
+    if (!earned) return '';
+    
+    switch (rarity) {
+      case 'Legendary': 
+        return 'shadow-lg shadow-yellow-500/40 ring-2 ring-yellow-400/30';
+      case 'Epic': 
+        return 'shadow-lg shadow-purple-500/40 ring-2 ring-purple-400/30';
+      case 'Rare': 
+        return 'shadow-md shadow-blue-500/30 ring-1 ring-blue-400/20';
+      default: 
+        return 'shadow-sm';
+    }
+  };
+
+  const getLockedState = () => {
+    if (badge.earned) return '';
+    return 'opacity-50 grayscale hover:opacity-70 hover:grayscale-0';
   };
 
   return (
-    <div
-      className={cn(
-        'rounded-xl border transition-all duration-300 hover:scale-105 cursor-pointer relative overflow-hidden group',
-        containerClasses[size],
-        badge.earned 
-          ? cn(
-              'border-2 hover:shadow-lg',
-              rarityColors[badge.rarity as keyof typeof rarityColors]
-            )
-          : 'bg-muted/50 border-muted opacity-70 hover:opacity-85'
-      )}
-    >
-      <div className="text-center">
-        <IconComponent 
-          className={cn(
-            'mx-auto mb-2',
-            sizeClasses[size],
-            badge.earned 
-              ? tierColors[badge.tier as keyof typeof tierColors]
-              : 'text-gray-400'
-          )} 
-        />
-        <p className={cn(
-          'font-medium',
-          size === 'sm' ? 'text-xs' : size === 'md' ? 'text-sm' : 'text-base',
-          badge.earned ? 'text-foreground' : 'text-gray-500'
-        )}>
-          {badge.name}
-        </p>
-        
-        {showDetails && (
-          <p className={cn(
-            'text-xs text-muted-foreground mt-1',
-            size === 'sm' ? 'hidden' : ''
-          )}>
-            {badge.description}
-          </p>
-        )}
-        
-        <p className={cn(
-          'text-xs mt-1',
-          badge.earned ? 'text-success' : 'text-gray-400'
-        )}>
-          +{badge.repPoints} Rep
-        </p>
-        
-        <div className="flex gap-1 justify-center mt-2">
-          <Badge 
-            variant={badge.earned ? "default" : "secondary"} 
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div
             className={cn(
-              'text-xs px-2 py-0.5',
-              badge.earned ? 'bg-success/20 text-success border-success/50' : 'bg-muted text-muted-foreground'
+              'relative rounded-full cursor-pointer transition-all duration-300 hover:scale-110 group',
+              sizeClasses[size],
+              getCategoryGradient(badge.icon),
+              getRarityGlow(badge.rarity, badge.earned),
+              getLockedState()
             )}
           >
-            {badge.earned ? 'Earned' : 'Locked'}
-          </Badge>
-          
-          <Badge 
-            variant="outline" 
-            className={cn(
-              'text-xs px-2 py-0.5 font-medium',
-              badge.rarity === 'Legendary' ? 'border-warning/60 text-warning bg-warning/10' :
-              badge.rarity === 'Epic' ? 'border-accent/60 text-accent bg-accent/10' :
-              badge.rarity === 'Rare' ? 'border-primary/60 text-primary bg-primary/10' :
-              'border-muted-foreground/40 text-muted-foreground bg-muted/30'
+            {/* Background pattern overlay */}
+            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/20 to-transparent" />
+            
+            {/* Icon container */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <IconComponent 
+                className={cn(
+                  iconSizes[size],
+                  'text-white drop-shadow-lg'
+                )} 
+              />
+            </div>
+
+            {/* Earned indicator */}
+            {badge.earned && (
+              <div className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
+                <CheckCircle className="h-3 w-3 text-white" />
+              </div>
             )}
-          >
-            {badge.rarity}
-          </Badge>
-        </div>
+
+            {/* Rarity sparkle effect for legendary */}
+            {badge.rarity === 'Legendary' && badge.earned && (
+              <div className="absolute inset-0 rounded-full animate-pulse">
+                <div className="absolute top-2 right-2 w-1 h-1 bg-yellow-300 rounded-full animate-ping" />
+                <div className="absolute bottom-3 left-2 w-1 h-1 bg-yellow-300 rounded-full animate-ping delay-75" />
+                <div className="absolute top-3 left-3 w-1 h-1 bg-yellow-300 rounded-full animate-ping delay-150" />
+              </div>
+            )}
+          </div>
+        </TooltipTrigger>
         
-        {/* Hover tooltip overlay */}
-        {!showDetails && (
-          <div className="absolute inset-0 bg-background/95 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-xl p-2 flex flex-col justify-center">
-            <p className="text-xs text-muted-foreground text-center leading-tight">
-              {badge.description}
-            </p>
-            {badge.requirement && (
-              <p className="text-xs text-accent text-center mt-1 font-medium">
+        <TooltipContent side="top" className="max-w-xs">
+          <div className="text-center">
+            <p className="font-semibold text-sm mb-1">{badge.name}</p>
+            <p className="text-xs text-muted-foreground mb-2">{badge.description}</p>
+            
+            <div className="flex items-center justify-between text-xs">
+              <span className={badge.earned ? 'text-green-600' : 'text-muted-foreground'}>
+                +{badge.repPoints} Rep
+              </span>
+              <span className={cn(
+                'px-2 py-0.5 rounded text-xs',
+                badge.rarity === 'Legendary' ? 'bg-yellow-100 text-yellow-800' :
+                badge.rarity === 'Epic' ? 'bg-purple-100 text-purple-800' :
+                badge.rarity === 'Rare' ? 'bg-blue-100 text-blue-800' :
+                'bg-gray-100 text-gray-800'
+              )}>
+                {badge.rarity}
+              </span>
+            </div>
+            
+            {badge.requirement && !badge.earned && (
+              <p className="text-xs text-muted-foreground mt-2">
                 Requires: {badge.requirement}+
               </p>
             )}
           </div>
-        )}
-      </div>
-    </div>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 }

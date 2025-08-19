@@ -319,8 +319,7 @@ export default function RepTab() {
                 <CollectibleBadge 
                   key={badge.id} 
                   badge={badge} 
-                  size="sm" 
-                  showDetails={false}
+                  size="sm"
                 />
               ))}
             </div>
@@ -340,8 +339,7 @@ export default function RepTab() {
                 <CollectibleBadge 
                   key={badge.id} 
                   badge={badge} 
-                  size="sm" 
-                  showDetails={false}
+                  size="sm"
                 />
               ))}
             </div>
@@ -361,8 +359,7 @@ export default function RepTab() {
                 <CollectibleBadge 
                   key={badge.id} 
                   badge={badge} 
-                  size="sm" 
-                  showDetails={false}
+                  size="sm"
                 />
               ))}
             </div>
