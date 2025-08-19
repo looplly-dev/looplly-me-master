@@ -2,13 +2,14 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/hooks/useAuth';
-import { Coins, Wallet, User, Users, Trophy, LogOut, Settings, HelpCircle } from 'lucide-react';
+import { Coins, Wallet, User, Users, Trophy, MessageSquare, LogOut, Settings, HelpCircle } from 'lucide-react';
 import SimplifiedEarnTab from './SimplifiedEarnTab';
 import WalletTab from './WalletTab';
 import ProfileTab from './ProfileTab';
 import SettingsTab from './SettingsTab';
 import ReferTab from './ReferTab';
 import RepTab from './RepTab';
+import CommunityTab from './CommunityTab';
 import SimplifiedSupportTab from './SimplifiedSupportTab';
 import { OnboardingTour } from '@/components/ui/onboarding-tour';
 import { useOnboarding } from '@/hooks/useOnboarding';
@@ -151,6 +152,9 @@ export default function Dashboard() {
           <TabsContent value="refer" className="mt-0">
             <ReferTab />
           </TabsContent>
+          <TabsContent value="community" className="mt-0">
+            <CommunityTab />
+          </TabsContent>
           <TabsContent value="rep" className="mt-0">
             <RepTab />
           </TabsContent>
@@ -158,7 +162,7 @@ export default function Dashboard() {
           {/* Bottom Navigation */}
           <div className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-sm border-t">
             <div className="max-w-md mx-auto">
-              <TabsList className="grid w-full grid-cols-5 h-16 bg-transparent">
+              <TabsList className="grid w-full grid-cols-6 h-16 bg-transparent">
                 <TabsTrigger 
                   value="earn" 
                   className="flex-col gap-1 h-full data-[state=active]:bg-primary/10 data-[state=active]:text-primary"
@@ -186,6 +190,13 @@ export default function Dashboard() {
                 >
                   <Users className="h-4 w-4" />
                   <span className="text-xs">Refer</span>
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="community" 
+                  className="flex-col gap-1 h-full data-[state=active]:bg-primary/10 data-[state=active]:text-primary"
+                >
+                  <MessageSquare className="h-4 w-4" />
+                  <span className="text-xs">Community</span>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="rep" 
