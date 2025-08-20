@@ -5,6 +5,7 @@ import { Separator } from '@/components/ui/separator';
 import { SkeletonLoader } from '@/components/ui/skeleton-loader';
 import { ContextualHelp } from '@/components/ui/contextual-help';
 import { CollapsibleSection } from '@/components/ui/collapsible-section';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { 
   Wallet, 
   ArrowUpRight, 
@@ -158,6 +159,30 @@ export default function WalletTab() {
             const status = getCashOutStatus(method.name);
             const isUnavailable = !method.available;
             
+            const needsTooltip = status.disabled && !isUnavailable && status.reason?.includes('Need');
+            const buttonText = isUnavailable 
+              ? 'Soon' 
+              : status.disabled 
+                ? (status.reason?.includes('Need') ? 'Cash Out' : 'Verify Profile')
+                : 'Cash Out';
+
+            const buttonElement = (
+              <Button 
+                size="sm" 
+                className="w-full text-xs h-7" 
+                disabled={status.disabled || isUnavailable}
+                variant={
+                  isUnavailable || (status.disabled && status.reason?.includes('Need')) 
+                    ? 'secondary' 
+                    : status.disabled && status.reason?.includes('Profile')
+                    ? 'default'
+                    : 'default'
+                }
+              >
+                {buttonText}
+              </Button>
+            );
+
             return (
               <Card key={method.name} className={`flex-shrink-0 w-32 cursor-pointer transition-all hover:shadow-md ${status.disabled || isUnavailable ? 'opacity-60' : ''}`}>
                 <CardContent className="p-3">
@@ -171,14 +196,20 @@ export default function WalletTab() {
                     {method.name === 'Cryptocurrency' && `Min $${cashOutMinimums[method.name].toFixed(2)}`}
                     {method.name === 'PayPal' && 'Coming Soon'}
                   </p>
-                  <Button 
-                    size="sm" 
-                    className="w-full text-xs h-7" 
-                    disabled={status.disabled || isUnavailable}
-                    variant={status.disabled || isUnavailable ? 'secondary' : 'default'}
-                  >
-                    {isUnavailable ? 'Soon' : status.disabled ? 'Available' : 'Cash Out'}
-                  </Button>
+                  {needsTooltip ? (
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          {buttonElement}
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>{status.reason?.split(' (')[0]}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  ) : (
+                    buttonElement
+                  )}
                 </CardContent>
               </Card>
             );
