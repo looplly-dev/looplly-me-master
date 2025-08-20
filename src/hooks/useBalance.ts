@@ -34,9 +34,9 @@ export const useBalance = () => {
       } else {
         setBalance(data || {
           total_earned: 12.50,
-          available_balance: 10.00,
+          available_balance: 4.00,
           pending_balance: 2.50,
-          lifetime_withdrawn: 0
+          lifetime_withdrawn: 6.00
         });
       }
     } catch (error) {

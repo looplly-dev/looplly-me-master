@@ -15,6 +15,19 @@ export interface Transaction {
 // Mock transactions showing The Accountant AI verification process - matching Earn tab activities
 export const mockTransactions: Transaction[] = [
   {
+    id: '0',
+    type: 'withdrawal',
+    amount: 6.00,
+    currency: 'USD',
+    status: 'verified',
+    accountant_status: 'completed',
+    description: 'Mobile Airtime Top-up',
+    method: 'Mobile Airtime',
+    created_at: '2024-01-20T10:30:00Z',
+    verified_at: '2024-01-20T10:31:45Z',
+    user_id: 'user1'
+  },
+  {
     id: '1',
     type: 'bonus',
     amount: 0.50,
