@@ -15,7 +15,8 @@ import {
   XCircle, 
   AlertCircle,
   Star,
-  BarChart3
+  BarChart3,
+  Shield
 } from 'lucide-react';
 import { useBalance } from '@/hooks/useBalance';
 import { useEarningActivities } from '@/hooks/useEarningActivities';
@@ -82,29 +83,30 @@ export default function EarnTab() {
   return (
     <div className="p-4 pb-20 space-y-6">
       {/* Balance Card */}
-      <Card className="bg-primary text-white border-0 shadow-lg">
+      <Card className="bg-card border shadow-sm">
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-2">
-                <p className="text-white/80 text-sm">Available Balance</p>
-                <Badge variant="secondary" className="bg-white/20 text-white border-0 text-xs">
+                <Shield className="h-4 w-4 text-primary" />
+                <p className="text-muted-foreground text-sm">Available Balance</p>
+                <Badge variant="secondary" className="bg-primary/10 text-primary border-0 text-xs">
                   AI Secured
                 </Badge>
               </div>
-              <p className="text-3xl font-bold mb-1">${balance?.available_balance?.toFixed(2) || '0.00'}</p>
-              <p className="text-white/80 text-sm">USD</p>
+              <p className="text-3xl font-bold text-foreground mb-1">${balance?.available_balance?.toFixed(2) || '0.00'}</p>
+              <p className="text-muted-foreground text-sm">USD</p>
               <div className="mt-3">
-                <p className="text-white/70 text-xs">80% to first cashout ($5.00)</p>
-                <div className="w-32 bg-white/20 rounded-full h-1.5 mt-1">
+                <p className="text-muted-foreground text-xs">80% to first cashout ($5.00)</p>
+                <div className="w-32 bg-muted rounded-full h-1.5 mt-1">
                   <div 
-                    className="bg-white rounded-full h-1.5 transition-all duration-300" 
+                    className="bg-primary rounded-full h-1.5 transition-all duration-300" 
                     style={{ width: `${Math.min(((balance?.available_balance || 0) / 5) * 100, 100)}%` }}
                   ></div>
                 </div>
               </div>
             </div>
-            <Coins className="h-12 w-12 text-white/60" />
+            <Coins className="h-12 w-12 text-muted-foreground/60" />
           </div>
         </CardContent>
       </Card>
