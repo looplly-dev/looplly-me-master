@@ -29,9 +29,9 @@ export function CollapsibleSection({
   const [isCompact, setIsCompact] = useState(false);
 
   const priorityColors = {
-    high: 'border-destructive/20 bg-destructive/5',
-    medium: 'border-primary/20 bg-primary/5', 
-    low: 'border-muted/50 bg-muted/10'
+    high: 'border-red-200 bg-white shadow-sm',
+    medium: 'border-gray-200 bg-white shadow-sm', 
+    low: 'border-gray-200 bg-white shadow-sm'
   };
 
   return (
