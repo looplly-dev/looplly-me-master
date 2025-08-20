@@ -211,15 +211,15 @@ export default function SimplifiedEarnTab() {
                 <span className="text-primary text-sm font-medium">AI Secured</span>
               </div>
               <p className="text-muted-foreground text-sm mb-1">Your Balance</p>
+              {balance?.pending_balance && balance.pending_balance > 0 && (
+                <p className="text-xs text-muted-foreground italic">
+                  (${balance.pending_balance.toFixed(2)} Under Review)
+                </p>
+              )}
               <p className="text-4xl font-bold text-foreground">
                 ${currentProgress.toFixed(2)}
               </p>
               <p className="text-muted-foreground text-xs">USD</p>
-              {balance?.pending_balance && balance.pending_balance > 0 && (
-                <p className="text-xs text-muted-foreground italic mt-1">
-                  (${balance.pending_balance.toFixed(2)} Under Review)
-                </p>
-              )}
             </div>
           </div>
         </CardContent>
