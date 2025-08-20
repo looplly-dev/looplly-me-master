@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { SkeletonLoader } from '@/components/ui/skeleton-loader';
 import { ContextualHelp } from '@/components/ui/contextual-help';
+import { CollapsibleSection } from '@/components/ui/collapsible-section';
 import { 
   Wallet, 
   ArrowUpRight, 
@@ -18,7 +19,8 @@ import {
   CheckCircle2,
   Clock,
   DollarSign,
-  TrendingUp
+  TrendingUp,
+  History
 } from 'lucide-react';
 import { useBalance } from '@/hooks/useBalance';
 import { useTransactions } from '@/hooks/useTransactions';
@@ -202,15 +204,41 @@ export default function WalletTab() {
         </CardContent>
       </Card>
 
-      {/* Smart Transaction History */}
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold">Transaction History</h3>
-          <Button variant="ghost" size="sm" className="text-accent font-medium">
-            View All <ChevronRight className="h-4 w-4 ml-1" />
-          </Button>
-        </div>
-        
+      {/* Transaction History - Collapsible */}
+      <CollapsibleSection
+        title={`Recent Transactions (${displayTransactions.length})`}
+        icon={<History className="h-4 w-4" />}
+        defaultOpen={false}
+        compactContent={
+          <div className="space-y-2">
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-muted-foreground">Latest Activity</span>
+              <span className="text-success font-medium">
+                +${displayTransactions.slice(0, 3).reduce((sum, t) => 
+                  (t.type === 'earning' || t.type === 'bonus' || t.type === 'referral') 
+                    ? sum + t.amount : sum, 0).toFixed(2)}
+              </span>
+            </div>
+            {displayTransactions.slice(0, 3).map((transaction) => (
+              <div key={transaction.id} className="flex items-center justify-between py-1">
+                <div className="flex items-center gap-2">
+                  <div className={`w-2 h-2 rounded-full ${
+                    transaction.type === 'earning' || transaction.type === 'bonus' || transaction.type === 'referral'
+                      ? 'bg-success' : 'bg-muted-foreground'
+                  }`} />
+                  <span className="text-sm truncate">{transaction.description}</span>
+                </div>
+                <span className={`text-xs font-medium ${
+                  transaction.type === 'earning' || transaction.type === 'bonus' || transaction.type === 'referral'
+                    ? 'text-success' : 'text-muted-foreground'
+                }`}>
+                  {transaction.type === 'earning' || transaction.type === 'bonus' || transaction.type === 'referral' ? '+' : '-'}${transaction.amount.toFixed(2)}
+                </span>
+              </div>
+            ))}
+          </div>
+        }
+      >
         <div className="space-y-3">
           {displayTransactions.slice(0, 6).map((transaction) => (
             <Card 
@@ -276,8 +304,14 @@ export default function WalletTab() {
               </CardContent>
             </Card>
           ))}
+          
+          <div className="flex justify-center pt-2">
+            <Button variant="ghost" size="sm" className="text-accent font-medium">
+              View All Transactions <ChevronRight className="h-4 w-4 ml-1" />
+            </Button>
+          </div>
         </div>
-      </div>
+      </CollapsibleSection>
 
       {/* AI Payment Intelligence */}
       <Card className="border border-muted/20 bg-card">
