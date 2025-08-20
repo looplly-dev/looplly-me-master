@@ -231,16 +231,37 @@ export default function SimplifiedEarnTab() {
                 </div>
               )}
             </div>
-            <div className="text-right">
-              <div className="mb-2">
+            <div className="flex flex-col items-center">
+              <div className="mb-2 text-center">
                 <span className="text-sm text-muted-foreground">Progress to {balance?.lifetime_withdrawn && balance.lifetime_withdrawn > 0 ? 'next' : 'first'} cashout</span>
                 <span className="text-sm font-bold text-foreground ml-2">${nextGoal.toFixed(2)}</span>
               </div>
-              <Progress 
-                value={progressPercentage} 
-                className="bg-muted h-2 mb-1"
-              />
-              <p className="text-xs text-muted-foreground">
+              <div className="relative w-16 h-16 mb-2">
+                <svg className="w-16 h-16 transform -rotate-90" viewBox="0 0 36 36">
+                  <path
+                    className="stroke-current text-muted"
+                    strokeWidth="3"
+                    fill="none"
+                    d="M18 2.0845
+                      a 15.9155 15.9155 0 0 1 0 31.831
+                      a 15.9155 15.9155 0 0 1 0 -31.831"
+                  />
+                  <path
+                    className="stroke-current text-primary"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    fill="none"
+                    strokeDasharray={`${progressPercentage}, 100`}
+                    d="M18 2.0845
+                      a 15.9155 15.9155 0 0 1 0 31.831
+                      a 15.9155 15.9155 0 0 1 0 -31.831"
+                  />
+                </svg>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-xs font-semibold text-foreground">{Math.round(progressPercentage)}%</span>
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground text-center">
                 ${(nextGoal - currentProgress).toFixed(2)} to go
               </p>
             </div>
