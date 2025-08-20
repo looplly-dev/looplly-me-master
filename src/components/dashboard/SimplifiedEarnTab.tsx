@@ -215,65 +215,15 @@ export default function SimplifiedEarnTab() {
                 ${currentProgress.toFixed(2)}
               </p>
               <p className="text-muted-foreground text-xs">USD</p>
-            </div>
-            <div className="flex flex-col items-center">
-              <div className="mb-2 text-center">
-                <span className="text-sm text-muted-foreground">Progress to {balance?.lifetime_withdrawn && balance.lifetime_withdrawn > 0 ? 'next' : 'first'} cashout</span>
-                <span className="text-sm font-bold text-foreground ml-2">${nextGoal.toFixed(2)}</span>
-              </div>
-              <div className="relative w-16 h-16 mb-2">
-                <svg className="w-16 h-16 transform -rotate-90" viewBox="0 0 36 36">
-                  <path
-                    className="stroke-current text-muted"
-                    strokeWidth="3"
-                    fill="none"
-                    d="M18 2.0845
-                      a 15.9155 15.9155 0 0 1 0 31.831
-                      a 15.9155 15.9155 0 0 1 0 -31.831"
-                  />
-                  <path
-                    className="stroke-current text-primary"
-                    strokeWidth="3"
-                    strokeLinecap="round"
-                    fill="none"
-                    strokeDasharray={`${progressPercentage}, 100`}
-                    d="M18 2.0845
-                      a 15.9155 15.9155 0 0 1 0 31.831
-                      a 15.9155 15.9155 0 0 1 0 -31.831"
-                  />
-                </svg>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-xs font-semibold text-foreground">{Math.round(progressPercentage)}%</span>
-                </div>
-              </div>
-              <p className="text-xs text-muted-foreground text-center">
-                ${(nextGoal - currentProgress).toFixed(2)} to go
-              </p>
+              {balance?.pending_balance && balance.pending_balance > 0 && (
+                <p className="text-xs text-muted-foreground italic mt-1">
+                  (${balance.pending_balance.toFixed(2)} Under Review)
+                </p>
+              )}
             </div>
           </div>
         </CardContent>
       </Card>
-
-      {/* Under Review Banner */}
-      {balance?.pending_balance && balance.pending_balance > 0 && (
-        <Card className="border-orange-200 bg-orange-50 shadow-sm">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-orange-100 rounded-full">
-                <Clock className="h-4 w-4 text-orange-600" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-foreground">
-                  ${balance.pending_balance.toFixed(2)} Under Review
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  The Accountant is verifying payments
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
 
       {/* Daily Check-in - More Prominent */}
       <Card className="border-primary/20 bg-white shadow-sm">
