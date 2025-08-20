@@ -1,18 +1,18 @@
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { SkeletonLoader } from '@/components/ui/skeleton-loader';
 import { ContextualHelp } from '@/components/ui/contextual-help';
 import { 
   Wallet, 
-  TrendingUp, 
   ArrowUpRight, 
   ArrowDownLeft, 
   Smartphone, 
-  Gift, 
   CreditCard,
-  AlertCircle
+  AlertCircle,
+  ChevronRight,
+  Bitcoin
 } from 'lucide-react';
 import { useBalance } from '@/hooks/useBalance';
 import { useTransactions } from '@/hooks/useTransactions';
@@ -33,238 +33,153 @@ export default function WalletTab() {
   }
 
   return (
-    <div className="p-4 pb-20 space-y-6">
-      {/* Balance Overview */}
-      <Card className="bg-green-600 text-white border-0 shadow-sm">
-        <CardContent className="p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <p className="text-white/80 text-sm">Available Balance</p>
-              <p className="text-4xl font-bold">${balance?.available_balance?.toFixed(2) || '0.00'}</p>
-              <p className="text-white/80 text-sm">USD</p>
-            </div>
-            <Wallet className="h-12 w-12 text-white/60" />
-          </div>
-          <div className="flex items-center gap-2 pt-4 border-t border-white/20">
-            <TrendingUp className="h-4 w-4" />
-            <span className="text-sm">Lifetime earnings: ${balance?.total_earned?.toFixed(2) || '0.00'} USD</span>
-          </div>
-        </CardContent>
-      </Card>
+    <div className="p-4 pb-20 space-y-4">
+      {/* Hero Balance */}
+      <div className="text-center py-6">
+        <p className="text-sm text-muted-foreground mb-1">Available Balance</p>
+        <p className="text-4xl font-bold mb-1">${balance?.available_balance?.toFixed(2) || '0.00'}</p>
+        <p className="text-xs text-muted-foreground">
+          ${balance?.total_earned?.toFixed(2) || '0.00'} earned • ${balance?.lifetime_withdrawn?.toFixed(2) || '0.00'} withdrawn
+        </p>
+      </div>
 
-      {/* KYC Requirement Banner */}
+      {/* Profile completion warning */}
       {!authState.user?.profileComplete && (
-        <Card className="bg-amber-50 border border-amber-200 shadow-sm">
-          <CardContent className="p-4">
-            <div className="flex gap-3">
-              <AlertCircle className="h-5 w-5 text-warning flex-shrink-0 mt-0.5" />
-              <div>
-                <h3 className="font-semibold text-sm mb-1">Profile Completion Required</h3>
-                <p className="text-xs text-muted-foreground mb-2">
-                  Complete your profile to unlock withdrawals and access all earning opportunities.
-                </p>
-                <Button size="sm" variant="outline" className="text-xs">
-                  Complete Profile
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 flex items-center gap-2">
+          <AlertCircle className="h-4 w-4 text-amber-600 flex-shrink-0" />
+          <div className="flex-1">
+            <p className="text-sm font-medium text-amber-800">Complete profile to withdraw</p>
+          </div>
+          <Button size="sm" variant="outline" className="text-xs h-7">
+            Complete
+          </Button>
+        </div>
       )}
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-2 gap-3 mb-4">
-        <Card className="bg-white shadow-sm border border-blue-200">
-          <CardContent className="p-4 text-center">
-            <Smartphone className="h-6 w-6 mx-auto mb-2 text-primary" />
-            <h3 className="font-semibold text-sm mb-1">Airtime</h3>
-            <p className="text-xs text-muted-foreground mb-3">Mobile top-up</p>
-            <Button size="sm" variant="outline" disabled={!authState.user?.profileComplete} className="w-full text-xs">
-              {authState.user?.profileComplete ? 'Min $5.00' : 'Profile Required'}
-            </Button>
-          </CardContent>
-        </Card>
-        
-        <Card className="bg-white shadow-sm border border-green-200">
-          <CardContent className="p-4 text-center">
-            <div className="text-lg mb-2">📱</div>
-            <h3 className="font-semibold text-sm mb-1">M-Pesa</h3>
-            <p className="text-xs text-muted-foreground mb-3">Mobile money</p>
-            <Button size="sm" variant="outline" disabled={!authState.user?.profileComplete} className="w-full text-xs">
-              {authState.user?.profileComplete ? 'Min $2.50' : 'Profile Required'}
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="grid grid-cols-2 gap-3">
-        <Card className="bg-white shadow-sm border border-orange-200">
-          <CardContent className="p-4 text-center">
-            <div className="text-lg mb-2">₿</div>
-            <h3 className="font-semibold text-sm mb-1">Crypto</h3>
-            <p className="text-xs text-muted-foreground mb-3">Bitcoin/USDT</p>
-            <Button size="sm" variant="outline" disabled={!authState.user?.profileComplete} className="w-full text-xs">
-              {authState.user?.profileComplete ? 'Min $10.00' : 'Profile Required'}
-            </Button>
-          </CardContent>
-        </Card>
-        
-        <Card className="bg-white shadow-sm border border-amber-200">
-          <CardContent className="p-4 text-center">
-            <CreditCard className="h-6 w-6 mx-auto mb-2 text-warning" />
-            <h3 className="font-semibold text-sm mb-1">PayPal</h3>
-            <p className="text-xs text-muted-foreground mb-3">Cash out</p>
-            <Button size="sm" variant="outline" disabled={!authState.user?.profileComplete} className="w-full text-xs">
-              {authState.user?.profileComplete ? 'Min $10.00' : 'Profile Required'}
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Pending Balance */}
-      {balance && balance.pending_balance > 0 && (
-        <Card className="bg-blue-50 border border-blue-200 shadow-sm">
-          <CardHeader>
-            <CardTitle className="text-sm">Pending Balance</CardTitle>
-          </CardHeader>
-          <CardContent className="p-4 pt-0">
-            <div className="flex items-center justify-between p-2 bg-background/50 rounded">
-              <div>
-                <p className="text-sm font-medium">${balance.pending_balance.toFixed(2)}</p>
-                <p className="text-xs text-muted-foreground">Processing</p>
+      <div>
+        <h3 className="text-sm font-medium mb-3">Quick Actions</h3>
+        <div className="flex gap-3 overflow-x-auto pb-2">
+          {[
+            { icon: Smartphone, label: 'Airtime', min: '$5.00', disabled: !authState.user?.profileComplete },
+            { icon: '📱', label: 'M-Pesa', min: '$2.50', disabled: !authState.user?.profileComplete },
+            { icon: Bitcoin, label: 'Crypto', min: '$10.00', disabled: !authState.user?.profileComplete },
+            { icon: CreditCard, label: 'PayPal', min: '$10.00', disabled: !authState.user?.profileComplete }
+          ].map((action, index) => (
+            <button
+              key={index}
+              disabled={action.disabled}
+              className="flex-shrink-0 p-3 bg-white border rounded-lg hover:bg-gray-50 disabled:bg-gray-50 disabled:opacity-60 min-w-[100px] text-center"
+            >
+              <div className="flex flex-col items-center gap-1">
+                {typeof action.icon === 'string' ? (
+                  <span className="text-lg">{action.icon}</span>
+                ) : (
+                  <action.icon className="h-5 w-5 text-gray-600" />
+                )}
+                <span className="text-xs font-medium">{action.label}</span>
+                <span className="text-xs text-muted-foreground">
+                  {action.disabled ? 'Profile required' : action.min}
+                </span>
               </div>
-              <Badge variant="secondary" className="text-xs">
-                Pending
-              </Badge>
-            </div>
-            <p className="text-xs text-muted-foreground mt-3">
-              💡 Earnings are reviewed and processed within 24-48 hours.
-            </p>
-          </CardContent>
-        </Card>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Pending Balance - if exists */}
+      {balance && balance.pending_balance > 0 && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium">${balance.pending_balance.toFixed(2)} pending</p>
+            <p className="text-xs text-muted-foreground">Processing within 24-48hrs</p>
+          </div>
+          <Badge variant="secondary" className="text-xs">Pending</Badge>
+        </div>
       )}
 
-      {/* Redeem Info with Help */}
-      <Card className="bg-amber-50 border border-amber-200 shadow-sm">
-        <CardContent className="p-4">
-          <div className="flex gap-3">
-            <AlertCircle className="h-5 w-5 text-warning flex-shrink-0 mt-0.5" />
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-1">
-                <h3 className="font-semibold text-sm">Payment Requirements</h3>
-                <ContextualHelp 
-                  content="We verify profiles to ensure secure payments and prevent fraud. This protects both you and other users in our community."
-                  position="top"
-                />
-              </div>
-              <p className="text-xs text-muted-foreground">
-                • Complete profile required for all withdrawals<br />
-                • PayPal & Crypto: Minimum $10.00<br />
-                • M-Pesa: Minimum $2.50<br />
-                • Airtime: Minimum $5.00<br />
-                • Payments processed within 24-48 hours
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
       {/* Transaction History */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Recent Transactions</CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
-          {transactionsLoading ? (
-            <div className="p-4">
-              <SkeletonLoader variant="transaction" count={3} />
-            </div>
-          ) : transactions.length === 0 ? (
-            <div className="p-8 text-center text-muted-foreground">
-              <Wallet className="h-12 w-12 mx-auto mb-3 text-muted-foreground/50" />
-              <p className="font-semibold mb-1">No transactions yet</p>
-              <p className="text-xs mb-4">Start earning to see your transaction history!</p>
-              <Button size="sm" onClick={() => window.location.hash = '#earn'}>
-                Start Earning
-              </Button>
-            </div>
-          ) : (
-            <div className="space-y-0">
-              {transactions.slice(0, 10).map((transaction, index) => (
-                <div key={transaction.id}>
-                  <div className="flex items-center justify-between p-4">
-                    <div className="flex items-center gap-3">
-                      <div className={`p-2 rounded-lg ${
-                        transaction.type === 'earning' || transaction.type === 'bonus' || transaction.type === 'referral'
-                          ? 'bg-success/10' 
-                          : 'bg-destructive/10'
-                      }`}>
-                        {transaction.type === 'earning' || transaction.type === 'bonus' || transaction.type === 'referral' ? (
-                          <ArrowDownLeft className="h-4 w-4 text-success" />
-                        ) : (
-                          <ArrowUpRight className="h-4 w-4 text-destructive" />
-                        )}
-                      </div>
-                      <div>
-                        <p className="font-medium text-sm">{transaction.description}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {new Date(transaction.created_at).toLocaleDateString()}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className={`font-semibold ${
-                        transaction.type === 'earning' || transaction.type === 'bonus' || transaction.type === 'referral'
-                          ? 'text-success' 
-                          : 'text-destructive'
-                      }`}>
-                        {transaction.type === 'earning' || transaction.type === 'bonus' || transaction.type === 'referral' ? '+' : '-'}${transaction.amount.toFixed(2)}
-                      </p>
-                      <Badge 
-                        variant={transaction.status === 'completed' ? 'outline' : 'secondary'}
-                        className={transaction.status === 'completed' 
-                          ? 'text-success border-success' 
-                          : 'text-warning border-warning'
-                        }
-                      >
-                        {transaction.status}
-                      </Badge>
-                    </div>
-                  </div>
-                  {index < Math.min(transactions.length, 10) - 1 && <Separator />}
-                </div>
-              ))}
-            </div>
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-sm font-medium">Recent Activity</h3>
+          {transactions.length > 0 && (
+            <Button variant="ghost" size="sm" className="text-xs h-7">
+              View All <ChevronRight className="h-3 w-3 ml-1" />
+            </Button>
           )}
-        </CardContent>
-      </Card>
-
-      {/* Stats Summary */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Earning Summary</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="text-center p-3 bg-blue-50 rounded-lg border border-blue-200">
-              <p className="text-2xl font-bold text-blue-700">${balance?.total_earned?.toFixed(2) || '0.00'}</p>
-              <p className="text-sm text-muted-foreground">Total Earned</p>
-            </div>
-            <div className="text-center p-3 bg-orange-50 rounded-lg border border-orange-200">
-              <p className="text-2xl font-bold text-orange-700">${balance?.available_balance?.toFixed(2) || '0.00'}</p>
-              <p className="text-sm text-muted-foreground">Available</p>
-            </div>
-            <div className="text-center p-3 bg-green-50 rounded-lg border border-green-200">
-              <p className="text-2xl font-bold text-green-700">${balance?.lifetime_withdrawn?.toFixed(2) || '0.00'}</p>
-              <p className="text-sm text-muted-foreground">Withdrawn</p>
-            </div>
-            <div className="text-center p-3 bg-amber-50 rounded-lg border border-amber-200">
-              <p className="text-2xl font-bold text-amber-700">{transactions.length}</p>
-              <p className="text-sm text-muted-foreground">Transactions</p>
-            </div>
+        </div>
+        
+        {transactionsLoading ? (
+          <div className="space-y-3">
+            <SkeletonLoader variant="transaction" count={3} />
           </div>
-        </CardContent>
-      </Card>
+        ) : transactions.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground">
+            <Wallet className="h-8 w-8 mx-auto mb-2 text-muted-foreground/50" />
+            <p className="text-sm mb-1">No transactions yet</p>
+            <p className="text-xs mb-3">Start earning to see your activity!</p>
+            <Button size="sm" onClick={() => window.location.hash = '#earn'} className="h-7 text-xs">
+              Start Earning
+            </Button>
+          </div>
+        ) : (
+          <div className="bg-white border rounded-lg divide-y">
+            {transactions.slice(0, 5).map((transaction) => (
+              <div key={transaction.id} className="flex items-center justify-between p-3">
+                <div className="flex items-center gap-3">
+                  <div className={`p-1.5 rounded-full ${
+                    transaction.type === 'earning' || transaction.type === 'bonus' || transaction.type === 'referral'
+                      ? 'bg-green-50' 
+                      : 'bg-red-50'
+                  }`}>
+                    {transaction.type === 'earning' || transaction.type === 'bonus' || transaction.type === 'referral' ? (
+                      <ArrowDownLeft className="h-3 w-3 text-green-600" />
+                    ) : (
+                      <ArrowUpRight className="h-3 w-3 text-red-600" />
+                    )}
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">{transaction.description}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {new Date(transaction.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className={`text-sm font-semibold ${
+                    transaction.type === 'earning' || transaction.type === 'bonus' || transaction.type === 'referral'
+                      ? 'text-green-600' 
+                      : 'text-red-600'
+                  }`}>
+                    {transaction.type === 'earning' || transaction.type === 'bonus' || transaction.type === 'referral' ? '+' : '-'}${transaction.amount.toFixed(2)}
+                  </p>
+                  <p className="text-xs text-muted-foreground capitalize">{transaction.status}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Payment Info - Collapsible */}
+      <details className="bg-gray-50 border rounded-lg">
+        <summary className="p-3 cursor-pointer flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="h-4 w-4 text-gray-500" />
+            <span className="text-sm font-medium">Payment Requirements</span>
+            <ContextualHelp 
+              content="We verify profiles to ensure secure payments and prevent fraud. This protects both you and other users in our community."
+              position="top"
+            />
+          </div>
+        </summary>
+        <div className="px-3 pb-3 text-xs text-muted-foreground space-y-1">
+          <p>• Complete profile required for all withdrawals</p>
+          <p>• PayPal & Crypto: Minimum $10.00</p>
+          <p>• M-Pesa: Minimum $2.50 • Airtime: Minimum $5.00</p>
+          <p>• Payments processed within 24-48 hours</p>
+        </div>
+      </details>
     </div>
   );
 }
