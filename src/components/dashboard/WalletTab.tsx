@@ -35,7 +35,7 @@ export default function WalletTab() {
   return (
     <div className="p-4 pb-20 space-y-6">
       {/* Balance Overview */}
-      <Card className="bg-gradient-to-r from-success to-success-glow text-white border-0 shadow-lg">
+      <Card className="bg-green-600 text-white border-0 shadow-sm">
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-4">
             <div>
@@ -54,7 +54,7 @@ export default function WalletTab() {
 
       {/* KYC Requirement Banner */}
       {!authState.user?.profileComplete && (
-        <Card className="border-warning/50 bg-warning/5">
+        <Card className="bg-amber-50 border border-amber-200 shadow-sm">
           <CardContent className="p-4">
             <div className="flex gap-3">
               <AlertCircle className="h-5 w-5 text-warning flex-shrink-0 mt-0.5" />
@@ -74,7 +74,7 @@ export default function WalletTab() {
 
       {/* Quick Actions */}
       <div className="grid grid-cols-2 gap-3 mb-4">
-        <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
+        <Card className="bg-white shadow-sm border border-blue-200">
           <CardContent className="p-4 text-center">
             <Smartphone className="h-6 w-6 mx-auto mb-2 text-primary" />
             <h3 className="font-semibold text-sm mb-1">Airtime</h3>
@@ -85,7 +85,7 @@ export default function WalletTab() {
           </CardContent>
         </Card>
         
-        <Card className="bg-gradient-to-br from-mpesa/5 to-mpesa/10 border-mpesa/20">
+        <Card className="bg-white shadow-sm border border-green-200">
           <CardContent className="p-4 text-center">
             <div className="text-lg mb-2">📱</div>
             <h3 className="font-semibold text-sm mb-1">M-Pesa</h3>
@@ -98,7 +98,7 @@ export default function WalletTab() {
       </div>
 
       <div className="grid grid-cols-2 gap-3">
-        <Card className="bg-gradient-to-br from-crypto/5 to-crypto/10 border-crypto/20">
+        <Card className="bg-white shadow-sm border border-orange-200">
           <CardContent className="p-4 text-center">
             <div className="text-lg mb-2">₿</div>
             <h3 className="font-semibold text-sm mb-1">Crypto</h3>
@@ -109,7 +109,7 @@ export default function WalletTab() {
           </CardContent>
         </Card>
         
-        <Card className="bg-gradient-to-br from-warning/5 to-warning/10 border-warning/20">
+        <Card className="bg-white shadow-sm border border-amber-200">
           <CardContent className="p-4 text-center">
             <CreditCard className="h-6 w-6 mx-auto mb-2 text-warning" />
             <h3 className="font-semibold text-sm mb-1">PayPal</h3>
@@ -123,7 +123,7 @@ export default function WalletTab() {
 
       {/* Pending Balance */}
       {balance && balance.pending_balance > 0 && (
-        <Card className="border-info/50 bg-info/5">
+        <Card className="bg-blue-50 border border-blue-200 shadow-sm">
           <CardHeader>
             <CardTitle className="text-sm">Pending Balance</CardTitle>
           </CardHeader>
@@ -145,7 +145,7 @@ export default function WalletTab() {
       )}
 
       {/* Redeem Info with Help */}
-      <Card className="border-warning/50 bg-warning/5">
+      <Card className="bg-amber-50 border border-amber-200 shadow-sm">
         <CardContent className="p-4">
           <div className="flex gap-3">
             <AlertCircle className="h-5 w-5 text-warning flex-shrink-0 mt-0.5" />
@@ -246,20 +246,20 @@ export default function WalletTab() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 gap-4">
-            <div className="text-center p-3 bg-primary/5 rounded-lg">
-              <p className="text-2xl font-bold text-primary">${balance?.total_earned?.toFixed(2) || '0.00'}</p>
+            <div className="text-center p-3 bg-blue-50 rounded-lg border border-blue-200">
+              <p className="text-2xl font-bold text-blue-700">${balance?.total_earned?.toFixed(2) || '0.00'}</p>
               <p className="text-sm text-muted-foreground">Total Earned</p>
             </div>
-            <div className="text-center p-3 bg-accent/5 rounded-lg">
-              <p className="text-2xl font-bold text-accent">${balance?.available_balance?.toFixed(2) || '0.00'}</p>
+            <div className="text-center p-3 bg-orange-50 rounded-lg border border-orange-200">
+              <p className="text-2xl font-bold text-orange-700">${balance?.available_balance?.toFixed(2) || '0.00'}</p>
               <p className="text-sm text-muted-foreground">Available</p>
             </div>
-            <div className="text-center p-3 bg-success/5 rounded-lg">
-              <p className="text-2xl font-bold text-success">${balance?.lifetime_withdrawn?.toFixed(2) || '0.00'}</p>
+            <div className="text-center p-3 bg-green-50 rounded-lg border border-green-200">
+              <p className="text-2xl font-bold text-green-700">${balance?.lifetime_withdrawn?.toFixed(2) || '0.00'}</p>
               <p className="text-sm text-muted-foreground">Withdrawn</p>
             </div>
-            <div className="text-center p-3 bg-warning/5 rounded-lg">
-              <p className="text-2xl font-bold text-warning">{transactions.length}</p>
+            <div className="text-center p-3 bg-amber-50 rounded-lg border border-amber-200">
+              <p className="text-2xl font-bold text-amber-700">{transactions.length}</p>
               <p className="text-sm text-muted-foreground">Transactions</p>
             </div>
           </div>

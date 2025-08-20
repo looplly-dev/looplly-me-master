@@ -44,8 +44,8 @@ export default function Dashboard() {
   // Show support page
   if (showSupport) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5">
-        <div className="bg-card/95 backdrop-blur-sm border-b sticky top-0 z-40">
+      <div className="min-h-screen bg-white">
+        <div className="bg-white border-b sticky top-0 z-40 shadow-sm">
           <div className="max-w-md mx-auto px-4 py-4 flex items-center justify-between">
             <Button
               variant="ghost"
@@ -71,8 +71,8 @@ export default function Dashboard() {
   // Show settings page
   if (showSettings) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5">
-        <div className="bg-card/95 backdrop-blur-sm border-b sticky top-0 z-40">
+      <div className="min-h-screen bg-white">
+        <div className="bg-white border-b sticky top-0 z-40 shadow-sm">
           <div className="max-w-md mx-auto px-4 py-4 flex items-center justify-between">
             <Button
               variant="ghost"
@@ -96,9 +96,9 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5">
+    <div className="min-h-screen bg-white">
       {/* Header */}
-      <div className="bg-card/95 backdrop-blur-sm border-b sticky top-0 z-40">
+      <div className="bg-white border-b sticky top-0 z-40 shadow-sm">
         <div className="max-w-md mx-auto px-4 py-4 flex items-center justify-between">
           <div>
             <h1 className="text-xl font-bold text-primary">
@@ -160,7 +160,7 @@ export default function Dashboard() {
           </TabsContent>
 
           {/* Bottom Navigation */}
-          <div className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-sm border-t">
+          <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-sm">
             <div className="max-w-md mx-auto">
               <TabsList className="grid w-full grid-cols-6 h-16 bg-transparent">
                 <TabsTrigger 

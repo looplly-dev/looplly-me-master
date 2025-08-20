@@ -122,7 +122,7 @@ export default function RepTab() {
         </Button>
       </div>
       {/* Enhanced Reputation Score - Always Visible */}
-      <Card className="border-primary/20 shadow-lg bg-gradient-to-br from-primary/5 to-accent/5">
+      <Card className="bg-white shadow-sm border border-primary/20">
         <CardContent className={isCompactView ? "p-4" : "p-6"}>
           <div className="text-center">
             <div className={isCompactView ? "text-4xl mb-1" : "text-6xl mb-2"}>{level.icon}</div>
@@ -203,32 +203,32 @@ export default function RepTab() {
       >
         <div className="space-y-4">
           <div className="grid grid-cols-3 gap-2 text-center">
-            <div className={`p-3 rounded-xl transition-all ${userStats.reputation.score >= 0 ? 'bg-gradient-to-br from-amber-100 to-amber-200 text-amber-800 shadow-sm' : 'bg-muted/50 text-muted-foreground'}`}>
+            <div className={`p-3 rounded-xl transition-all ${userStats.reputation.score >= 0 ? 'bg-amber-50 text-amber-800 shadow-sm border border-amber-200' : 'bg-gray-50 text-muted-foreground border'}`}>
               <div className="text-lg mb-1">🥉</div>
               <div className="text-xs font-medium">Bronze</div>
               <div className="text-xs opacity-75">0-99</div>
             </div>
-            <div className={`p-3 rounded-xl transition-all ${userStats.reputation.score >= 100 ? 'bg-gradient-to-br from-gray-100 to-gray-200 text-gray-700 shadow-sm' : 'bg-muted/50 text-muted-foreground'}`}>
+            <div className={`p-3 rounded-xl transition-all ${userStats.reputation.score >= 100 ? 'bg-gray-50 text-gray-700 shadow-sm border border-gray-200' : 'bg-gray-50 text-muted-foreground border'}`}>
               <div className="text-lg mb-1">🥈</div>
               <div className="text-xs font-medium">Silver</div>
               <div className="text-xs opacity-75">100-249</div>
             </div>
-            <div className={`p-3 rounded-xl transition-all ${userStats.reputation.score >= 250 ? 'bg-gradient-to-br from-yellow-100 to-yellow-200 text-yellow-800 shadow-sm' : 'bg-muted/50 text-muted-foreground'}`}>
+            <div className={`p-3 rounded-xl transition-all ${userStats.reputation.score >= 250 ? 'bg-yellow-50 text-yellow-800 shadow-sm border border-yellow-200' : 'bg-gray-50 text-muted-foreground border'}`}>
               <div className="text-lg mb-1">🥇</div>
               <div className="text-xs font-medium">Gold</div>
               <div className="text-xs opacity-75">250-499</div>
             </div>
-            <div className={`p-3 rounded-xl transition-all ${userStats.reputation.score >= 500 ? 'bg-gradient-to-br from-purple-100 to-purple-200 text-purple-800 shadow-sm' : 'bg-muted/50 text-muted-foreground'}`}>
+            <div className={`p-3 rounded-xl transition-all ${userStats.reputation.score >= 500 ? 'bg-purple-50 text-purple-800 shadow-sm border border-purple-200' : 'bg-gray-50 text-muted-foreground border'}`}>
               <div className="text-lg mb-1">⭐</div>
               <div className="text-xs font-medium">Platinum</div>
               <div className="text-xs opacity-75">500-999</div>
             </div>
-            <div className={`p-3 rounded-xl transition-all ${userStats.reputation.score >= 1000 ? 'bg-gradient-to-br from-cyan-100 to-cyan-200 text-cyan-800 shadow-sm' : 'bg-muted/50 text-muted-foreground'}`}>
+            <div className={`p-3 rounded-xl transition-all ${userStats.reputation.score >= 1000 ? 'bg-cyan-50 text-cyan-800 shadow-sm border border-cyan-200' : 'bg-gray-50 text-muted-foreground border'}`}>
               <div className="text-lg mb-1">💎</div>
               <div className="text-xs font-medium">Diamond</div>
               <div className="text-xs opacity-75">1000-1999</div>
             </div>
-            <div className={`p-3 rounded-xl transition-all ${userStats.reputation.score >= 2000 ? 'bg-gradient-to-br from-warning/20 to-warning/40 text-warning-foreground shadow-md' : 'bg-muted/50 text-muted-foreground'}`}>
+            <div className={`p-3 rounded-xl transition-all ${userStats.reputation.score >= 2000 ? 'bg-orange-50 text-orange-800 shadow-sm border border-orange-200' : 'bg-gray-50 text-muted-foreground border'}`}>
               <div className="text-lg mb-1">👑</div>
               <div className="text-xs font-medium">Elite</div>
               <div className="text-xs opacity-75">2000+</div>
@@ -390,12 +390,12 @@ export default function RepTab() {
       >
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
-            <div className="text-center p-4 bg-gradient-to-br from-success/10 to-success/20 rounded-xl border border-success/20">
-              <p className="text-2xl font-bold text-success">{userStats.reputation.qualityMetrics.consistencyScore}%</p>
+            <div className="text-center p-4 bg-green-50 rounded-xl border border-green-200 shadow-sm">
+              <p className="text-2xl font-bold text-green-700">{userStats.reputation.qualityMetrics.consistencyScore}%</p>
               <p className="text-sm text-muted-foreground">Consistency</p>
             </div>
-            <div className="text-center p-4 bg-gradient-to-br from-primary/10 to-primary/20 rounded-xl border border-primary/20">
-              <p className="text-2xl font-bold text-primary">{userStats.reputation.qualityMetrics.averageTime}</p>
+            <div className="text-center p-4 bg-blue-50 rounded-xl border border-blue-200 shadow-sm">
+              <p className="text-2xl font-bold text-blue-700">{userStats.reputation.qualityMetrics.averageTime}</p>
               <p className="text-sm text-muted-foreground">Avg. Time</p>
             </div>
           </div>

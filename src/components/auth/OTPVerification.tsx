@@ -95,8 +95,8 @@ export default function OTPVerification({ onBack }: OTPVerificationProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md shadow-2xl border-0 bg-card/95 backdrop-blur-sm">
+    <div className="min-h-screen bg-white flex items-center justify-center p-4">
+      <Card className="w-full max-w-md shadow-lg bg-white border">
         <CardHeader className="text-center pb-6">
           <Button 
             variant="ghost" 
