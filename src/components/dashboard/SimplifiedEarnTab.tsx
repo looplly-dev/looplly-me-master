@@ -239,7 +239,7 @@ export default function SimplifiedEarnTab() {
 
 
       {/* Daily Check-in - More Prominent */}
-      <Card className="border-primary/30 bg-gradient-to-r from-primary/5 to-primary/10">
+      <Card className="border-primary/20 bg-white shadow-sm">
         <CardContent className="p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -279,19 +279,19 @@ export default function SimplifiedEarnTab() {
 
       {/* Quick Stats */}
       <div className="grid grid-cols-3 gap-3">
-        <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
+        <Card className="bg-white shadow-sm border">
           <CardContent className="p-3 text-center">
             <p className="text-2xl font-bold text-primary">{completedTasks.length}</p>
             <p className="text-xs text-muted-foreground">Tasks Done</p>
           </CardContent>
         </Card>
-        <Card className="bg-gradient-to-br from-warning/5 to-warning/10 border-warning/20">
+        <Card className="bg-white shadow-sm border">
           <CardContent className="p-3 text-center">
             <p className="text-2xl font-bold text-warning">{availableTasks.length}</p>
             <p className="text-xs text-muted-foreground">Available</p>
           </CardContent>
         </Card>
-        <Card className="bg-gradient-to-br from-success/5 to-success/10 border-success/20">
+        <Card className="bg-white shadow-sm border">
           <CardContent className="p-3 text-center">
             <p className="text-2xl font-bold text-success">
               ${(balance?.total_earned || 0).toFixed(0)}
@@ -304,7 +304,7 @@ export default function SimplifiedEarnTab() {
       {/* Simplified Task Sections */}
       <div className="space-y-4">
         {/* Ready to Earn with Tabs */}
-        <Card>
+        <Card className="bg-white shadow-sm border">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center justify-between">
               <span className="flex items-center gap-2">
@@ -364,7 +364,7 @@ export default function SimplifiedEarnTab() {
                   </div>
                 ) : (
                   availableTasks.filter(a => a.activity_type === 'survey').map((activity) => (
-                    <div key={activity.id} className="p-4 border rounded-lg bg-background border-l-4 border-l-primary/50">
+                    <div key={activity.id} className="p-4 border rounded-lg bg-white shadow-sm border-l-4 border-l-primary/50">
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-3">
                           <FileText className="h-5 w-5 text-primary" />
@@ -418,7 +418,7 @@ export default function SimplifiedEarnTab() {
                   </div>
                 ) : (
                   availableTasks.filter(a => a.activity_type === 'video').map((activity) => (
-                    <div key={activity.id} className="p-4 border rounded-lg bg-background border-l-4 border-l-accent/50">
+                    <div key={activity.id} className="p-4 border rounded-lg bg-white shadow-sm border-l-4 border-l-accent/50">
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-3">
                           <Play className="h-5 w-5 text-accent" />
@@ -463,7 +463,7 @@ export default function SimplifiedEarnTab() {
                   </div>
                 ) : (
                   availableTasks.filter(a => a.activity_type === 'task').map((activity) => (
-                    <div key={activity.id} className="p-4 border rounded-lg bg-background border-l-4 border-l-warning/50">
+                    <div key={activity.id} className="p-4 border rounded-lg bg-white shadow-sm border-l-4 border-l-warning/50">
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-3">
                           <Zap className="h-5 w-5 text-warning" />
@@ -507,7 +507,7 @@ export default function SimplifiedEarnTab() {
               </TabsContent>
 
               <TabsContent value="data" className="space-y-3 mt-4">
-                <div className="p-4 border rounded-lg bg-primary/5">
+                <div className="p-4 border rounded-lg bg-white shadow-sm">
                   <div className="flex gap-3 mb-4">
                     <div className="p-2 bg-primary/10 rounded-lg">
                       <div className="text-lg">🔄</div>
@@ -521,7 +521,7 @@ export default function SimplifiedEarnTab() {
                   </div>
                   
                   <div className="space-y-3">
-                    <div className="flex items-center justify-between p-3 bg-background/50 rounded-lg">
+                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                       <div>
                         <p className="font-medium text-sm">Location Data</p>
                         <p className="text-xs text-muted-foreground">Anonymous location insights</p>
@@ -534,7 +534,7 @@ export default function SimplifiedEarnTab() {
                       </div>
                     </div>
                     
-                    <div className="flex items-center justify-between p-3 bg-background/50 rounded-lg">
+                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                       <div>
                         <p className="font-medium text-sm">Shopping Behavior</p>
                         <p className="text-xs text-muted-foreground">Purchase pattern analysis</p>
@@ -548,7 +548,7 @@ export default function SimplifiedEarnTab() {
                        </div>
                      </div>
                      
-                     <div className="flex items-center justify-between p-3 bg-background/50 rounded-lg">
+                     <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                        <div>
                          <p className="font-medium text-sm">App Usage Patterns</p>
                          <p className="text-xs text-muted-foreground">Digital behavior insights</p>
@@ -563,7 +563,7 @@ export default function SimplifiedEarnTab() {
                      </div>
                   </div>
                   
-                  <div className="mt-4 p-3 bg-info/5 rounded-lg">
+                  <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-100">
                     <p className="text-xs text-muted-foreground">
                       💡 <strong>Transparent Earnings:</strong> You earn a share of revenue each time your data contributes to insights sold to research partners. All data is anonymized and aggregated.
                     </p>
@@ -576,7 +576,7 @@ export default function SimplifiedEarnTab() {
 
         {/* Completed Tasks (if any) */}
         {completedTasks.length > 0 && (
-          <Card className="bg-success/5 border-success/30">
+          <Card className="bg-white shadow-sm border border-success/30">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-success">
                 <CheckCircle className="h-5 w-5" />
@@ -585,8 +585,8 @@ export default function SimplifiedEarnTab() {
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                {completedTasks.slice(0, 2).map((activity) => (
-                  <div key={activity.id} className="flex items-center justify-between p-2 bg-background/50 rounded">
+                 {completedTasks.slice(0, 2).map((activity) => (
+                   <div key={activity.id} className="flex items-center justify-between p-2 bg-green-50 rounded">
                     <span className="text-sm font-medium">{activity.title}</span>
                     <span className="text-sm font-bold text-success">
                       +${activity.reward_amount.toFixed(2)}
@@ -600,7 +600,7 @@ export default function SimplifiedEarnTab() {
       </div>
 
       {/* Rep Importance Section */}
-      <Card className="border-accent/30 bg-gradient-to-r from-accent/5 to-warning/5">
+      <Card className="bg-white shadow-sm border border-accent/20">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-accent">
             <Shield className="h-5 w-5" />
@@ -609,7 +609,7 @@ export default function SimplifiedEarnTab() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 gap-3">
-            <div className="flex items-start gap-3 p-3 bg-background/50 rounded-lg">
+            <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
               <div className="p-2 bg-primary/10 rounded-lg">
                 <Zap className="h-4 w-4 text-primary" />
               </div>
@@ -621,7 +621,7 @@ export default function SimplifiedEarnTab() {
               </div>
             </div>
             
-            <div className="flex items-start gap-3 p-3 bg-background/50 rounded-lg">
+            <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
               <div className="p-2 bg-success/10 rounded-lg">
                 <Trophy className="h-4 w-4 text-success" />
               </div>
@@ -633,7 +633,7 @@ export default function SimplifiedEarnTab() {
               </div>
             </div>
             
-            <div className="flex items-start gap-3 p-3 bg-background/50 rounded-lg">
+            <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
               <div className="p-2 bg-accent/10 rounded-lg">
                 <Award className="h-4 w-4 text-accent" />
               </div>
@@ -646,7 +646,7 @@ export default function SimplifiedEarnTab() {
             </div>
           </div>
           
-          <div className="p-3 bg-info/5 rounded-lg border border-info/20">
+          <div className="p-3 bg-blue-50 rounded-lg border border-blue-100">
             <p className="text-xs text-info font-medium">
               💡 <strong>Pro Tip:</strong> Check in daily and complete quality tasks to build Rep fast. Higher Rep = Higher earnings!
             </p>
