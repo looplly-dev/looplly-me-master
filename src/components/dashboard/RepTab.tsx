@@ -292,12 +292,12 @@ export default function RepTab() {
         compactContent={
           <div className="flex justify-center gap-2">
             {allBadges.filter(b => b.earned).slice(0, 6).map((badge) => (
-              <div key={badge.id} className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
+              <div key={badge.id} className="w-8 h-8 rounded-full bg-blue-50 border border-blue-200 flex items-center justify-center">
                 <span className="text-xs">{badge.icon}</span>
               </div>
             ))}
             {allBadges.filter(b => b.earned).length > 6 && (
-              <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+              <div className="w-8 h-8 rounded-full bg-gray-50 border border-gray-200 flex items-center justify-center">
                 <span className="text-xs font-bold">+{allBadges.filter(b => b.earned).length - 6}</span>
               </div>
             )}
@@ -401,21 +401,21 @@ export default function RepTab() {
           </div>
           
           <div className="space-y-3">
-            <div className="flex justify-between items-center p-3 bg-secondary/30 rounded-lg">
+            <div className="flex justify-between items-center p-3 bg-white border border-green-200 rounded-lg shadow-sm">
               <span className="text-sm font-medium">Surveys Completed</span>
-              <Badge variant="default" className="bg-success/20 text-success">
+              <Badge variant="default" className="bg-green-50 text-green-700 border border-green-200">
                 {userStats.reputation.qualityMetrics.surveysCompleted}
               </Badge>
             </div>
-            <div className="flex justify-between items-center p-3 bg-secondary/30 rounded-lg">
+            <div className="flex justify-between items-center p-3 bg-white border border-red-200 rounded-lg shadow-sm">
               <span className="text-sm font-medium">Surveys Rejected</span>
-              <Badge variant="destructive" className="bg-destructive/20">
+              <Badge variant="destructive" className="bg-red-50 border border-red-200">
                 {userStats.reputation.qualityMetrics.surveysRejected}
               </Badge>
             </div>
-            <div className="flex justify-between items-center p-3 bg-secondary/30 rounded-lg">
+            <div className="flex justify-between items-center p-3 bg-white border border-blue-200 rounded-lg shadow-sm">
               <span className="text-sm font-medium">Success Rate</span>
-              <Badge variant="default" className="bg-primary/20 text-primary">
+              <Badge variant="default" className="bg-blue-50 text-blue-700 border border-blue-200">
                 {Math.round((userStats.reputation.qualityMetrics.surveysCompleted / (userStats.reputation.qualityMetrics.surveysCompleted + userStats.reputation.qualityMetrics.surveysRejected)) * 100)}%
               </Badge>
             </div>
@@ -438,9 +438,9 @@ export default function RepTab() {
       >
         <div className="space-y-3 max-h-64 overflow-y-auto">
           {userStats.reputation.history.map((entry, index) => (
-            <div key={index} className="flex items-center gap-3 p-3 bg-secondary/30 rounded-lg transition-all hover:bg-secondary/50">
+            <div key={index} className="flex items-center gap-3 p-3 bg-white border border-gray-200 rounded-lg shadow-sm transition-all hover:shadow-md">
               <div className={`p-2 rounded-full ${
-                entry.points > 0 ? 'bg-success/20 text-success' : 'bg-destructive/20 text-destructive'
+                entry.points > 0 ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'
               }`}>
                 {entry.points > 0 ? (
                   <Plus className="h-4 w-4" />
@@ -474,30 +474,30 @@ export default function RepTab() {
         }
       >
         <div className="space-y-3">
-          <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-success/10 to-success/20 rounded-lg border border-success/20">
-            <div className="w-3 h-3 bg-success rounded-full"></div>
+          <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-green-200 shadow-sm">
+            <div className="w-3 h-3 bg-green-600 rounded-full"></div>
             <span className="text-sm font-medium">Higher-paying survey opportunities</span>
-            <CheckCircle className="h-4 w-4 text-success ml-auto" />
+            <CheckCircle className="h-4 w-4 text-green-600 ml-auto" />
           </div>
-          <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-primary/10 to-primary/20 rounded-lg border border-primary/20">
-            <div className="w-3 h-3 bg-primary rounded-full"></div>
+          <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-blue-200 shadow-sm">
+            <div className="w-3 h-3 bg-blue-600 rounded-full"></div>
             <span className="text-sm font-medium">Priority access to new features</span>
-            <CheckCircle className="h-4 w-4 text-primary ml-auto" />
+            <CheckCircle className="h-4 w-4 text-blue-600 ml-auto" />
           </div>
-          <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-accent/10 to-accent/20 rounded-lg border border-accent/20">
-            <div className="w-3 h-3 bg-accent rounded-full"></div>
+          <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-purple-200 shadow-sm">
+            <div className="w-3 h-3 bg-purple-600 rounded-full"></div>
             <span className="text-sm font-medium">Exclusive Gold+ member surveys</span>
-            <CheckCircle className="h-4 w-4 text-accent ml-auto" />
+            <CheckCircle className="h-4 w-4 text-purple-600 ml-auto" />
           </div>
-          <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-warning/10 to-warning/20 rounded-lg border border-warning/20">
-            <div className="w-3 h-3 bg-warning rounded-full"></div>
+          <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-amber-200 shadow-sm">
+            <div className="w-3 h-3 bg-amber-600 rounded-full"></div>
             <span className="text-sm font-medium">Faster payment processing</span>
-            <CheckCircle className="h-4 w-4 text-warning ml-auto" />
+            <CheckCircle className="h-4 w-4 text-amber-600 ml-auto" />
           </div>
-          <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-crypto/10 to-crypto/20 rounded-lg border border-crypto/20">
-            <div className="w-3 h-3 bg-crypto rounded-full"></div>
+          <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-orange-200 shadow-sm">
+            <div className="w-3 h-3 bg-orange-600 rounded-full"></div>
             <span className="text-sm font-medium">Premium crypto verification access</span>
-            <CheckCircle className="h-4 w-4 text-crypto ml-auto" />
+            <CheckCircle className="h-4 w-4 text-orange-600 ml-auto" />
           </div>
         </div>
       </CollapsibleSection>
@@ -518,10 +518,10 @@ export default function RepTab() {
       >
         <div className="space-y-3">
           {tips.map((tip, index) => (
-            <div key={index} className={`p-4 rounded-xl border transition-all hover:shadow-md ${
-              tip.priority === 'high' ? 'border-destructive/30 bg-gradient-to-r from-destructive/5 to-destructive/10' :
-              tip.priority === 'medium' ? 'border-warning/30 bg-gradient-to-r from-warning/5 to-warning/10' :
-              'border-info/30 bg-gradient-to-r from-info/5 to-info/10'
+            <div key={index} className={`p-4 rounded-xl border transition-all hover:shadow-md bg-white shadow-sm ${
+              tip.priority === 'high' ? 'border-red-200' :
+              tip.priority === 'medium' ? 'border-amber-200' :
+              'border-blue-200'
             }`}>
               <div className="flex items-start justify-between gap-3">
                 <div className="flex-1">
@@ -544,7 +544,7 @@ export default function RepTab() {
           ))}
         </div>
         
-        <div className="mt-4 p-3 bg-info/5 rounded-lg">
+        <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg shadow-sm">
           <p className="text-xs text-muted-foreground">
             💡 <strong>Reputation Tips:</strong> Higher reputation unlocks better opportunities, faster payments, and premium features. Complete actions above to boost your score efficiently.
           </p>
