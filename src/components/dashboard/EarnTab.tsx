@@ -83,19 +83,19 @@ export default function EarnTab() {
   return (
     <div className="p-4 pb-20 space-y-6">
       {/* Balance Card */}
-      <Card className="bg-card border shadow-sm">
+      <Card className="bg-card border-0 shadow-lg">
         <CardContent className="p-6">
-          <div className="flex items-center justify-between">
-            <div className="flex-1">
+          <div className="flex items-center justify-between mb-6">
+            <div>
               <div className="flex items-center gap-2 mb-2">
-                <Shield className="h-4 w-4 text-primary" />
-                <p className="text-muted-foreground text-sm">Available Balance</p>
-                <Badge variant="secondary" className="bg-primary/10 text-primary border-0 text-xs">
-                  AI Secured
-                </Badge>
+                <Shield className="h-5 w-5 text-primary" />
+                <span className="text-primary text-sm font-medium">AI Secured</span>
               </div>
-              <p className="text-3xl font-bold text-foreground mb-1">${balance?.available_balance?.toFixed(2) || '0.00'}</p>
-              <p className="text-muted-foreground text-sm">USD</p>
+              <p className="text-muted-foreground text-sm mb-1">Available Balance</p>
+              <p className="text-4xl font-bold text-foreground">
+                ${balance?.available_balance?.toFixed(2) || '0.00'}
+              </p>
+              <p className="text-muted-foreground text-xs">USD</p>
               <div className="mt-3">
                 <p className="text-muted-foreground text-xs">80% to first cashout ($5.00)</p>
                 <div className="w-32 bg-muted rounded-full h-1.5 mt-1">
@@ -106,7 +106,12 @@ export default function EarnTab() {
                 </div>
               </div>
             </div>
-            <Coins className="h-12 w-12 text-muted-foreground/60" />
+            <div className="text-right">
+              <Coins className="h-12 w-12 text-muted-foreground/40 mb-2" />
+              <div className="text-muted-foreground text-xs space-y-1">
+                <div>Earned: ${(balance?.total_earned || 0).toFixed(2)}</div>
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>
