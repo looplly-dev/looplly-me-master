@@ -216,9 +216,19 @@ export default function SimplifiedEarnTab() {
               </p>
               <p className="text-muted-foreground text-xs">USD</p>
               {balance?.pending_balance && balance.pending_balance > 0 && (
-                <p className="text-muted-foreground text-sm mt-1">
-                  ${balance.pending_balance.toFixed(2)} Under Review
-                </p>
+                <div className="flex items-center gap-2 mt-2">
+                  <div className="p-1 bg-orange-100 rounded-full">
+                    <Clock className="h-3 w-3 text-orange-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-foreground">
+                      ${balance.pending_balance.toFixed(2)} Under Review
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      The Accountant is verifying payments
+                    </p>
+                  </div>
+                </div>
               )}
             </div>
             <div className="text-right">
