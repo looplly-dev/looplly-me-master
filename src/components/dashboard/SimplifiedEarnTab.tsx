@@ -215,14 +215,9 @@ export default function SimplifiedEarnTab() {
                 ${currentProgress.toFixed(2)}
               </p>
               <p className="text-muted-foreground text-xs">USD</p>
-              <p className="text-muted-foreground text-sm flex items-center gap-1 mt-2">
-                <TrendingUp className="h-3 w-3" />
-                Earn $5-15 per week
-              </p>
             </div>
             <div className="text-right">
-              <Coins className="h-12 w-12 text-muted-foreground/40 mb-2" />
-              <p className="text-xs text-muted-foreground">Ready to cash out?</p>
+              <Coins className="h-12 w-12 text-muted-foreground/40" />
             </div>
           </div>
           
