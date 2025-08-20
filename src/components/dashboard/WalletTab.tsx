@@ -35,10 +35,10 @@ export default function WalletTab() {
   return (
     <div className="p-4 pb-20 space-y-4">
       {/* Hero Balance */}
-      <div className="text-center py-6">
-        <p className="text-sm text-muted-foreground mb-1">Available Balance</p>
+      <div className="bg-gradient-to-br from-blue-600 to-blue-700 text-white rounded-xl p-6 text-center">
+        <p className="text-blue-100 text-sm mb-1">Available Balance</p>
         <p className="text-4xl font-bold mb-1">${balance?.available_balance?.toFixed(2) || '0.00'}</p>
-        <p className="text-xs text-muted-foreground">
+        <p className="text-xs text-blue-100">
           ${balance?.total_earned?.toFixed(2) || '0.00'} earned • ${balance?.lifetime_withdrawn?.toFixed(2) || '0.00'} withdrawn
         </p>
       </div>
@@ -61,21 +61,23 @@ export default function WalletTab() {
         <h3 className="text-sm font-medium mb-3">Quick Actions</h3>
         <div className="flex gap-3 overflow-x-auto pb-2">
           {[
-            { icon: Smartphone, label: 'Airtime', min: '$5.00', disabled: !authState.user?.profileComplete },
-            { icon: '📱', label: 'M-Pesa', min: '$2.50', disabled: !authState.user?.profileComplete },
-            { icon: Bitcoin, label: 'Crypto', min: '$10.00', disabled: !authState.user?.profileComplete },
-            { icon: CreditCard, label: 'PayPal', min: '$10.00', disabled: !authState.user?.profileComplete }
+            { icon: Smartphone, label: 'Airtime', min: '$5.00', disabled: !authState.user?.profileComplete, color: 'border-blue-200 bg-blue-50 hover:bg-blue-100' },
+            { icon: '📱', label: 'M-Pesa', min: '$2.50', disabled: !authState.user?.profileComplete, color: 'border-green-200 bg-green-50 hover:bg-green-100' },
+            { icon: Bitcoin, label: 'Crypto', min: '$10.00', disabled: !authState.user?.profileComplete, color: 'border-orange-200 bg-orange-50 hover:bg-orange-100' },
+            { icon: CreditCard, label: 'PayPal', min: '$10.00', disabled: !authState.user?.profileComplete, color: 'border-purple-200 bg-purple-50 hover:bg-purple-100' }
           ].map((action, index) => (
             <button
               key={index}
               disabled={action.disabled}
-              className="flex-shrink-0 p-3 bg-white border rounded-lg hover:bg-gray-50 disabled:bg-gray-50 disabled:opacity-60 min-w-[100px] text-center"
+              className={`flex-shrink-0 p-3 border rounded-lg disabled:bg-gray-50 disabled:opacity-60 disabled:border-gray-200 min-w-[100px] text-center transition-colors ${
+                action.disabled ? 'bg-gray-50 border-gray-200' : action.color
+              }`}
             >
               <div className="flex flex-col items-center gap-1">
                 {typeof action.icon === 'string' ? (
                   <span className="text-lg">{action.icon}</span>
                 ) : (
-                  <action.icon className="h-5 w-5 text-gray-600" />
+                  <action.icon className="h-5 w-5 text-gray-700" />
                 )}
                 <span className="text-xs font-medium">{action.label}</span>
                 <span className="text-xs text-muted-foreground">
@@ -123,14 +125,14 @@ export default function WalletTab() {
             </Button>
           </div>
         ) : (
-          <div className="bg-white border rounded-lg divide-y">
+          <div className="bg-white border border-gray-200 rounded-lg divide-y divide-gray-100">
             {transactions.slice(0, 5).map((transaction) => (
-              <div key={transaction.id} className="flex items-center justify-between p-3">
+              <div key={transaction.id} className="flex items-center justify-between p-3 hover:bg-gray-50 transition-colors">
                 <div className="flex items-center gap-3">
                   <div className={`p-1.5 rounded-full ${
                     transaction.type === 'earning' || transaction.type === 'bonus' || transaction.type === 'referral'
-                      ? 'bg-green-50' 
-                      : 'bg-red-50'
+                      ? 'bg-green-100 border border-green-200' 
+                      : 'bg-red-100 border border-red-200'
                   }`}>
                     {transaction.type === 'earning' || transaction.type === 'bonus' || transaction.type === 'referral' ? (
                       <ArrowDownLeft className="h-3 w-3 text-green-600" />
@@ -162,18 +164,18 @@ export default function WalletTab() {
       </div>
 
       {/* Payment Info - Collapsible */}
-      <details className="bg-gray-50 border rounded-lg">
-        <summary className="p-3 cursor-pointer flex items-center justify-between">
+      <details className="bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 rounded-lg">
+        <summary className="p-3 cursor-pointer flex items-center justify-between hover:bg-amber-50 transition-colors">
           <div className="flex items-center gap-2">
-            <AlertCircle className="h-4 w-4 text-gray-500" />
-            <span className="text-sm font-medium">Payment Requirements</span>
+            <AlertCircle className="h-4 w-4 text-amber-600" />
+            <span className="text-sm font-medium text-amber-800">Payment Requirements</span>
             <ContextualHelp 
               content="We verify profiles to ensure secure payments and prevent fraud. This protects both you and other users in our community."
               position="top"
             />
           </div>
         </summary>
-        <div className="px-3 pb-3 text-xs text-muted-foreground space-y-1">
+        <div className="px-3 pb-3 text-xs text-amber-700 space-y-1">
           <p>• Complete profile required for all withdrawals</p>
           <p>• PayPal & Crypto: Minimum $10.00</p>
           <p>• M-Pesa: Minimum $2.50 • Airtime: Minimum $5.00</p>
