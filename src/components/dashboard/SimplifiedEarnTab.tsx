@@ -202,35 +202,41 @@ export default function SimplifiedEarnTab() {
   return (
     <div className="p-4 pb-20 space-y-6">
       {/* Enhanced Balance Card with Progress */}
-      <Card className="bg-primary text-white border-0 shadow-lg overflow-hidden relative">
-        <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -mr-10 -mt-10" />
-        <CardContent className="p-6 relative">
-          <div className="flex items-center justify-between mb-4">
+      <Card className="bg-card border-0 shadow-lg">
+        <CardContent className="p-6">
+          <div className="flex items-center justify-between mb-6">
             <div>
-              <p className="text-white/80 text-sm">Your Balance</p>
-              <p className="text-3xl font-bold">${currentProgress.toFixed(2)}</p>
-              <p className="text-white/80 text-sm flex items-center gap-1">
+              <div className="flex items-center gap-2 mb-2">
+                <Shield className="h-5 w-5 text-primary" />
+                <span className="text-primary text-sm font-medium">AI Secured</span>
+              </div>
+              <p className="text-muted-foreground text-sm mb-1">Your Balance</p>
+              <p className="text-4xl font-bold text-foreground">
+                ${currentProgress.toFixed(2)}
+              </p>
+              <p className="text-muted-foreground text-xs">USD</p>
+              <p className="text-muted-foreground text-sm flex items-center gap-1 mt-2">
                 <TrendingUp className="h-3 w-3" />
                 Earn $5-15 per week
               </p>
             </div>
-            <div className="text-center">
-              <Coins className="h-12 w-12 text-white/60 mx-auto mb-1" />
-              <p className="text-xs text-white/80">Ready to cash out?</p>
+            <div className="text-right">
+              <Coins className="h-12 w-12 text-muted-foreground/40 mb-2" />
+              <p className="text-xs text-muted-foreground">Ready to cash out?</p>
             </div>
           </div>
           
           {/* Progress to Goal */}
-          <div className="pt-4 border-t border-white/20">
+          <div className="pt-4 border-t border-border">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-white/80">Progress to first cashout</span>
-              <span className="text-sm font-bold">${nextGoal.toFixed(2)}</span>
+              <span className="text-sm text-muted-foreground">Progress to first cashout</span>
+              <span className="text-sm font-bold text-foreground">${nextGoal.toFixed(2)}</span>
             </div>
             <Progress 
               value={progressPercentage} 
-              className="bg-white/20 h-2"
+              className="bg-muted h-2"
             />
-            <p className="text-xs text-white/80 mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               ${(nextGoal - currentProgress).toFixed(2)} to go
             </p>
           </div>
