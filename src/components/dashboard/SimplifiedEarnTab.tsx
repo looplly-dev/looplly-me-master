@@ -218,6 +218,8 @@ export default function SimplifiedEarnTab() {
                   </p>
                 )}
               </div>
+            </div>
+            <div className="text-right">
               <p className="text-4xl font-bold text-foreground">
                 ${currentProgress.toFixed(2)}
               </p>
