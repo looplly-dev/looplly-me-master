@@ -200,456 +200,100 @@ export default function SimplifiedEarnTab() {
 
 
   return (
-    <div className="p-4 pb-20 space-y-6">
-      {/* Enhanced Balance Card with Progress */}
-      <Card className="bg-primary text-white border-0 shadow-lg overflow-hidden relative">
-        <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -mr-10 -mt-10" />
-        <CardContent className="p-6 relative">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <p className="text-white/80 text-sm">Your Balance</p>
-              <p className="text-3xl font-bold">${currentProgress.toFixed(2)}</p>
-              <p className="text-white/80 text-sm flex items-center gap-1">
-                <TrendingUp className="h-3 w-3" />
-                Earn $5-15 per week
-              </p>
-            </div>
-            <div className="text-center">
-              <Coins className="h-12 w-12 text-white/60 mx-auto mb-1" />
-              <p className="text-xs text-white/80">Ready to cash out?</p>
-            </div>
-          </div>
-          
-          {/* Progress to Goal */}
-          <div className="pt-4 border-t border-white/20">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-white/80">Progress to first cashout</span>
-              <span className="text-sm font-bold">${nextGoal.toFixed(2)}</span>
-            </div>
-            <Progress 
-              value={progressPercentage} 
-              className="bg-white/20 h-2"
-            />
-            <p className="text-xs text-white/80 mt-1">
-              ${(nextGoal - currentProgress).toFixed(2)} to go
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-
-
-      {/* Daily Check-in - More Prominent */}
-      <Card className="border-primary/20 bg-white shadow-sm">
-        <CardContent className="p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-3 bg-primary/20 rounded-xl">
-                <Trophy className="h-6 w-6 text-primary" />
-              </div>
-              <div>
-                <h3 className="font-bold text-lg">Daily Streak Boost</h3>
-                <p className="text-sm text-muted-foreground flex items-center gap-1">
-                  <Star className="h-3 w-3 text-warning" />
-                  Day {userStats.streaks.currentStreak} • +{userStats.streaks.currentStreak >= 30 ? 25 : userStats.streaks.currentStreak >= 14 ? 15 : userStats.streaks.currentStreak >= 7 ? 10 : 5} Rep daily
-                </p>
-              </div>
-            </div>
-            <Button
-              variant={checkInDone ? "secondary" : "default"}
-              size="lg"
-              onClick={handleCheckIn}
-              disabled={checkInDone}
-              className={checkInDone ? "" : "bg-primary hover:bg-primary/90"}
-            >
-              {checkInDone ? (
-                <>
-                  <CheckCircle className="h-5 w-5 mr-2" />
-                  Boosted Today!
-                </>
-              ) : (
-                <>
-                  <Sparkles className="h-5 w-5 mr-2" />
-                  +25 Rep
-                </>
-              )}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Quick Stats */}
-      <div className="grid grid-cols-3 gap-3">
-        <Card className="bg-white shadow-sm border">
-          <CardContent className="p-3 text-center">
-            <p className="text-2xl font-bold text-primary">{completedTasks.length}</p>
-            <p className="text-xs text-muted-foreground">Tasks Done</p>
-          </CardContent>
-        </Card>
-        <Card className="bg-white shadow-sm border">
-          <CardContent className="p-3 text-center">
-            <p className="text-2xl font-bold text-warning">{availableTasks.length}</p>
-            <p className="text-xs text-muted-foreground">Available</p>
-          </CardContent>
-        </Card>
-        <Card className="bg-white shadow-sm border">
-          <CardContent className="p-3 text-center">
-            <p className="text-2xl font-bold text-success">
-              ${(balance?.total_earned || 0).toFixed(0)}
-            </p>
-            <p className="text-xs text-muted-foreground">Total Earned</p>
-          </CardContent>
-        </Card>
+    <div className="p-4 pb-20 space-y-4">
+      {/* Header with category counts */}
+      <div>
+        <div className="flex items-center justify-between mb-4">
+          <h1 className="text-xl font-bold flex items-center gap-2">
+            <Target className="h-5 w-5 text-orange-500" />
+            Ready to Earn
+          </h1>
+          <Badge className="bg-orange-100 text-orange-600 border-orange-200">
+            {availableTasks.length} available
+          </Badge>
+        </div>
+        
+        {/* Category tabs */}
+        <div className="flex gap-2 mb-4">
+          <Badge variant="outline" className="px-3 py-1 bg-white">
+            <FileText className="h-3 w-3 mr-1" />
+            Surveys <span className="ml-1 bg-orange-500 text-white text-xs px-1.5 py-0.5 rounded-full">{surveyCount}</span>
+          </Badge>
+          <Badge variant="outline" className="px-3 py-1 bg-white">
+            <Play className="h-3 w-3 mr-1" />
+            Videos <span className="ml-1 bg-teal-500 text-white text-xs px-1.5 py-0.5 rounded-full">{videoCount}</span>
+          </Badge>
+          <Badge variant="outline" className="px-3 py-1 bg-white">
+            <Zap className="h-3 w-3 mr-1" />
+            Tasks <span className="ml-1 bg-amber-500 text-white text-xs px-1.5 py-0.5 rounded-full">{taskCount}</span>
+          </Badge>
+          <Badge variant="outline" className="px-3 py-1 bg-white">
+            <Shield className="h-3 w-3 mr-1" />
+            Data <span className="ml-1 bg-emerald-500 text-white text-xs px-1.5 py-0.5 rounded-full">{dataCount}</span>
+          </Badge>
+        </div>
       </div>
 
-      {/* Simplified Task Sections */}
-      <div className="space-y-4">
-        {/* Ready to Earn with Tabs */}
-        <Card className="bg-white shadow-sm border">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center justify-between">
-              <span className="flex items-center gap-2">
-                <Target className="h-5 w-5 text-primary" />
-                Ready to Earn
-              </span>
-              <Badge variant="secondary" className="bg-primary/10 text-primary">
-                {availableTasks.length} available
-              </Badge>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Tabs defaultValue="surveys" className="w-full">
-              <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="surveys" className="text-xs relative">
-                  Surveys
-                  {surveyCount > 0 && (
-                    <span className="absolute -top-1 -right-1 h-5 w-5 bg-primary text-white text-xs rounded-full flex items-center justify-center font-medium z-10">
-                      {surveyCount}
-                    </span>
-                  )}
-                </TabsTrigger>
-                <TabsTrigger value="videos" className="text-xs relative">
-                  Videos
-                  {videoCount > 0 && (
-                    <span className="absolute -top-1 -right-1 h-5 w-5 bg-accent text-white text-xs rounded-full flex items-center justify-center font-medium z-10">
-                      {videoCount}
-                    </span>
-                  )}
-                </TabsTrigger>
-                <TabsTrigger value="tasks" className="text-xs relative">
-                  Tasks
-                  {taskCount > 0 && (
-                    <span className="absolute -top-1 -right-1 h-5 w-5 bg-warning text-white text-xs rounded-full flex items-center justify-center font-medium z-10">
-                      {taskCount}
-                    </span>
-                  )}
-                </TabsTrigger>
-                <TabsTrigger value="data" className="text-xs relative">
-                  Data
-                  {dataCount > 0 && (
-                    <span className="absolute -top-1 -right-1 h-5 w-5 bg-success text-white text-xs rounded-full flex items-center justify-center font-medium z-10">
-                      {dataCount}
-                    </span>
-                  )}
-                </TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="surveys" className="space-y-3 mt-4">
-                {availableTasks.filter(a => a.activity_type === 'survey').length === 0 ? (
-                  <div className="text-center py-8">
-                    <FileText className="h-12 w-12 mx-auto mb-3 text-muted-foreground/50" />
-                    <h3 className="font-semibold mb-2">No surveys available</h3>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Check back later for new survey opportunities!
-                    </p>
-                  </div>
-                ) : (
-                  availableTasks.filter(a => a.activity_type === 'survey').map((activity) => (
-                    <div key={activity.id} className="p-4 border rounded-lg bg-white shadow-sm border-l-4 border-l-primary/50">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-3">
-                          <FileText className="h-5 w-5 text-primary" />
-                          <div>
-                            <h3 className="font-semibold">{activity.title}</h3>
-                            <p className="text-sm text-muted-foreground">
-                              {activity.description}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex flex-col items-end">
-                          <Button
-                            onClick={() => handleStartTask(activity.activity_type, activity.title, activity.reward_amount)}
-                          >
-                            Start
-                          </Button>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-4 text-sm">
-                        <span className="flex items-center gap-1">
-                          <Clock className="h-4 w-4" />
-                          {activity.time_estimate || 5} min
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Coins className="h-4 w-4 text-success" />
-                          <span className="font-bold text-success">${activity.reward_amount.toFixed(2)}</span>
-                        </span>
-                        <div className="flex items-center gap-1">
-                          <Star className="h-4 w-4 text-warning fill-current" />
-                          <span className="font-medium">
-                            {activity.metadata?.rating || '4.2'}
-                          </span>
-                          <span className="text-muted-foreground">
-                            ({activity.metadata?.reviews || '284'})
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </TabsContent>
-
-              <TabsContent value="videos" className="space-y-3 mt-4">
-                {availableTasks.filter(a => a.activity_type === 'video').length === 0 ? (
-                  <div className="text-center py-8">
-                    <Play className="h-12 w-12 mx-auto mb-3 text-muted-foreground/50" />
-                    <h3 className="font-semibold mb-2">No videos available</h3>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Video opportunities will appear here when available!
-                    </p>
-                  </div>
-                ) : (
-                  availableTasks.filter(a => a.activity_type === 'video').map((activity) => (
-                    <div key={activity.id} className="p-4 border rounded-lg bg-white shadow-sm border-l-4 border-l-accent/50">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-3">
-                          <Play className="h-5 w-5 text-accent" />
-                          <div>
-                            <h3 className="font-semibold">{activity.title}</h3>
-                            <p className="text-sm text-muted-foreground">
-                              {activity.description}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex flex-col items-end">
-                          <Button
-                            onClick={() => handleStartTask(activity.activity_type, activity.title, activity.reward_amount)}
-                          >
-                            Start
-                          </Button>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-4 text-sm">
-                        <span className="flex items-center gap-1">
-                          <Clock className="h-4 w-4" />
-                          {activity.time_estimate || 3} min
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Coins className="h-4 w-4 text-success" />
-                          <span className="font-bold text-success">${activity.reward_amount.toFixed(2)}</span>
-                        </span>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </TabsContent>
-
-              <TabsContent value="tasks" className="space-y-3 mt-4">
-                {availableTasks.filter(a => a.activity_type === 'task').length === 0 ? (
-                  <div className="text-center py-8">
-                    <Zap className="h-12 w-12 mx-auto mb-3 text-muted-foreground/50" />
-                    <h3 className="font-semibold mb-2">No tasks available</h3>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Micro-tasks will be posted here when available!
-                    </p>
-                  </div>
-                ) : (
-                  availableTasks.filter(a => a.activity_type === 'task').map((activity) => (
-                    <div key={activity.id} className="p-4 border rounded-lg bg-white shadow-sm border-l-4 border-l-warning/50">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-3">
-                          <Zap className="h-5 w-5 text-warning" />
-                          <div>
-                            <h3 className="font-semibold">{activity.title}</h3>
-                            <p className="text-sm text-muted-foreground">
-                              {activity.description}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex flex-col items-end">
-                          <Button
-                            onClick={() => handleStartTask(activity.activity_type, activity.title, activity.reward_amount)}
-                          >
-                            Start
-                          </Button>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-4 text-sm">
-                        <span className="flex items-center gap-1">
-                          <Clock className="h-4 w-4" />
-                          {activity.time_estimate || 2} min
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Coins className="h-4 w-4 text-success" />
-                          <span className="font-bold text-success">${activity.reward_amount.toFixed(2)}</span>
-                        </span>
-                        <div className="flex items-center gap-1">
-                          <Star className="h-4 w-4 text-warning fill-current" />
-                          <span className="font-medium">
-                            {activity.metadata?.rating || '4.5'}
-                          </span>
-                          <span className="text-muted-foreground">
-                            ({activity.metadata?.reviews || '92'})
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </TabsContent>
-
-              <TabsContent value="data" className="space-y-3 mt-4">
-                <div className="p-4 border rounded-lg bg-white shadow-sm">
-                  <div className="flex gap-3 mb-4">
-                    <div className="p-2 bg-primary/10 rounded-lg">
-                      <div className="text-lg">🔄</div>
-                    </div>
+      {/* Available Activities - Clean Card Layout */}
+      <div className="space-y-3">
+        {availableTasks.slice(0, 6).map((activity) => (
+          <Card key={activity.id} className="bg-white border-l-4 border-l-orange-400 shadow-sm hover:shadow-md transition-shadow">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                  <div className="flex items-start gap-3 mb-3">
+                    {activity.activity_type === 'survey' && <FileText className="h-5 w-5 text-gray-600 mt-0.5" />}
+                    {activity.activity_type === 'video' && <Play className="h-5 w-5 text-gray-600 mt-0.5" />}
+                    {activity.activity_type === 'task' && <Zap className="h-5 w-5 text-gray-600 mt-0.5" />}
                     <div>
-                      <h3 className="font-semibold text-sm mb-1">Data Revenue Sharing</h3>
-                      <p className="text-xs text-muted-foreground">
-                        Earn when Looplly generates revenue from your opted-in data
+                      <h3 className="font-semibold text-gray-900 mb-1">{activity.title}</h3>
+                      <p className="text-sm text-gray-600 mb-3 leading-relaxed">
+                        {activity.description}
                       </p>
                     </div>
                   </div>
                   
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <div>
-                        <p className="font-medium text-sm">Location Data</p>
-                        <p className="text-xs text-muted-foreground">Anonymous location insights</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-sm font-semibold text-success">$0.05/month</p>
-                        <Badge variant="outline" className="text-success border-success text-xs">
-                          Active
-                        </Badge>
-                      </div>
+                  <div className="flex items-center gap-4 text-sm">
+                    <div className="flex items-center gap-1">
+                      <Clock className="h-4 w-4 text-gray-500" />
+                      <span className="font-medium">{activity.time_estimate || 5} min</span>
                     </div>
-                    
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <div>
-                        <p className="font-medium text-sm">Shopping Behavior</p>
-                        <p className="text-xs text-muted-foreground">Purchase pattern analysis</p>
-                      </div>
-                       <div className="flex flex-col items-end gap-1">
-                         <p className="text-sm font-semibold text-success">$0.10/month</p>
-                         <Switch
-                           checked={dataOptIns.shopping}
-                           onCheckedChange={(checked) => handleDataToggle('shopping', checked)}
-                         />
-                       </div>
-                     </div>
-                     
-                     <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                       <div>
-                         <p className="font-medium text-sm">App Usage Patterns</p>
-                         <p className="text-xs text-muted-foreground">Digital behavior insights</p>
-                       </div>
-                       <div className="flex flex-col items-end gap-1">
-                         <p className="text-sm font-semibold text-success">$0.08/month</p>
-                         <Switch
-                           checked={dataOptIns.appUsage}
-                           onCheckedChange={(checked) => handleDataToggle('appUsage', checked)}
-                         />
-                       </div>
-                     </div>
-                  </div>
-                  
-                  <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-100">
-                    <p className="text-xs text-muted-foreground">
-                      💡 <strong>Transparent Earnings:</strong> You earn a share of revenue each time your data contributes to insights sold to research partners. All data is anonymized and aggregated.
-                    </p>
+                    <div className="flex items-center gap-1">
+                      <Coins className="h-4 w-4 text-emerald-600" />
+                      <span className="font-bold text-emerald-600">${activity.reward_amount.toFixed(2)}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Star className="h-4 w-4 text-amber-500 fill-current" />
+                      <span className="font-medium">{activity.metadata?.rating || '4.6'}</span>
+                      <span className="text-gray-500">({activity.metadata?.reviews || '234'})</span>
+                    </div>
                   </div>
                 </div>
-              </TabsContent>
-            </Tabs>
-          </CardContent>
-        </Card>
-
-        {/* Completed Tasks (if any) */}
-        {completedTasks.length > 0 && (
-          <Card className="bg-white shadow-sm border border-success/30">
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-success">
-                <CheckCircle className="h-5 w-5" />
-                Recently Completed
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                 {completedTasks.slice(0, 2).map((activity) => (
-                   <div key={activity.id} className="flex items-center justify-between p-2 bg-green-50 rounded">
-                    <span className="text-sm font-medium">{activity.title}</span>
-                    <span className="text-sm font-bold text-success">
-                      +${activity.reward_amount.toFixed(2)}
-                    </span>
-                  </div>
-                ))}
+                
+                <Button 
+                  className="ml-4 bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg font-medium"
+                  onClick={() => handleStartTask(activity.activity_type, activity.title, activity.reward_amount)}
+                >
+                  Start
+                </Button>
               </div>
             </CardContent>
           </Card>
-        )}
+        ))}
       </div>
 
-      {/* Rep Importance Section */}
-      <Card className="bg-white shadow-sm border border-accent/20">
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-accent">
-            <Shield className="h-5 w-5" />
-            Why Rep Matters
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 gap-3">
-            <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
-              <div className="p-2 bg-primary/10 rounded-lg">
-                <Zap className="h-4 w-4 text-primary" />
-              </div>
-              <div>
-                <h4 className="font-semibold text-sm mb-1">Higher Paying Tasks</h4>
-                <p className="text-xs text-muted-foreground">
-                  Higher Rep unlocks premium surveys and tasks worth $2-$10 each
-                </p>
-              </div>
+      {/* Quick Progress Indicator */}
+      <Card className="bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200">
+        <CardContent className="p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-blue-900">Progress to first cashout</p>
+              <p className="text-2xl font-bold text-blue-700">${currentProgress.toFixed(2)} / $5.00</p>
             </div>
-            
-            <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
-              <div className="p-2 bg-success/10 rounded-lg">
-                <Trophy className="h-4 w-4 text-success" />
-              </div>
-              <div>
-                <h4 className="font-semibold text-sm mb-1">Priority Access</h4>
-                <p className="text-xs text-muted-foreground">
-                  Get first access to new earning opportunities before others
-                </p>
-              </div>
+            <div className="text-right">
+              <p className="text-sm text-blue-600">{Math.round(progressPercentage)}% complete</p>
+              <Progress value={progressPercentage} className="w-20 h-2 mt-1" />
             </div>
-            
-            <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
-              <div className="p-2 bg-accent/10 rounded-lg">
-                <Award className="h-4 w-4 text-accent" />
-              </div>
-              <div>
-                <h4 className="font-semibold text-sm mb-1">Trust & Credibility</h4>
-                <p className="text-xs text-muted-foreground">
-                  Brands prefer working with high-Rep users for market research
-                </p>
-              </div>
-            </div>
-          </div>
-          
-          <div className="p-3 bg-blue-50 rounded-lg border border-blue-100">
-            <p className="text-xs text-info font-medium">
-              💡 <strong>Pro Tip:</strong> Check in daily and complete quality tasks to build Rep fast. Higher Rep = Higher earnings!
-            </p>
           </div>
         </CardContent>
       </Card>
