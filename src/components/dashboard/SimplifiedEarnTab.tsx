@@ -204,7 +204,7 @@ export default function SimplifiedEarnTab() {
       {/* Enhanced Balance Card with Progress */}
       <Card className="bg-card border-0 shadow-lg">
         <CardContent className="p-6">
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center justify-between">
             <div>
               <div className="flex items-center gap-2 mb-2">
                 <Shield className="h-5 w-5 text-primary" />
@@ -215,25 +215,25 @@ export default function SimplifiedEarnTab() {
                 ${currentProgress.toFixed(2)}
               </p>
               <p className="text-muted-foreground text-xs">USD</p>
+              {balance?.pending_balance && balance.pending_balance > 0 && (
+                <p className="text-muted-foreground text-sm mt-1">
+                  ${balance.pending_balance.toFixed(2)} Under Review
+                </p>
+              )}
             </div>
             <div className="text-right">
-              <Coins className="h-12 w-12 text-muted-foreground/40" />
+              <div className="mb-2">
+                <span className="text-sm text-muted-foreground">Progress to {balance?.lifetime_withdrawn && balance.lifetime_withdrawn > 0 ? 'next' : 'first'} cashout</span>
+                <span className="text-sm font-bold text-foreground ml-2">${nextGoal.toFixed(2)}</span>
+              </div>
+              <Progress 
+                value={progressPercentage} 
+                className="bg-muted h-2 mb-1"
+              />
+              <p className="text-xs text-muted-foreground">
+                ${(nextGoal - currentProgress).toFixed(2)} to go
+              </p>
             </div>
-          </div>
-          
-          {/* Progress to Goal */}
-          <div className="pt-4 border-t border-border">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-muted-foreground">Progress to first cashout</span>
-              <span className="text-sm font-bold text-foreground">${nextGoal.toFixed(2)}</span>
-            </div>
-            <Progress 
-              value={progressPercentage} 
-              className="bg-muted h-2"
-            />
-            <p className="text-xs text-muted-foreground mt-1">
-              ${(nextGoal - currentProgress).toFixed(2)} to go
-            </p>
           </div>
         </CardContent>
       </Card>
