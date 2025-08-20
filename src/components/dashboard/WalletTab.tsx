@@ -42,70 +42,90 @@ export default function WalletTab() {
     );
   }
 
-  return (
-    <div className="p-6 pb-20 space-y-6">
-      {/* Premium Balance Hero */}
-      <div className="relative overflow-hidden">
-        <Card className="border-0 bg-gradient-to-br from-card via-card to-accent/5" style={{ boxShadow: 'var(--shadow-elegant)' }}>
-          <CardContent className="p-8 text-center relative">
-            <div className="absolute top-4 right-4">
-              <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-success/10 border border-success/20">
-                <Bot className="h-3 w-3 text-success" />
-                <span className="text-xs font-medium text-success">AI Secured</span>
-              </div>
-            </div>
-            
-            <div className="mb-2">
-              <p className="text-muted-foreground text-sm mb-1">Available Balance</p>
-              <div className="flex items-center justify-center gap-2">
-                <DollarSign className="h-8 w-8 text-success" />
-                <p className="text-5xl font-bold text-foreground tracking-tight">
-                  {balance?.available_balance?.toFixed(2) || '245.75'}
-                </p>
-              </div>
-            </div>
-            
-            <div className="flex items-center justify-center gap-6 text-sm">
-              <div className="flex items-center gap-1">
-                <TrendingUp className="h-4 w-4 text-success" />
-                <span className="text-muted-foreground">${balance?.total_earned?.toFixed(2) || '312.50'} earned</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <ArrowUpRight className="h-4 w-4 text-accent" />
-                <span className="text-muted-foreground">${balance?.lifetime_withdrawn?.toFixed(2) || '66.75'} withdrawn</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+  // Minimum cash-out amounts for each method
+  const cashOutMinimums = {
+    'Mobile Airtime': 1.00,
+    'M-Pesa': 5.00,
+    'Cryptocurrency': 10.00,
+    'PayPal': 5.00
+  };
 
-      {/* The Accountant AI Status */}
-      <Card className="border border-accent/20 bg-gradient-to-r from-accent/5 to-accent/10" style={{ boxShadow: 'var(--shadow-card)' }}>
-        <CardContent className="p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-full bg-accent/10 border border-accent/20">
-                <Bot className="h-5 w-5 text-accent" />
+  const getCashOutStatus = (method: string) => {
+    const minimum = cashOutMinimums[method as keyof typeof cashOutMinimums];
+    const currentBalance = balance?.available_balance || 0;
+    
+    if (!authState.user?.profileComplete) {
+      return { disabled: true, reason: 'Profile verification required' };
+    }
+    
+    if (currentBalance < minimum) {
+      const needed = minimum - currentBalance;
+      return { disabled: true, reason: `Need $${needed.toFixed(2)} more (Min: $${minimum.toFixed(2)})` };
+    }
+    
+    return { disabled: false, reason: null };
+  };
+
+  return (
+    <div className="p-4 pb-20 space-y-6">
+      {/* Balance Hero Section */}
+      <Card className="border-0 shadow-lg bg-card">
+        <CardContent className="p-6">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <Shield className="h-5 w-5 text-primary" />
+                <span className="text-primary text-sm font-medium">AI Secured</span>
               </div>
-              <div>
-                <p className="font-semibold text-sm">The Accountant</p>
-                <p className="text-xs text-muted-foreground">AI Payment Verification System</p>
-              </div>
+              <p className="text-muted-foreground text-sm mb-1">Available Balance</p>
+              <p className="text-4xl font-bold text-foreground">
+                ${balance?.available_balance?.toFixed(2) || '0.00'}
+              </p>
+              <p className="text-muted-foreground text-xs">USD</p>
             </div>
             <div className="text-right">
-              <div className="flex items-center gap-1 mb-1">
-                <CheckCircle2 className="h-3 w-3 text-success" />
-                <span className="text-xs font-medium text-success">Active</span>
+              <Wallet className="h-12 w-12 text-muted-foreground/40 mb-2" />
+              <div className="text-muted-foreground text-xs space-y-1">
+                <div>Earned: ${balance?.total_earned?.toFixed(2) || '0.00'}</div>
+                <div>Withdrawn: ${balance?.lifetime_withdrawn?.toFixed(2) || '0.00'}</div>
               </div>
-              <p className="text-xs text-muted-foreground">Last check: 2m ago</p>
             </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* The Accountant Status */}
+      <Card className="border-primary/20 bg-primary/5">
+        <CardContent className="p-4">
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                <Bot className="h-5 w-5 text-primary" />
+              </div>
+              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-success rounded-full border-2 border-background flex items-center justify-center">
+                <CheckCircle2 className="h-2.5 w-2.5 text-white" />
+              </div>
+            </div>
+            <div className="flex-1">
+              <h3 className="font-semibold text-sm flex items-center gap-2">
+                The Accountant
+                <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
+              </h3>
+              <p className="text-xs text-muted-foreground">
+                AI system is actively monitoring and verifying all transactions
+              </p>
+            </div>
+            <Badge variant="outline" className="text-success border-success">
+              <div className="w-2 h-2 bg-success rounded-full mr-2 animate-pulse" />
+              Active
+            </Badge>
           </div>
         </CardContent>
       </Card>
 
       {/* Profile completion warning */}
       {!authState.user?.profileComplete && (
-        <Card className="border border-warning/20 bg-gradient-to-r from-warning/5 to-warning/10" style={{ boxShadow: 'var(--shadow-card)' }}>
+        <Card className="border border-warning/20 bg-warning/10">
           <CardContent className="p-4 flex items-center gap-3">
             <div className="p-2 rounded-full bg-warning/10 border border-warning/20">
               <Shield className="h-4 w-4 text-warning" />
@@ -121,105 +141,63 @@ export default function WalletTab() {
         </Card>
       )}
 
-      {/* Premium Quick Actions */}
+      {/* Cash Out Options */}
       <div>
-        <h3 className="text-lg font-semibold mb-4">Cash Out Options</h3>
+        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+          <ArrowUpRight className="h-5 w-5 text-primary" />
+          Cash Out Options
+        </h2>
         <div className="grid grid-cols-2 gap-4">
           {[
-            { 
-              icon: Smartphone, 
-              label: 'Mobile Airtime', 
-              min: '$5.00', 
-              color: 'from-primary/10 to-primary/20',
-              borderColor: 'border-primary/20',
-              iconBg: 'bg-primary/10',
-              iconColor: 'text-primary',
-              disabled: !authState.user?.profileComplete 
-            },
-            { 
-              icon: '📱', 
-              label: 'M-Pesa', 
-              min: '$2.50', 
-              color: 'from-mpesa/10 to-mpesa/20',
-              borderColor: 'border-mpesa/20',
-              iconBg: 'bg-mpesa/10',
-              iconColor: 'text-mpesa',
-              disabled: !authState.user?.profileComplete 
-            },
-            { 
-              icon: Bitcoin, 
-              label: 'Cryptocurrency', 
-              min: '$10.00', 
-              color: 'from-crypto/10 to-crypto/20',
-              borderColor: 'border-crypto/20',
-              iconBg: 'bg-crypto/10',
-              iconColor: 'text-crypto',
-              disabled: !authState.user?.profileComplete 
-            },
-            { 
-              icon: CreditCard, 
-              label: 'PayPal', 
-              min: '$10.00', 
-              color: 'from-accent/10 to-accent/20',
-              borderColor: 'border-accent/20',
-              iconBg: 'bg-accent/10',
-              iconColor: 'text-accent',
-              disabled: !authState.user?.profileComplete 
-            }
-          ].map((action, index) => (
-            <Card 
-              key={index} 
-              className={`border ${action.borderColor} bg-gradient-to-br ${action.color} transition-all hover:scale-[1.02] hover:shadow-lg ${
-                action.disabled ? 'opacity-60' : ''
-              }`}
-              style={{ boxShadow: 'var(--shadow-card)' }}
-            >
-              <CardContent className="p-5">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className={`p-2 rounded-full ${action.iconBg} border ${action.borderColor}`}>
-                    {typeof action.icon === 'string' ? (
-                      <span className="text-lg">{action.icon}</span>
-                    ) : (
-                      <action.icon className={`h-5 w-5 ${action.iconColor}`} />
-                    )}
+            { name: 'Mobile Airtime', icon: '📱', available: true },
+            { name: 'M-Pesa', icon: '💚', available: true },
+            { name: 'Cryptocurrency', icon: '₿', available: true },
+            { name: 'PayPal', icon: '💙', available: false }
+          ].map((method) => {
+            const status = getCashOutStatus(method.name);
+            const isUnavailable = !method.available;
+            
+            return (
+              <Card key={method.name} className={`cursor-pointer transition-all hover:shadow-md ${status.disabled || isUnavailable ? 'opacity-60' : ''}`}>
+                <CardContent className="p-4">
+                  <div className="w-full h-24 bg-muted/50 rounded-lg mb-3 flex items-center justify-center text-2xl">
+                    {method.icon}
                   </div>
-                  <div>
-                    <p className="text-sm font-semibold">{action.label}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {action.disabled ? 'Verification required' : `Min ${action.min}`}
-                    </p>
-                  </div>
-                </div>
-                <Button 
-                  size="sm" 
-                  disabled={action.disabled}
-                  className={`w-full font-medium ${
-                    action.disabled 
-                      ? 'bg-muted text-muted-foreground' 
-                      : `${action.iconColor.replace('text-', 'bg-')} text-white hover:opacity-90`
-                  }`}
-                >
-                  {action.disabled ? 'Locked' : 'Cash Out'}
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
+                  <h3 className="font-semibold text-sm mb-1">{method.name}</h3>
+                  <p className="text-xs text-muted-foreground mb-3">
+                    {method.name === 'Mobile Airtime' && `Direct top-up (Min: $${cashOutMinimums[method.name].toFixed(2)})`}
+                    {method.name === 'M-Pesa' && `Instant mobile money (Min: $${cashOutMinimums[method.name].toFixed(2)})`}
+                    {method.name === 'Cryptocurrency' && `Bitcoin, USDC, ETH (Min: $${cashOutMinimums[method.name].toFixed(2)})`}
+                    {method.name === 'PayPal' && 'Coming soon - worldwide'}
+                  </p>
+                  <Button 
+                    size="sm" 
+                    className="w-full text-xs" 
+                    disabled={status.disabled || isUnavailable}
+                    variant={status.disabled || isUnavailable ? 'secondary' : 'default'}
+                  >
+                    {isUnavailable ? 'Coming Soon' : status.disabled ? status.reason : 'Cash Out'}
+                  </Button>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       </div>
 
       {/* AI-Managed Pending Balance */}
-      <Card className="border border-info/20 bg-gradient-to-r from-info/5 to-info/10" style={{ boxShadow: 'var(--shadow-card)' }}>
+      <Card className="border-muted">
         <CardContent className="p-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-full bg-info/10 border border-info/20">
-              <Clock className="h-4 w-4 text-info" />
+            <div className="p-2 rounded-full bg-primary/10 border border-primary/20">
+              <Clock className="h-4 w-4 text-primary" />
             </div>
             <div>
-              <p className="text-sm font-semibold">${balance?.pending_balance?.toFixed(2) || '28.75'} Under Review</p>
+              <p className="text-sm font-semibold">${balance?.pending_balance?.toFixed(2) || '0.00'} Under Review</p>
               <p className="text-xs text-muted-foreground">The Accountant is verifying payments</p>
             </div>
           </div>
-          <Badge variant="secondary" className="bg-info/10 text-info border-info/20">
+          <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">
             AI Processing
           </Badge>
         </CardContent>
@@ -239,7 +217,6 @@ export default function WalletTab() {
             <Card 
               key={transaction.id} 
               className="border border-muted/20 bg-card transition-all hover:shadow-md hover:scale-[1.01]"
-              style={{ boxShadow: 'var(--shadow-card)' }}
             >
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
@@ -247,12 +224,12 @@ export default function WalletTab() {
                     <div className={`p-2 rounded-full border ${
                       transaction.type === 'earning' || transaction.type === 'bonus' || transaction.type === 'referral'
                         ? 'bg-success/10 border-success/20' 
-                        : 'bg-accent/10 border-accent/20'
+                        : 'bg-muted/50 border-muted'
                     }`}>
                       {transaction.type === 'earning' || transaction.type === 'bonus' || transaction.type === 'referral' ? (
                         <ArrowDownLeft className="h-4 w-4 text-success" />
                       ) : (
-                        <ArrowUpRight className="h-4 w-4 text-accent" />
+                        <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
                       )}
                     </div>
                     <div>
@@ -263,7 +240,7 @@ export default function WalletTab() {
                         </p>
                         <span className="text-muted-foreground">•</span>
                         <div className="flex items-center gap-1">
-                          <Bot className="h-3 w-3 text-accent" />
+                          <Bot className="h-3 w-3 text-primary" />
                           <span className={`text-xs font-medium ${getAccountantStatusColor(transaction.accountant_status)}`}>
                             {getAccountantStatusText(transaction.accountant_status)}
                           </span>
@@ -278,7 +255,7 @@ export default function WalletTab() {
                     <p className={`text-lg font-bold ${
                       transaction.type === 'earning' || transaction.type === 'bonus' || transaction.type === 'referral'
                         ? 'text-success' 
-                        : 'text-accent'
+                        : 'text-muted-foreground'
                     }`}>
                       {transaction.type === 'earning' || transaction.type === 'bonus' || transaction.type === 'referral' ? '+' : '-'}${transaction.amount.toFixed(2)}
                     </p>
@@ -289,7 +266,7 @@ export default function WalletTab() {
                           ? 'bg-success/10 text-success border-success/20' 
                           : transaction.status === 'pending_verification'
                           ? 'bg-warning/10 text-warning border-warning/20'
-                          : 'bg-info/10 text-info border-info/20'
+                          : 'bg-primary/10 text-primary border-primary/20'
                       }`}
                     >
                       {transaction.status === 'verified' ? 'Complete' : 
@@ -304,12 +281,12 @@ export default function WalletTab() {
       </div>
 
       {/* AI Payment Intelligence */}
-      <Card className="border border-muted/20 bg-gradient-to-br from-card to-muted/5" style={{ boxShadow: 'var(--shadow-card)' }}>
+      <Card className="border border-muted/20 bg-card">
         <details>
           <summary className="p-4 cursor-pointer flex items-center justify-between hover:bg-muted/30 transition-colors rounded-t-lg">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-full bg-accent/10 border border-accent/20">
-                <Bot className="h-4 w-4 text-accent" />
+              <div className="p-2 rounded-full bg-primary/10 border border-primary/20">
+                <Bot className="h-4 w-4 text-primary" />
               </div>
               <div>
                 <span className="text-sm font-semibold">How The Accountant Works</span>
@@ -332,14 +309,14 @@ export default function WalletTab() {
                 </div>
               </div>
               <div className="flex items-start gap-2">
-                <Shield className="h-4 w-4 text-accent mt-0.5 flex-shrink-0" />
+                <Shield className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
                 <div>
                   <p className="font-medium text-foreground">Fraud Protection</p>
                   <p className="text-xs">Only verified payments trigger reward distribution</p>
                 </div>
               </div>
               <div className="flex items-start gap-2">
-                <Clock className="h-4 w-4 text-info mt-0.5 flex-shrink-0" />
+                <Clock className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
                 <div>
                   <p className="font-medium text-foreground">Real-time Processing</p>
                   <p className="text-xs">Payments verified and released within minutes</p>
