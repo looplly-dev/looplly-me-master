@@ -84,27 +84,27 @@ export default function EarnTab() {
       {/* Balance Card */}
       <Card className="bg-primary text-white border-0 shadow-lg">
         <CardContent className="p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <p className="text-white/80 text-sm">Current Balance</p>
-              <p className="text-3xl font-bold">${balance?.available_balance?.toFixed(2) || '0.00'}</p>
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-2">
+                <p className="text-white/80 text-sm">Available Balance</p>
+                <Badge variant="secondary" className="bg-white/20 text-white border-0 text-xs">
+                  AI Secured
+                </Badge>
+              </div>
+              <p className="text-3xl font-bold mb-1">${balance?.available_balance?.toFixed(2) || '0.00'}</p>
               <p className="text-white/80 text-sm">USD</p>
+              <div className="mt-3">
+                <p className="text-white/70 text-xs">80% to first cashout ($5.00)</p>
+                <div className="w-32 bg-white/20 rounded-full h-1.5 mt-1">
+                  <div 
+                    className="bg-white rounded-full h-1.5 transition-all duration-300" 
+                    style={{ width: `${Math.min(((balance?.available_balance || 0) / 5) * 100, 100)}%` }}
+                  ></div>
+                </div>
+              </div>
             </div>
             <Coins className="h-12 w-12 text-white/60" />
-          </div>
-          <div className="grid grid-cols-3 gap-4 pt-4 border-t border-white/20">
-            <div className="text-center">
-              <p className="text-xl font-bold">{activities.filter(a => a.activity_type === 'survey' && a.status === 'completed').length}</p>
-              <p className="text-white/80 text-xs">Surveys</p>
-            </div>
-            <div className="text-center">
-              <p className="text-xl font-bold">{activities.filter(a => a.activity_type === 'video' && a.status === 'completed').length}</p>
-              <p className="text-white/80 text-xs">Videos</p>
-            </div>
-            <div className="text-center">
-              <p className="text-xl font-bold">{activities.filter(a => a.activity_type === 'task' && a.status === 'completed').length}</p>
-              <p className="text-white/80 text-xs">Tasks</p>
-            </div>
           </div>
         </CardContent>
       </Card>
