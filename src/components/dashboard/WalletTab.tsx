@@ -96,27 +96,26 @@ export default function WalletTab() {
 
       {/* The Accountant Status */}
       <Card className="border-primary/20 bg-primary/5">
-        <CardContent className="p-4">
+        <CardContent className="p-3">
           <div className="flex items-center gap-3">
             <div className="relative">
-              <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-                <Bot className="h-5 w-5 text-primary" />
+              <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                <Bot className="h-4 w-4 text-primary" />
               </div>
-              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-success rounded-full border-2 border-background flex items-center justify-center">
-                <CheckCircle2 className="h-2.5 w-2.5 text-white" />
+              <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-success rounded-full border border-background flex items-center justify-center">
+                <CheckCircle2 className="h-2 w-2 text-white" />
               </div>
             </div>
             <div className="flex-1">
-              <h3 className="font-semibold text-sm flex items-center gap-2">
+              <h3 className="font-medium text-sm flex items-center gap-2">
                 The Accountant
-                <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
+                <div className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse" />
               </h3>
               <p className="text-xs text-muted-foreground">
-                AI system is actively monitoring and verifying all transactions
+                AI monitoring all transactions
               </p>
             </div>
-            <Badge variant="outline" className="text-success border-success">
-              <div className="w-2 h-2 bg-success rounded-full mr-2 animate-pulse" />
+            <Badge variant="outline" className="text-success border-success text-xs">
               Active
             </Badge>
           </div>
@@ -143,40 +142,40 @@ export default function WalletTab() {
 
       {/* Cash Out Options */}
       <div>
-        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-          <ArrowUpRight className="h-5 w-5 text-primary" />
+        <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
+          <ArrowUpRight className="h-4 w-4 text-primary" />
           Cash Out Options
         </h2>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
           {[
-            { name: 'Mobile Airtime', icon: '📱', available: true },
-            { name: 'M-Pesa', icon: '💚', available: true },
-            { name: 'Cryptocurrency', icon: '₿', available: true },
-            { name: 'PayPal', icon: '💙', available: false }
+            { name: 'Mobile Airtime', icon: '📱', available: true, short: 'Airtime' },
+            { name: 'M-Pesa', icon: '💚', available: true, short: 'M-Pesa' },
+            { name: 'Cryptocurrency', icon: '₿', available: true, short: 'Crypto' },
+            { name: 'PayPal', icon: '💙', available: false, short: 'PayPal' }
           ].map((method) => {
             const status = getCashOutStatus(method.name);
             const isUnavailable = !method.available;
             
             return (
-              <Card key={method.name} className={`cursor-pointer transition-all hover:shadow-md ${status.disabled || isUnavailable ? 'opacity-60' : ''}`}>
-                <CardContent className="p-4">
-                  <div className="w-full h-24 bg-muted/50 rounded-lg mb-3 flex items-center justify-center text-2xl">
+              <Card key={method.name} className={`flex-shrink-0 w-32 cursor-pointer transition-all hover:shadow-md ${status.disabled || isUnavailable ? 'opacity-60' : ''}`}>
+                <CardContent className="p-3">
+                  <div className="flex items-center justify-center text-lg mb-2 h-8">
                     {method.icon}
                   </div>
-                  <h3 className="font-semibold text-sm mb-1">{method.name}</h3>
-                  <p className="text-xs text-muted-foreground mb-3">
-                    {method.name === 'Mobile Airtime' && `Direct top-up (Min: $${cashOutMinimums[method.name].toFixed(2)})`}
-                    {method.name === 'M-Pesa' && `Instant mobile money (Min: $${cashOutMinimums[method.name].toFixed(2)})`}
-                    {method.name === 'Cryptocurrency' && `Bitcoin, USDC, ETH (Min: $${cashOutMinimums[method.name].toFixed(2)})`}
-                    {method.name === 'PayPal' && 'Coming soon - worldwide'}
+                  <h3 className="font-medium text-xs text-center mb-1">{method.short}</h3>
+                  <p className="text-xs text-muted-foreground text-center mb-2 leading-tight">
+                    {method.name === 'Mobile Airtime' && `Min $${cashOutMinimums[method.name].toFixed(2)}`}
+                    {method.name === 'M-Pesa' && `Min $${cashOutMinimums[method.name].toFixed(2)}`}
+                    {method.name === 'Cryptocurrency' && `Min $${cashOutMinimums[method.name].toFixed(2)}`}
+                    {method.name === 'PayPal' && 'Coming Soon'}
                   </p>
                   <Button 
                     size="sm" 
-                    className="w-full text-xs" 
+                    className="w-full text-xs h-7" 
                     disabled={status.disabled || isUnavailable}
                     variant={status.disabled || isUnavailable ? 'secondary' : 'default'}
                   >
-                    {isUnavailable ? 'Coming Soon' : status.disabled ? status.reason : 'Cash Out'}
+                    {isUnavailable ? 'Soon' : status.disabled ? 'Available' : 'Cash Out'}
                   </Button>
                 </CardContent>
               </Card>
