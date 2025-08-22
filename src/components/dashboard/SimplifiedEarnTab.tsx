@@ -569,48 +569,48 @@ export default function SimplifiedEarnTab() {
                   
                   <div className="space-y-6">
                     {/* Location Data - Already Active */}
-                    <div className="flex items-center justify-between p-4 bg-green-50 rounded-lg border border-green-200">
-                      <div className="flex items-center gap-3">
-                        <MapPin className="h-4 w-4 text-green-600" />
-                        <div>
-                          <p className="font-medium text-sm flex items-center gap-2">
-                            Location Data
-                            <Badge variant="outline" className="text-green-600 border-green-600 text-xs">
+                    <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex items-center gap-3">
+                          <MapPin className="h-4 w-4 text-green-600 flex-shrink-0" />
+                          <div className="min-w-0">
+                            <p className="font-medium text-sm">Location Data</p>
+                            <Badge variant="outline" className="text-green-600 border-green-600 text-xs mt-1">
                               Anonymous
                             </Badge>
-                          </p>
-                          <p className="text-xs text-muted-foreground">Anonymous location insights for market research</p>
+                          </div>
+                        </div>
+                        <div className="text-right flex-shrink-0">
+                          <p className="text-sm font-semibold text-success">$0.05/month</p>
+                          <Badge variant="outline" className="text-success border-success text-xs mt-1">
+                            Active
+                          </Badge>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <p className="text-sm font-semibold text-success">$0.05/month</p>
-                        <Badge variant="outline" className="text-success border-success text-xs">
-                          Active
-                        </Badge>
-                      </div>
+                      <p className="text-xs text-muted-foreground pl-7">Anonymous location insights for market research</p>
                     </div>
 
                     {/* Cookie Tracking */}
-                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                      <div className="flex items-center gap-3">
-                        <Cookie className="h-4 w-4 text-orange-600" />
-                        <div>
-                          <p className="font-medium text-sm flex items-center gap-2">
-                            Cookie Tracking
-                            <Badge variant="outline" className="text-orange-600 border-orange-600 text-xs">
+                    <div className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex items-center gap-3">
+                          <Cookie className="h-4 w-4 text-orange-600 flex-shrink-0" />
+                          <div className="min-w-0">
+                            <p className="font-medium text-sm">Cookie Tracking</p>
+                            <Badge variant="outline" className="text-orange-600 border-orange-600 text-xs mt-1">
                               Pseudonymous
                             </Badge>
-                          </p>
-                          <p className="text-xs text-muted-foreground">Website cookies for advertising optimization</p>
+                          </div>
+                        </div>
+                        <div className="flex flex-col items-end gap-1 flex-shrink-0">
+                          <p className="text-sm font-semibold text-success">$0.05/month</p>
+                          <Switch
+                            checked={dataOptIns.cookieTracking}
+                            onCheckedChange={(checked) => handleDataToggle('cookieTracking', checked)}
+                          />
                         </div>
                       </div>
-                      <div className="flex flex-col items-end gap-1">
-                        <p className="text-sm font-semibold text-success">$0.05/month</p>
-                        <Switch
-                          checked={dataOptIns.cookieTracking}
-                          onCheckedChange={(checked) => handleDataToggle('cookieTracking', checked)}
-                        />
-                      </div>
+                      <p className="text-xs text-muted-foreground pl-7">Website cookies for advertising optimization</p>
                     </div>
 
                     {/* Browser History */}
