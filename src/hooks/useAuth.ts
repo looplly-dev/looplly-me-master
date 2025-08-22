@@ -109,8 +109,8 @@ export const useAuthLogic = () => {
                   dateOfBirth: profile.date_of_birth ? new Date(profile.date_of_birth) : new Date(),
                   address: profile.address || '',
                   gpsEnabled: true,
-                  firstName: profile.first_name,
-                  lastName: profile.last_name,
+                  firstName: profile.first_name || '',
+                  lastName: profile.last_name || '',
                   email: session.user.email || ''
                 } : undefined
               };
@@ -128,7 +128,7 @@ export const useAuthLogic = () => {
                 setTimeout(() => {
                   auditActions.login(session.user.id, { 
                     method: 'email_password',
-                    profile_complete: profile?.profile_complete 
+                    profile_complete: profile?.profile_complete || false
                   }).catch(console.error);
                 }, 0);
               }
