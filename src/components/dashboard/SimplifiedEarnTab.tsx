@@ -345,7 +345,7 @@ export default function SimplifiedEarnTab() {
                 </TabsTrigger>
               </TabsList>
 
-              <TabsContent value="surveys" className="space-y-3 mt-4 max-h-[500px] overflow-y-auto scroll-smooth">
+              <TabsContent value="surveys" className="space-y-3 mt-4 max-h-[400px] overflow-y-auto scroll-smooth pb-4">
                 {availableTasks.filter(a => a.activity_type === 'survey').length === 0 ? (
                   <div className="text-center py-8">
                     <FileText className="h-12 w-12 mx-auto mb-3 text-muted-foreground/50" />
@@ -356,7 +356,7 @@ export default function SimplifiedEarnTab() {
                   </div>
                 ) : (
                   availableTasks.filter(a => a.activity_type === 'survey').map((activity) => (
-                    <div key={activity.id} className="p-4 border rounded-lg bg-white shadow-sm border-l-4 border-l-primary/50">
+                    <div key={activity.id} className="p-4 border rounded-lg bg-white shadow-sm border-l-4 border-l-primary/50 hover:shadow-md transition-shadow">
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-3">
                           <FileText className="h-5 w-5 text-primary" />
@@ -399,7 +399,7 @@ export default function SimplifiedEarnTab() {
                 )}
               </TabsContent>
 
-              <TabsContent value="videos" className="space-y-3 mt-4 max-h-[500px] overflow-y-auto scroll-smooth">
+              <TabsContent value="videos" className="space-y-3 mt-4 max-h-[400px] overflow-y-auto scroll-smooth pb-4">
                 {availableTasks.filter(a => a.activity_type === 'video').length === 0 ? (
                   <div className="text-center py-8">
                     <Play className="h-12 w-12 mx-auto mb-3 text-muted-foreground/50" />
@@ -410,7 +410,7 @@ export default function SimplifiedEarnTab() {
                   </div>
                 ) : (
                   availableTasks.filter(a => a.activity_type === 'video').map((activity) => (
-                    <div key={activity.id} className="p-4 border rounded-lg bg-white shadow-sm border-l-4 border-l-accent/50">
+                    <div key={activity.id} className="p-4 border rounded-lg bg-white shadow-sm border-l-4 border-l-accent/50 hover:shadow-md transition-shadow">
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-3">
                           <Play className="h-5 w-5 text-accent" />
@@ -438,13 +438,22 @@ export default function SimplifiedEarnTab() {
                           <Coins className="h-4 w-4 text-success" />
                           <span className="font-bold text-success">${activity.reward_amount.toFixed(2)}</span>
                         </span>
+                        <div className="flex items-center gap-1">
+                          <Star className="h-4 w-4 text-warning fill-current" />
+                          <span className="font-medium">
+                            {activity.metadata?.rating || '4.2'}
+                          </span>
+                          <span className="text-muted-foreground">
+                            ({activity.metadata?.reviews || '284'})
+                          </span>
+                        </div>
                       </div>
                     </div>
                   ))
                 )}
               </TabsContent>
 
-              <TabsContent value="tasks" className="space-y-3 mt-4 max-h-[500px] overflow-y-auto scroll-smooth">
+              <TabsContent value="tasks" className="space-y-3 mt-4 max-h-[400px] overflow-y-auto scroll-smooth pb-4">
                 {availableTasks.filter(a => a.activity_type === 'task').length === 0 ? (
                   <div className="text-center py-8">
                     <Zap className="h-12 w-12 mx-auto mb-3 text-muted-foreground/50" />
@@ -455,7 +464,7 @@ export default function SimplifiedEarnTab() {
                   </div>
                 ) : (
                   availableTasks.filter(a => a.activity_type === 'task').map((activity) => (
-                    <div key={activity.id} className="p-4 border rounded-lg bg-white shadow-sm border-l-4 border-l-warning/50">
+                    <div key={activity.id} className="p-4 border rounded-lg bg-white shadow-sm border-l-4 border-l-warning/50 hover:shadow-md transition-shadow">
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-3">
                           <Zap className="h-5 w-5 text-warning" />
