@@ -22,7 +22,16 @@ import {
   Award,
   FileText,
   Play,
-  Clock
+  Clock,
+  Cookie,
+  Eye,
+  Search,
+  Globe,
+  MapPin,
+  ShoppingBag,
+  Smartphone,
+  CreditCard,
+  Share2
 } from 'lucide-react';
 import { useBalance } from '@/hooks/useBalance';
 import { useEarningActivities } from '@/hooks/useEarningActivities';
@@ -36,7 +45,15 @@ export default function SimplifiedEarnTab() {
   const [checkInDone, setCheckInDone] = useState(false);
   const [dataOptIns, setDataOptIns] = useState({
     shopping: false,
-    appUsage: false
+    appUsage: false,
+    cookieTracking: false,
+    browsingBehavior: false,
+    searchHistory: false,
+    crossSiteTracking: false,
+    adPreferences: false,
+    socialMedia: false,
+    ecommerce: false,
+    financial: false
   });
   const { toast } = useToast();
   const { balance } = useBalance();
@@ -92,14 +109,40 @@ export default function SimplifiedEarnTab() {
     });
   };
 
-  const handleDataToggle = (type: 'shopping' | 'appUsage', checked: boolean) => {
+  const handleDataToggle = (type: keyof typeof dataOptIns, checked: boolean) => {
     setDataOptIns(prev => ({ ...prev, [type]: checked }));
     
-    const earnings = type === 'shopping' ? 0.10 : 0.08;
+    const earningsMap = {
+      shopping: 0.10,
+      appUsage: 0.08,
+      cookieTracking: 0.05,
+      browsingBehavior: 0.12,
+      searchHistory: 0.08,
+      crossSiteTracking: 0.15,
+      adPreferences: 0.06,
+      socialMedia: 0.18,
+      ecommerce: 0.22,
+      financial: 0.25
+    };
+    
+    const nameMap = {
+      shopping: 'shopping behavior',
+      appUsage: 'app usage',
+      cookieTracking: 'cookie tracking',
+      browsingBehavior: 'browsing behavior',
+      searchHistory: 'search history',
+      crossSiteTracking: 'cross-site tracking',
+      adPreferences: 'advertising preferences',
+      socialMedia: 'social media activity',
+      ecommerce: 'e-commerce behavior',
+      financial: 'financial behavior'
+    };
+    
+    const earnings = earningsMap[type];
     const action = checked ? 'Opted In' : 'Opted Out';
     const description = checked 
-      ? `You'll now earn $${earnings.toFixed(2)}/month from ${type === 'shopping' ? 'shopping behavior' : 'app usage'} data sharing.`
-      : `You've stopped earning $${earnings.toFixed(2)}/month from ${type === 'shopping' ? 'shopping behavior' : 'app usage'} data sharing.`;
+      ? `You'll now earn $${earnings.toFixed(2)}/month from ${nameMap[type]} data sharing.`
+      : `You've stopped earning $${earnings.toFixed(2)}/month from ${nameMap[type]} data sharing.`;
     
     toast({
       title: checked ? '🎉 Successfully Opted In!' : 'Opted Out',
@@ -197,7 +240,7 @@ export default function SimplifiedEarnTab() {
   const videoCount = availableTasks.filter(a => a.activity_type === 'video').length;
   const taskCount = availableTasks.filter(a => a.activity_type === 'task').length;
   // Only show data dot if there are items to opt into
-  const dataCount = (!dataOptIns.shopping || !dataOptIns.appUsage) ? (2 - (dataOptIns.shopping ? 1 : 0) - (dataOptIns.appUsage ? 1 : 0)) : 0;
+  const dataCount = Object.values(dataOptIns).filter(opt => !opt).length;
 
 
   return (
@@ -507,25 +550,34 @@ export default function SimplifiedEarnTab() {
                 )}
               </TabsContent>
 
-              <TabsContent value="data" className="space-y-3 mt-4 max-h-[500px] overflow-y-auto scroll-smooth">
+              <TabsContent value="data" className="space-y-3 mt-4 max-h-[400px] overflow-y-auto scroll-smooth pb-4">
                 <div className="p-4 border rounded-lg bg-white shadow-sm">
                   <div className="flex gap-3 mb-4">
                     <div className="p-2 bg-primary/10 rounded-lg">
-                      <div className="text-lg">🔄</div>
+                      <Share2 className="h-5 w-5 text-primary" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-sm mb-1">Data Revenue Sharing</h3>
+                      <h3 className="font-semibold text-sm mb-1">Cookie Tracking & Data Revenue Sharing</h3>
                       <p className="text-xs text-muted-foreground">
-                        Earn when Looplly generates revenue from your opted-in data
+                        Earn when Looplly generates revenue from your opted-in data. All data is anonymized.
                       </p>
                     </div>
                   </div>
                   
                   <div className="space-y-3">
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <div>
-                        <p className="font-medium text-sm">Location Data</p>
-                        <p className="text-xs text-muted-foreground">Anonymous location insights</p>
+                    {/* Location Data - Already Active */}
+                    <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-200">
+                      <div className="flex items-center gap-3">
+                        <MapPin className="h-4 w-4 text-green-600" />
+                        <div>
+                          <p className="font-medium text-sm flex items-center gap-2">
+                            Location Data
+                            <Badge variant="outline" className="text-green-600 border-green-600 text-xs">
+                              Anonymous
+                            </Badge>
+                          </p>
+                          <p className="text-xs text-muted-foreground">Anonymous location insights for market research</p>
+                        </div>
                       </div>
                       <div className="text-right">
                         <p className="text-sm font-semibold text-success">$0.05/month</p>
@@ -534,40 +586,251 @@ export default function SimplifiedEarnTab() {
                         </Badge>
                       </div>
                     </div>
-                    
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <div>
-                        <p className="font-medium text-sm">Shopping Behavior</p>
-                        <p className="text-xs text-muted-foreground">Purchase pattern analysis</p>
+
+                    {/* Cookie Tracking */}
+                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                      <div className="flex items-center gap-3">
+                        <Cookie className="h-4 w-4 text-orange-600" />
+                        <div>
+                          <p className="font-medium text-sm flex items-center gap-2">
+                            Cookie Tracking
+                            <Badge variant="outline" className="text-orange-600 border-orange-600 text-xs">
+                              Pseudonymous
+                            </Badge>
+                          </p>
+                          <p className="text-xs text-muted-foreground">Website cookies for advertising optimization</p>
+                        </div>
                       </div>
-                       <div className="flex flex-col items-end gap-1">
-                         <p className="text-sm font-semibold text-success">$0.10/month</p>
-                         <Switch
-                           checked={dataOptIns.shopping}
-                           onCheckedChange={(checked) => handleDataToggle('shopping', checked)}
-                         />
-                       </div>
-                     </div>
-                     
-                     <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                       <div>
-                         <p className="font-medium text-sm">App Usage Patterns</p>
-                         <p className="text-xs text-muted-foreground">Digital behavior insights</p>
-                       </div>
-                       <div className="flex flex-col items-end gap-1">
-                         <p className="text-sm font-semibold text-success">$0.08/month</p>
-                         <Switch
-                           checked={dataOptIns.appUsage}
-                           onCheckedChange={(checked) => handleDataToggle('appUsage', checked)}
-                         />
-                       </div>
-                     </div>
+                      <div className="flex flex-col items-end gap-1">
+                        <p className="text-sm font-semibold text-success">$0.05/month</p>
+                        <Switch
+                          checked={dataOptIns.cookieTracking}
+                          onCheckedChange={(checked) => handleDataToggle('cookieTracking', checked)}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Browsing Behavior */}
+                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                      <div className="flex items-center gap-3">
+                        <Globe className="h-4 w-4 text-blue-600" />
+                        <div>
+                          <p className="font-medium text-sm flex items-center gap-2">
+                            Web Browsing Behavior
+                            <Badge variant="outline" className="text-blue-600 border-blue-600 text-xs">
+                              Aggregated
+                            </Badge>
+                          </p>
+                          <p className="text-xs text-muted-foreground">Website visits and page engagement patterns</p>
+                        </div>
+                      </div>
+                      <div className="flex flex-col items-end gap-1">
+                        <p className="text-sm font-semibold text-success">$0.12/month</p>
+                        <Switch
+                          checked={dataOptIns.browsingBehavior}
+                          onCheckedChange={(checked) => handleDataToggle('browsingBehavior', checked)}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Search History */}
+                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                      <div className="flex items-center gap-3">
+                        <Search className="h-4 w-4 text-purple-600" />
+                        <div>
+                          <p className="font-medium text-sm flex items-center gap-2">
+                            Search History Patterns
+                            <Badge variant="outline" className="text-purple-600 border-purple-600 text-xs">
+                              Anonymous
+                            </Badge>
+                          </p>
+                          <p className="text-xs text-muted-foreground">Search trends and keyword preferences</p>
+                        </div>
+                      </div>
+                      <div className="flex flex-col items-end gap-1">
+                        <p className="text-sm font-semibold text-success">$0.08/month</p>
+                        <Switch
+                          checked={dataOptIns.searchHistory}
+                          onCheckedChange={(checked) => handleDataToggle('searchHistory', checked)}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Cross-Site Tracking */}
+                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                      <div className="flex items-center gap-3">
+                        <Eye className="h-4 w-4 text-red-600" />
+                        <div>
+                          <p className="font-medium text-sm flex items-center gap-2">
+                            Cross-Site Tracking
+                            <Badge variant="outline" className="text-red-600 border-red-600 text-xs">
+                              Premium
+                            </Badge>
+                          </p>
+                          <p className="text-xs text-muted-foreground">Cross-platform behavior for attribution analysis</p>
+                        </div>
+                      </div>
+                      <div className="flex flex-col items-end gap-1">
+                        <p className="text-sm font-semibold text-success">$0.15/month</p>
+                        <Switch
+                          checked={dataOptIns.crossSiteTracking}
+                          onCheckedChange={(checked) => handleDataToggle('crossSiteTracking', checked)}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Advertising Preferences */}
+                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                      <div className="flex items-center gap-3">
+                        <Target className="h-4 w-4 text-pink-600" />
+                        <div>
+                          <p className="font-medium text-sm flex items-center gap-2">
+                            Advertising Preferences
+                            <Badge variant="outline" className="text-pink-600 border-pink-600 text-xs">
+                              Anonymous
+                            </Badge>
+                          </p>
+                          <p className="text-xs text-muted-foreground">Ad interaction and preference data</p>
+                        </div>
+                      </div>
+                      <div className="flex flex-col items-end gap-1">
+                        <p className="text-sm font-semibold text-success">$0.06/month</p>
+                        <Switch
+                          checked={dataOptIns.adPreferences}
+                          onCheckedChange={(checked) => handleDataToggle('adPreferences', checked)}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Shopping Behavior */}
+                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                      <div className="flex items-center gap-3">
+                        <ShoppingBag className="h-4 w-4 text-green-600" />
+                        <div>
+                          <p className="font-medium text-sm flex items-center gap-2">
+                            Shopping Behavior
+                            <Badge variant="outline" className="text-green-600 border-green-600 text-xs">
+                              Aggregated
+                            </Badge>
+                          </p>
+                          <p className="text-xs text-muted-foreground">Purchase patterns and product preferences</p>
+                        </div>
+                      </div>
+                      <div className="flex flex-col items-end gap-1">
+                        <p className="text-sm font-semibold text-success">$0.10/month</p>
+                        <Switch
+                          checked={dataOptIns.shopping}
+                          onCheckedChange={(checked) => handleDataToggle('shopping', checked)}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Social Media Activity */}
+                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                      <div className="flex items-center gap-3">
+                        <Share2 className="h-4 w-4 text-blue-500" />
+                        <div>
+                          <p className="font-medium text-sm flex items-center gap-2">
+                            Social Media Activity
+                            <Badge variant="outline" className="text-blue-500 border-blue-500 text-xs">
+                              Premium
+                            </Badge>
+                          </p>
+                          <p className="text-xs text-muted-foreground">Social engagement and sharing patterns</p>
+                        </div>
+                      </div>
+                      <div className="flex flex-col items-end gap-1">
+                        <p className="text-sm font-semibold text-success">$0.18/month</p>
+                        <Switch
+                          checked={dataOptIns.socialMedia}
+                          onCheckedChange={(checked) => handleDataToggle('socialMedia', checked)}
+                        />
+                      </div>
+                    </div>
+
+                    {/* E-commerce Behavior */}
+                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                      <div className="flex items-center gap-3">
+                        <Globe className="h-4 w-4 text-indigo-600" />
+                        <div>
+                          <p className="font-medium text-sm flex items-center gap-2">
+                            E-commerce Behavior
+                            <Badge variant="outline" className="text-indigo-600 border-indigo-600 text-xs">
+                              Premium
+                            </Badge>
+                          </p>
+                          <p className="text-xs text-muted-foreground">Online shopping journey and cart behavior</p>
+                        </div>
+                      </div>
+                      <div className="flex flex-col items-end gap-1">
+                        <p className="text-sm font-semibold text-success">$0.22/month</p>
+                        <Switch
+                          checked={dataOptIns.ecommerce}
+                          onCheckedChange={(checked) => handleDataToggle('ecommerce', checked)}
+                        />
+                      </div>
+                    </div>
+
+                    {/* App Usage Patterns */}
+                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                      <div className="flex items-center gap-3">
+                        <Smartphone className="h-4 w-4 text-gray-600" />
+                        <div>
+                          <p className="font-medium text-sm flex items-center gap-2">
+                            App Usage Patterns
+                            <Badge variant="outline" className="text-gray-600 border-gray-600 text-xs">
+                              Aggregated
+                            </Badge>
+                          </p>
+                          <p className="text-xs text-muted-foreground">Mobile app engagement and usage insights</p>
+                        </div>
+                      </div>
+                      <div className="flex flex-col items-end gap-1">
+                        <p className="text-sm font-semibold text-success">$0.08/month</p>
+                        <Switch
+                          checked={dataOptIns.appUsage}
+                          onCheckedChange={(checked) => handleDataToggle('appUsage', checked)}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Financial Behavior */}
+                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                      <div className="flex items-center gap-3">
+                        <CreditCard className="h-4 w-4 text-yellow-600" />
+                        <div>
+                          <p className="font-medium text-sm flex items-center gap-2">
+                            Financial Behavior Patterns
+                            <Badge variant="outline" className="text-yellow-600 border-yellow-600 text-xs">
+                              Premium
+                            </Badge>
+                          </p>
+                          <p className="text-xs text-muted-foreground">Spending patterns and financial preferences</p>
+                        </div>
+                      </div>
+                      <div className="flex flex-col items-end gap-1">
+                        <p className="text-sm font-semibold text-success">$0.25/month</p>
+                        <Switch
+                          checked={dataOptIns.financial}
+                          onCheckedChange={(checked) => handleDataToggle('financial', checked)}
+                        />
+                      </div>
+                    </div>
                   </div>
                   
                   <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-100">
-                    <p className="text-xs text-muted-foreground">
-                      💡 <strong>Transparent Earnings:</strong> You earn a share of revenue each time your data contributes to insights sold to research partners. All data is anonymized and aggregated.
-                    </p>
+                    <div className="flex items-start gap-2">
+                      <Shield className="h-4 w-4 text-blue-600 mt-0.5" />
+                      <div>
+                        <p className="text-xs font-medium text-blue-800 mb-1">Privacy & Transparency</p>
+                        <p className="text-xs text-blue-600">
+                          All data is anonymized, aggregated, and never sold with personal identifiers. You earn a share of revenue each time your data contributes to research insights sold to partners.
+                        </p>
+                        <button className="text-xs text-blue-600 underline mt-1 hover:text-blue-800">
+                          Learn more about our data practices →
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </TabsContent>
