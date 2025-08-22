@@ -564,9 +564,9 @@ export default function SimplifiedEarnTab() {
                     </div>
                   </div>
                   
-                  <div className="space-y-3">
+                  <div className="space-y-6">
                     {/* Location Data - Already Active */}
-                    <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-200">
+                    <div className="flex items-center justify-between p-4 bg-green-50 rounded-lg border border-green-200">
                       <div className="flex items-center gap-3">
                         <MapPin className="h-4 w-4 text-green-600" />
                         <div>
@@ -588,7 +588,7 @@ export default function SimplifiedEarnTab() {
                     </div>
 
                     {/* Cookie Tracking */}
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                       <div className="flex items-center gap-3">
                         <Cookie className="h-4 w-4 text-orange-600" />
                         <div>
@@ -611,7 +611,7 @@ export default function SimplifiedEarnTab() {
                     </div>
 
                     {/* Browsing Behavior */}
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                       <div className="flex items-center gap-3">
                         <Globe className="h-4 w-4 text-blue-600" />
                         <div>
@@ -634,7 +634,7 @@ export default function SimplifiedEarnTab() {
                     </div>
 
                     {/* Search History */}
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                       <div className="flex items-center gap-3">
                         <Search className="h-4 w-4 text-purple-600" />
                         <div>
@@ -657,7 +657,7 @@ export default function SimplifiedEarnTab() {
                     </div>
 
                     {/* Cross-Site Tracking */}
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                       <div className="flex items-center gap-3">
                         <Eye className="h-4 w-4 text-red-600" />
                         <div>
@@ -667,7 +667,7 @@ export default function SimplifiedEarnTab() {
                               Premium
                             </Badge>
                           </p>
-                          <p className="text-xs text-muted-foreground">Cross-platform behavior for attribution analysis</p>
+                          <p className="text-xs text-muted-foreground">Website activity across multiple domains</p>
                         </div>
                       </div>
                       <div className="flex flex-col items-end gap-1">
@@ -679,18 +679,18 @@ export default function SimplifiedEarnTab() {
                       </div>
                     </div>
 
-                    {/* Advertising Preferences */}
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                    {/* Ad Preferences */}
+                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                       <div className="flex items-center gap-3">
-                        <Target className="h-4 w-4 text-pink-600" />
+                        <Eye className="h-4 w-4 text-pink-600" />
                         <div>
                           <p className="font-medium text-sm flex items-center gap-2">
                             Advertising Preferences
                             <Badge variant="outline" className="text-pink-600 border-pink-600 text-xs">
-                              Anonymous
+                              Aggregated
                             </Badge>
                           </p>
-                          <p className="text-xs text-muted-foreground">Ad interaction and preference data</p>
+                          <p className="text-xs text-muted-foreground">Ad clicks, views, and interaction patterns</p>
                         </div>
                       </div>
                       <div className="flex flex-col items-end gap-1">
@@ -703,7 +703,7 @@ export default function SimplifiedEarnTab() {
                     </div>
 
                     {/* Shopping Behavior */}
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                       <div className="flex items-center gap-3">
                         <ShoppingBag className="h-4 w-4 text-green-600" />
                         <div>
@@ -726,7 +726,7 @@ export default function SimplifiedEarnTab() {
                     </div>
 
                     {/* Social Media Activity */}
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                       <div className="flex items-center gap-3">
                         <Share2 className="h-4 w-4 text-blue-500" />
                         <div>
@@ -749,7 +749,7 @@ export default function SimplifiedEarnTab() {
                     </div>
 
                     {/* E-commerce Behavior */}
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                       <div className="flex items-center gap-3">
                         <Globe className="h-4 w-4 text-indigo-600" />
                         <div>
@@ -772,7 +772,7 @@ export default function SimplifiedEarnTab() {
                     </div>
 
                     {/* App Usage Patterns */}
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                       <div className="flex items-center gap-3">
                         <Smartphone className="h-4 w-4 text-gray-600" />
                         <div>
@@ -795,7 +795,7 @@ export default function SimplifiedEarnTab() {
                     </div>
 
                     {/* Financial Behavior */}
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                       <div className="flex items-center gap-3">
                         <CreditCard className="h-4 w-4 text-yellow-600" />
                         <div>
