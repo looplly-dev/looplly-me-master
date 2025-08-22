@@ -308,7 +308,7 @@ export default function SimplifiedEarnTab() {
               </Badge>
             </CardTitle>
           </CardHeader>
-          <CardContent className="max-h-[500px] overflow-hidden">
+          <CardContent className="max-h-[650px] overflow-hidden">
             <Tabs defaultValue="surveys" className="w-full">
               <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="surveys" className="text-xs relative">
@@ -345,7 +345,7 @@ export default function SimplifiedEarnTab() {
                 </TabsTrigger>
               </TabsList>
 
-              <TabsContent value="surveys" className="space-y-3 mt-4 max-h-96 overflow-y-auto">
+              <TabsContent value="surveys" className="space-y-3 mt-4 max-h-[500px] overflow-y-auto scroll-smooth">
                 {availableTasks.filter(a => a.activity_type === 'survey').length === 0 ? (
                   <div className="text-center py-8">
                     <FileText className="h-12 w-12 mx-auto mb-3 text-muted-foreground/50" />
@@ -399,7 +399,7 @@ export default function SimplifiedEarnTab() {
                 )}
               </TabsContent>
 
-              <TabsContent value="videos" className="space-y-3 mt-4 max-h-96 overflow-y-auto">
+              <TabsContent value="videos" className="space-y-3 mt-4 max-h-[500px] overflow-y-auto scroll-smooth">
                 {availableTasks.filter(a => a.activity_type === 'video').length === 0 ? (
                   <div className="text-center py-8">
                     <Play className="h-12 w-12 mx-auto mb-3 text-muted-foreground/50" />
@@ -444,7 +444,7 @@ export default function SimplifiedEarnTab() {
                 )}
               </TabsContent>
 
-              <TabsContent value="tasks" className="space-y-3 mt-4 max-h-96 overflow-y-auto">
+              <TabsContent value="tasks" className="space-y-3 mt-4 max-h-[500px] overflow-y-auto scroll-smooth">
                 {availableTasks.filter(a => a.activity_type === 'task').length === 0 ? (
                   <div className="text-center py-8">
                     <Zap className="h-12 w-12 mx-auto mb-3 text-muted-foreground/50" />
@@ -498,7 +498,7 @@ export default function SimplifiedEarnTab() {
                 )}
               </TabsContent>
 
-              <TabsContent value="data" className="space-y-3 mt-4 max-h-96 overflow-y-auto">
+              <TabsContent value="data" className="space-y-3 mt-4 max-h-[500px] overflow-y-auto scroll-smooth">
                 <div className="p-4 border rounded-lg bg-white shadow-sm">
                   <div className="flex gap-3 mb-4">
                     <div className="p-2 bg-primary/10 rounded-lg">
