@@ -150,27 +150,10 @@ export default function Login({ onForgotPassword, onRegister }: LoginProps) {
               {isSubmitting ? 'Signing In...' : 'Sign In'}
             </Button>
 
-            <Button 
-              type="button" 
-              variant="outline" 
-              size="mobile" 
-              className="w-full"
-              disabled={isSubmitting}
-              onClick={handleMockLogin}
-            >
-              🎭 Demo Login (Mock Data)
-            </Button>
-
-            <div className="text-center">
-              <span className="text-muted-foreground">Don't have an account? </span>
-              <Button
-                type="button"
-                variant="link"
-                className="p-0 h-auto text-primary font-semibold"
-                onClick={onRegister}
-              >
-                Create Account
-              </Button>
+            <div className="text-center mt-4">
+              <p className="text-sm text-muted-foreground">
+                Access restricted to authorized test users only
+              </p>
             </div>
           </form>
         </CardContent>

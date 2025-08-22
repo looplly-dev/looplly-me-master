@@ -4,10 +4,11 @@ import { useAuth } from './useAuth';
 
 export interface Transaction {
   id: string;
+  user_id?: string;
   type: 'earning' | 'withdrawal' | 'bonus' | 'referral';
   amount: number;
   currency: string;
-  description: string;
+  description?: string;
   source: string;
   status: 'pending' | 'completed' | 'failed' | 'cancelled';
   metadata: any;

@@ -307,9 +307,9 @@ export default function SimplifiedEarnTab() {
               </Badge>
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="max-h-96 overflow-hidden">
             <Tabs defaultValue="surveys" className="w-full">
-              <TabsList className="grid w-full grid-cols-4">
+              <TabsList className="grid w-full grid-cols-5">
                 <TabsTrigger value="surveys" className="text-xs relative">
                   Surveys
                   {surveyCount > 0 && (
@@ -342,9 +342,12 @@ export default function SimplifiedEarnTab() {
                     </span>
                   )}
                 </TabsTrigger>
+                <TabsTrigger value="rep-info" className="text-xs">
+                  Rep Info
+                </TabsTrigger>
               </TabsList>
 
-              <TabsContent value="surveys" className="space-y-3 mt-4">
+              <TabsContent value="surveys" className="space-y-3 mt-4 max-h-80 overflow-y-auto">
                 {availableTasks.filter(a => a.activity_type === 'survey').length === 0 ? (
                   <div className="text-center py-8">
                     <FileText className="h-12 w-12 mx-auto mb-3 text-muted-foreground/50" />
@@ -398,7 +401,7 @@ export default function SimplifiedEarnTab() {
                 )}
               </TabsContent>
 
-              <TabsContent value="videos" className="space-y-3 mt-4">
+              <TabsContent value="videos" className="space-y-3 mt-4 max-h-80 overflow-y-auto">
                 {availableTasks.filter(a => a.activity_type === 'video').length === 0 ? (
                   <div className="text-center py-8">
                     <Play className="h-12 w-12 mx-auto mb-3 text-muted-foreground/50" />
@@ -443,7 +446,7 @@ export default function SimplifiedEarnTab() {
                 )}
               </TabsContent>
 
-              <TabsContent value="tasks" className="space-y-3 mt-4">
+              <TabsContent value="tasks" className="space-y-3 mt-4 max-h-80 overflow-y-auto">
                 {availableTasks.filter(a => a.activity_type === 'task').length === 0 ? (
                   <div className="text-center py-8">
                     <Zap className="h-12 w-12 mx-auto mb-3 text-muted-foreground/50" />
@@ -497,7 +500,7 @@ export default function SimplifiedEarnTab() {
                 )}
               </TabsContent>
 
-              <TabsContent value="data" className="space-y-3 mt-4">
+              <TabsContent value="data" className="space-y-3 mt-4 max-h-80 overflow-y-auto">
                 <div className="p-4 border rounded-lg bg-white shadow-sm">
                   <div className="flex gap-3 mb-4">
                     <div className="p-2 bg-primary/10 rounded-lg">
@@ -558,6 +561,75 @@ export default function SimplifiedEarnTab() {
                     <p className="text-xs text-muted-foreground">
                       💡 <strong>Transparent Earnings:</strong> You earn a share of revenue each time your data contributes to insights sold to research partners. All data is anonymized and aggregated.
                     </p>
+                  </div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="rep-info" className="space-y-3 mt-4 max-h-80 overflow-y-auto">
+                <div className="space-y-4">
+                  {/* Rep Score Overview */}
+                  <div className="text-center p-4 bg-white rounded-lg border border-primary/20">
+                    <div className="text-4xl mb-2">🏆</div>
+                    <h3 className="text-xl font-bold mb-1">Bronze I</h3>
+                    <p className="text-muted-foreground text-sm mb-3">
+                      {userStats.reputation.score} Rep • Bronze Tier
+                    </p>
+                    <Progress value={45} className="h-2 mb-2" />
+                    <p className="text-xs text-muted-foreground">
+                      {100 - userStats.reputation.score} points to Silver tier
+                    </p>
+                  </div>
+
+                  {/* Why Rep Matters */}
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-foreground flex items-center gap-2">
+                      <Shield className="h-4 w-4" />
+                      Why Rep Matters
+                    </h4>
+                    
+                    <div className="space-y-2">
+                      <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+                        <div className="p-2 bg-primary/10 rounded-lg">
+                          <Zap className="h-4 w-4 text-primary" />
+                        </div>
+                        <div>
+                          <h5 className="font-semibold text-sm mb-1">Higher Paying Tasks</h5>
+                          <p className="text-xs text-muted-foreground">
+                            Higher Rep unlocks premium surveys worth $2-$10 each
+                          </p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+                        <div className="p-2 bg-success/10 rounded-lg">
+                          <Trophy className="h-4 w-4 text-success" />
+                        </div>
+                        <div>
+                          <h5 className="font-semibold text-sm mb-1">Priority Access</h5>
+                          <p className="text-xs text-muted-foreground">
+                            Get first access to new opportunities before others
+                          </p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+                        <div className="p-2 bg-accent/10 rounded-lg">
+                          <Award className="h-4 w-4 text-accent" />
+                        </div>
+                        <div>
+                          <h5 className="font-semibold text-sm mb-1">Trust & Credibility</h5>
+                          <p className="text-xs text-muted-foreground">
+                            Brands prefer working with high-Rep users
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="p-3 bg-blue-50 rounded-lg border border-blue-100">
+                      <p className="text-xs text-info font-medium">
+                        💡 <strong>Pro Tip:</strong> Check in daily and complete quality tasks to build Rep fast. Higher Rep = Higher earnings!
+                      </p>
+                    </div>
                   </div>
                 </div>
               </TabsContent>

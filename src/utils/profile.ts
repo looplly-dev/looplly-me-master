@@ -4,12 +4,12 @@ import { supabase } from '@/integrations/supabase/client';
 export interface ProfileUpdateData {
   first_name?: string;
   last_name?: string;
-  gender?: string;
+  gender?: 'male' | 'female' | 'other';
   date_of_birth?: string;
   address?: string;
   household_income?: string;
   ethnicity?: string;
-  sec?: string;
+  sec?: 'A' | 'B' | 'C1' | 'C2' | 'D' | 'E';
   profile_complete?: boolean;
 }
 
@@ -17,12 +17,12 @@ export const formatProfileForDatabase = (profile: any): ProfileUpdateData => {
   return {
     first_name: profile.firstName,
     last_name: profile.lastName,
-    gender: profile.gender,
+    gender: profile.gender as 'male' | 'female' | 'other',
     date_of_birth: profile.dateOfBirth,
     address: profile.address,
     household_income: profile.householdIncome,
     ethnicity: profile.ethnicity,
-    sec: profile.sec,
+    sec: profile.sec as 'A' | 'B' | 'C1' | 'C2' | 'D' | 'E',
     profile_complete: true
   };
 };
