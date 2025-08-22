@@ -579,9 +579,11 @@ export default function SimplifiedEarnTab() {
                             <p className="font-medium text-sm">Location Data</p>
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <Badge variant="outline" className="text-green-600 border-green-600 text-xs mt-1 cursor-help">
-                                  Anonymous
-                                </Badge>
+                                <div className="inline-block cursor-help">
+                                  <Badge variant="outline" className="text-green-600 border-green-600 text-xs mt-1">
+                                    Anonymous
+                                  </Badge>
+                                </div>
                               </TooltipTrigger>
                               <TooltipContent>
                                 <p>Data is completely anonymous with no personal identifiers</p>
@@ -608,9 +610,11 @@ export default function SimplifiedEarnTab() {
                             <p className="font-medium text-sm">Cookie Tracking</p>
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <Badge variant="outline" className="text-orange-600 border-orange-600 text-xs mt-1 cursor-help">
-                                  Pseudonymous
-                                </Badge>
+                                <div className="inline-block cursor-help">
+                                  <Badge variant="outline" className="text-orange-600 border-orange-600 text-xs mt-1">
+                                    Pseudonymous
+                                  </Badge>
+                                </div>
                               </TooltipTrigger>
                               <TooltipContent>
                                 <p>Data uses pseudonyms instead of real identities for privacy</p>
@@ -638,9 +642,11 @@ export default function SimplifiedEarnTab() {
                             <p className="font-medium text-sm">Browser History</p>
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <Badge variant="outline" className="text-purple-600 border-purple-600 text-xs mt-1 cursor-help">
-                                  Aggregated
-                                </Badge>
+                                <div className="inline-block cursor-help">
+                                  <Badge variant="outline" className="text-purple-600 border-purple-600 text-xs mt-1">
+                                    Aggregated
+                                  </Badge>
+                                </div>
                               </TooltipTrigger>
                               <TooltipContent>
                                 <p>Data is combined with others and cannot be traced back to you</p>
@@ -668,9 +674,11 @@ export default function SimplifiedEarnTab() {
                             <p className="font-medium text-sm">Search History</p>
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <Badge variant="outline" className="text-orange-600 border-orange-600 text-xs mt-1 cursor-help">
-                                  Aggregated
-                                </Badge>
+                                <div className="inline-block cursor-help">
+                                  <Badge variant="outline" className="text-orange-600 border-orange-600 text-xs mt-1">
+                                    Aggregated
+                                  </Badge>
+                                </div>
                               </TooltipTrigger>
                               <TooltipContent>
                                 <p>Data is combined with others and cannot be traced back to you</p>
@@ -698,9 +706,11 @@ export default function SimplifiedEarnTab() {
                             <p className="font-medium text-sm">Cross-Site Tracking</p>
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <Badge variant="outline" className="text-red-600 border-red-600 text-xs mt-1 cursor-help">
-                                  Premium
-                                </Badge>
+                                <div className="inline-block cursor-help">
+                                  <Badge variant="outline" className="text-red-600 border-red-600 text-xs mt-1">
+                                    Premium
+                                  </Badge>
+                                </div>
                               </TooltipTrigger>
                               <TooltipContent>
                                 <p>Higher value data with premium privacy protections</p>
@@ -728,9 +738,11 @@ export default function SimplifiedEarnTab() {
                             <p className="font-medium text-sm">Advertising Preferences</p>
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <Badge variant="outline" className="text-pink-600 border-pink-600 text-xs mt-1 cursor-help">
-                                  Aggregated
-                                </Badge>
+                                <div className="inline-block cursor-help">
+                                  <Badge variant="outline" className="text-pink-600 border-pink-600 text-xs mt-1">
+                                    Aggregated
+                                  </Badge>
+                                </div>
                               </TooltipTrigger>
                               <TooltipContent>
                                 <p>Data is combined with others and cannot be traced back to you</p>
@@ -758,9 +770,11 @@ export default function SimplifiedEarnTab() {
                             <p className="font-medium text-sm">Shopping Behavior</p>
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <Badge variant="outline" className="text-green-600 border-green-600 text-xs mt-1 cursor-help">
-                                  Aggregated
-                                </Badge>
+                                <div className="inline-block cursor-help">
+                                  <Badge variant="outline" className="text-green-600 border-green-600 text-xs mt-1">
+                                    Aggregated
+                                  </Badge>
+                                </div>
                               </TooltipTrigger>
                               <TooltipContent>
                                 <p>Data is combined with others and cannot be traced back to you</p>
@@ -788,9 +802,11 @@ export default function SimplifiedEarnTab() {
                             <p className="font-medium text-sm">Social Media Activity</p>
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <Badge variant="outline" className="text-blue-500 border-blue-500 text-xs mt-1 cursor-help">
-                                  Premium
-                                </Badge>
+                                <div className="inline-block cursor-help">
+                                  <Badge variant="outline" className="text-blue-500 border-blue-500 text-xs mt-1">
+                                    Premium
+                                  </Badge>
+                                </div>
                               </TooltipTrigger>
                               <TooltipContent>
                                 <p>Higher value data with premium privacy protections</p>
@@ -818,9 +834,11 @@ export default function SimplifiedEarnTab() {
                             <p className="font-medium text-sm">E-commerce Behavior</p>
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <Badge variant="outline" className="text-indigo-600 border-indigo-600 text-xs mt-1 cursor-help">
-                                  Premium
-                                </Badge>
+                                <div className="inline-block cursor-help">
+                                  <Badge variant="outline" className="text-indigo-600 border-indigo-600 text-xs mt-1">
+                                    Premium
+                                  </Badge>
+                                </div>
                               </TooltipTrigger>
                               <TooltipContent>
                                 <p>Higher value data with premium privacy protections</p>
@@ -848,9 +866,11 @@ export default function SimplifiedEarnTab() {
                             <p className="font-medium text-sm">App Usage Patterns</p>
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <Badge variant="outline" className="text-gray-600 border-gray-600 text-xs mt-1 cursor-help">
-                                  Aggregated
-                                </Badge>
+                                <div className="inline-block cursor-help">
+                                  <Badge variant="outline" className="text-gray-600 border-gray-600 text-xs mt-1">
+                                    Aggregated
+                                  </Badge>
+                                </div>
                               </TooltipTrigger>
                               <TooltipContent>
                                 <p>Data is combined with others and cannot be traced back to you</p>
@@ -878,9 +898,11 @@ export default function SimplifiedEarnTab() {
                             <p className="font-medium text-sm">Financial Behavior Patterns</p>
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <Badge variant="outline" className="text-yellow-600 border-yellow-600 text-xs mt-1 cursor-help">
-                                  Premium
-                                </Badge>
+                                <div className="inline-block cursor-help">
+                                  <Badge variant="outline" className="text-yellow-600 border-yellow-600 text-xs mt-1">
+                                    Premium
+                                  </Badge>
+                                </div>
                               </TooltipTrigger>
                               <TooltipContent>
                                 <p>Higher value data with premium privacy protections</p>
