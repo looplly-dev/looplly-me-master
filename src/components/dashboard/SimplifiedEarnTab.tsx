@@ -6,6 +6,7 @@ import { Progress } from '@/components/ui/progress';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CollapsibleSection } from '@/components/ui/collapsible-section';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useToast } from '@/hooks/use-toast';
 import { 
   Coins, 
@@ -247,34 +248,35 @@ export default function SimplifiedEarnTab() {
 
 
   return (
-    <div className="p-4 pb-20 space-y-6">
-      {/* Enhanced Balance Card with Progress */}
-      <Card className="bg-card border-0 shadow-lg">
-        <CardContent className="p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <Shield className="h-5 w-5 text-primary" />
-                <span className="text-primary text-sm font-medium">AI Secured</span>
+    <TooltipProvider>
+      <div className="p-4 pb-20 space-y-6">
+        {/* Enhanced Balance Card with Progress */}
+        <Card className="bg-card border-0 shadow-lg">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <Shield className="h-5 w-5 text-primary" />
+                  <span className="text-primary text-sm font-medium">AI Secured</span>
+                </div>
+                <div className="mb-1">
+                  <p className="text-muted-foreground text-sm">Your Balance</p>
+                  {balance?.pending_balance && balance.pending_balance > 0 && (
+                    <p className="text-xs text-muted-foreground italic">
+                      (${balance.pending_balance.toFixed(2)} Under Review)
+                    </p>
+                  )}
+                </div>
               </div>
-              <div className="mb-1">
-                <p className="text-muted-foreground text-sm">Your Balance</p>
-                {balance?.pending_balance && balance.pending_balance > 0 && (
-                  <p className="text-xs text-muted-foreground italic">
-                    (${balance.pending_balance.toFixed(2)} Under Review)
-                  </p>
-                )}
+              <div className="text-right">
+                <p className="text-4xl font-bold text-foreground">
+                  ${currentProgress.toFixed(2)}
+                </p>
+                <p className="text-muted-foreground text-xs">USD</p>
               </div>
             </div>
-            <div className="text-right">
-              <p className="text-4xl font-bold text-foreground">
-                ${currentProgress.toFixed(2)}
-              </p>
-              <p className="text-muted-foreground text-xs">USD</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
 
       {/* Daily Check-in - More Prominent */}
       <Card className="border-primary/20 bg-white shadow-sm">
@@ -575,9 +577,16 @@ export default function SimplifiedEarnTab() {
                           <MapPin className="h-4 w-4 text-green-600 flex-shrink-0" />
                           <div className="min-w-0">
                             <p className="font-medium text-sm">Location Data</p>
-                            <Badge variant="outline" className="text-green-600 border-green-600 text-xs mt-1">
-                              Anonymous
-                            </Badge>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Badge variant="outline" className="text-green-600 border-green-600 text-xs mt-1 cursor-help">
+                                  Anonymous
+                                </Badge>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Data is completely anonymous with no personal identifiers</p>
+                              </TooltipContent>
+                            </Tooltip>
                           </div>
                         </div>
                         <div className="text-right flex-shrink-0">
@@ -597,9 +606,16 @@ export default function SimplifiedEarnTab() {
                           <Cookie className="h-4 w-4 text-orange-600 flex-shrink-0" />
                           <div className="min-w-0">
                             <p className="font-medium text-sm">Cookie Tracking</p>
-                            <Badge variant="outline" className="text-orange-600 border-orange-600 text-xs mt-1">
-                              Pseudonymous
-                            </Badge>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Badge variant="outline" className="text-orange-600 border-orange-600 text-xs mt-1 cursor-help">
+                                  Pseudonymous
+                                </Badge>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Data uses pseudonyms instead of real identities for privacy</p>
+                              </TooltipContent>
+                            </Tooltip>
                           </div>
                         </div>
                         <div className="flex flex-col items-end gap-1 flex-shrink-0">
@@ -620,9 +636,16 @@ export default function SimplifiedEarnTab() {
                           <Globe className="h-4 w-4 text-purple-600 flex-shrink-0" />
                           <div className="min-w-0">
                             <p className="font-medium text-sm">Browser History</p>
-                            <Badge variant="outline" className="text-purple-600 border-purple-600 text-xs mt-1">
-                              Aggregated
-                            </Badge>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Badge variant="outline" className="text-purple-600 border-purple-600 text-xs mt-1 cursor-help">
+                                  Aggregated
+                                </Badge>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Data is combined with others and cannot be traced back to you</p>
+                              </TooltipContent>
+                            </Tooltip>
                           </div>
                         </div>
                         <div className="flex flex-col items-end gap-1 flex-shrink-0">
@@ -643,9 +666,16 @@ export default function SimplifiedEarnTab() {
                           <Search className="h-4 w-4 text-orange-600 flex-shrink-0" />
                           <div className="min-w-0">
                             <p className="font-medium text-sm">Search History</p>
-                            <Badge variant="outline" className="text-orange-600 border-orange-600 text-xs mt-1">
-                              Aggregated
-                            </Badge>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Badge variant="outline" className="text-orange-600 border-orange-600 text-xs mt-1 cursor-help">
+                                  Aggregated
+                                </Badge>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Data is combined with others and cannot be traced back to you</p>
+                              </TooltipContent>
+                            </Tooltip>
                           </div>
                         </div>
                         <div className="flex flex-col items-end gap-1 flex-shrink-0">
@@ -666,9 +696,16 @@ export default function SimplifiedEarnTab() {
                           <Eye className="h-4 w-4 text-red-600 flex-shrink-0" />
                           <div className="min-w-0">
                             <p className="font-medium text-sm">Cross-Site Tracking</p>
-                            <Badge variant="outline" className="text-red-600 border-red-600 text-xs mt-1">
-                              Premium
-                            </Badge>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Badge variant="outline" className="text-red-600 border-red-600 text-xs mt-1 cursor-help">
+                                  Premium
+                                </Badge>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Higher value data with premium privacy protections</p>
+                              </TooltipContent>
+                            </Tooltip>
                           </div>
                         </div>
                         <div className="flex flex-col items-end gap-1 flex-shrink-0">
@@ -689,9 +726,16 @@ export default function SimplifiedEarnTab() {
                           <Eye className="h-4 w-4 text-pink-600 flex-shrink-0" />
                           <div className="min-w-0">
                             <p className="font-medium text-sm">Advertising Preferences</p>
-                            <Badge variant="outline" className="text-pink-600 border-pink-600 text-xs mt-1">
-                              Aggregated
-                            </Badge>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Badge variant="outline" className="text-pink-600 border-pink-600 text-xs mt-1 cursor-help">
+                                  Aggregated
+                                </Badge>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Data is combined with others and cannot be traced back to you</p>
+                              </TooltipContent>
+                            </Tooltip>
                           </div>
                         </div>
                         <div className="flex flex-col items-end gap-1 flex-shrink-0">
@@ -712,9 +756,16 @@ export default function SimplifiedEarnTab() {
                           <ShoppingBag className="h-4 w-4 text-green-600 flex-shrink-0" />
                           <div className="min-w-0">
                             <p className="font-medium text-sm">Shopping Behavior</p>
-                            <Badge variant="outline" className="text-green-600 border-green-600 text-xs mt-1">
-                              Aggregated
-                            </Badge>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Badge variant="outline" className="text-green-600 border-green-600 text-xs mt-1 cursor-help">
+                                  Aggregated
+                                </Badge>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Data is combined with others and cannot be traced back to you</p>
+                              </TooltipContent>
+                            </Tooltip>
                           </div>
                         </div>
                         <div className="flex flex-col items-end gap-1 flex-shrink-0">
@@ -735,9 +786,16 @@ export default function SimplifiedEarnTab() {
                           <Share2 className="h-4 w-4 text-blue-500 flex-shrink-0" />
                           <div className="min-w-0">
                             <p className="font-medium text-sm">Social Media Activity</p>
-                            <Badge variant="outline" className="text-blue-500 border-blue-500 text-xs mt-1">
-                              Premium
-                            </Badge>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Badge variant="outline" className="text-blue-500 border-blue-500 text-xs mt-1 cursor-help">
+                                  Premium
+                                </Badge>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Higher value data with premium privacy protections</p>
+                              </TooltipContent>
+                            </Tooltip>
                           </div>
                         </div>
                         <div className="flex flex-col items-end gap-1 flex-shrink-0">
@@ -758,9 +816,16 @@ export default function SimplifiedEarnTab() {
                           <Globe className="h-4 w-4 text-indigo-600 flex-shrink-0" />
                           <div className="min-w-0">
                             <p className="font-medium text-sm">E-commerce Behavior</p>
-                            <Badge variant="outline" className="text-indigo-600 border-indigo-600 text-xs mt-1">
-                              Premium
-                            </Badge>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Badge variant="outline" className="text-indigo-600 border-indigo-600 text-xs mt-1 cursor-help">
+                                  Premium
+                                </Badge>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Higher value data with premium privacy protections</p>
+                              </TooltipContent>
+                            </Tooltip>
                           </div>
                         </div>
                         <div className="flex flex-col items-end gap-1 flex-shrink-0">
@@ -781,9 +846,16 @@ export default function SimplifiedEarnTab() {
                           <Smartphone className="h-4 w-4 text-gray-600 flex-shrink-0" />
                           <div className="min-w-0">
                             <p className="font-medium text-sm">App Usage Patterns</p>
-                            <Badge variant="outline" className="text-gray-600 border-gray-600 text-xs mt-1">
-                              Aggregated
-                            </Badge>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Badge variant="outline" className="text-gray-600 border-gray-600 text-xs mt-1 cursor-help">
+                                  Aggregated
+                                </Badge>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Data is combined with others and cannot be traced back to you</p>
+                              </TooltipContent>
+                            </Tooltip>
                           </div>
                         </div>
                         <div className="flex flex-col items-end gap-1 flex-shrink-0">
@@ -804,9 +876,16 @@ export default function SimplifiedEarnTab() {
                           <CreditCard className="h-4 w-4 text-yellow-600 flex-shrink-0" />
                           <div className="min-w-0">
                             <p className="font-medium text-sm">Financial Behavior Patterns</p>
-                            <Badge variant="outline" className="text-yellow-600 border-yellow-600 text-xs mt-1">
-                              Premium
-                            </Badge>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Badge variant="outline" className="text-yellow-600 border-yellow-600 text-xs mt-1 cursor-help">
+                                  Premium
+                                </Badge>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Higher value data with premium privacy protections</p>
+                              </TooltipContent>
+                            </Tooltip>
                           </div>
                         </div>
                         <div className="flex flex-col items-end gap-1 flex-shrink-0">
@@ -913,13 +992,14 @@ export default function SimplifiedEarnTab() {
             </div>
           </div>
           
-          <div className="p-3 bg-blue-50 rounded-lg border border-blue-100">
-            <p className="text-xs text-info font-medium">
-              💡 <strong>Pro Tip:</strong> Check in daily and complete quality tasks to build Rep fast. Higher Rep = Higher earnings!
-            </p>
-          </div>
-        </div>
-      </CollapsibleSection>
-    </div>
+           <div className="p-3 bg-blue-50 rounded-lg border border-blue-100">
+             <p className="text-xs text-info font-medium">
+               💡 <strong>Pro Tip:</strong> Check in daily and complete quality tasks to build Rep fast. Higher Rep = Higher earnings!
+             </p>
+           </div>
+         </div>
+       </CollapsibleSection>
+     </div>
+    </TooltipProvider>
   );
 }
