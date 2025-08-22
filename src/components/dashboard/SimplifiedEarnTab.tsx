@@ -308,7 +308,7 @@ export default function SimplifiedEarnTab() {
               </Badge>
             </CardTitle>
           </CardHeader>
-          <CardContent className="max-h-[650px] overflow-hidden">
+          <CardContent className="min-h-[500px] max-h-[650px] overflow-visible">
             <Tabs defaultValue="surveys" className="w-full">
               <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="surveys" className="text-xs relative">
