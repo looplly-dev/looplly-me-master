@@ -74,24 +74,26 @@ export default function WalletTab() {
       {/* Balance Hero Section */}
       <Card className="border-0 shadow-lg bg-card">
         <CardContent className="p-6">
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center justify-between">
             <div>
               <div className="flex items-center gap-2 mb-2">
                 <Shield className="h-5 w-5 text-primary" />
                 <span className="text-primary text-sm font-medium">AI Secured</span>
               </div>
-              <p className="text-muted-foreground text-sm mb-1">Available Balance</p>
+              <div className="mb-1">
+                <p className="text-muted-foreground text-sm">Your Balance</p>
+                {balance?.pending_balance && balance.pending_balance > 0 && (
+                  <p className="text-xs text-muted-foreground italic">
+                    (${balance.pending_balance.toFixed(2)} Under Review)
+                  </p>
+                )}
+              </div>
+            </div>
+            <div className="text-right">
               <p className="text-4xl font-bold text-foreground">
                 ${balance?.available_balance?.toFixed(2) || '0.00'}
               </p>
               <p className="text-muted-foreground text-xs">USD</p>
-            </div>
-            <div className="text-right">
-              <Wallet className="h-12 w-12 text-muted-foreground/40 mb-2" />
-              <div className="text-muted-foreground text-xs space-y-1">
-                <div>Earned: ${balance?.total_earned?.toFixed(2) || '0.00'}</div>
-                <div>Withdrawn: ${balance?.lifetime_withdrawn?.toFixed(2) || '0.00'}</div>
-              </div>
             </div>
           </div>
         </CardContent>
@@ -270,6 +272,17 @@ export default function WalletTab() {
           </div>
         }
       >
+        {/* Earned/Withdrawn Summary */}
+        <div className="mb-4 p-3 bg-muted/30 rounded-lg">
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-muted-foreground font-medium">Total Summary</span>
+            <div className="flex gap-4 text-xs">
+              <span className="text-success">Earned: ${balance?.total_earned?.toFixed(2) || '0.00'}</span>
+              <span className="text-muted-foreground">Withdrawn: ${balance?.lifetime_withdrawn?.toFixed(2) || '0.00'}</span>
+            </div>
+          </div>
+        </div>
+
         <div className="space-y-3">
           {displayTransactions.slice(0, 6).map((transaction) => (
             <Card 
