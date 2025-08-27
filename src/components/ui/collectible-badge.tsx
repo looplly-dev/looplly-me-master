@@ -79,41 +79,41 @@ export function CollectibleBadge({ badge, size = 'md', onClick }: CollectibleBad
     return 'rounded-full'; // All badges are circles for consistent Pokéball style
   };
 
-  // Super vibrant circular badges using design system tokens
+  // Super vibrant circular badges using psychedelic design system tokens
   const getCategoryGradient = (tier: string, rarity: string) => {
     if (!badge.earned) {
-      return 'bg-gradient-to-br from-slate-300 to-slate-400 opacity-50';
+      return 'bg-gradient-to-br from-muted/40 to-muted/60 opacity-50';
     }
     
     switch (tier) {
       case 'Diamond':
-        return 'bg-gradient-to-br from-blue-400 to-cyan-500 shadow-[var(--shadow-diamond-glow)]';
+        return 'bg-[var(--gradient-diamond)] shadow-[var(--shadow-diamond-glow)]';
       case 'Platinum':
-        return 'bg-gradient-to-br from-slate-400 to-slate-500 shadow-[var(--shadow-silver-glow)]';
+        return 'bg-[var(--gradient-platinum)] shadow-[var(--shadow-platinum-glow)]';
       case 'Gold':
-        return 'bg-gradient-to-br from-yellow-400 to-amber-500 shadow-[var(--shadow-gold-glow)]';
+        return 'bg-[var(--gradient-gold)] shadow-[var(--shadow-gold-glow)]';
       case 'Silver':
-        return 'bg-gradient-to-br from-slate-300 to-slate-400 shadow-[var(--shadow-silver-glow)]';
+        return 'bg-[var(--gradient-silver)] shadow-[var(--shadow-silver-glow)]';
       case 'Bronze':
-        return 'bg-gradient-to-br from-orange-400 to-amber-500 shadow-[var(--shadow-bronze-glow)]';
+        return 'bg-[var(--gradient-bronze)] shadow-[var(--shadow-bronze-glow)]';
       default:
-        return 'bg-gradient-to-br from-purple-500 to-pink-500 shadow-[var(--shadow-legendary-glow)]';
+        return 'bg-[var(--gradient-legendary)] shadow-[var(--shadow-legendary-glow)]';
     }
   };
 
-  // Enhanced rarity effects with vibrant rings
+  // Enhanced rarity effects with psychedelic vibrant rings
   const getRarityEffects = (rarity: string, earned: boolean) => {
-    if (!earned) return 'ring-2 ring-slate-200/50';
+    if (!earned) return 'ring-2 ring-muted/30';
     
     switch (rarity) {
       case 'Legendary': 
-        return 'ring-4 ring-purple-400/70 ring-offset-2 ring-offset-white shadow-2xl';
+        return 'ring-4 ring-[hsl(var(--psychedelic-magenta)/0.8)] ring-offset-2 ring-offset-background shadow-2xl animate-pulse';
       case 'Epic': 
-        return 'ring-3 ring-pink-400/60 ring-offset-1 ring-offset-white shadow-xl';
+        return 'ring-3 ring-[hsl(var(--psychedelic-purple)/0.7)] ring-offset-1 ring-offset-background shadow-xl';
       case 'Rare': 
-        return 'ring-2 ring-blue-400/50 ring-offset-1 ring-offset-white shadow-lg';
+        return 'ring-2 ring-[hsl(var(--electric-cyan)/0.6)] ring-offset-1 ring-offset-background shadow-lg';
       case 'Common':
-        return 'ring-1 ring-slate-300/40 shadow-md';
+        return 'ring-1 ring-[hsl(var(--neon-green)/0.5)] shadow-md';
       default: 
         return '';
     }
@@ -136,7 +136,8 @@ export function CollectibleBadge({ badge, size = 'md', onClick }: CollectibleBad
           getShapeClasses(badge.shape || 'circle'),
           getCategoryGradient(badge.tier, badge.rarity),
           getRarityEffects(badge.rarity, badge.earned),
-          getLockedState()
+          getLockedState(),
+          badge.earned && badge.rarity === 'Legendary' && 'animate-pulse'
         )}
       >
         {/* Simplified background overlay */}
