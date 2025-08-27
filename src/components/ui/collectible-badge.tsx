@@ -80,24 +80,45 @@ export function CollectibleBadge({ badge, size = 'md', onClick }: CollectibleBad
   };
 
   // Super vibrant circular badges using psychedelic design system tokens
-  const getCategoryGradient = (tier: string, rarity: string) => {
+  const getCategoryStyle = (tier: string, rarity: string) => {
     if (!badge.earned) {
-      return 'bg-gradient-to-br from-muted/40 to-muted/60 opacity-50';
+      return {
+        background: 'linear-gradient(135deg, hsl(var(--muted) / 0.4), hsl(var(--muted) / 0.6))',
+        opacity: 0.5
+      };
     }
     
     switch (tier) {
       case 'Diamond':
-        return 'bg-[var(--gradient-diamond)] shadow-[var(--shadow-diamond-glow)]';
+        return {
+          background: 'var(--gradient-diamond)',
+          boxShadow: 'var(--shadow-diamond-glow)'
+        };
       case 'Platinum':
-        return 'bg-[var(--gradient-platinum)] shadow-[var(--shadow-platinum-glow)]';
+        return {
+          background: 'var(--gradient-platinum)',
+          boxShadow: 'var(--shadow-platinum-glow)'
+        };
       case 'Gold':
-        return 'bg-[var(--gradient-gold)] shadow-[var(--shadow-gold-glow)]';
+        return {
+          background: 'var(--gradient-gold)',
+          boxShadow: 'var(--shadow-gold-glow)'
+        };
       case 'Silver':
-        return 'bg-[var(--gradient-silver)] shadow-[var(--shadow-silver-glow)]';
+        return {
+          background: 'var(--gradient-silver)',
+          boxShadow: 'var(--shadow-silver-glow)'
+        };
       case 'Bronze':
-        return 'bg-[var(--gradient-bronze)] shadow-[var(--shadow-bronze-glow)]';
+        return {
+          background: 'var(--gradient-bronze)',
+          boxShadow: 'var(--shadow-bronze-glow)'
+        };
       default:
-        return 'bg-[var(--gradient-legendary)] shadow-[var(--shadow-legendary-glow)]';
+        return {
+          background: 'var(--gradient-legendary)',
+          boxShadow: 'var(--shadow-legendary-glow)'
+        };
     }
   };
 
@@ -134,11 +155,11 @@ export function CollectibleBadge({ badge, size = 'md', onClick }: CollectibleBad
           'relative transition-transform duration-200 hover:scale-105 active:scale-95',
           sizeClasses[size],
           getShapeClasses(badge.shape || 'circle'),
-          getCategoryGradient(badge.tier, badge.rarity),
           getRarityEffects(badge.rarity, badge.earned),
           getLockedState(),
           badge.earned && badge.rarity === 'Legendary' && 'animate-pulse'
         )}
+        style={getCategoryStyle(badge.tier, badge.rarity)}
       >
         {/* Simplified background overlay */}
         <div className={cn(
