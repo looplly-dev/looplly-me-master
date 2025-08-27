@@ -7,21 +7,21 @@ import { cn } from "@/lib/utils"
 
 // Icon mapping system (exactly matching CollectibleBadge)
 const iconMap = {
-  Shield,
-  MapPin,
-  CheckCircle,
-  Star,
-  Users,
-  Flame,
-  Trophy,
-  Award,
-  Crown,
-  Target,
-  Zap,
-  Hexagon,
-  Diamond,
-  Medal,
-  Sparkles
+  Shield: Shield,
+  MapPin: MapPin,
+  CheckCircle: CheckCircle,
+  Star: Star,
+  Users: Users,
+  Flame: Flame,
+  Trophy: Trophy,
+  Award: Award,
+  Crown: Crown,
+  Target: Target,
+  Zap: Zap,
+  Hexagon: Hexagon,
+  Diamond: Diamond,
+  Medal: Medal,
+  Sparkles: Sparkles
 }
 
 interface BadgeDetailModalProps {
@@ -33,7 +33,7 @@ interface BadgeDetailModalProps {
 export function BadgeDetailModal({ badge, open, onOpenChange }: BadgeDetailModalProps) {
   if (!badge) return null
   
-  // Resolve icon component outside JSX (matching CollectibleBadge pattern)
+  // Resolve icon component (matching CollectibleBadge pattern)
   const IconComponent = iconMap[badge.icon as keyof typeof iconMap] || Shield;
 
   const getShapeClasses = (shape: string) => {
