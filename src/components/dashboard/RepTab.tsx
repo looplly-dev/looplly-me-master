@@ -30,7 +30,7 @@ import { CollapsibleSection } from '@/components/ui/collapsible-section';
 
 export default function RepTab() {
   const { authState } = useAuth();
-  const [isCompactView, setIsCompactView] = useState(false);
+  const [isCompactView, setIsCompactView] = useState(true);
   // Endless reputation system with tiers and prestige
   const getLevel = (score: number) => {
     if (score >= 2000) return { name: 'Elite', tier: 'Elite', color: 'text-gradient', icon: '👑', min: 2000, max: Infinity };
