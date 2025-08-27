@@ -309,7 +309,7 @@ export default function RepTab() {
           <div>
             <h4 className="text-sm font-semibold mb-3 text-foreground flex items-center gap-2">
               <Shield className="h-4 w-4" />
-              Core Verification
+              Identity & Security
               <Badge variant="outline" className="text-xs">
                 {badgeSystem.coreVerification.filter(b => b.earned).length}/{badgeSystem.coreVerification.length}
               </Badge>
@@ -329,7 +329,7 @@ export default function RepTab() {
           <div>
             <h4 className="text-sm font-semibold mb-3 text-foreground flex items-center gap-2">
               <Flame className="h-4 w-4" />
-              Streak Achievements
+              Consistency Mastery
               <Badge variant="outline" className="text-xs">
                 {badgeSystem.streakAchievements.filter(b => b.earned).length}/{badgeSystem.streakAchievements.length}
               </Badge>
@@ -349,7 +349,7 @@ export default function RepTab() {
           <div>
             <h4 className="text-sm font-semibold mb-3 text-foreground flex items-center gap-2">
               <Award className="h-4 w-4" />
-              Quality Achievements
+              Excellence & Impact
               <Badge variant="outline" className="text-xs">
                 {badgeSystem.qualityAchievements.filter(b => b.earned).length}/{badgeSystem.qualityAchievements.length}
               </Badge>

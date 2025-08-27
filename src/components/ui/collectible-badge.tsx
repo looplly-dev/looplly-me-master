@@ -11,7 +11,11 @@ import {
   Award, 
   Crown, 
   Target, 
-  Zap 
+  Zap,
+  Hexagon,
+  Diamond,
+  Medal,
+  Sparkles
 } from 'lucide-react';
 
 const iconMap = {
@@ -25,7 +29,11 @@ const iconMap = {
   Award,
   Crown,
   Target,
-  Zap
+  Zap,
+  Hexagon,
+  Diamond,
+  Medal,
+  Sparkles
 };
 
 interface CollectibleBadgeProps {
@@ -39,6 +47,8 @@ interface CollectibleBadgeProps {
     rarity: string;
     icon: string;
     requirement?: number;
+    shape?: 'circle' | 'hexagon' | 'shield' | 'star' | 'diamond';
+    category?: string;
   };
   size?: 'sm' | 'md' | 'lg';
 }
@@ -58,35 +68,51 @@ export function CollectibleBadge({ badge, size = 'md' }: CollectibleBadgeProps) 
     lg: 'h-10 w-10'
   };
 
-  const getCategoryGradient = (icon: string) => {
-    if (['Shield', 'CheckCircle', 'MapPin'].includes(icon)) {
-      return 'bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700';
+  const getShapeClasses = (shape: string) => {
+    switch (shape) {
+      case 'hexagon':
+        return 'clip-path-hexagon';
+      case 'shield':
+        return 'clip-path-shield rounded-none';
+      case 'star':
+        return 'clip-path-star rounded-none';
+      case 'diamond':
+        return 'rotate-45 rounded-lg';
+      default:
+        return 'rounded-full';
     }
-    if (['Flame', 'Target'].includes(icon)) {
-      return 'bg-gradient-to-br from-orange-500 via-red-500 to-red-600';
-    }
-    if (['Trophy', 'Award', 'Crown'].includes(icon)) {
-      return 'bg-gradient-to-br from-yellow-400 via-yellow-500 to-orange-500';
-    }
-    if (['Star', 'Zap'].includes(icon)) {
-      return 'bg-gradient-to-br from-purple-500 via-purple-600 to-indigo-600';
-    }
-    if (['Users'].includes(icon)) {
-      return 'bg-gradient-to-br from-green-500 via-emerald-500 to-teal-600';
-    }
-    return 'bg-gradient-to-br from-gray-500 via-gray-600 to-gray-700';
   };
 
-  const getRarityGlow = (rarity: string, earned: boolean) => {
+  const getCategoryGradient = (tier: string, rarity: string) => {
+    // Enhanced gradients based on tier and rarity
+    switch (tier) {
+      case 'Diamond':
+        return 'bg-gradient-to-br from-cyan-400 via-blue-500 to-purple-600 shadow-xl shadow-blue-500/30';
+      case 'Platinum':
+        return 'bg-gradient-to-br from-slate-300 via-slate-400 to-slate-600 shadow-lg shadow-slate-400/30';
+      case 'Gold':
+        return 'bg-gradient-to-br from-yellow-400 via-amber-500 to-orange-500 shadow-lg shadow-amber-400/30';
+      case 'Silver':
+        return 'bg-gradient-to-br from-slate-200 via-slate-300 to-slate-400 shadow-md shadow-slate-300/30';
+      case 'Bronze':
+        return 'bg-gradient-to-br from-orange-300 via-amber-600 to-yellow-700 shadow-md shadow-amber-500/20';
+      default:
+        return 'bg-gradient-to-br from-slate-400 via-slate-500 to-slate-600';
+    }
+  };
+
+  const getRarityEffects = (rarity: string, earned: boolean) => {
     if (!earned) return '';
     
     switch (rarity) {
       case 'Legendary': 
-        return 'shadow-lg shadow-yellow-500/40 ring-2 ring-yellow-400/30';
+        return 'ring-4 ring-yellow-400/50 shadow-2xl shadow-yellow-500/50 animate-pulse';
       case 'Epic': 
-        return 'shadow-lg shadow-purple-500/40 ring-2 ring-purple-400/30';
+        return 'ring-3 ring-purple-400/40 shadow-xl shadow-purple-500/40';
       case 'Rare': 
-        return 'shadow-md shadow-blue-500/30 ring-1 ring-blue-400/20';
+        return 'ring-2 ring-blue-400/30 shadow-lg shadow-blue-500/30';
+      case 'Common':
+        return 'ring-1 ring-gray-300/20 shadow-md';
       default: 
         return 'shadow-sm';
     }
@@ -94,77 +120,143 @@ export function CollectibleBadge({ badge, size = 'md' }: CollectibleBadgeProps) 
 
   const getLockedState = () => {
     if (badge.earned) return '';
-    return 'opacity-50 grayscale hover:opacity-70 hover:grayscale-0';
+    return 'opacity-60 grayscale hover:opacity-80 hover:grayscale-0 hover:scale-105';
   };
 
   return (
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <div
-            className={cn(
-              'relative rounded-full cursor-pointer transition-all duration-300 hover:scale-110 group',
-              sizeClasses[size],
-              getCategoryGradient(badge.icon),
-              getRarityGlow(badge.rarity, badge.earned),
-              getLockedState()
-            )}
-          >
-            {/* Background pattern overlay */}
-            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/20 to-transparent" />
-            
-            {/* Icon container */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <IconComponent 
-                className={cn(
-                  iconSizes[size],
-                  'text-white drop-shadow-lg'
-                )} 
-              />
-            </div>
-
-            {/* Earned indicator */}
-            {badge.earned && (
-              <div className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
-                <CheckCircle className="h-3 w-3 text-white" />
+          <div className="relative group">
+            <div
+              className={cn(
+                'relative cursor-pointer transition-all duration-500 hover:scale-110 group-hover:rotate-2',
+                sizeClasses[size],
+                getShapeClasses(badge.shape || 'circle'),
+                getCategoryGradient(badge.tier, badge.rarity),
+                getRarityEffects(badge.rarity, badge.earned),
+                getLockedState()
+              )}
+            >
+              {/* Enhanced background patterns */}
+              <div className={cn(
+                "absolute inset-0 bg-gradient-to-br from-white/30 via-white/10 to-transparent",
+                getShapeClasses(badge.shape || 'circle')
+              )} />
+              
+              {/* Diamond inner icon adjustment */}
+              <div className={cn(
+                "absolute inset-0 flex items-center justify-center",
+                badge.shape === 'diamond' ? '-rotate-45' : ''
+              )}>
+                <IconComponent 
+                  className={cn(
+                    iconSizes[size],
+                    'text-white drop-shadow-xl filter brightness-110'
+                  )} 
+                />
               </div>
-            )}
 
-            {/* Rarity sparkle effect for legendary */}
-            {badge.rarity === 'Legendary' && badge.earned && (
-              <div className="absolute inset-0 rounded-full animate-pulse">
-                <div className="absolute top-2 right-2 w-1 h-1 bg-yellow-300 rounded-full animate-ping" />
-                <div className="absolute bottom-3 left-2 w-1 h-1 bg-yellow-300 rounded-full animate-ping delay-75" />
-                <div className="absolute top-3 left-3 w-1 h-1 bg-yellow-300 rounded-full animate-ping delay-150" />
+              {/* Enhanced earned indicator */}
+              {badge.earned && (
+                <div className="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-br from-emerald-400 to-green-600 rounded-full border-2 border-white flex items-center justify-center shadow-lg animate-bounce">
+                  <CheckCircle className="h-3 w-3 text-white" />
+                </div>
+              )}
+
+              {/* Enhanced rarity effects */}
+              {badge.rarity === 'Legendary' && badge.earned && (
+                <>
+                  <div className={cn(
+                    "absolute inset-0 animate-pulse",
+                    getShapeClasses(badge.shape || 'circle')
+                  )}>
+                    <Sparkles className="absolute top-1 right-1 h-3 w-3 text-yellow-300 animate-ping" />
+                    <Sparkles className="absolute bottom-2 left-1 h-2 w-2 text-yellow-200 animate-ping delay-75" />
+                    <Sparkles className="absolute top-2 left-2 h-2 w-2 text-yellow-400 animate-ping delay-150" />
+                  </div>
+                  {/* Legendary glow animation */}
+                  <div className={cn(
+                    "absolute inset-0 bg-gradient-to-br from-yellow-400/20 to-orange-500/20 animate-pulse",
+                    getShapeClasses(badge.shape || 'circle')
+                  )} />
+                </>
+              )}
+
+              {/* Epic rarity effects */}
+              {badge.rarity === 'Epic' && badge.earned && (
+                <div className={cn(
+                  "absolute inset-0 bg-gradient-to-br from-purple-400/10 to-indigo-500/10",
+                  getShapeClasses(badge.shape || 'circle')
+                )} />
+              )}
+            </div>
+            
+            {/* Progress indicator for unearned badges with requirements */}
+            {!badge.earned && badge.requirement && (
+              <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2">
+                <div className="bg-muted/90 backdrop-blur-sm rounded-full px-2 py-1">
+                  <span className="text-xs font-medium text-muted-foreground">
+                    0/{badge.requirement}
+                  </span>
+                </div>
               </div>
             )}
           </div>
         </TooltipTrigger>
         
-        <TooltipContent side="top" className="max-w-xs">
-          <div className="text-center">
-            <p className="font-semibold text-sm mb-1">{badge.name}</p>
-            <p className="text-xs text-muted-foreground mb-2">{badge.description}</p>
+        <TooltipContent side="top" className="max-w-sm">
+          <div className="text-center space-y-2">
+            <div className="flex items-center justify-center gap-2">
+              <p className="font-bold text-base">{badge.name}</p>
+              {badge.earned && <CheckCircle className="h-4 w-4 text-green-500" />}
+            </div>
             
-            <div className="flex items-center justify-between text-xs">
-              <span className={badge.earned ? 'text-green-600' : 'text-muted-foreground'}>
-                +{badge.repPoints} Rep
-              </span>
+            <p className="text-sm text-muted-foreground leading-relaxed">{badge.description}</p>
+            
+            <div className="flex items-center justify-between text-sm pt-2 border-t">
+              <div className="flex items-center gap-2">
+                <span className={cn(
+                  'px-2 py-1 rounded-full text-xs font-medium',
+                  badge.tier === 'Diamond' ? 'bg-cyan-100 text-cyan-800 border border-cyan-200' :
+                  badge.tier === 'Platinum' ? 'bg-slate-100 text-slate-800 border border-slate-200' :
+                  badge.tier === 'Gold' ? 'bg-yellow-100 text-yellow-800 border border-yellow-200' :
+                  badge.tier === 'Silver' ? 'bg-gray-100 text-gray-800 border border-gray-200' :
+                  badge.tier === 'Bronze' ? 'bg-orange-100 text-orange-800 border border-orange-200' :
+                  'bg-gray-100 text-gray-600'
+                )}>
+                  {badge.tier}
+                </span>
+                <span className={cn(
+                  'px-2 py-1 rounded-full text-xs font-medium',
+                  badge.rarity === 'Legendary' ? 'bg-gradient-to-r from-yellow-200 to-orange-200 text-yellow-900 border border-yellow-300' :
+                  badge.rarity === 'Epic' ? 'bg-gradient-to-r from-purple-200 to-indigo-200 text-purple-900 border border-purple-300' :
+                  badge.rarity === 'Rare' ? 'bg-gradient-to-r from-blue-200 to-cyan-200 text-blue-900 border border-blue-300' :
+                  'bg-gray-100 text-gray-700 border border-gray-200'
+                )}>
+                  {badge.rarity}
+                </span>
+              </div>
               <span className={cn(
-                'px-2 py-0.5 rounded text-xs',
-                badge.rarity === 'Legendary' ? 'bg-yellow-100 text-yellow-800' :
-                badge.rarity === 'Epic' ? 'bg-purple-100 text-purple-800' :
-                badge.rarity === 'Rare' ? 'bg-blue-100 text-blue-800' :
-                'bg-gray-100 text-gray-800'
+                'font-bold text-sm',
+                badge.earned ? 'text-green-600' : 'text-muted-foreground'
               )}>
-                {badge.rarity}
+                +{badge.repPoints} Rep
               </span>
             </div>
             
             {badge.requirement && !badge.earned && (
-              <p className="text-xs text-muted-foreground mt-2">
-                Requires: {badge.requirement}+
-              </p>
+              <div className="pt-2 border-t">
+                <p className="text-xs text-muted-foreground">
+                  <strong>Requirement:</strong> {badge.requirement}+ {badge.category?.toLowerCase() || 'actions'}
+                </p>
+              </div>
+            )}
+
+            {badge.earned && (
+              <div className="pt-2 border-t">
+                <p className="text-xs text-green-600 font-medium">✨ Achievement Unlocked!</p>
+              </div>
             )}
           </div>
         </TooltipContent>

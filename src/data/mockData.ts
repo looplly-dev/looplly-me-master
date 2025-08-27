@@ -455,147 +455,219 @@ export const userStats = {
   }
 };
 
-// Collectible badges system
-export const badgeSystem = {
+// Badge type definition
+interface BadgeType {
+  id: string;
+  name: string;
+  description: string;
+  tier: string;
+  repPoints: number;
+  earned: boolean;
+  rarity: string;
+  icon: string;
+  shape: 'circle' | 'hexagon' | 'shield' | 'star' | 'diamond';
+  category: string;
+  requirement?: number;
+}
+
+// Collectible badges system - Enhanced Edition
+export const badgeSystem: {
+  coreVerification: BadgeType[];
+  streakAchievements: BadgeType[];
+  qualityAchievements: BadgeType[];
+} = {
   coreVerification: [
     { 
       id: 'otp_verified', 
-      name: 'OTP Verified', 
-      description: 'Mobile number verified via SMS', 
+      name: 'Digital Guardian', 
+      description: 'Secured your digital identity with SMS verification - the first step to earning trust in our community', 
       tier: 'Bronze', 
       repPoints: 15, 
       earned: true,
       rarity: 'Common',
-      icon: 'Shield'
+      icon: 'Shield',
+      shape: 'shield',
+      category: 'Security'
     },
     { 
       id: 'gps_enabled', 
-      name: 'Location Guardian', 
-      description: 'GPS sharing enabled while using app', 
+      name: 'Location Pioneer', 
+      description: 'Embraced location-based opportunities by enabling GPS - unlocking geo-targeted surveys and rewards', 
       tier: 'Bronze', 
       repPoints: 10, 
       earned: true,
       rarity: 'Common',
-      icon: 'MapPin'
+      icon: 'MapPin',
+      shape: 'circle',
+      category: 'Accessibility'
     },
     { 
       id: 'kyc_verified', 
-      name: 'Identity Champion', 
-      description: 'Full KYC verification completed', 
+      name: 'Trusted Surveyor', 
+      description: 'Achieved the gold standard of verification through complete KYC - unlocking premium opportunities and higher payouts', 
       tier: 'Silver', 
       repPoints: 50, 
       earned: true,
       rarity: 'Rare',
-      icon: 'CheckCircle'
+      icon: 'CheckCircle',
+      shape: 'hexagon',
+      category: 'Verification'
     },
     { 
       id: 'crypto_token', 
-      name: 'Crypto Pioneer', 
-      description: 'Soulbase crypto token connected', 
+      name: 'Blockchain Visionary', 
+      description: 'Connected your Soulbase crypto token - joining the elite ranks of crypto-enabled users with exclusive benefits', 
       tier: 'Gold', 
       repPoints: 100, 
       earned: false,
       rarity: 'Epic',
-      icon: 'Star'
+      icon: 'Sparkles',
+      shape: 'star',
+      category: 'Innovation'
     },
     { 
       id: 'comms_enabled', 
-      name: 'Communication Pro', 
-      description: 'WhatsApp notifications enabled', 
+      name: 'Connected Earner', 
+      description: 'Enabled instant WhatsApp notifications - never missing a high-paying survey opportunity again', 
       tier: 'Bronze', 
       repPoints: 20, 
       earned: true,
       rarity: 'Common',
-      icon: 'Users'
+      icon: 'Users',
+      shape: 'circle',
+      category: 'Communication'
     }
   ],
   streakAchievements: [
     { 
       id: 'week_warrior', 
-      name: 'Week Warrior', 
-      description: '7-day daily streak completed', 
+      name: 'Consistency Champion', 
+      description: 'Maintained a perfect 7-day earning streak - proving your dedication to consistent daily progress', 
       tier: 'Bronze', 
       repPoints: 25, 
       earned: true,
       rarity: 'Common',
       icon: 'Flame',
+      shape: 'circle',
+      category: 'Streaks',
       requirement: 7
     },
     { 
       id: 'month_master', 
-      name: 'Month Master', 
-      description: '30-day daily streak completed', 
+      name: 'Momentum Master', 
+      description: 'Conquered a full 30-day streak - demonstrating unwavering commitment and earning exponential rewards', 
       tier: 'Silver', 
       repPoints: 75, 
       earned: true,
       rarity: 'Rare',
       icon: 'Trophy',
+      shape: 'hexagon',
+      category: 'Streaks',
       requirement: 30
     },
     { 
       id: 'quarter_champion', 
-      name: 'Quarter Champion', 
-      description: '90-day daily streak completed', 
+      name: 'Seasonal Strategist', 
+      description: 'Achieved an epic 90-day streak - joining the elite 5% of users who master long-term consistency', 
       tier: 'Gold', 
       repPoints: 150, 
       earned: false,
       rarity: 'Epic',
       icon: 'Award',
+      shape: 'star',
+      category: 'Streaks',
       requirement: 90
     },
     { 
       id: 'semi_annual_star', 
-      name: 'Semi-Annual Star', 
-      description: '180-day daily streak completed', 
+      name: 'Endurance Legend', 
+      description: 'Sustained an incredible 180-day streak - showcasing superhuman dedication to your earning journey', 
       tier: 'Platinum', 
       repPoints: 300, 
       earned: false,
       rarity: 'Epic',
-      icon: 'Star',
+      icon: 'Diamond',
+      shape: 'diamond',
+      category: 'Streaks',
       requirement: 180
     },
     { 
       id: 'annual_legend', 
-      name: 'Annual Legend', 
-      description: '365-day daily streak completed', 
+      name: 'Eternal Earnings God', 
+      description: 'Transcended mortal limits with a legendary 365-day streak - earning your place in the hall of fame forever', 
       tier: 'Diamond', 
       repPoints: 500, 
       earned: false,
       rarity: 'Legendary',
       icon: 'Crown',
+      shape: 'star',
+      category: 'Streaks',
       requirement: 365
     }
   ],
   qualityAchievements: [
     { 
       id: 'survey_ace', 
-      name: 'Survey Ace', 
-      description: '100+ surveys with 95%+ quality score', 
+      name: 'Precision Perfectionist', 
+      description: 'Completed 100+ surveys with 95%+ quality score - proving that excellence is your standard, not your goal', 
       tier: 'Gold', 
       repPoints: 100, 
       earned: false,
       rarity: 'Epic',
-      icon: 'Target'
+      icon: 'Target',
+      shape: 'hexagon',
+      category: 'Quality',
+      requirement: 100
     },
     { 
       id: 'speed_demon', 
-      name: 'Speed Demon', 
-      description: 'Fast but accurate survey completion', 
+      name: 'Lightning Responder', 
+      description: 'Mastered the art of fast yet accurate survey completion - maximizing earnings while maintaining top quality', 
       tier: 'Silver', 
       repPoints: 50, 
       earned: true,
       rarity: 'Rare',
-      icon: 'Zap'
+      icon: 'Zap',
+      shape: 'diamond',
+      category: 'Efficiency'
     },
     { 
       id: 'community_contributor', 
-      name: 'Community Hero', 
-      description: 'Active community space participation', 
+      name: 'Community Catalyst', 
+      description: 'Became a pillar of our community through active participation and helping fellow members succeed', 
       tier: 'Silver', 
       repPoints: 40, 
       earned: true,
       rarity: 'Rare',
-      icon: 'Users'
+      icon: 'Users',
+      shape: 'shield',
+      category: 'Community'
+    },
+    { 
+      id: 'data_quality_master', 
+      name: 'Data Integrity Guardian', 
+      description: 'Achieved legendary status with 98%+ data consistency across all surveys - researchers love your contributions', 
+      tier: 'Platinum', 
+      repPoints: 200, 
+      earned: false,
+      rarity: 'Epic',
+      icon: 'Shield',
+      shape: 'star',
+      category: 'Quality',
+      requirement: 50
+    },
+    { 
+      id: 'feedback_champion', 
+      name: 'Insight Innovator', 
+      description: 'Provided exceptional qualitative feedback in 25+ surveys - elevating research quality across the platform', 
+      tier: 'Gold', 
+      repPoints: 80, 
+      earned: false,
+      rarity: 'Rare',
+      icon: 'Medal',
+      shape: 'hexagon',
+      category: 'Feedback',
+      requirement: 25
     }
   ]
 };
