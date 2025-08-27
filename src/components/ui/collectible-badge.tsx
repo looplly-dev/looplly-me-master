@@ -79,11 +79,11 @@ export function CollectibleBadge({ badge, size = 'md', onClick }: CollectibleBad
     return 'rounded-full'; // All badges are circles for consistent Pokéball style
   };
 
-  // Super vibrant circular badges using psychedelic design system tokens
+  // Flat vibrant circular badges - no gradients
   const getCategoryStyle = (tier: string, rarity: string) => {
     if (!badge.earned) {
       return {
-        background: 'linear-gradient(135deg, hsl(var(--muted) / 0.4), hsl(var(--muted) / 0.6))',
+        background: 'hsl(var(--muted))',
         opacity: 0.5
       };
     }
@@ -91,32 +91,32 @@ export function CollectibleBadge({ badge, size = 'md', onClick }: CollectibleBad
     switch (tier) {
       case 'Diamond':
         return {
-          background: 'var(--gradient-diamond)',
+          background: 'hsl(200, 100%, 60%)', // Electric cyan
           boxShadow: 'var(--shadow-diamond-glow)'
         };
       case 'Platinum':
         return {
-          background: 'var(--gradient-platinum)',
+          background: 'hsl(220, 40%, 70%)', // Platinum blue
           boxShadow: 'var(--shadow-platinum-glow)'
         };
       case 'Gold':
         return {
-          background: 'var(--gradient-gold)',
+          background: 'hsl(45, 100%, 50%)', // Electric gold
           boxShadow: 'var(--shadow-gold-glow)'
         };
       case 'Silver':
         return {
-          background: 'var(--gradient-silver)',
+          background: 'hsl(240, 20%, 80%)', // Bright silver
           boxShadow: 'var(--shadow-silver-glow)'
         };
       case 'Bronze':
         return {
-          background: 'var(--gradient-bronze)',
+          background: 'hsl(30, 100%, 50%)', // Electric orange
           boxShadow: 'var(--shadow-bronze-glow)'
         };
       default:
         return {
-          background: 'var(--gradient-legendary)',
+          background: 'hsl(300, 100%, 70%)', // Electric magenta
           boxShadow: 'var(--shadow-legendary-glow)'
         };
     }
@@ -161,12 +161,6 @@ export function CollectibleBadge({ badge, size = 'md', onClick }: CollectibleBad
         )}
         style={getCategoryStyle(badge.tier, badge.rarity)}
       >
-        {/* Simplified background overlay */}
-        <div className={cn(
-          "absolute inset-0 bg-gradient-to-br from-white/20 to-transparent",
-          getShapeClasses(badge.shape || 'circle')
-        )} />
-        
         {/* Icon container - no rotation needed for circles */}
         <div className="absolute inset-0 flex items-center justify-center">
           <IconComponent 
