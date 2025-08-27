@@ -12,7 +12,8 @@ import {
   CheckCircle, 
   Star,
   TrendingUp,
-  Gift
+  Gift,
+  Shield
 } from 'lucide-react';
 import { userStats } from '@/data/mockData';
 
@@ -43,18 +44,25 @@ export default function ReferTab() {
   return (
     <div className="p-4 pb-20 space-y-6">
       {/* Referral Earnings */}
-      <Card className="bg-primary text-white border-0 shadow-lg">
+      <Card className="bg-card border-0 shadow-lg">
         <CardContent className="p-6">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between">
             <div>
-              <p className="text-white/80 text-sm">Referral Earnings</p>
-              <p className="text-4xl font-bold">{userStats.referrals.earnings}</p>
-              <p className="text-white/80 text-sm">points earned</p>
+              <div className="flex items-center gap-2 mb-2">
+                <Shield className="h-5 w-5 text-primary" />
+                <span className="text-primary text-sm font-medium">AI Secured</span>
+              </div>
+              <div className="mb-1">
+                <p className="text-muted-foreground text-sm">Referral Earnings</p>
+              </div>
             </div>
-            <Gift className="h-12 w-12 text-white/60" />
+            <div className="text-right">
+              <p className="text-4xl font-bold text-foreground">{userStats.referrals.earnings}</p>
+              <p className="text-muted-foreground text-xs">points earned</p>
+            </div>
           </div>
-          <div className="pt-4 border-t border-white/20">
-            <p className="text-sm text-white/90">
+          <div className="pt-4 border-t border-border/20">
+            <p className="text-sm text-muted-foreground">
               Earn 50 points for each qualified referral!
             </p>
           </div>
