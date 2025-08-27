@@ -1,5 +1,5 @@
 import React from "react"
-import { X, Calendar, Trophy, Target, Clock, Shield, Flame, Users, Star, MapPin, Award, Zap, Gift, Crown, Gem, Globe, MessageSquare, Heart, Coffee, Book, Code, Music, Gamepad2, Camera, Palette, Rocket, Key, Lock, Settings, Bell, Mail, Phone, Home, User, CheckCircle, XCircle, AlertCircle, Info, Plus, Minus } from "lucide-react"
+import { X, Calendar, Trophy, Target, Clock, Shield, Flame, Users, Star, MapPin, Award, Zap, Gift, Crown, Gem, Globe, MessageSquare, Heart, Coffee, Book, Code, Music, Gamepad2, Camera, Palette, Rocket, Key, Lock, Settings, Bell, Mail, Phone, Home, User, CheckCircle, XCircle, AlertCircle, Info, Plus, Minus, Sparkles, Diamond } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
@@ -41,7 +41,9 @@ const iconMap = {
   x: XCircle,
   alert: AlertCircle,
   info: Info,
-  mapPin: MapPin
+  mapPin: MapPin,
+  sparkles: Sparkles,
+  diamond: Diamond
 }
 
 interface BadgeDetailModalProps {
@@ -71,13 +73,13 @@ export function BadgeDetailModal({ badge, open, onOpenChange }: BadgeDetailModal
   const getCategoryGradient = (tier: string) => {
     switch (tier?.toLowerCase()) {
       case 'legendary':
-        return 'from-gradient-legendary-start to-gradient-legendary-end'
+        return 'from-electric-legendary-start to-electric-legendary-end'
       case 'epic':
-        return 'from-gradient-epic-start to-gradient-epic-end'
+        return 'from-electric-epic-start to-electric-epic-end'
       case 'rare':
-        return 'from-gradient-rare-start to-gradient-rare-end'
+        return 'from-electric-rare-start to-electric-rare-end'
       case 'common':
-        return 'from-gradient-common-start to-gradient-common-end'
+        return 'from-electric-common-start to-electric-common-end'
       default:
         return 'from-muted to-muted-foreground/20'
     }
@@ -86,11 +88,11 @@ export function BadgeDetailModal({ badge, open, onOpenChange }: BadgeDetailModal
   const getRarityRing = (rarity: string) => {
     switch (rarity?.toLowerCase()) {
       case 'legendary':
-        return 'ring-4 ring-gradient-legendary-start/50'
+        return 'ring-4 ring-electric-legendary-start/50'
       case 'epic':
-        return 'ring-4 ring-gradient-epic-start/50'
+        return 'ring-4 ring-electric-epic-start/50'
       case 'rare':
-        return 'ring-2 ring-gradient-rare-start/50'
+        return 'ring-2 ring-electric-rare-start/50'
       default:
         return ''
     }
@@ -125,14 +127,15 @@ export function BadgeDetailModal({ badge, open, onOpenChange }: BadgeDetailModal
               >
                 <div className="text-white text-4xl">
                   {(() => {
-                    const IconComponent = iconMap[badge.icon as keyof typeof iconMap];
+                    const iconKey = badge.icon?.toLowerCase();
+                    const IconComponent = iconMap[iconKey as keyof typeof iconMap];
                     return IconComponent ? <IconComponent className="h-12 w-12" /> : (badge.icon || '🏆');
                   })()}
                 </div>
                 
                 {/* Earned indicator */}
                 {badge.earned && (
-                  <div className="absolute -top-2 -right-2 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                  <div className="absolute -top-2 -right-2 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center z-20 ring-2 ring-background shadow-lg">
                     <Trophy className="h-4 w-4 text-white" />
                   </div>
                 )}
