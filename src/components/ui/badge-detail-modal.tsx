@@ -32,6 +32,9 @@ interface BadgeDetailModalProps {
 
 export function BadgeDetailModal({ badge, open, onOpenChange }: BadgeDetailModalProps) {
   if (!badge) return null
+  
+  // Resolve icon component outside JSX (matching CollectibleBadge pattern)
+  const IconComponent = iconMap[badge.icon as keyof typeof iconMap] || Shield;
 
   const getShapeClasses = (shape: string) => {
     switch (shape) {
@@ -169,10 +172,7 @@ export function BadgeDetailModal({ badge, open, onOpenChange }: BadgeDetailModal
               style={getCategoryStyle(badge.tier, badge.rarity)}
             >
               <div className="absolute inset-0 flex items-center justify-center">
-                {(() => {
-                  const IconComponent = iconMap[badge.icon as keyof typeof iconMap] || Shield;
-                  return <IconComponent className="h-12 w-12 text-white drop-shadow-lg" />;
-                })()}
+                <IconComponent className="h-12 w-12 text-white drop-shadow-lg" />
               </div>
               
               {/* Earned indicator */}
