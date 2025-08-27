@@ -314,7 +314,7 @@ export default function RepTab() {
                 {badgeSystem.coreVerification.filter(b => b.earned).length}/{badgeSystem.coreVerification.length}
               </Badge>
             </h4>
-            <div className="grid grid-cols-3 lg:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4"> {/* Better mobile spacing */}
               {badgeSystem.coreVerification.map((badge) => (
                 <CollectibleBadge 
                   key={badge.id} 
@@ -334,7 +334,7 @@ export default function RepTab() {
                 {badgeSystem.streakAchievements.filter(b => b.earned).length}/{badgeSystem.streakAchievements.length}
               </Badge>
             </h4>
-            <div className="grid grid-cols-3 lg:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4"> {/* Better mobile spacing */}
               {badgeSystem.streakAchievements.map((badge) => (
                 <CollectibleBadge 
                   key={badge.id} 
@@ -354,7 +354,7 @@ export default function RepTab() {
                 {badgeSystem.qualityAchievements.filter(b => b.earned).length}/{badgeSystem.qualityAchievements.length}
               </Badge>
             </h4>
-            <div className="grid grid-cols-3 lg:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4"> {/* Better mobile spacing */}
               {badgeSystem.qualityAchievements.map((badge) => (
                 <CollectibleBadge 
                   key={badge.id} 
