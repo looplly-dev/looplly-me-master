@@ -394,6 +394,36 @@ export default function SimplifiedEarnTab() {
               </TabsList>
 
               <TabsContent value="surveys" className="space-y-3 mt-4 max-h-[400px] overflow-y-auto scroll-smooth pb-4">
+                {/* Cint Surveys Space Filler */}
+                <div className="p-4 border rounded-lg bg-gradient-to-r from-primary/5 to-accent/5 border-dashed border-primary/30">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-primary/10 rounded-lg">
+                        <Search className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-primary">Cint Premium Surveys</h3>
+                        <p className="text-sm text-muted-foreground">
+                          High-paying surveys coming soon
+                        </p>
+                      </div>
+                    </div>
+                    <Badge variant="outline" className="border-primary/50 text-primary">
+                      Coming Soon
+                    </Badge>
+                  </div>
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                    <span className="flex items-center gap-1">
+                      <Clock className="h-4 w-4" />
+                      5-15 min
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Coins className="h-4 w-4 text-success" />
+                      <span className="font-bold text-success">$2.00-$8.00</span>
+                    </span>
+                  </div>
+                </div>
+
                 {availableTasks.filter(a => a.activity_type === 'survey').length === 0 ? (
                   <div className="text-center py-8">
                     <FileText className="h-12 w-12 mx-auto mb-3 text-muted-foreground/50" />
