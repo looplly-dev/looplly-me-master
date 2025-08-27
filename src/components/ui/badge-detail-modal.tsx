@@ -5,45 +5,45 @@ import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { cn } from "@/lib/utils"
 
-// Icon mapping system (matching CollectibleBadge)
+// Icon mapping system (matching CollectibleBadge exactly)
 const iconMap = {
-  shield: Shield,
-  flame: Flame,
-  users: Users,
-  star: Star,
-  trophy: Trophy,
-  target: Target,
-  crown: Crown,
-  gem: Gem,
-  award: Award,
-  zap: Zap,
-  gift: Gift,
-  globe: Globe,
-  message: MessageSquare,
-  heart: Heart,
-  coffee: Coffee,
-  book: Book,
-  code: Code,
-  music: Music,
-  gamepad: Gamepad2,
-  camera: Camera,
-  palette: Palette,
-  rocket: Rocket,
-  key: Key,
-  lock: Lock,
-  settings: Settings,
-  bell: Bell,
-  mail: Mail,
-  phone: Phone,
-  home: Home,
-  user: User,
-  check: CheckCircle,
-  x: XCircle,
-  alert: AlertCircle,
-  info: Info,
-  mapPin: MapPin,
-  sparkles: Sparkles,
-  diamond: Diamond
+  Shield,
+  MapPin,
+  CheckCircle,
+  Star,
+  Users,
+  Flame,
+  Trophy,
+  Award,
+  Crown,
+  Target,
+  Zap,
+  Diamond,
+  Sparkles,
+  Globe,
+  MessageSquare,
+  Heart,
+  Coffee,
+  Book,
+  Code,
+  Music,
+  Gamepad2,
+  Camera,
+  Palette,
+  Rocket,
+  Key,
+  Lock,
+  Settings,
+  Bell,
+  Mail,
+  Phone,
+  Home,
+  User,
+  XCircle,
+  AlertCircle,
+  Info,
+  Plus,
+  Minus
 }
 
 interface BadgeDetailModalProps {
@@ -70,31 +70,95 @@ export function BadgeDetailModal({ badge, open, onOpenChange }: BadgeDetailModal
     }
   }
 
-  const getCategoryGradient = (tier: string) => {
-    switch (tier?.toLowerCase()) {
-      case 'legendary':
-        return 'from-electric-legendary-start to-electric-legendary-end'
-      case 'epic':
-        return 'from-electric-epic-start to-electric-epic-end'
-      case 'rare':
-        return 'from-electric-rare-start to-electric-rare-end'
-      case 'common':
-        return 'from-electric-common-start to-electric-common-end'
+  const getTierGradient = (tier: string) => {
+    // Use badge ID to deterministically choose one of available colors per tier
+    const colorIndex = badge.id ? badge.id.length % 3 : 0;
+    
+    switch (tier) {
+      case 'Diamond':
+        const diamondGradients = [
+          'var(--diamond-african-star)',
+          'var(--diamond-kohinoor)', 
+          'var(--diamond-namib-crystal)'
+        ];
+        return {
+          background: diamondGradients[colorIndex],
+          boxShadow: 'var(--shadow-diamond-glow)'
+        };
+      case 'Platinum':
+        const platinumGradients = [
+          'var(--platinum-victoria-falls)',
+          'var(--platinum-taj-mahal)',
+          'var(--platinum-kilimanjaro-peak)'
+        ];
+        return {
+          background: platinumGradients[colorIndex],
+          boxShadow: 'var(--shadow-platinum-glow)'
+        };
+      case 'Gold':
+        const goldGradients = [
+          'var(--gold-sahara-crown)',
+          'var(--gold-lions-mane)',
+          'var(--gold-gold-coast)'
+        ];
+        return {
+          background: goldGradients[colorIndex],
+          boxShadow: 'var(--shadow-gold-glow)'
+        };
+      case 'Silver':
+        const silverGradients = [
+          'var(--silver-serengeti-storm)',
+          'var(--silver-zambezi-mist)',
+          'var(--silver-atlas-silver)'
+        ];
+        return {
+          background: silverGradients[colorIndex],
+          boxShadow: 'var(--shadow-silver-glow)'
+        };
+      case 'Bronze':
+        const bronzeGradients = [
+          'var(--bronze-safari-sunset)',
+          'var(--bronze-spice-caravan)',
+          'var(--bronze-desert-copper)'
+        ];
+        return {
+          background: bronzeGradients[colorIndex],
+          boxShadow: 'var(--shadow-bronze-glow)'
+        };
       default:
-        return 'from-muted to-muted-foreground/20'
+        return {
+          background: 'linear-gradient(135deg, hsl(var(--muted)), hsl(var(--muted-foreground) / 0.2))',
+          boxShadow: 'none'
+        };
     }
   }
 
-  const getRarityRing = (rarity: string) => {
+  const getCategoryStyle = (tier: string, rarity: string) => {
+    if (!badge.earned) {
+      // Show tier gradient with reduced opacity for unearned badges
+      const earnedStyle = getTierGradient(tier);
+      return {
+        background: earnedStyle.background,
+        opacity: 0.4,
+        boxShadow: 'none'
+      };
+    }
+    
+    return getTierGradient(tier);
+  }
+
+  const getRarityEffects = (rarity: string, earned: boolean) => {
+    if (!earned) return '';
+    
     switch (rarity?.toLowerCase()) {
       case 'legendary':
-        return 'ring-4 ring-electric-legendary-start/50'
+        return 'ring-4 ring-purple-400/50 animate-pulse';
       case 'epic':
-        return 'ring-4 ring-electric-epic-start/50'
+        return 'ring-2 ring-violet-400/50';
       case 'rare':
-        return 'ring-2 ring-electric-rare-start/50'
+        return 'ring-1 ring-blue-400/50';
       default:
-        return ''
+        return '';
     }
   }
 
@@ -116,29 +180,27 @@ export function BadgeDetailModal({ badge, open, onOpenChange }: BadgeDetailModal
           <div className="flex flex-col items-center space-y-6">
             {/* Large Badge */}
             <div className="relative">
-              <div
-                className={cn(
-                  "w-32 h-32 flex items-center justify-center bg-gradient-to-br shadow-lg transition-all duration-300",
-                  getCategoryGradient(badge.tier),
-                  getShapeClasses(badge.shape),
-                  getRarityRing(badge.rarity),
-                  badge.earned ? "opacity-100" : "opacity-40 grayscale"
-                )}
-              >
-                <div className="text-white text-4xl">
-                  {(() => {
-                    const iconKey = badge.icon?.toLowerCase();
-                    const IconComponent = iconMap[iconKey as keyof typeof iconMap];
-                    return IconComponent ? <IconComponent className="h-12 w-12" /> : (badge.icon || '🏆');
-                  })()}
+            <div
+              className={cn(
+                "w-32 h-32 flex items-center justify-center shadow-lg transition-all duration-300 rounded-full",
+                getRarityEffects(badge.rarity, badge.earned),
+                badge.earned ? "opacity-100" : "opacity-40 grayscale"
+              )}
+              style={getCategoryStyle(badge.tier, badge.rarity)}
+            >
+              <div className="text-white text-4xl">
+                {(() => {
+                  const IconComponent = iconMap[badge.icon as keyof typeof iconMap] || Trophy;
+                  return <IconComponent className="h-12 w-12" />;
+                })()}
+              </div>
+              
+              {/* Earned indicator */}
+              {badge.earned && (
+                <div className="absolute -top-2 -right-2 w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center z-20 ring-2 ring-background shadow-lg">
+                  <CheckCircle className="h-4 w-4 text-white" />
                 </div>
-                
-                {/* Earned indicator */}
-                {badge.earned && (
-                  <div className="absolute -top-2 -right-2 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center z-20 ring-2 ring-background shadow-lg">
-                    <Trophy className="h-4 w-4 text-white" />
-                  </div>
-                )}
+              )}
               </div>
             </div>
 
