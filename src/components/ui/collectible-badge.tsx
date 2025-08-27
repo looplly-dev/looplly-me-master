@@ -74,53 +74,46 @@ export function CollectibleBadge({ badge, size = 'md', onClick }: CollectibleBad
     lg: 'h-8 w-8'
   };
 
-  // Simplified shapes using CSS only - better mobile performance
+  // Force all badges to be perfect circles - Pokéball style
   const getShapeClasses = (shape: string) => {
-    switch (shape) {
-      case 'hexagon':
-        return 'rounded-xl'; // Simplified to rounded rectangle
-      case 'shield':
-        return 'rounded-t-full rounded-b-lg'; // CSS-only shield shape
-      case 'star':
-        return 'rounded-lg rotate-45'; // Simple rotated square
-      case 'diamond':
-        return 'rounded-lg rotate-45'; // Diamond as rotated square
-      default:
-        return 'rounded-full'; // Default circle
-    }
+    return 'rounded-full'; // All badges are circles for consistent Pokéball style
   };
 
-  // Simplified gradients using design system tokens - better performance
+  // Super vibrant circular badges using design system tokens
   const getCategoryGradient = (tier: string, rarity: string) => {
+    if (!badge.earned) {
+      return 'bg-gradient-to-br from-slate-300 to-slate-400 opacity-50';
+    }
+    
     switch (tier) {
       case 'Diamond':
-        return 'bg-gradient-to-br from-cyan-500 to-blue-600 shadow-lg';
+        return 'bg-gradient-to-br from-blue-400 to-cyan-500 shadow-[var(--shadow-diamond-glow)]';
       case 'Platinum':
-        return 'bg-gradient-to-br from-slate-400 to-slate-600 shadow-lg';
+        return 'bg-gradient-to-br from-slate-400 to-slate-500 shadow-[var(--shadow-silver-glow)]';
       case 'Gold':
-        return 'bg-gradient-to-br from-amber-400 to-orange-500 shadow-md';
+        return 'bg-gradient-to-br from-yellow-400 to-amber-500 shadow-[var(--shadow-gold-glow)]';
       case 'Silver':
-        return 'bg-gradient-to-br from-slate-300 to-slate-500 shadow-md';
+        return 'bg-gradient-to-br from-slate-300 to-slate-400 shadow-[var(--shadow-silver-glow)]';
       case 'Bronze':
-        return 'bg-gradient-to-br from-orange-400 to-amber-600 shadow-sm';
+        return 'bg-gradient-to-br from-orange-400 to-amber-500 shadow-[var(--shadow-bronze-glow)]';
       default:
-        return 'bg-gradient-to-br from-slate-500 to-slate-600 shadow-sm';
+        return 'bg-gradient-to-br from-purple-500 to-pink-500 shadow-[var(--shadow-legendary-glow)]';
     }
   };
 
-  // Simplified rarity effects - mobile optimized
+  // Enhanced rarity effects with vibrant rings
   const getRarityEffects = (rarity: string, earned: boolean) => {
-    if (!earned) return '';
+    if (!earned) return 'ring-2 ring-slate-200/50';
     
     switch (rarity) {
       case 'Legendary': 
-        return 'ring-2 ring-yellow-400/60 shadow-lg';
+        return 'ring-4 ring-purple-400/70 ring-offset-2 ring-offset-white shadow-2xl';
       case 'Epic': 
-        return 'ring-2 ring-purple-400/50 shadow-md';
+        return 'ring-3 ring-pink-400/60 ring-offset-1 ring-offset-white shadow-xl';
       case 'Rare': 
-        return 'ring-1 ring-blue-400/40 shadow-md';
+        return 'ring-2 ring-blue-400/50 ring-offset-1 ring-offset-white shadow-lg';
       case 'Common':
-        return 'ring-1 ring-gray-300/30 shadow-sm';
+        return 'ring-1 ring-slate-300/40 shadow-md';
       default: 
         return '';
     }
@@ -152,11 +145,8 @@ export function CollectibleBadge({ badge, size = 'md', onClick }: CollectibleBad
           getShapeClasses(badge.shape || 'circle')
         )} />
         
-        {/* Icon container with shape compensation */}
-        <div className={cn(
-          "absolute inset-0 flex items-center justify-center",
-          (badge.shape === 'diamond' || badge.shape === 'star') ? '-rotate-45' : ''
-        )}>
+        {/* Icon container - no rotation needed for circles */}
+        <div className="absolute inset-0 flex items-center justify-center">
           <IconComponent 
             className={cn(
               iconSizes[size],

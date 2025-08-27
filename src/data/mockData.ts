@@ -468,31 +468,39 @@ interface BadgeType {
   shape: 'circle' | 'hexagon' | 'shield' | 'star' | 'diamond';
   category: string;
   requirement?: number;
+  earnedAt?: string;
 }
 
-// Collectible badges system - Enhanced Edition
+import { expandedBadgeCategories } from './expandedBadges';
+
+// Collectible badges system - Pokémon-Style Enhanced Edition
 export const badgeSystem: {
   coreVerification: BadgeType[];
   streakAchievements: BadgeType[];
   qualityAchievements: BadgeType[];
+  socialConnector: BadgeType[];
+  speedDemon: BadgeType[];
+  perfectionist: BadgeType[];
+  explorer: BadgeType[];
 } = {
   coreVerification: [
     { 
       id: 'otp_verified', 
       name: 'Digital Guardian', 
-      description: 'Secured your digital identity with SMS verification - the first step to earning trust in our community', 
+      description: 'Secured your digital identity with SMS verification', 
       tier: 'Bronze', 
       repPoints: 15, 
       earned: true,
       rarity: 'Common',
       icon: 'Shield',
-      shape: 'shield',
-      category: 'Security'
+      shape: 'circle',
+      category: 'Security',
+      earnedAt: '2024-01-10'
     },
     { 
       id: 'gps_enabled', 
       name: 'Location Pioneer', 
-      description: 'Embraced location-based opportunities by enabling GPS - unlocking geo-targeted surveys and rewards', 
+      description: 'Enabled GPS for location-based opportunities', 
       tier: 'Bronze', 
       repPoints: 10, 
       earned: true,
@@ -669,5 +677,9 @@ export const badgeSystem: {
       category: 'Feedback',
       requirement: 25
     }
-  ]
+  ],
+  socialConnector: expandedBadgeCategories.socialConnector,
+  speedDemon: expandedBadgeCategories.speedDemon,
+  perfectionist: expandedBadgeCategories.perfectionist,
+  explorer: expandedBadgeCategories.explorer
 };

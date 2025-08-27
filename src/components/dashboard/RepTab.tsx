@@ -20,7 +20,8 @@ import {
   AlertTriangle,
   Settings,
   Maximize2,
-  Minimize2
+  Minimize2,
+  Zap
 } from 'lucide-react';
 import { userStats, badgeSystem } from '@/data/mockData';
 import { useAuth } from '@/hooks/useAuth';
@@ -28,6 +29,7 @@ import { CollectibleBadge } from '@/components/ui/collectible-badge';
 import { BadgeDetailModal } from '@/components/ui/badge-detail-modal';
 import { StreakProgress } from '@/components/ui/streak-progress';
 import { CollapsibleSection } from '@/components/ui/collapsible-section';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 
 export default function RepTab() {
   const { authState } = useAuth();
@@ -55,11 +57,15 @@ export default function RepTab() {
     ? 100 
     : ((userStats.reputation.score - level.min) / (level.max - level.min + 1)) * 100;
 
-  // Combine all badge categories into one array
-  const allBadges = [
-    ...badgeSystem.coreVerification,
-    ...badgeSystem.streakAchievements,
-    ...badgeSystem.qualityAchievements
+  // Combine all badge categories into carousel sections
+  const badgeCategories = [
+    { name: 'Identity & Security', icon: Shield, badges: badgeSystem.coreVerification },
+    { name: 'Consistency Mastery', icon: Flame, badges: badgeSystem.streakAchievements },
+    { name: 'Excellence & Impact', icon: Award, badges: badgeSystem.qualityAchievements },
+    { name: 'Social Network', icon: Users, badges: badgeSystem.socialConnector },
+    { name: 'Speed Masters', icon: Zap, badges: badgeSystem.speedDemon },
+    { name: 'Perfection Elite', icon: Target, badges: badgeSystem.perfectionist },
+    { name: 'Exploration Heroes', icon: MapPin, badges: badgeSystem.explorer }
   ];
 
   const handleBadgeClick = (badge: any) => {
@@ -298,82 +304,87 @@ export default function RepTab() {
         defaultOpen={!isCompactView}
         priority="high"
         compactContent={
-          <div className="flex justify-center gap-2">
-            {allBadges.filter(b => b.earned).slice(0, 6).map((badge) => (
-              <div key={badge.id} className="w-8 h-8 rounded-full bg-blue-50 border border-blue-200 flex items-center justify-center">
-                <span className="text-xs">{badge.icon}</span>
-              </div>
-            ))}
-            {allBadges.filter(b => b.earned).length > 6 && (
-              <div className="w-8 h-8 rounded-full bg-gray-50 border border-gray-200 flex items-center justify-center">
-                <span className="text-xs font-bold">+{allBadges.filter(b => b.earned).length - 6}</span>
-              </div>
-            )}
+          <div className="flex justify-center gap-2 overflow-x-auto pb-2">
+            {badgeCategories.slice(0, 2).map((category) => 
+              category.badges.filter(b => b.earned).slice(0, 3).map((badge) => (
+                <div key={badge.id} className="flex-shrink-0">
+                  <CollectibleBadge 
+                    badge={badge} 
+                    size="sm"
+                    onClick={() => handleBadgeClick(badge)}
+                  />
+                </div>
+              ))
+            ).flat()}
+            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-muted border flex items-center justify-center">
+              <span className="text-xs font-bold text-muted-foreground">
+                +{badgeCategories.reduce((total, cat) => total + cat.badges.filter(b => b.earned).length, 0) - 6}
+              </span>
+            </div>
           </div>
         }
       >
-        <div className="space-y-6">
-          {/* Core Verification Badges */}
-          <div>
-            <h4 className="text-sm font-semibold mb-3 text-foreground flex items-center gap-2">
-              <Shield className="h-4 w-4" />
-              Identity & Security
-              <Badge variant="outline" className="text-xs">
-                {badgeSystem.coreVerification.filter(b => b.earned).length}/{badgeSystem.coreVerification.length}
-              </Badge>
-            </h4>
-            <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-8 gap-2">
-              {badgeSystem.coreVerification.map((badge) => (
-                <CollectibleBadge 
-                  key={badge.id} 
-                  badge={badge} 
-                  size="sm"
-                  onClick={() => handleBadgeClick(badge)}
-                />
-              ))}
-            </div>
-          </div>
+        <div className="space-y-8">
+          {badgeCategories.map((category) => (
+            <div key={category.name} className="space-y-4">
+              {/* Category Header with Progress */}
+              <div className="flex items-center justify-between">
+                <h4 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                  <category.icon className="h-4 w-4" />
+                  {category.name}
+                </h4>
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className="text-xs">
+                    {category.badges.filter(b => b.earned).length}/{category.badges.length}
+                  </Badge>
+                  <div className="text-xs text-muted-foreground">
+                    Tap for details
+                  </div>
+                </div>
+              </div>
 
-          {/* Streak Achievement Badges */}
-          <div>
-            <h4 className="text-sm font-semibold mb-3 text-foreground flex items-center gap-2">
-              <Flame className="h-4 w-4" />
-              Consistency Mastery
-              <Badge variant="outline" className="text-xs">
-                {badgeSystem.streakAchievements.filter(b => b.earned).length}/{badgeSystem.streakAchievements.length}
-              </Badge>
-            </h4>
-            <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-8 gap-2">
-              {badgeSystem.streakAchievements.map((badge) => (
-                <CollectibleBadge 
-                  key={badge.id} 
-                  badge={badge} 
-                  size="sm"
-                  onClick={() => handleBadgeClick(badge)}
-                />
-              ))}
-            </div>
-          </div>
+              {/* Badge Carousel */}
+              <Carousel
+                opts={{
+                  align: "start",
+                  loop: false,
+                  dragFree: true,
+                }}
+                className="w-full"
+              >
+                <CarouselContent className="ml-0 gap-3">
+                  {category.badges.map((badge) => (
+                    <CarouselItem key={badge.id} className="basis-auto pl-0">
+                      <CollectibleBadge 
+                        badge={badge} 
+                        size="md"
+                        onClick={() => handleBadgeClick(badge)}
+                      />
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <CarouselPrevious className="hidden sm:flex" />
+                <CarouselNext className="hidden sm:flex" />
+              </Carousel>
 
-          {/* Quality Achievement Badges */}
-          <div>
-            <h4 className="text-sm font-semibold mb-3 text-foreground flex items-center gap-2">
-              <Award className="h-4 w-4" />
-              Excellence & Impact
-              <Badge variant="outline" className="text-xs">
-                {badgeSystem.qualityAchievements.filter(b => b.earned).length}/{badgeSystem.qualityAchievements.length}
-              </Badge>
-            </h4>
-            <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-8 gap-2">
-              {badgeSystem.qualityAchievements.map((badge) => (
-                <CollectibleBadge 
-                  key={badge.id} 
-                  badge={badge} 
-                  size="sm"
-                  onClick={() => handleBadgeClick(badge)}
+              {/* Progress Bar for Category */}
+              <div className="w-full bg-muted rounded-full h-1.5 overflow-hidden">
+                <div 
+                  className="h-full bg-primary rounded-full transition-all duration-500"
+                  style={{ 
+                    width: `${(category.badges.filter(b => b.earned).length / category.badges.length) * 100}%` 
+                  }}
                 />
-              ))}
+              </div>
             </div>
+          ))}
+
+          {/* Tap Hint */}
+          <div className="text-center py-4">
+            <p className="text-sm text-muted-foreground flex items-center justify-center gap-2">
+              <Target className="h-4 w-4" />
+              Tap any badge to view detailed achievement info
+            </p>
           </div>
         </div>
       </CollapsibleSection>

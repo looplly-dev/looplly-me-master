@@ -70,6 +70,29 @@ All colors MUST be HSL.
     --info: 220 100% 65%; /* Electric blue */
     --info-foreground: 0 0% 100%;
 
+    /* Vibrant Badge System Colors */
+    --badge-bronze: 251 146 60;
+    --badge-silver: 148 163 184;
+    --badge-gold: 251 191 36;
+    --badge-platinum: 168 162 158;
+    --badge-diamond: 14 165 233;
+    --badge-legendary: 168 85 247;
+    
+    /* Electric Gradients for Pokémon-style badges */
+    --gradient-bronze: linear-gradient(135deg, hsl(var(--badge-bronze)), hsl(251, 146, 80));
+    --gradient-silver: linear-gradient(135deg, hsl(var(--badge-silver)), hsl(148, 200, 220));
+    --gradient-gold: linear-gradient(135deg, hsl(var(--badge-gold)), hsl(251, 191, 60));
+    --gradient-platinum: linear-gradient(135deg, hsl(var(--badge-platinum)), hsl(168, 180, 200));
+    --gradient-diamond: linear-gradient(135deg, hsl(var(--badge-diamond)), hsl(59, 130, 246));
+    --gradient-legendary: linear-gradient(135deg, hsl(var(--badge-legendary)), hsl(236, 72, 153));
+    
+    /* Vibrant shadows for badge glow effects */
+    --shadow-bronze-glow: 0 0 20px hsl(var(--badge-bronze) / 0.4);
+    --shadow-silver-glow: 0 0 20px hsl(var(--badge-silver) / 0.4);
+    --shadow-gold-glow: 0 0 20px hsl(var(--badge-gold) / 0.4);
+    --shadow-diamond-glow: 0 0 20px hsl(var(--badge-diamond) / 0.4);
+    --shadow-legendary-glow: 0 0 20px hsl(var(--badge-legendary) / 0.4);
+
     /* Single color gradients */
     --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
     --gradient-success: linear-gradient(135deg, hsl(var(--success)), hsl(var(--success-glow)));
