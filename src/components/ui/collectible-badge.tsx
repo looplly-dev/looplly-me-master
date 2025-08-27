@@ -79,44 +79,51 @@ export function CollectibleBadge({ badge, size = 'md', onClick }: CollectibleBad
     return 'rounded-full'; // All badges are circles for consistent Pokéball style
   };
 
-  // Flat vibrant circular badges - no gradients
+  // Electric gradient badges using design system tokens
   const getCategoryStyle = (tier: string, rarity: string) => {
     if (!badge.earned) {
+      // Show tier gradient with reduced opacity for unearned badges
+      const earnedStyle = getTierGradient(tier);
       return {
-        background: 'hsl(var(--muted))',
-        opacity: 0.5
+        background: earnedStyle.background,
+        opacity: 0.4,
+        boxShadow: 'none'
       };
     }
     
+    return getTierGradient(tier);
+  };
+
+  const getTierGradient = (tier: string) => {
     switch (tier) {
       case 'Diamond':
         return {
-          background: 'hsl(200, 100%, 60%)', // Electric cyan
+          background: 'var(--gradient-diamond)', // Electric cyan to bright blue
           boxShadow: 'var(--shadow-diamond-glow)'
         };
       case 'Platinum':
         return {
-          background: 'hsl(220, 40%, 70%)', // Platinum blue
+          background: 'var(--gradient-platinum)', // Platinum shimmer with purple hints
           boxShadow: 'var(--shadow-platinum-glow)'
         };
       case 'Gold':
         return {
-          background: 'hsl(45, 100%, 50%)', // Electric gold
+          background: 'var(--gradient-gold)', // Electric gold to bright yellow
           boxShadow: 'var(--shadow-gold-glow)'
         };
       case 'Silver':
         return {
-          background: 'hsl(240, 20%, 80%)', // Bright silver
+          background: 'var(--gradient-silver)', // Bright silver with shimmer
           boxShadow: 'var(--shadow-silver-glow)'
         };
       case 'Bronze':
         return {
-          background: 'hsl(30, 100%, 50%)', // Electric orange
+          background: 'var(--gradient-bronze)', // Electric orange to amber
           boxShadow: 'var(--shadow-bronze-glow)'
         };
       default:
         return {
-          background: 'hsl(300, 100%, 70%)', // Electric magenta
+          background: 'var(--gradient-legendary)', // Electric magenta to hot pink
           boxShadow: 'var(--shadow-legendary-glow)'
         };
     }
