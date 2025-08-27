@@ -30,6 +30,7 @@ import { BadgeDetailModal } from '@/components/ui/badge-detail-modal';
 import { StreakProgress } from '@/components/ui/streak-progress';
 import { CollapsibleSection } from '@/components/ui/collapsible-section';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import CarouselBadges from '@/components/ui/CarouselBadges';
 
 export default function RepTab() {
   const { authState } = useAuth();
@@ -351,29 +352,23 @@ export default function RepTab() {
                 </div>
               </div>
 
-              {/* Badge Carousel */}
-              <Carousel
-                opts={{
-                  align: "start",
-                  loop: false,
-                  dragFree: true,
+              {/* Enhanced Badge Carousel with Motion */}
+              <CarouselBadges
+                items={category.badges.map(badge => ({
+                  id: badge.id,
+                  title: badge.name,
+                  icon: badge.icon,
+                  tier: badge.tier,
+                  rarity: badge.rarity,
+                  earned: badge.earned,
+                  description: badge.description,
+                  color: undefined // Will use tier-based gradients
+                }))}
+                onItemClick={(item) => {
+                  const badge = category.badges.find(b => b.id === item.id);
+                  if (badge) handleBadgeClick(badge);
                 }}
-                className="w-full"
-              >
-                <CarouselContent className="ml-0 gap-3">
-                  {category.badges.map((badge) => (
-                    <CarouselItem key={badge.id} className="basis-auto pl-0">
-                      <CollectibleBadge 
-                        badge={badge} 
-                        size="md"
-                        onClick={() => handleBadgeClick(badge)}
-                      />
-                    </CarouselItem>
-                  ))}
-                </CarouselContent>
-                <CarouselPrevious className="hidden sm:flex" />
-                <CarouselNext className="hidden sm:flex" />
-              </Carousel>
+              />
 
               {/* Progress Bar for Category */}
               <div className="w-full bg-muted rounded-full h-1.5 overflow-hidden">
