@@ -1,11 +1,11 @@
 import React from "react"
-import { X, Calendar, Trophy, Target, Clock, Shield, Flame, Users, Star, MapPin, Award, Zap, Gift, Crown, Gem, Globe, MessageSquare, Heart, Coffee, Book, Code, Music, Gamepad2, Camera, Palette, Rocket, Key, Lock, Settings, Bell, Mail, Phone, Home, User, CheckCircle, XCircle, AlertCircle, Info, Plus, Minus, Sparkles, Diamond } from "lucide-react"
+import { X, Calendar, Trophy, Target, Clock, Shield, Flame, Users, Star, MapPin, Award, Zap, Crown, CheckCircle, Hexagon, Diamond, Medal, Sparkles } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { cn } from "@/lib/utils"
 
-// Icon mapping system (matching CollectibleBadge exactly)
+// Icon mapping system (exactly matching CollectibleBadge)
 const iconMap = {
   Shield,
   MapPin,
@@ -18,32 +18,10 @@ const iconMap = {
   Crown,
   Target,
   Zap,
+  Hexagon,
   Diamond,
-  Sparkles,
-  Globe,
-  MessageSquare,
-  Heart,
-  Coffee,
-  Book,
-  Code,
-  Music,
-  Gamepad2,
-  Camera,
-  Palette,
-  Rocket,
-  Key,
-  Lock,
-  Settings,
-  Bell,
-  Mail,
-  Phone,
-  Home,
-  User,
-  XCircle,
-  AlertCircle,
-  Info,
-  Plus,
-  Minus
+  Medal,
+  Sparkles
 }
 
 interface BadgeDetailModalProps {
@@ -99,7 +77,7 @@ export function BadgeDetailModal({ badge, open, onOpenChange }: BadgeDetailModal
         const goldGradients = [
           'var(--gold-sahara-crown)',
           'var(--gold-lions-mane)',
-          'var(--gold-gold-coast)'
+          'var(--gold-rajasthani-gold)'
         ];
         return {
           background: goldGradients[colorIndex],
@@ -109,7 +87,7 @@ export function BadgeDetailModal({ badge, open, onOpenChange }: BadgeDetailModal
         const silverGradients = [
           'var(--silver-serengeti-storm)',
           'var(--silver-zambezi-mist)',
-          'var(--silver-atlas-silver)'
+          'var(--silver-monsoon-silver)'
         ];
         return {
           background: silverGradients[colorIndex],
@@ -117,9 +95,9 @@ export function BadgeDetailModal({ badge, open, onOpenChange }: BadgeDetailModal
         };
       case 'Bronze':
         const bronzeGradients = [
-          'var(--bronze-safari-sunset)',
-          'var(--bronze-spice-caravan)',
-          'var(--bronze-desert-copper)'
+          'var(--bronze-savanna-sunset)',
+          'var(--bronze-turmeric-fire)',
+          'var(--bronze-cinnamon-spice)'
         ];
         return {
           background: bronzeGradients[colorIndex],
@@ -127,8 +105,8 @@ export function BadgeDetailModal({ badge, open, onOpenChange }: BadgeDetailModal
         };
       default:
         return {
-          background: 'linear-gradient(135deg, hsl(var(--muted)), hsl(var(--muted-foreground) / 0.2))',
-          boxShadow: 'none'
+          background: 'var(--gradient-legendary)',
+          boxShadow: 'var(--shadow-legendary-glow)'
         };
     }
   }
@@ -148,16 +126,18 @@ export function BadgeDetailModal({ badge, open, onOpenChange }: BadgeDetailModal
   }
 
   const getRarityEffects = (rarity: string, earned: boolean) => {
-    if (!earned) return '';
+    if (!earned) return 'ring-2 ring-muted/30';
     
-    switch (rarity?.toLowerCase()) {
-      case 'legendary':
-        return 'ring-4 ring-purple-400/50 animate-pulse';
-      case 'epic':
-        return 'ring-2 ring-violet-400/50';
-      case 'rare':
-        return 'ring-1 ring-blue-400/50';
-      default:
+    switch (rarity) {
+      case 'Legendary': 
+        return 'ring-4 ring-[hsl(var(--psychedelic-magenta)/0.8)] ring-offset-2 ring-offset-background shadow-2xl animate-pulse';
+      case 'Epic': 
+        return 'ring-3 ring-[hsl(var(--psychedelic-purple)/0.7)] ring-offset-1 ring-offset-background shadow-xl';
+      case 'Rare': 
+        return 'ring-2 ring-[hsl(var(--electric-cyan)/0.6)] ring-offset-1 ring-offset-background shadow-lg';
+      case 'Common':
+        return 'ring-1 ring-[hsl(var(--neon-green)/0.5)] shadow-md';
+      default: 
         return '';
     }
   }
@@ -188,10 +168,10 @@ export function BadgeDetailModal({ badge, open, onOpenChange }: BadgeDetailModal
               )}
               style={getCategoryStyle(badge.tier, badge.rarity)}
             >
-              <div className="text-white text-4xl">
+              <div className="absolute inset-0 flex items-center justify-center">
                 {(() => {
-                  const IconComponent = iconMap[badge.icon as keyof typeof iconMap] || Trophy;
-                  return <IconComponent className="h-12 w-12" />;
+                  const IconComponent = iconMap[badge.icon as keyof typeof iconMap] || Shield;
+                  return <IconComponent className="h-12 w-12 text-white drop-shadow-lg" />;
                 })()}
               </div>
               
