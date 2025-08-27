@@ -78,12 +78,45 @@ All colors MUST be HSL.
     --badge-diamond: 200 100% 60;   /* Electric cyan */
     --badge-legendary: 300 100% 70; /* Electric magenta */
     
-    /* PSYCHEDELIC Electric Gradients */
-    --gradient-bronze: linear-gradient(135deg, hsl(30, 100%, 50%), hsl(25, 100%, 60%));
-    --gradient-silver: linear-gradient(135deg, hsl(240, 20%, 80%), hsl(260, 30%, 90%));
-    --gradient-gold: linear-gradient(135deg, hsl(45, 100%, 50%), hsl(60, 100%, 70%));
-    --gradient-platinum: linear-gradient(135deg, hsl(220, 40%, 70%), hsl(240, 60%, 85%));
-    --gradient-diamond: linear-gradient(135deg, hsl(200, 100%, 60%), hsl(180, 100%, 70%));
+    /* PASSIONATE AFRICA & INDIA Badge Gradients - 3 per tier */
+    
+    /* Bronze Tier - Earth & Spice Foundation */
+    --bronze-savanna-sunset: linear-gradient(135deg, hsl(25, 85%, 55%), hsl(35, 90%, 65%));
+    --bronze-baobab-bark: linear-gradient(135deg, hsl(20, 70%, 45%), hsl(30, 80%, 55%));
+    --bronze-kalahari-sand: linear-gradient(135deg, hsl(40, 75%, 50%), hsl(50, 85%, 60%));
+    --bronze-turmeric-fire: linear-gradient(135deg, hsl(45, 95%, 50%), hsl(55, 100%, 60%));
+    --bronze-cinnamon-spice: linear-gradient(135deg, hsl(15, 80%, 45%), hsl(25, 85%, 55%));
+    --bronze-cardamom-earth: linear-gradient(135deg, hsl(35, 70%, 45%), hsl(45, 80%, 55%));
+
+    /* Silver Tier - Metallic Brilliance */
+    --silver-serengeti-storm: linear-gradient(135deg, hsl(200, 60%, 65%), hsl(220, 70%, 75%));
+    --silver-zambezi-mist: linear-gradient(135deg, hsl(180, 40%, 70%), hsl(200, 50%, 80%));
+    --silver-atlas-silver: linear-gradient(135deg, hsl(240, 25%, 75%), hsl(260, 35%, 85%));
+    --silver-monsoon-silver: linear-gradient(135deg, hsl(210, 45%, 70%), hsl(230, 55%, 80%));
+    --silver-temple-bells: linear-gradient(135deg, hsl(190, 35%, 75%), hsl(210, 45%, 85%));
+    --silver-kashmir-snow: linear-gradient(135deg, hsl(220, 30%, 80%), hsl(240, 40%, 90%));
+
+    /* Gold Tier - Royal Splendor */
+    --gold-sahara-crown: linear-gradient(135deg, hsl(45, 100%, 55%), hsl(60, 100%, 70%));
+    --gold-lions-mane: linear-gradient(135deg, hsl(40, 95%, 50%), hsl(50, 100%, 65%));
+    --gold-gold-coast: linear-gradient(135deg, hsl(50, 90%, 55%), hsl(65, 95%, 70%));
+    --gold-rajasthani-gold: linear-gradient(135deg, hsl(35, 100%, 50%), hsl(45, 100%, 65%));
+    --gold-temple-gold: linear-gradient(135deg, hsl(42, 95%, 55%), hsl(52, 100%, 70%));
+    --gold-bollywood-glam: linear-gradient(135deg, hsl(48, 100%, 60%), hsl(58, 100%, 75%));
+
+    /* Platinum Tier - Legendary Power */
+    --platinum-victoria-falls: linear-gradient(135deg, hsl(180, 80%, 70%), hsl(200, 90%, 80%));
+    --platinum-taj-mahal: linear-gradient(135deg, hsl(220, 50%, 80%), hsl(240, 60%, 90%));
+    --platinum-kilimanjaro-peak: linear-gradient(135deg, hsl(210, 70%, 75%), hsl(230, 80%, 85%));
+    --platinum-ganges-sacred: linear-gradient(135deg, hsl(190, 60%, 75%), hsl(210, 70%, 85%));
+
+    /* Diamond Tier - Ultimate Brilliance */
+    --diamond-african-star: linear-gradient(135deg, hsl(200, 100%, 65%), hsl(180, 100%, 75%));
+    --diamond-kohinoor: linear-gradient(135deg, hsl(220, 90%, 70%), hsl(200, 100%, 80%));
+    --diamond-namib-crystal: linear-gradient(135deg, hsl(190, 100%, 70%), hsl(170, 100%, 80%));
+    --diamond-himalayan-ice: linear-gradient(135deg, hsl(210, 80%, 75%), hsl(190, 90%, 85%));
+
+    /* Legendary Tier */
     --gradient-legendary: linear-gradient(135deg, hsl(300, 100%, 70%), hsl(320, 100%, 80%));
     
     /* INTENSE Glow Effects */

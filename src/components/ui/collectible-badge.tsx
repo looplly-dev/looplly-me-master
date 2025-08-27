@@ -95,35 +95,63 @@ export function CollectibleBadge({ badge, size = 'md', onClick }: CollectibleBad
   };
 
   const getTierGradient = (tier: string) => {
+    // Use badge ID to deterministically choose one of 3 colors per tier
+    const colorIndex = badge.id.length % 3;
+    
     switch (tier) {
       case 'Diamond':
+        const diamondGradients = [
+          'var(--diamond-african-star)',
+          'var(--diamond-kohinoor)', 
+          'var(--diamond-namib-crystal)'
+        ];
         return {
-          background: 'var(--gradient-diamond)', // Electric cyan to bright blue
+          background: diamondGradients[colorIndex],
           boxShadow: 'var(--shadow-diamond-glow)'
         };
       case 'Platinum':
+        const platinumGradients = [
+          'var(--platinum-victoria-falls)',
+          'var(--platinum-taj-mahal)',
+          'var(--platinum-kilimanjaro-peak)'
+        ];
         return {
-          background: 'var(--gradient-platinum)', // Platinum shimmer with purple hints
+          background: platinumGradients[colorIndex],
           boxShadow: 'var(--shadow-platinum-glow)'
         };
       case 'Gold':
+        const goldGradients = [
+          'var(--gold-sahara-crown)',
+          'var(--gold-lions-mane)',
+          'var(--gold-rajasthani-gold)'
+        ];
         return {
-          background: 'var(--gradient-gold)', // Electric gold to bright yellow
+          background: goldGradients[colorIndex],
           boxShadow: 'var(--shadow-gold-glow)'
         };
       case 'Silver':
+        const silverGradients = [
+          'var(--silver-serengeti-storm)',
+          'var(--silver-zambezi-mist)',
+          'var(--silver-monsoon-silver)'
+        ];
         return {
-          background: 'var(--gradient-silver)', // Bright silver with shimmer
+          background: silverGradients[colorIndex],
           boxShadow: 'var(--shadow-silver-glow)'
         };
       case 'Bronze':
+        const bronzeGradients = [
+          'var(--bronze-savanna-sunset)',
+          'var(--bronze-turmeric-fire)',
+          'var(--bronze-cinnamon-spice)'
+        ];
         return {
-          background: 'var(--gradient-bronze)', // Electric orange to amber
+          background: bronzeGradients[colorIndex],
           boxShadow: 'var(--shadow-bronze-glow)'
         };
       default:
         return {
-          background: 'var(--gradient-legendary)', // Electric magenta to hot pink
+          background: 'var(--gradient-legendary)',
           boxShadow: 'var(--shadow-legendary-glow)'
         };
     }
