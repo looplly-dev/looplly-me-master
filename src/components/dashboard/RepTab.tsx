@@ -25,12 +25,15 @@ import {
 import { userStats, badgeSystem } from '@/data/mockData';
 import { useAuth } from '@/hooks/useAuth';
 import { CollectibleBadge } from '@/components/ui/collectible-badge';
+import { BadgeDetailModal } from '@/components/ui/badge-detail-modal';
 import { StreakProgress } from '@/components/ui/streak-progress';
 import { CollapsibleSection } from '@/components/ui/collapsible-section';
 
 export default function RepTab() {
   const { authState } = useAuth();
   const [isCompactView, setIsCompactView] = useState(true);
+  const [selectedBadge, setSelectedBadge] = useState<any>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   // Endless reputation system with tiers and prestige
   const getLevel = (score: number) => {
     if (score >= 2000) return { name: 'Elite', tier: 'Elite', color: 'text-gradient', icon: '👑', min: 2000, max: Infinity };
@@ -58,6 +61,11 @@ export default function RepTab() {
     ...badgeSystem.streakAchievements,
     ...badgeSystem.qualityAchievements
   ];
+
+  const handleBadgeClick = (badge: any) => {
+    setSelectedBadge(badge);
+    setIsModalOpen(true);
+  };
 
   const tips = [
     { 
@@ -314,12 +322,13 @@ export default function RepTab() {
                 {badgeSystem.coreVerification.filter(b => b.earned).length}/{badgeSystem.coreVerification.length}
               </Badge>
             </h4>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4"> {/* Better mobile spacing */}
+            <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-8 gap-2">
               {badgeSystem.coreVerification.map((badge) => (
                 <CollectibleBadge 
                   key={badge.id} 
                   badge={badge} 
                   size="sm"
+                  onClick={() => handleBadgeClick(badge)}
                 />
               ))}
             </div>
@@ -334,12 +343,13 @@ export default function RepTab() {
                 {badgeSystem.streakAchievements.filter(b => b.earned).length}/{badgeSystem.streakAchievements.length}
               </Badge>
             </h4>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4"> {/* Better mobile spacing */}
+            <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-8 gap-2">
               {badgeSystem.streakAchievements.map((badge) => (
                 <CollectibleBadge 
                   key={badge.id} 
                   badge={badge} 
                   size="sm"
+                  onClick={() => handleBadgeClick(badge)}
                 />
               ))}
             </div>
@@ -354,12 +364,13 @@ export default function RepTab() {
                 {badgeSystem.qualityAchievements.filter(b => b.earned).length}/{badgeSystem.qualityAchievements.length}
               </Badge>
             </h4>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4"> {/* Better mobile spacing */}
+            <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-8 gap-2">
               {badgeSystem.qualityAchievements.map((badge) => (
                 <CollectibleBadge 
                   key={badge.id} 
                   badge={badge} 
                   size="sm"
+                  onClick={() => handleBadgeClick(badge)}
                 />
               ))}
             </div>
@@ -550,6 +561,13 @@ export default function RepTab() {
           </p>
         </div>
       </CollapsibleSection>
+
+      {/* Badge Detail Modal */}
+      <BadgeDetailModal
+        badge={selectedBadge}
+        open={isModalOpen}
+        onOpenChange={setIsModalOpen}
+      />
     </div>
   );
 }

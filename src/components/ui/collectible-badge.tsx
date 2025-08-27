@@ -1,5 +1,4 @@
 import { cn } from '@/lib/utils';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { 
   Shield, 
   MapPin, 
@@ -49,11 +48,17 @@ interface CollectibleBadgeProps {
     requirement?: number;
     shape?: 'circle' | 'hexagon' | 'shield' | 'star' | 'diamond';
     category?: string;
+    requirements?: string[];
+    points?: number;
+    progress?: number;
+    target?: number;
+    earnedAt?: string;
   };
   size?: 'sm' | 'md' | 'lg';
+  onClick?: () => void;
 }
 
-export function CollectibleBadge({ badge, size = 'md' }: CollectibleBadgeProps) {
+export function CollectibleBadge({ badge, size = 'md', onClick }: CollectibleBadgeProps) {
   const IconComponent = iconMap[badge.icon as keyof typeof iconMap] || Shield;
   
   // Consistent sizing for all badges - mobile optimized
@@ -127,112 +132,56 @@ export function CollectibleBadge({ badge, size = 'md' }: CollectibleBadgeProps) 
   };
 
   return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <div className="relative group touch-manipulation"> {/* Better mobile touch */}
-            <div
-              className={cn(
-                'relative cursor-pointer transition-transform duration-200 hover:scale-105 active:scale-95', // Simplified mobile-friendly animation
-                sizeClasses[size],
-                getShapeClasses(badge.shape || 'circle'),
-                getCategoryGradient(badge.tier, badge.rarity),
-                getRarityEffects(badge.rarity, badge.earned),
-                getLockedState()
-              )}
-            >
-              {/* Simplified background overlay */}
-              <div className={cn(
-                "absolute inset-0 bg-gradient-to-br from-white/20 to-transparent",
-                getShapeClasses(badge.shape || 'circle')
-              )} />
-              
-              {/* Icon container with shape compensation */}
-              <div className={cn(
-                "absolute inset-0 flex items-center justify-center",
-                (badge.shape === 'diamond' || badge.shape === 'star') ? '-rotate-45' : ''
-              )}>
-                <IconComponent 
-                  className={cn(
-                    iconSizes[size],
-                    'text-white drop-shadow-lg'
-                  )} 
-                />
-              </div>
-
-              {/* Simplified earned indicator */}
-              {badge.earned && (
-                <div className="absolute -top-1 -right-1 w-5 h-5 bg-emerald-500 rounded-full border-2 border-white flex items-center justify-center shadow-md">
-                  <CheckCircle className="h-2.5 w-2.5 text-white" />
-                </div>
-              )}
-
-              {/* Simplified legendary effect */}
-              {badge.rarity === 'Legendary' && badge.earned && (
-                <div className="absolute top-1 right-1">
-                  <Sparkles className="h-3 w-3 text-yellow-300" />
-                </div>
-              )}
-            </div>
-            
-            {/* Simplified progress indicator */}
-            {!badge.earned && badge.requirement && (
-              <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2">
-                <div className="bg-muted rounded-full px-2 py-0.5">
-                  <span className="text-xs font-medium text-muted-foreground">
-                    0/{badge.requirement}
-                  </span>
-                </div>
-              </div>
-            )}
-          </div>
-        </TooltipTrigger>
+    <div 
+      className="relative group touch-manipulation cursor-pointer"
+      onClick={onClick}
+    >
+      <div
+        className={cn(
+          'relative transition-transform duration-200 hover:scale-105 active:scale-95',
+          sizeClasses[size],
+          getShapeClasses(badge.shape || 'circle'),
+          getCategoryGradient(badge.tier, badge.rarity),
+          getRarityEffects(badge.rarity, badge.earned),
+          getLockedState()
+        )}
+      >
+        {/* Simplified background overlay */}
+        <div className={cn(
+          "absolute inset-0 bg-gradient-to-br from-white/20 to-transparent",
+          getShapeClasses(badge.shape || 'circle')
+        )} />
         
-        <TooltipContent side="top" className="max-w-xs"> {/* Smaller max-width for mobile */}
-          <div className="text-center space-y-2">
-            <div className="flex items-center justify-center gap-2">
-              <p className="font-bold text-sm">{badge.name}</p> {/* Smaller text for mobile */}
-              {badge.earned && <CheckCircle className="h-3 w-3 text-green-500" />}
-            </div>
-            
-            <p className="text-xs text-muted-foreground leading-relaxed">{badge.description}</p>
-            
-            {/* Simplified mobile-friendly layout */}
-            <div className="space-y-2 pt-2 border-t">
-              <div className="flex items-center justify-center gap-2">
-                <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-muted text-muted-foreground">
-                  {badge.tier}
-                </span>
-                <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-muted text-muted-foreground">
-                  {badge.rarity}
-                </span>
-              </div>
-              <div className="text-center">
-                <span className={cn(
-                  'text-sm font-bold',
-                  badge.earned ? 'text-green-600' : 'text-muted-foreground'
-                )}>
-                  +{badge.repPoints} Rep
-                </span>
-              </div>
-            </div>
-            
-            {badge.requirement && !badge.earned && (
-              <div className="pt-2 border-t">
-                <p className="text-xs text-muted-foreground">
-                  Need {badge.requirement}+ {badge.category?.toLowerCase() || 'actions'}
-                </p>
-              </div>
-            )}
+        {/* Icon container with shape compensation */}
+        <div className={cn(
+          "absolute inset-0 flex items-center justify-center",
+          (badge.shape === 'diamond' || badge.shape === 'star') ? '-rotate-45' : ''
+        )}>
+          <IconComponent 
+            className={cn(
+              iconSizes[size],
+              'text-white drop-shadow-lg'
+            )} 
+          />
+        </div>
 
-            {badge.earned && (
-              <div className="pt-2 border-t">
-                <p className="text-xs text-green-600 font-medium">✨ Unlocked!</p>
-              </div>
-            )}
+        {/* Simplified earned indicator */}
+        {badge.earned && (
+          <div className="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-white flex items-center justify-center shadow-md">
+            <CheckCircle className="h-2 w-2 text-white" />
           </div>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+        )}
+
+        {/* Progress indicator for unearned badges */}
+        {!badge.earned && badge.progress !== undefined && badge.target && (
+          <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-8 h-1 bg-black/20 rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-white/60 rounded-full transition-all duration-300"
+              style={{ width: `${Math.min((badge.progress / badge.target) * 100, 100)}%` }}
+            />
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
