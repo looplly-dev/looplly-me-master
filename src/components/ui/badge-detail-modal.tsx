@@ -1,9 +1,48 @@
 import React from "react"
-import { X, Calendar, Trophy, Target, Clock } from "lucide-react"
+import { X, Calendar, Trophy, Target, Clock, Shield, Flame, Users, Star, MapPin, Award, Zap, Gift, Crown, Gem, Globe, MessageSquare, Heart, Coffee, Book, Code, Music, Gamepad2, Camera, Palette, Rocket, Key, Lock, Settings, Bell, Mail, Phone, Home, User, CheckCircle, XCircle, AlertCircle, Info, Plus, Minus } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { cn } from "@/lib/utils"
+
+// Icon mapping system (matching CollectibleBadge)
+const iconMap = {
+  shield: Shield,
+  flame: Flame,
+  users: Users,
+  star: Star,
+  trophy: Trophy,
+  target: Target,
+  crown: Crown,
+  gem: Gem,
+  award: Award,
+  zap: Zap,
+  gift: Gift,
+  globe: Globe,
+  message: MessageSquare,
+  heart: Heart,
+  coffee: Coffee,
+  book: Book,
+  code: Code,
+  music: Music,
+  gamepad: Gamepad2,
+  camera: Camera,
+  palette: Palette,
+  rocket: Rocket,
+  key: Key,
+  lock: Lock,
+  settings: Settings,
+  bell: Bell,
+  mail: Mail,
+  phone: Phone,
+  home: Home,
+  user: User,
+  check: CheckCircle,
+  x: XCircle,
+  alert: AlertCircle,
+  info: Info,
+  mapPin: MapPin
+}
 
 interface BadgeDetailModalProps {
   badge: any
@@ -85,7 +124,10 @@ export function BadgeDetailModal({ badge, open, onOpenChange }: BadgeDetailModal
                 )}
               >
                 <div className="text-white text-4xl">
-                  {badge.icon || '🏆'}
+                  {(() => {
+                    const IconComponent = iconMap[badge.icon as keyof typeof iconMap];
+                    return IconComponent ? <IconComponent className="h-12 w-12" /> : (badge.icon || '🏆');
+                  })()}
                 </div>
                 
                 {/* Earned indicator */}

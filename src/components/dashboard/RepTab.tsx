@@ -324,6 +324,14 @@ export default function RepTab() {
           </div>
         }
       >
+        {/* Tap Hint - Moved to Top */}
+        <div className="text-center py-3 mb-4 bg-primary/5 rounded-xl border border-primary/20">
+          <p className="text-sm font-medium text-primary flex items-center justify-center gap-2">
+            <Target className="h-4 w-4" />
+            Tap any badge to view detailed achievement info
+          </p>
+        </div>
+
         <div className="space-y-8">
           {badgeCategories.map((category) => (
             <div key={category.name} className="space-y-4">
@@ -379,13 +387,6 @@ export default function RepTab() {
             </div>
           ))}
 
-          {/* Tap Hint */}
-          <div className="text-center py-4">
-            <p className="text-sm text-muted-foreground flex items-center justify-center gap-2">
-              <Target className="h-4 w-4" />
-              Tap any badge to view detailed achievement info
-            </p>
-          </div>
         </div>
       </CollapsibleSection>
 

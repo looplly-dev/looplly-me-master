@@ -70,43 +70,43 @@ All colors MUST be HSL.
     --info: 220 100% 65%; /* Electric blue */
     --info-foreground: 0 0% 100%;
 
-    /* Vibrant Badge System Colors */
-    --badge-bronze: 251 146 60;
-    --badge-silver: 148 163 184;
-    --badge-gold: 251 191 36;
-    --badge-platinum: 168 162 158;
-    --badge-diamond: 14 165 233;
-    --badge-legendary: 168 85 247;
+    /* PSYCHEDELIC Badge System Colors - Super Vibrant! */
+    --badge-bronze: 30 100% 40;     /* Deep amber */
+    --badge-silver: 240 15% 85;     /* Bright silver */
+    --badge-gold: 45 100% 50;       /* Electric gold */
+    --badge-platinum: 220 30% 70;   /* Platinum shimmer */
+    --badge-diamond: 200 100% 60;   /* Electric cyan */
+    --badge-legendary: 300 100% 70; /* Electric magenta */
     
-    /* Electric Gradients for Pokémon-style badges */
-    --gradient-bronze: linear-gradient(135deg, hsl(var(--badge-bronze)), hsl(251, 146, 80));
-    --gradient-silver: linear-gradient(135deg, hsl(var(--badge-silver)), hsl(148, 200, 220));
-    --gradient-gold: linear-gradient(135deg, hsl(var(--badge-gold)), hsl(251, 191, 60));
-    --gradient-platinum: linear-gradient(135deg, hsl(var(--badge-platinum)), hsl(168, 180, 200));
-    --gradient-diamond: linear-gradient(135deg, hsl(var(--badge-diamond)), hsl(59, 130, 246));
-    --gradient-legendary: linear-gradient(135deg, hsl(var(--badge-legendary)), hsl(236, 72, 153));
+    /* PSYCHEDELIC Electric Gradients */
+    --gradient-bronze: linear-gradient(135deg, hsl(30, 100%, 50%), hsl(25, 100%, 60%));
+    --gradient-silver: linear-gradient(135deg, hsl(240, 20%, 80%), hsl(260, 30%, 90%));
+    --gradient-gold: linear-gradient(135deg, hsl(45, 100%, 50%), hsl(60, 100%, 70%));
+    --gradient-platinum: linear-gradient(135deg, hsl(220, 40%, 70%), hsl(240, 60%, 85%));
+    --gradient-diamond: linear-gradient(135deg, hsl(200, 100%, 60%), hsl(180, 100%, 70%));
+    --gradient-legendary: linear-gradient(135deg, hsl(300, 100%, 70%), hsl(320, 100%, 80%));
     
-    /* Vibrant shadows for badge glow effects */
-    --shadow-bronze-glow: 0 0 20px hsl(var(--badge-bronze) / 0.4);
-    --shadow-silver-glow: 0 0 20px hsl(var(--badge-silver) / 0.4);
-    --shadow-gold-glow: 0 0 20px hsl(var(--badge-gold) / 0.4);
-    --shadow-diamond-glow: 0 0 20px hsl(var(--badge-diamond) / 0.4);
-    --shadow-legendary-glow: 0 0 20px hsl(var(--badge-legendary) / 0.4);
+    /* INTENSE Glow Effects */
+    --shadow-bronze-glow: 0 0 30px hsl(30, 100%, 50% / 0.6), 0 0 60px hsl(30, 100%, 50% / 0.3);
+    --shadow-silver-glow: 0 0 30px hsl(240, 20%, 80% / 0.6), 0 0 60px hsl(240, 20%, 80% / 0.3);
+    --shadow-gold-glow: 0 0 30px hsl(45, 100%, 50% / 0.6), 0 0 60px hsl(45, 100%, 50% / 0.3);
+    --shadow-diamond-glow: 0 0 30px hsl(200, 100%, 60% / 0.6), 0 0 60px hsl(200, 100%, 60% / 0.3);
+    --shadow-legendary-glow: 0 0 30px hsl(300, 100%, 70% / 0.6), 0 0 60px hsl(300, 100%, 70% / 0.3);
 
     /* Single color gradients */
     --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
     --gradient-success: linear-gradient(135deg, hsl(var(--success)), hsl(var(--success-glow)));
     --gradient-subtle: linear-gradient(135deg, hsl(var(--primary) / 0.1), hsl(var(--primary) / 0.2));
     
-    /* Badge system gradients */
-    --gradient-legendary-start: 40 100% 50%;  /* golden */
-    --gradient-legendary-end: 25 95% 53%;     /* amber */
-    --gradient-epic-start: 271 91% 65%;       /* purple */
-    --gradient-epic-end: 292 84% 61%;         /* violet */
-    --gradient-rare-start: 217 91% 60%;       /* blue */
-    --gradient-rare-end: 213 94% 68%;         /* light blue */
-    --gradient-common-start: 160 84% 39%;     /* emerald */
-    --gradient-common-end: 158 64% 52%;       /* green */
+    /* ELECTRIC Badge system gradients - Inspired by tribal art! */
+    --gradient-legendary-start: 300 100% 60%;  /* Electric magenta */
+    --gradient-legendary-end: 320 100% 80%;    /* Hot pink */
+    --gradient-epic-start: 260 100% 70%;       /* Electric purple */
+    --gradient-epic-end: 280 100% 85%;         /* Bright violet */
+    --gradient-rare-start: 180 100% 50%;       /* Neon cyan */
+    --gradient-rare-end: 200 100% 70%;         /* Electric blue */
+    --gradient-common-start: 120 100% 50%;     /* Neon green */
+    --gradient-common-end: 140 100% 60%;       /* Lime green */
 
     /* Elegant shadows */
     --shadow-card: 0 2px 10px -2px hsl(220 13% 9% / 0.1);
