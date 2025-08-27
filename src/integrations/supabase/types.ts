@@ -14,6 +14,84 @@ export type Database = {
   }
   public: {
     Tables: {
+      cint_config: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          key: string
+          updated_at: string
+          value: Json
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          key: string
+          updated_at?: string
+          value: Json
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          key?: string
+          updated_at?: string
+          value?: Json
+        }
+        Relationships: []
+      }
+      cint_survey_sessions: {
+        Row: {
+          actual_reward: number | null
+          cint_session_id: string
+          completed_at: string | null
+          created_at: string
+          estimated_duration: number | null
+          estimated_reward: number
+          id: string
+          started_at: string
+          status: string
+          survey_id: string
+          survey_url: string
+          terminated_reason: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          actual_reward?: number | null
+          cint_session_id: string
+          completed_at?: string | null
+          created_at?: string
+          estimated_duration?: number | null
+          estimated_reward: number
+          id?: string
+          started_at?: string
+          status?: string
+          survey_id: string
+          survey_url: string
+          terminated_reason?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          actual_reward?: number | null
+          cint_session_id?: string
+          completed_at?: string | null
+          created_at?: string
+          estimated_duration?: number | null
+          estimated_reward?: number
+          id?: string
+          started_at?: string
+          status?: string
+          survey_id?: string
+          survey_url?: string
+          terminated_reason?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       communication_preferences: {
         Row: {
           created_at: string
@@ -155,6 +233,96 @@ export type Database = {
         }
         Relationships: []
       }
+      referral_codes: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          is_active: boolean | null
+          max_uses: number | null
+          updated_at: string
+          user_id: string
+          uses_count: number | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          max_uses?: number | null
+          updated_at?: string
+          user_id: string
+          uses_count?: number | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          max_uses?: number | null
+          updated_at?: string
+          user_id?: string
+          uses_count?: number | null
+        }
+        Relationships: []
+      }
+      referrals: {
+        Row: {
+          accountant_status: string | null
+          created_at: string
+          funds_verified: boolean | null
+          id: string
+          min_rep_points: number | null
+          paid_at: string | null
+          payout_completed: boolean | null
+          qualification_met: boolean | null
+          qualified_at: string | null
+          referee_earnings: number | null
+          referee_id: string
+          referral_code: string
+          referrer_id: string
+          referrer_payout: number | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          accountant_status?: string | null
+          created_at?: string
+          funds_verified?: boolean | null
+          id?: string
+          min_rep_points?: number | null
+          paid_at?: string | null
+          payout_completed?: boolean | null
+          qualification_met?: boolean | null
+          qualified_at?: string | null
+          referee_earnings?: number | null
+          referee_id: string
+          referral_code: string
+          referrer_id: string
+          referrer_payout?: number | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          accountant_status?: string | null
+          created_at?: string
+          funds_verified?: boolean | null
+          id?: string
+          min_rep_points?: number | null
+          paid_at?: string | null
+          payout_completed?: boolean | null
+          qualification_met?: boolean | null
+          qualified_at?: string | null
+          referee_earnings?: number | null
+          referee_id?: string
+          referral_code?: string
+          referrer_id?: string
+          referrer_payout?: number | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       transactions: {
         Row: {
           amount: number
@@ -162,6 +330,7 @@ export type Database = {
           currency: string | null
           id: string
           metadata: Json | null
+          referral_id: string | null
           source: string | null
           status: Database["public"]["Enums"]["transaction_status"] | null
           type: Database["public"]["Enums"]["transaction_type"]
@@ -174,6 +343,7 @@ export type Database = {
           currency?: string | null
           id?: string
           metadata?: Json | null
+          referral_id?: string | null
           source?: string | null
           status?: Database["public"]["Enums"]["transaction_status"] | null
           type: Database["public"]["Enums"]["transaction_type"]
@@ -186,13 +356,22 @@ export type Database = {
           currency?: string | null
           id?: string
           metadata?: Json | null
+          referral_id?: string | null
           source?: string | null
           status?: Database["public"]["Enums"]["transaction_status"] | null
           type?: Database["public"]["Enums"]["transaction_type"]
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "transactions_referral_id_fkey"
+            columns: ["referral_id"]
+            isOneToOne: false
+            referencedRelation: "referrals"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_balances: {
         Row: {
