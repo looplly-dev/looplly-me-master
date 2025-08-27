@@ -38,6 +38,7 @@ import { useBalance } from '@/hooks/useBalance';
 import { useEarningActivities } from '@/hooks/useEarningActivities';
 import { useTransactions } from '@/hooks/useTransactions';
 import { useAuth } from '@/hooks/useAuth';
+import { useCintSurveys } from '@/hooks/useCintSurveys';
 import { addMissingDemoActivities } from '@/utils/addMissingDemoActivities';
 import { addMockEarningActivities } from '@/utils/mockEarningActivities';
 import { userStats } from '@/data/mockData';
@@ -62,6 +63,7 @@ export default function SimplifiedEarnTab() {
   const { activities, addActivity, refetch } = useEarningActivities();
   const { addTransaction } = useTransactions();
   const { authState } = useAuth();
+  const { surveys: cintSurveys, isLoading: cintLoading, startSurvey } = useCintSurveys();
 
   // Using static mock data - no database calls needed
 
@@ -394,35 +396,74 @@ export default function SimplifiedEarnTab() {
               </TabsList>
 
               <TabsContent value="surveys" className="space-y-3 mt-4 max-h-[400px] overflow-y-auto scroll-smooth pb-4">
-                {/* Cint Surveys Space Filler */}
-                <div className="p-4 border rounded-lg bg-gradient-to-r from-primary/5 to-accent/5 border-dashed border-primary/30">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-primary/10 rounded-lg">
-                        <Search className="h-5 w-5 text-primary" />
+                {/* Cint Premium Surveys */}
+                {cintLoading ? (
+                  <div className="space-y-3">
+                    {[...Array(3)].map((_, i) => (
+                      <div key={i} className="p-4 border rounded-lg animate-pulse">
+                        <div className="h-4 bg-muted rounded w-3/4 mb-2"></div>
+                        <div className="h-3 bg-muted rounded w-1/2"></div>
                       </div>
-                      <div>
-                        <h3 className="font-semibold text-primary">Cint Premium Surveys</h3>
-                        <p className="text-sm text-muted-foreground">
-                          High-paying surveys coming soon
-                        </p>
+                    ))}
+                  </div>
+                ) : cintSurveys.length > 0 ? (
+                  cintSurveys.map((survey) => (
+                    <Card key={survey.id} className="p-4 hover:shadow-md transition-shadow">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-primary/10 rounded-lg">
+                            <Search className="h-5 w-5 text-primary" />
+                          </div>
+                          <div>
+                            <h3 className="font-semibold">{survey.title}</h3>
+                            <p className="text-sm text-muted-foreground">
+                              {survey.description}
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {survey.category} • {survey.completion_rate}% completion rate
+                            </p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Badge variant="outline" className="text-xs">
+                              Cint Premium
+                            </Badge>
+                          </div>
+                          <Button 
+                            size="sm" 
+                            onClick={() => startSurvey(survey)}
+                            className="w-20"
+                          >
+                            Start
+                          </Button>
+                        </div>
                       </div>
-                    </div>
-                    <Badge variant="outline" className="border-primary/50 text-primary">
-                      Coming Soon
-                    </Badge>
+                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                        <span className="flex items-center gap-1">
+                          <Clock className="h-4 w-4" />
+                          {survey.time_estimate} min
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Coins className="h-4 w-4 text-success" />
+                          <span className="font-bold text-success">${survey.reward_amount.toFixed(2)}</span>
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Target className="h-4 w-4" />
+                          {survey.qualification_score}% match score
+                        </span>
+                      </div>
+                    </Card>
+                  ))
+                ) : (
+                  <div className="text-center py-8">
+                    <Search className="h-12 w-12 mx-auto mb-3 text-muted-foreground/50" />
+                    <h3 className="font-semibold mb-2">No Premium Surveys Available</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Check back later for high-paying Cint surveys
+                    </p>
                   </div>
-                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                    <span className="flex items-center gap-1">
-                      <Clock className="h-4 w-4" />
-                      5-15 min
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Coins className="h-4 w-4 text-success" />
-                      <span className="font-bold text-success">$2.00-$8.00</span>
-                    </span>
-                  </div>
-                </div>
+                )}
 
                 {availableTasks.filter(a => a.activity_type === 'survey').length === 0 ? (
                   <div className="text-center py-8">
