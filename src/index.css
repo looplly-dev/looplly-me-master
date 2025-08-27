@@ -138,15 +138,27 @@ All colors MUST be HSL.
     --gradient-success: linear-gradient(135deg, hsl(var(--success)), hsl(var(--success-glow)));
     --gradient-subtle: linear-gradient(135deg, hsl(var(--primary) / 0.1), hsl(var(--primary) / 0.2));
     
-    /* ELECTRIC Badge system gradients - Inspired by tribal art! */
-    --gradient-legendary-start: 300 100% 60%;  /* Electric magenta */
-    --gradient-legendary-end: 320 100% 80%;    /* Hot pink */
-    --gradient-epic-start: 260 100% 70%;       /* Electric purple */
-    --gradient-epic-end: 280 100% 85%;         /* Bright violet */
-    --gradient-rare-start: 180 100% 50%;       /* Neon cyan */
-    --gradient-rare-end: 200 100% 70%;         /* Electric blue */
-    --gradient-common-start: 120 100% 50%;     /* Neon green */
-    --gradient-common-end: 140 100% 60%;       /* Lime green */
+    /* INSANE ELECTRIC Badge Colors - NO BLENDING! */
+    --tier-bronze: 20 100% 50%;           /* Pure molten orange */
+    --tier-bronze-glow: 25 100% 60%;      /* Electric amber */
+    --tier-silver: 0 0% 75%;              /* Pure chrome silver */
+    --tier-silver-glow: 0 0% 85%;         /* Electric silver */
+    --tier-gold: 51 100% 50%;             /* Pure gold */
+    --tier-gold-glow: 45 100% 65%;        /* Electric gold */
+    --tier-platinum: 200 100% 70%;        /* Ice blue platinum */
+    --tier-platinum-glow: 195 100% 80%;   /* Arctic platinum */
+    --tier-diamond: 180 100% 50%;         /* Electric cyan */
+    --tier-diamond-glow: 185 100% 65%;    /* Laser blue */
+    --tier-legendary: 300 100% 50%;       /* Hot magenta */
+    --tier-legendary-glow: 310 100% 65%;  /* Electric pink */
+    
+    /* Pure Neon Outlines */
+    --neon-bronze: 0 0 20px hsl(20, 100%, 50%);
+    --neon-silver: 0 0 20px hsl(0, 0%, 85%);
+    --neon-gold: 0 0 20px hsl(51, 100%, 50%);
+    --neon-platinum: 0 0 20px hsl(200, 100%, 70%);
+    --neon-diamond: 0 0 20px hsl(180, 100%, 50%);
+    --neon-legendary: 0 0 20px hsl(300, 100%, 50%);
 
     /* Elegant shadows */
     --shadow-card: 0 2px 10px -2px hsl(220 13% 9% / 0.1);

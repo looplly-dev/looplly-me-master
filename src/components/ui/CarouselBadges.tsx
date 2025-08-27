@@ -22,6 +22,7 @@ type BadgeItem = {
   target?: number;
   earnedAt?: string;
   repPoints?: number; // Optional since not always provided
+  isSpacer?: boolean; // For spacer items
 };
 
 export default function CarouselBadges({ 
@@ -31,8 +32,21 @@ export default function CarouselBadges({
   items: BadgeItem[]; 
   onItemClick?: (item: BadgeItem) => void;
 }) {
+  // Add spacers for perfect centering
+  const spacerItem: BadgeItem = {
+    id: 'spacer',
+    title: '',
+    icon: '',
+    tier: '',
+    rarity: '',
+    earned: false,
+    description: '',
+    isSpacer: true
+  };
+  
+  const itemsWithSpacers = [spacerItem, spacerItem, ...items, spacerItem, spacerItem];
   const [emblaRef, embla] = useEmblaCarousel({ loop: false, align: "center", dragFree: false, skipSnaps: false });
-  const [selected, setSelected] = React.useState(0);
+  const [selected, setSelected] = React.useState(2); // Start at first real badge
 
   React.useEffect(() => {
     if (!embla) return;
@@ -43,57 +57,102 @@ export default function CarouselBadges({
 
   const scrollTo = (i: number) => embla?.scrollTo(i);
   
-  // Get tier gradient for dynamic background
-  const getActiveTierGradient = () => {
-    const activeBadge = items[selected];
-    if (!activeBadge) return "from-background to-background";
+  // Smart navigation that skips spacers
+  const scrollToPrevious = () => {
+    const currentReal = selected - 2; // Convert to real badge index
+    if (currentReal > 0) {
+      scrollTo(currentReal - 1 + 2); // Convert back to spacer index
+    }
+  };
+  
+  const scrollToNext = () => {
+    const currentReal = selected - 2; // Convert to real badge index
+    if (currentReal < items.length - 1) {
+      scrollTo(currentReal + 1 + 2); // Convert back to spacer index
+    }
+  };
+  
+  // Get electric tier colors - NO BLENDING!
+  const getActiveTierColor = () => {
+    const realIndex = selected - 2;
+    const activeBadge = items[realIndex];
+    if (!activeBadge) return "tier-bronze";
     
     switch (activeBadge.tier?.toLowerCase()) {
-      case 'legendary': return "from-gradient-legendary-start to-gradient-legendary-end";
-      case 'epic': return "from-gradient-epic-start to-gradient-epic-end";
-      case 'rare': return "from-gradient-rare-start to-gradient-rare-end";
-      case 'uncommon': return "from-gradient-uncommon-start to-gradient-uncommon-end";
-      default: return "from-gradient-common-start to-gradient-common-end";
+      case 'legendary': return "tier-legendary";
+      case 'diamond': return "tier-diamond";
+      case 'platinum': return "tier-platinum";
+      case 'gold': return "tier-gold";
+      case 'silver': return "tier-silver";
+      default: return "tier-bronze";
+    }
+  };
+  
+  const getActiveTierGlow = () => {
+    const realIndex = selected - 2;
+    const activeBadge = items[realIndex];
+    if (!activeBadge) return "tier-bronze-glow";
+    
+    switch (activeBadge.tier?.toLowerCase()) {
+      case 'legendary': return "tier-legendary-glow";
+      case 'diamond': return "tier-diamond-glow";
+      case 'platinum': return "tier-platinum-glow";
+      case 'gold': return "tier-gold-glow";
+      case 'silver': return "tier-silver-glow";
+      default: return "tier-bronze-glow";
     }
   };
 
   return (
     <div className="w-full relative">
-      {/* Dynamic Background Glow */}
+      {/* ELECTRIC Background Glow - Pure Colors Only */}
       <motion.div 
-        className={`absolute inset-0 bg-gradient-to-r ${getActiveTierGradient()} opacity-10 blur-3xl rounded-3xl`}
+        className="absolute inset-0 rounded-3xl opacity-20 blur-3xl"
+        style={{
+          backgroundColor: `hsl(var(--${getActiveTierColor()}))`,
+        }}
         animate={{
-          opacity: [0.05, 0.15, 0.05],
-          scale: [1, 1.05, 1],
+          opacity: [0.1, 0.3, 0.1],
+          scale: [1, 1.1, 1],
+          boxShadow: [
+            `0 0 50px hsl(var(--${getActiveTierGlow()}) / 0.3)`,
+            `0 0 100px hsl(var(--${getActiveTierGlow()}) / 0.6)`,
+            `0 0 50px hsl(var(--${getActiveTierGlow()}) / 0.3)`
+          ]
         }}
         transition={{
-          duration: 4,
+          duration: 3,
           repeat: Infinity,
           ease: "easeInOut"
         }}
       />
       
-      {/* Floating Particles for Legendary/Epic */}
+      {/* ELECTRIC Particles for Legendary */}
       <AnimatePresence>
-        {items[selected]?.tier === 'Legendary' && (
+        {items[selected - 2]?.tier === 'Legendary' && (
           <div className="absolute inset-0 pointer-events-none overflow-hidden">
-            {[...Array(6)].map((_, i) => (
+            {[...Array(8)].map((_, i) => (
               <motion.div
                 key={i}
-                className="absolute w-1 h-1 bg-gradient-legendary-start rounded-full"
+                className="absolute w-2 h-2 rounded-full"
+                style={{
+                  backgroundColor: `hsl(var(--tier-legendary))`,
+                  boxShadow: `0 0 10px hsl(var(--tier-legendary))`
+                }}
                 initial={{ 
                   x: Math.random() * 300, 
                   y: Math.random() * 200,
                   opacity: 0 
                 }}
                 animate={{
-                  y: [null, -50],
+                  y: [null, -80],
+                  x: [null, Math.random() * 100 - 50],
                   opacity: [0, 1, 0],
-                  scale: [0, 1, 0]
+                  scale: [0, 1.5, 0]
                 }}
                 transition={{
-                  duration: 3,
-                  delay: i * 0.5,
+                  duration: 4,
+                  delay: i * 0.3,
                   repeat: Infinity,
                   ease: "easeOut"
                 }}
@@ -104,22 +163,44 @@ export default function CarouselBadges({
       </AnimatePresence>
 
       <div className="relative">
-        {/* Progress Bar */}
-        <div className="mb-2 h-1 bg-muted rounded-full overflow-hidden">
+        {/* RAINBOW Progress Bar */}
+        <div className="mb-4 h-2 bg-muted rounded-full overflow-hidden">
           <motion.div
-            className="h-full bg-gradient-to-r from-primary to-accent rounded-full"
-            animate={{
-              width: `${((selected + 1) / items.length) * 100}%`
+            className="h-full rounded-full"
+            style={{
+              background: `linear-gradient(90deg, 
+                hsl(var(--tier-bronze)), 
+                hsl(var(--tier-silver)), 
+                hsl(var(--tier-gold)), 
+                hsl(var(--tier-platinum)), 
+                hsl(var(--tier-diamond)), 
+                hsl(var(--tier-legendary)))`
             }}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            animate={{
+              width: `${((selected - 1) / items.length) * 100}%`,
+              boxShadow: [
+                `0 0 10px hsl(var(--${getActiveTierColor()}) / 0.5)`,
+                `0 0 20px hsl(var(--${getActiveTierColor()}) / 0.8)`,
+                `0 0 10px hsl(var(--${getActiveTierColor()}) / 0.5)`
+              ]
+            }}
+            transition={{ 
+              width: { type: "spring", stiffness: 300, damping: 30 },
+              boxShadow: { duration: 2, repeat: Infinity }
+            }}
           />
         </div>
         
         <div className="overflow-hidden" ref={emblaRef}>
           <div className="flex gap-8 py-6 px-4">
-            {items.map((item, i) => {
+            {itemsWithSpacers.map((item, i) => {
               const active = i === selected;
               const distance = Math.abs(i - selected);
+              
+              // Hide spacers completely
+              if (item.isSpacer) {
+                return <div key={`spacer-${i}`} className="basis-[140px] shrink-0" />;
+              }
               
               return (
                 <motion.div
@@ -197,10 +278,15 @@ export default function CarouselBadges({
           </div>
         </div>
 
-        {/* Electric Navigation Buttons */}
+        {/* ELECTRIC Navigation Buttons */}
         <motion.button
-          className="absolute left-2 top-1/2 -translate-y-1/2 bg-gradient-to-r from-primary to-accent p-3 rounded-full shadow-neon border border-primary/50 backdrop-blur-sm"
-          onClick={() => embla?.scrollPrev()}
+          className="absolute left-2 top-1/2 -translate-y-1/2 p-3 rounded-full backdrop-blur-sm border-2"
+          style={{
+            backgroundColor: `hsl(var(--${getActiveTierColor()}) / 0.2)`,
+            borderColor: `hsl(var(--${getActiveTierColor()}))`,
+            boxShadow: `var(--neon-${getActiveTierColor().replace('tier-', '')})`
+          }}
+          onClick={scrollToPrevious}
           aria-label="Previous"
           whileHover={{ 
             scale: 1.1, 
@@ -222,8 +308,13 @@ export default function CarouselBadges({
         </motion.button>
         
         <motion.button
-          className="absolute right-2 top-1/2 -translate-y-1/2 bg-gradient-to-r from-accent to-primary p-3 rounded-full shadow-neon border border-accent/50 backdrop-blur-sm"
-          onClick={() => embla?.scrollNext()}
+          className="absolute right-2 top-1/2 -translate-y-1/2 p-3 rounded-full backdrop-blur-sm border-2"
+          style={{
+            backgroundColor: `hsl(var(--${getActiveTierColor()}) / 0.2)`,
+            borderColor: `hsl(var(--${getActiveTierColor()}))`,
+            boxShadow: `var(--neon-${getActiveTierColor().replace('tier-', '')})`
+          }}
+          onClick={scrollToNext}
           aria-label="Next"
           whileHover={{ 
             scale: 1.1, 
@@ -245,46 +336,53 @@ export default function CarouselBadges({
         </motion.button>
       </div>
 
-      {/* Animated Dots with Pulse */}
-      <div className="mt-6 flex justify-center gap-3">
-        {items.map((_, i) => (
-          <motion.button
-            key={i}
-            className={`relative h-3 w-3 rounded-full transition-all duration-300 ${
-              i === selected 
-                ? "bg-gradient-to-r from-primary to-accent" 
-                : "bg-muted-foreground/40"
-            }`}
-            onClick={() => scrollTo(i)}
-            aria-label={`Go to slide ${i + 1}`}
-            whileHover={{ scale: 1.3 }}
-            whileTap={{ scale: 0.9 }}
-            animate={i === selected ? {
-              boxShadow: [
-                "0 0 0 0 hsl(var(--primary) / 0.4)",
-                "0 0 0 8px hsl(var(--primary) / 0)",
-              ]
-            } : {}}
-            transition={{
-              boxShadow: { duration: 1, repeat: Infinity }
-            }}
-          >
-            {i === selected && (
-              <motion.div
-                className="absolute inset-0 rounded-full bg-gradient-to-r from-primary to-accent"
-                animate={{
-                  scale: [1, 1.5, 1],
-                  opacity: [0.8, 0.4, 0.8]
-                }}
-                transition={{
-                  duration: 1.5,
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }}
-              />
-            )}
-          </motion.button>
-        ))}
+      {/* ELECTRIC Dots with Pulse */}
+      <div className="mt-6 flex justify-center gap-4">
+        {items.map((_, i) => {
+          const dotSelected = i === selected - 2; // Adjust for spacers
+          return (
+            <motion.button
+              key={i}
+              className="relative h-4 w-4 rounded-full transition-all duration-300"
+              style={{
+                backgroundColor: dotSelected 
+                  ? `hsl(var(--${getActiveTierColor()}))` 
+                  : "hsl(var(--muted-foreground) / 0.4)"
+              }}
+              onClick={() => scrollTo(i + 2)} // Adjust for spacers
+              aria-label={`Go to slide ${i + 1}`}
+              whileHover={{ scale: 1.4 }}
+              whileTap={{ scale: 0.8 }}
+              animate={dotSelected ? {
+                boxShadow: [
+                  `0 0 0 0 hsl(var(--${getActiveTierColor()}) / 0.6)`,
+                  `0 0 0 12px hsl(var(--${getActiveTierColor()}) / 0)`,
+                ]
+              } : {}}
+              transition={{
+                boxShadow: { duration: 1.2, repeat: Infinity }
+              }}
+            >
+              {dotSelected && (
+                <motion.div
+                  className="absolute inset-0 rounded-full"
+                  style={{
+                    backgroundColor: `hsl(var(--${getActiveTierGlow()}))`
+                  }}
+                  animate={{
+                    scale: [1, 1.8, 1],
+                    opacity: [0.9, 0.3, 0.9]
+                  }}
+                  transition={{
+                    duration: 1.8,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                />
+              )}
+            </motion.button>
+          );
+        })}
       </div>
     </div>
   );
