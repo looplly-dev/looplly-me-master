@@ -251,7 +251,7 @@ export default function SimplifiedEarnTab() {
 
   return (
     <TooltipProvider>
-      <div className="p-4 md:p-6 lg:p-8 pb-20 md:pb-6 space-y-6">
+      <div className="p-4 md:p-6 lg:p-8 pb-24 md:pb-20 lg:pb-8 space-y-6">
         {/* Enhanced Balance Card with Progress */}
         <Card className="bg-card border-0 shadow-lg">
           <CardContent className="p-6">
