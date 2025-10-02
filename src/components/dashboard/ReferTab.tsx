@@ -75,7 +75,7 @@ export default function ReferTab() {
   }
 
   return (
-    <div className="p-4 pb-20 space-y-6">
+    <div className="p-4 md:p-6 lg:p-8 pb-20 md:pb-6 space-y-6">
       {/* Referral Earnings */}
       <Card className="bg-card border-0 shadow-lg">
         <CardContent className="p-6">
@@ -113,7 +113,7 @@ export default function ReferTab() {
       </Card>
 
       {/* Referral Stats */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-4 text-center">
             <UserPlus className="h-6 w-6 mx-auto mb-2 text-primary" />

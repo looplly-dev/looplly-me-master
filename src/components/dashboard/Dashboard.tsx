@@ -45,8 +45,8 @@ export default function Dashboard() {
   if (showSupport) {
     return (
       <div className="min-h-screen bg-white">
-        <div className="bg-white border-b sticky top-0 z-40 shadow-sm">
-          <div className="max-w-md mx-auto px-4 py-4 flex items-center justify-between">
+      <div className="bg-white border-b sticky top-0 z-40 shadow-sm">
+        <div className="max-w-md md:max-w-2xl lg:max-w-5xl mx-auto px-4 md:px-6 lg:px-8 py-4 flex items-center justify-between">
             <Button
               variant="ghost"
               size="sm"
@@ -61,7 +61,7 @@ export default function Dashboard() {
             <div className="w-8" /> {/* Spacer */}
           </div>
         </div>
-        <div className="max-w-md mx-auto">
+        <div className="max-w-md md:max-w-2xl lg:max-w-5xl mx-auto">
           <SimplifiedSupportTab />
         </div>
       </div>
@@ -72,8 +72,8 @@ export default function Dashboard() {
   if (showSettings) {
     return (
       <div className="min-h-screen bg-white">
-        <div className="bg-white border-b sticky top-0 z-40 shadow-sm">
-          <div className="max-w-md mx-auto px-4 py-4 flex items-center justify-between">
+      <div className="bg-white border-b sticky top-0 z-40 shadow-sm">
+        <div className="max-w-md md:max-w-2xl lg:max-w-5xl mx-auto px-4 md:px-6 lg:px-8 py-4 flex items-center justify-between">
             <Button
               variant="ghost"
               size="sm"
@@ -88,7 +88,7 @@ export default function Dashboard() {
             <div className="w-8" /> {/* Spacer */}
           </div>
         </div>
-        <div className="max-w-md mx-auto">
+        <div className="max-w-md md:max-w-2xl lg:max-w-5xl mx-auto">
           <SettingsTab />
         </div>
       </div>
@@ -99,9 +99,9 @@ export default function Dashboard() {
     <div className="min-h-screen bg-white">
       {/* Header */}
       <div className="bg-white border-b sticky top-0 z-40 shadow-sm">
-        <div className="max-w-md mx-auto px-4 py-4 flex items-center justify-between">
+        <div className="max-w-md md:max-w-2xl lg:max-w-5xl mx-auto px-4 md:px-6 lg:px-8 py-4 flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-bold text-primary">
+            <h1 className="text-xl md:text-2xl font-bold text-primary">
               Looplly
             </h1>
             <p className="text-sm text-muted-foreground">
@@ -138,7 +138,7 @@ export default function Dashboard() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-md mx-auto">
+      <div className="max-w-md md:max-w-2xl lg:max-w-5xl mx-auto">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsContent value="earn" className="mt-0">
             <SimplifiedEarnTab />
@@ -160,50 +160,50 @@ export default function Dashboard() {
           </TabsContent>
 
           {/* Bottom Navigation */}
-          <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-sm">
-            <div className="max-w-md mx-auto">
-              <TabsList className="grid w-full grid-cols-6 h-16 bg-transparent">
+          <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-sm md:pb-0 pb-0">
+            <div className="max-w-md md:max-w-2xl lg:max-w-5xl mx-auto">
+              <TabsList className="grid w-full grid-cols-6 h-16 md:h-14 bg-transparent">
                 <TabsTrigger 
                   value="earn" 
-                  className="flex-col gap-1 h-full data-[state=active]:bg-primary/10 data-[state=active]:text-primary"
+                  className="flex-col gap-1 h-full data-[state=active]:bg-primary/10 data-[state=active]:text-primary active:scale-95 transition-transform"
                 >
-                  <Coins className="h-4 w-4" />
-                  <span className="text-xs">Earn</span>
+                  <Coins className="h-4 w-4 md:h-5 md:w-5" />
+                  <span className="text-xs md:text-sm">Earn</span>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="wallet" 
-                  className="flex-col gap-1 h-full data-[state=active]:bg-primary/10 data-[state=active]:text-primary"
+                  className="flex-col gap-1 h-full data-[state=active]:bg-primary/10 data-[state=active]:text-primary active:scale-95 transition-transform"
                 >
-                  <Wallet className="h-4 w-4" />
-                  <span className="text-xs">Wallet</span>
+                  <Wallet className="h-4 w-4 md:h-5 md:w-5" />
+                  <span className="text-xs md:text-sm">Wallet</span>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="profile" 
-                  className="flex-col gap-1 h-full data-[state=active]:bg-primary/10 data-[state=active]:text-primary"
+                  className="flex-col gap-1 h-full data-[state=active]:bg-primary/10 data-[state=active]:text-primary active:scale-95 transition-transform"
                 >
-                  <User className="h-4 w-4" />
-                  <span className="text-xs">Profile</span>
+                  <User className="h-4 w-4 md:h-5 md:w-5" />
+                  <span className="text-xs md:text-sm">Profile</span>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="refer" 
-                  className="flex-col gap-1 h-full data-[state=active]:bg-primary/10 data-[state=active]:text-primary"
+                  className="flex-col gap-1 h-full data-[state=active]:bg-primary/10 data-[state=active]:text-primary active:scale-95 transition-transform"
                 >
-                  <Users className="h-4 w-4" />
-                  <span className="text-xs">Refer</span>
+                  <Users className="h-4 w-4 md:h-5 md:w-5" />
+                  <span className="text-xs md:text-sm">Refer</span>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="community" 
-                  className="flex-col gap-1 h-full data-[state=active]:bg-primary/10 data-[state=active]:text-primary"
+                  className="flex-col gap-1 h-full data-[state=active]:bg-primary/10 data-[state=active]:text-primary active:scale-95 transition-transform"
                 >
-                  <MessageSquare className="h-4 w-4" />
-                  <span className="text-xs">Community</span>
+                  <MessageSquare className="h-4 w-4 md:h-5 md:w-5" />
+                  <span className="text-xs md:text-sm">Community</span>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="rep" 
-                  className="flex-col gap-1 h-full data-[state=active]:bg-primary/10 data-[state=active]:text-primary"
+                  className="flex-col gap-1 h-full data-[state=active]:bg-primary/10 data-[state=active]:text-primary active:scale-95 transition-transform"
                 >
-                  <Trophy className="h-4 w-4" />
-                  <span className="text-xs">Rep</span>
+                  <Trophy className="h-4 w-4 md:h-5 md:w-5" />
+                  <span className="text-xs md:text-sm">Rep</span>
                 </TabsTrigger>
               </TabsList>
             </div>

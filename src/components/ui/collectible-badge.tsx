@@ -61,17 +61,17 @@ interface CollectibleBadgeProps {
 export function CollectibleBadge({ badge, size = 'md', onClick }: CollectibleBadgeProps) {
   const IconComponent = iconMap[badge.icon as keyof typeof iconMap] || Shield;
   
-  // Consistent sizing for all badges - mobile optimized
+  // Responsive sizing for all badges
   const sizeClasses = {
-    sm: 'w-14 h-14', // Smaller, more consistent mobile size
-    md: 'w-16 h-16', // Standard size for mobile
-    lg: 'w-20 h-20'  // Larger size
+    sm: 'w-14 h-14 md:w-16 md:h-16', // Responsive small
+    md: 'w-16 h-16 md:w-18 md:h-18 lg:w-20 lg:h-20', // Responsive medium
+    lg: 'w-20 h-20 md:w-24 md:h-24 lg:w-28 lg:h-28'  // Responsive large
   };
 
   const iconSizes = {
-    sm: 'h-5 w-5',
-    md: 'h-6 w-6',
-    lg: 'h-8 w-8'
+    sm: 'h-5 w-5 md:h-6 md:w-6',
+    md: 'h-6 w-6 md:h-7 md:w-7 lg:h-8 lg:w-8',
+    lg: 'h-8 w-8 md:h-10 md:w-10 lg:h-12 lg:w-12'
   };
 
   // Force all badges to be perfect circles - Pokéball style

@@ -49,7 +49,7 @@ export default function ProfileTab() {
   };
 
   return (
-    <div className="p-4 pb-20 space-y-6">
+    <div className="p-4 md:p-6 lg:p-8 pb-20 md:pb-6 space-y-6">
       {/* Profile Header */}
       <Card>
         <CardContent className="p-6">
@@ -84,13 +84,13 @@ export default function ProfileTab() {
 
       {/* Automotive & Transportation */}
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+        <CardHeader className="p-4 md:p-6">
+          <CardTitle className="flex items-center gap-2 text-base md:text-lg">
             <Car className="h-5 w-5" />
             Automotive & Transportation
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 p-4 md:p-6 pt-0">
           <div className="space-y-2">
             <Label htmlFor="carMake">Car Make/Brand</Label>
             <Select 

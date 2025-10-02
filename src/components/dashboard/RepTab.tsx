@@ -112,7 +112,7 @@ export default function RepTab() {
   ];
 
   return (
-    <div className="p-4 pb-20 space-y-4">
+    <div className="p-4 md:p-6 lg:p-8 pb-20 md:pb-6 space-y-4 md:space-y-6">
       {/* View Toggle Controls */}
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-foreground">Reputation</h1>

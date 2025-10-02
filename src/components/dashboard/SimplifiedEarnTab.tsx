@@ -251,7 +251,7 @@ export default function SimplifiedEarnTab() {
 
   return (
     <TooltipProvider>
-      <div className="p-4 pb-20 space-y-6">
+      <div className="p-4 md:p-6 lg:p-8 pb-20 md:pb-6 space-y-6">
         {/* Enhanced Balance Card with Progress */}
         <Card className="bg-card border-0 shadow-lg">
           <CardContent className="p-6">
@@ -320,7 +320,7 @@ export default function SimplifiedEarnTab() {
       </Card>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-3 md:grid-cols-3 lg:grid-cols-3 gap-3 md:gap-4">
         <Card className="bg-white shadow-sm border">
           <CardContent className="p-3 text-center">
             <p className="text-2xl font-bold text-primary">{completedTasks.length}</p>
