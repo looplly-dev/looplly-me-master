@@ -62,7 +62,13 @@ export const loginUser = async (params: LoginParams): Promise<{ success: boolean
 
     if (error) {
       console.error('Login error:', error);
-      return { success: false, error: { message: 'Invalid email or password' } };
+      // Return more specific error messages
+      const errorMessage = error.message === 'Email not confirmed' 
+        ? 'Please verify your email before logging in' 
+        : error.message === 'Invalid login credentials'
+        ? 'Invalid email or password'
+        : error.message || 'Login failed';
+      return { success: false, error: { message: errorMessage } };
     }
     
     console.log('Login successful');

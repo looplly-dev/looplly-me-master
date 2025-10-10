@@ -45,11 +45,20 @@ export default function Login({ onForgotPassword, onRegister }: LoginProps) {
       const success = await login(formData.email, formData.password);
       
       if (!success) {
-        // Show inline signup prompt instead of just an error
+        toast({
+          title: 'Login Failed',
+          description: 'Invalid email or password. Please try again or create an account.',
+          variant: 'destructive'
+        });
         setShowSignupPrompt(true);
       }
     } catch (error: any) {
       console.error('Login component error:', error);
+      toast({
+        title: 'Login Error',
+        description: error?.message || 'Something went wrong. Please try again.',
+        variant: 'destructive'
+      });
       setShowSignupPrompt(true);
     } finally {
       setIsSubmitting(false);
