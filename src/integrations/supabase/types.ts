@@ -118,6 +118,112 @@ export type Database = {
           },
         ]
       }
+      cint_survey_sessions: {
+        Row: {
+          actual_reward: number | null
+          cint_session_id: string
+          completed_at: string | null
+          created_at: string | null
+          estimated_duration: number | null
+          estimated_reward: number
+          id: string
+          started_at: string | null
+          status: string | null
+          survey_id: string
+          survey_url: string
+          terminated_reason: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          actual_reward?: number | null
+          cint_session_id: string
+          completed_at?: string | null
+          created_at?: string | null
+          estimated_duration?: number | null
+          estimated_reward: number
+          id?: string
+          started_at?: string | null
+          status?: string | null
+          survey_id: string
+          survey_url: string
+          terminated_reason?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          actual_reward?: number | null
+          cint_session_id?: string
+          completed_at?: string | null
+          created_at?: string | null
+          estimated_duration?: number | null
+          estimated_reward?: number
+          id?: string
+          started_at?: string | null
+          status?: string | null
+          survey_id?: string
+          survey_url?: string
+          terminated_reason?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cint_survey_sessions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      earning_activities: {
+        Row: {
+          activity_type: string
+          completed_at: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          metadata: Json | null
+          reward_amount: number
+          status: string | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          activity_type: string
+          completed_at?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          metadata?: Json | null
+          reward_amount: number
+          status?: string | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          activity_type?: string
+          completed_at?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          metadata?: Json | null
+          reward_amount?: number
+          status?: string | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "earning_activities_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           address: string | null
@@ -213,6 +319,53 @@ export type Database = {
         }
         Relationships: []
       }
+      transactions: {
+        Row: {
+          amount: number
+          created_at: string | null
+          currency: string | null
+          description: string | null
+          id: string
+          metadata: Json | null
+          source: string | null
+          status: string | null
+          type: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          currency?: string | null
+          description?: string | null
+          id?: string
+          metadata?: Json | null
+          source?: string | null
+          status?: string | null
+          type: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          currency?: string | null
+          description?: string | null
+          id?: string
+          metadata?: Json | null
+          source?: string | null
+          status?: string | null
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       user_badges: {
         Row: {
           awarded_at: string | null
@@ -247,6 +400,47 @@ export type Database = {
             foreignKeyName: "user_badges_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      user_balances: {
+        Row: {
+          balance: number
+          created_at: string | null
+          currency: string | null
+          id: string
+          lifetime_earnings: number | null
+          pending_balance: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          balance?: number
+          created_at?: string | null
+          currency?: string | null
+          id?: string
+          lifetime_earnings?: number | null
+          pending_balance?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          balance?: number
+          created_at?: string | null
+          currency?: string | null
+          id?: string
+          lifetime_earnings?: number | null
+          pending_balance?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_balances_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
             referencedRelation: "profiles"
             referencedColumns: ["user_id"]
           },
