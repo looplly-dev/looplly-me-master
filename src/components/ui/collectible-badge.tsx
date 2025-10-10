@@ -45,6 +45,7 @@ interface CollectibleBadgeProps {
     earned: boolean;
     rarity: string;
     icon: string;
+    imageUrl?: string; // AI-generated badge image
     requirement?: number;
     shape?: 'circle' | 'hexagon' | 'shield' | 'star' | 'diamond';
     category?: string;
@@ -196,12 +197,28 @@ export function CollectibleBadge({ badge, size = 'md', onClick }: CollectibleBad
         )}
         style={getCategoryStyle(badge.tier, badge.rarity)}
       >
-        {/* Icon container - no rotation needed for circles */}
+        {/* Icon or custom image container */}
         <div className="absolute inset-0 flex items-center justify-center">
+          {badge.imageUrl ? (
+            <img 
+              src={badge.imageUrl} 
+              alt={badge.name}
+              className={cn(
+                'object-cover rounded-full',
+                sizeClasses[size]
+              )}
+              onError={(e) => {
+                // Fallback to Lucide icon if image fails to load
+                e.currentTarget.style.display = 'none';
+                e.currentTarget.nextElementSibling?.classList.remove('hidden');
+              }}
+            />
+          ) : null}
           <IconComponent 
             className={cn(
               iconSizes[size],
-              'text-white drop-shadow-lg'
+              'text-white drop-shadow-lg',
+              badge.imageUrl && 'hidden' // Hide icon if custom image exists
             )} 
           />
         </div>
