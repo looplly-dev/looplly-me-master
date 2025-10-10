@@ -90,6 +90,46 @@ function AdminDashboardContent() {
           </CardContent>
         </Card>
       </div>
+
+      <Card className="border-amber-500/50 bg-amber-500/5">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Award className="h-5 w-5 text-amber-500" />
+            Integration Status
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between p-3 rounded-lg bg-background/50">
+              <div>
+                <p className="font-medium">Email Service</p>
+                <p className="text-sm text-muted-foreground">Resend API for transactional emails</p>
+              </div>
+              <span className="px-3 py-1 text-xs font-medium rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-400">
+                Mock
+              </span>
+            </div>
+            <div className="flex items-center justify-between p-3 rounded-lg bg-background/50">
+              <div>
+                <p className="font-medium">Payment Gateway</p>
+                <p className="text-sm text-muted-foreground">Stripe or Razorpay integration</p>
+              </div>
+              <span className="px-3 py-1 text-xs font-medium rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-400">
+                Pending
+              </span>
+            </div>
+            <div className="flex items-center justify-between p-3 rounded-lg bg-background/50">
+              <div>
+                <p className="font-medium">SMS Service</p>
+                <p className="text-sm text-muted-foreground">Twilio for OTP and notifications</p>
+              </div>
+              <span className="px-3 py-1 text-xs font-medium rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-400">
+                Pending
+              </span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
