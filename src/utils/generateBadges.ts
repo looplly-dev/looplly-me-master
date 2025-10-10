@@ -17,7 +17,7 @@ export async function generateBadgeImage(params: GenerateBadgeParams): Promise<s
   try {
     console.log(`Generating image for ${params.badgeName}...`);
     
-    const { data, error } = await supabase.functions.invoke('badge-service-api/generate', {
+    const { data, error } = await supabase.functions.invoke('generate-badge-image', {
       body: {
         badgeName: params.badgeName,
         tier: params.tier,
