@@ -70,7 +70,7 @@ export default function WalletTab() {
   };
 
   return (
-    <div className="p-4 md:p-6 lg:p-8 pb-24 md:pb-20 lg:pb-8 space-y-6">
+    <div className="p-4 md:p-6 lg:p-8 pb-32 md:pb-20 lg:pb-8 space-y-6">
       {/* Balance Hero Section */}
       <Card className="border-0 shadow-lg bg-card">
         <CardContent className="p-6">
@@ -358,7 +358,7 @@ export default function WalletTab() {
       </CollapsibleSection>
 
       {/* AI Payment Intelligence */}
-      <Card className="border border-muted/20 bg-card">
+      <Card className="border border-muted/20 bg-card mb-4 scroll-mb-24">
         <details>
           <summary className="p-4 cursor-pointer flex items-center justify-between hover:bg-muted/30 transition-colors rounded-t-lg">
             <div className="flex items-center gap-3">
