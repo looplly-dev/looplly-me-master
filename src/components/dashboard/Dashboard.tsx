@@ -159,8 +159,11 @@ export default function Dashboard() {
             <RepTab />
           </TabsContent>
 
+          {/* Universal bottom spacer to ensure all tabs can scroll past the fixed nav */}
+          <div aria-hidden="true" className="h-24 md:h-20 lg:h-8" />
+
           {/* Bottom Navigation */}
-          <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-sm md:pb-0 pb-0">
+          <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-sm pb-[env(safe-area-inset-bottom)]">
             <div className="max-w-md md:max-w-2xl lg:max-w-5xl mx-auto">
               <TabsList className="grid w-full grid-cols-6 h-16 md:h-14 bg-transparent">
                 <TabsTrigger 
