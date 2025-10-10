@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,6 +9,7 @@ import { Switch } from '@/components/ui/switch';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { getIncomeRangesForCountry } from '@/utils/incomeRanges';
 
 interface MultiStepProfileSetupProps {
   onBack: () => void;
@@ -41,8 +42,14 @@ export default function MultiStepProfileSetup({ onBack, onComplete }: MultiStepP
     gpsEnabled: false
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { completeProfile } = useAuth();
+  const { completeProfile, authState } = useAuth();
   const { toast } = useToast();
+
+  // Get income ranges based on user's country code
+  const incomeRanges = useMemo(() => {
+    const countryCode = authState.user?.countryCode || '+1';
+    return getIncomeRangesForCountry(countryCode);
+  }, [authState.user?.countryCode]);
 
   const handleInputChange = (field: keyof ProfileData, value: string | boolean) => {
     setProfileData(prev => ({ ...prev, [field]: value }));
@@ -185,12 +192,11 @@ export default function MultiStepProfileSetup({ onBack, onComplete }: MultiStepP
             <SelectValue placeholder="Select income range" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="under-25k">Under $25,000</SelectItem>
-            <SelectItem value="25k-50k">$25,000 - $50,000</SelectItem>
-            <SelectItem value="50k-75k">$50,000 - $75,000</SelectItem>
-            <SelectItem value="75k-100k">$75,000 - $100,000</SelectItem>
-            <SelectItem value="100k-150k">$100,000 - $150,000</SelectItem>
-            <SelectItem value="over-150k">Over $150,000</SelectItem>
+            {incomeRanges.map((range) => (
+              <SelectItem key={range.value} value={range.value}>
+                {range.label}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>
