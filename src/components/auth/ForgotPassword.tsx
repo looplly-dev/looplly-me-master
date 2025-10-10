@@ -161,9 +161,26 @@ export default function ForgotPassword({ onBack }: ForgotPasswordProps) {
 
           {step === 'sent' && (
             <div className="space-y-6 text-center">
-              <p className="text-muted-foreground">
-                We sent a password reset link to your email. Click the link to open the Reset Password page and choose a new password.
-              </p>
+              <Button 
+                type="button" 
+                variant="mobile" 
+                size="mobile" 
+                className="w-full"
+                disabled={isSubmitting}
+                onClick={async () => {
+                  setIsSubmitting(true);
+                  try {
+                    await forgotPassword(email);
+                    toast({ title: 'Email sent', description: "If you don't see it, check your spam folder." });
+                  } catch (e) {
+                    toast({ title: 'Error', description: 'Failed to resend reset email', variant: 'destructive' });
+                  } finally {
+                    setIsSubmitting(false);
+                  }
+                }}
+              >
+                Resend Reset Email
+              </Button>
               <Button 
                 type="button" 
                 variant="mobile" 
