@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-export function useOnboarding() {
+export function useOnboarding(triggerOnboarding?: boolean) {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
 
@@ -8,6 +8,12 @@ export function useOnboarding() {
     // Check if user has completed onboarding
     const completed = localStorage.getItem('onboarding_completed');
     setHasCompletedOnboarding(!!completed);
+    
+    // If explicitly triggered (from profile completion), force show
+    if (triggerOnboarding) {
+      setShowOnboarding(true);
+      return;
+    }
     
     // Show onboarding for new users after a brief delay
     if (!completed) {
@@ -17,7 +23,7 @@ export function useOnboarding() {
       
       return () => clearTimeout(timer);
     }
-  }, []);
+  }, [triggerOnboarding]);
 
   const completeOnboarding = () => {
     localStorage.setItem('onboarding_completed', 'true');

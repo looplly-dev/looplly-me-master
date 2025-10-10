@@ -11,6 +11,7 @@ import ForgotPassword from './auth/ForgotPassword';
 
 export default function LoopllyApp() {
   const [authFlow, setAuthFlow] = useState<'login' | 'register' | 'forgot' | 'profile' | 'communication' | 'otp'>('login');
+  const [justCompletedProfile, setJustCompletedProfile] = useState(false);
   // Removed isAdmin state - now handled by role-based authentication
   const { authState } = useAuth();
 
@@ -44,7 +45,10 @@ export default function LoopllyApp() {
       return (
         <MultiStepProfileSetup 
           onBack={() => {}}
-          onComplete={() => {}}
+          onComplete={() => {
+            // Mark that user just completed profile
+            setJustCompletedProfile(true);
+          }}
         />
       );
     }
@@ -62,7 +66,7 @@ export default function LoopllyApp() {
     
     // User has completed all steps, show dashboard
     console.log('LoopllyApp - Showing dashboard');
-    return <Dashboard />;
+    return <Dashboard triggerOnboarding={justCompletedProfile} />;
   }
 
   // Auth screens

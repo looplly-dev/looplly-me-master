@@ -14,12 +14,16 @@ import SimplifiedSupportTab from './SimplifiedSupportTab';
 import { OnboardingTour } from '@/components/ui/onboarding-tour';
 import { useOnboarding } from '@/hooks/useOnboarding';
 
-export default function Dashboard() {
+interface DashboardProps {
+  triggerOnboarding?: boolean;
+}
+
+export default function Dashboard({ triggerOnboarding = false }: DashboardProps) {
   const [activeTab, setActiveTab] = useState('earn');
   const [showSettings, setShowSettings] = useState(false);
   const [showSupport, setShowSupport] = useState(false);
   const { authState, logout } = useAuth();
-  const { showOnboarding, completeOnboarding, skipOnboarding } = useOnboarding();
+  const { showOnboarding, completeOnboarding, skipOnboarding } = useOnboarding(triggerOnboarding);
 
   const handleLogout = () => {
     logout();

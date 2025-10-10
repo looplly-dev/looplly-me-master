@@ -356,6 +356,7 @@ export const useAuthLogic = () => {
     
     // Clear mock user from localStorage
     localStorage.removeItem('mockUser');
+    localStorage.removeItem('onboarding_completed'); // Clear onboarding state on logout
     
     await logoutUser();
   };
