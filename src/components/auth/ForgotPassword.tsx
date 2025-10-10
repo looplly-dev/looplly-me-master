@@ -12,7 +12,7 @@ interface ForgotPasswordProps {
 }
 
 export default function ForgotPassword({ onBack }: ForgotPasswordProps) {
-  const [step, setStep] = useState<'email' | 'otp' | 'reset'>('email');
+  const [step, setStep] = useState<'email' | 'sent'>('email');
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [passwords, setPasswords] = useState({
@@ -36,7 +36,7 @@ export default function ForgotPassword({ onBack }: ForgotPasswordProps) {
         title: 'Code Sent',
         description: 'Reset code sent to your email address',
       });
-      setStep('otp');
+      setStep('sent');
     } catch (error) {
       toast({
         title: 'Error',
@@ -67,7 +67,7 @@ export default function ForgotPassword({ onBack }: ForgotPasswordProps) {
     if (otpCode.length !== 6) return;
 
     if (otpCode === '123456') {
-      setStep('reset');
+      setStep('sent');
     } else {
       toast({
         title: 'Invalid Code',
@@ -125,13 +125,11 @@ export default function ForgotPassword({ onBack }: ForgotPasswordProps) {
           </div>
           <CardTitle className="text-2xl font-bold text-primary">
             {step === 'email' && 'Reset Password'}
-            {step === 'otp' && 'Verify Code'}
-            {step === 'reset' && 'New Password'}
+            {step === 'sent' && 'Check your email'}
           </CardTitle>
           <p className="text-muted-foreground">
-            {step === 'email' && 'Enter your email address to reset password'}
-            {step === 'otp' && 'Enter the 6-digit code sent to your email'}
-            {step === 'reset' && 'Create a new password for your account'}
+            {step === 'email' && 'Enter your email address to receive a reset link'}
+            {step === 'sent' && 'We sent a password reset link to your email. Open it to set a new password.'}
           </p>
         </CardHeader>
         <CardContent>
@@ -161,39 +159,21 @@ export default function ForgotPassword({ onBack }: ForgotPasswordProps) {
             </form>
           )}
 
-          {step === 'otp' && (
-            <form onSubmit={handleOtpSubmit} className="space-y-6">
-              <div className="space-y-2">
-                <Label className="text-center block">Enter Reset Code</Label>
-                <div className="flex gap-2 justify-center">
-                  {otp.map((digit, index) => (
-                    <Input
-                      key={index}
-                      id={`reset-otp-${index}`}
-                      type="text"
-                      inputMode="numeric"
-                      pattern="[0-9]*"
-                      maxLength={1}
-                      value={digit}
-                      onChange={(e) => handleOtpChange(index, e.target.value)}
-                      className="w-12 h-12 text-center text-lg font-bold"
-                    />
-                  ))}
-                </div>
-                <p className="text-sm text-center text-muted-foreground">
-                  Use code: <span className="font-mono font-bold text-primary">123456</span> for demo
-                </p>
-              </div>
+          {step === 'sent' && (
+            <div className="space-y-6 text-center">
+              <p className="text-muted-foreground">
+                We sent a password reset link to your email. Click the link to open the Reset Password page and choose a new password.
+              </p>
               <Button 
-                type="submit" 
+                type="button" 
                 variant="mobile" 
                 size="mobile" 
                 className="w-full"
-                disabled={otp.join('').length !== 6}
+                onClick={() => window.location.assign('/')}
               >
-                Verify Code
+                Back to Sign In
               </Button>
-            </form>
+            </div>
           )}
 
           {step === 'reset' && (
