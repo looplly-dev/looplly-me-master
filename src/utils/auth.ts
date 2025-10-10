@@ -87,7 +87,9 @@ export const logoutUser = async (): Promise<void> => {
 export const resetUserPassword = async (email: string): Promise<{ success: boolean; error?: any }> => {
   try {
     console.log('Initiating forgot password for email:', email);
-    const { error } = await supabase.auth.resetPasswordForEmail(email);
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
     
     if (error) {
       console.error('Forgot password error:', error);
