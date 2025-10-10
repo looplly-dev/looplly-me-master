@@ -14,6 +14,7 @@ import {
   CreditCard,
   AlertCircle,
   ChevronRight,
+  ChevronDown,
   Bitcoin,
   Bot,
   Shield,
@@ -359,8 +360,8 @@ export default function WalletTab() {
 
       {/* AI Payment Intelligence */}
       <Card className="border border-muted/20 bg-card mb-4 scroll-mb-24">
-        <details>
-          <summary className="p-4 cursor-pointer flex items-center justify-between hover:bg-muted/30 transition-colors rounded-t-lg">
+        <details className="group">
+          <summary className="p-4 cursor-pointer flex items-center justify-between hover:bg-muted/30 transition-colors rounded-t-lg list-none">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-full bg-primary/10 border border-primary/20">
                 <Bot className="h-4 w-4 text-primary" />
@@ -374,6 +375,7 @@ export default function WalletTab() {
                 position="top"
               />
             </div>
+            <ChevronDown className="h-5 w-5 text-muted-foreground transition-transform duration-200 group-open:rotate-180" />
           </summary>
           <div className="px-4 pb-4 space-y-3">
             <Separator />
