@@ -183,9 +183,8 @@ export const useAuthLogic = () => {
       });
 
       if (result.success) {
-        // Demo activities will be created by the SimplifiedEarnTab component
-        // when the user first visits the earn page to avoid duplicates
-        
+        // Stop loading and move to OTP step (no session yet after sign-up)
+        setAuthState(prev => ({ ...prev, isLoading: false, step: 'otp-verification' }));
         return true;
       } else {
         console.error('Registration failed:', result.error);
@@ -262,14 +261,8 @@ export const useAuthLogic = () => {
 
   const verifyOTP = async (code: string): Promise<boolean> => {
     console.log('Verifying OTP:', code);
-    // In a real implementation, this would verify OTP via Supabase
-    // For now, we'll simulate success for any 6-digit code
-    if (code.length === 6) {
-      setAuthState(prev => ({ 
-        ...prev, 
-        user: prev.user ? { ...prev.user, isVerified: true } : prev.user,
-        step: 'dashboard' 
-      }));
+    // Demo OTP: accept exactly "12345"
+    if (code === '12345') {
       return true;
     }
     return false;

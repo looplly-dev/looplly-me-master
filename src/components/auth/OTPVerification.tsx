@@ -13,7 +13,7 @@ interface OTPVerificationProps {
 }
 
 export default function OTPVerification({ onBack, onSuccess }: OTPVerificationProps) {
-  const [otp, setOtp] = useState(['', '', '', '', '', '']);
+  const [otp, setOtp] = useState(['', '', '', '', '']);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [resendTimer, setResendTimer] = useState(30);
   const [canResend, setCanResend] = useState(false);
@@ -37,7 +37,7 @@ export default function OTPVerification({ onBack, onSuccess }: OTPVerificationPr
     setOtp(newOtp);
 
     // Auto-focus next input
-    if (value && index < 5) {
+    if (value && index < 4) {
       const nextInput = document.getElementById(`otp-${index + 1}`);
       nextInput?.focus();
     }
@@ -54,10 +54,10 @@ export default function OTPVerification({ onBack, onSuccess }: OTPVerificationPr
     e.preventDefault();
     
     const otpCode = otp.join('');
-    if (otpCode.length !== 6) {
+    if (otpCode.length !== 5) {
       toast({
         title: 'Error',
-        description: 'Please enter the complete 6-digit code',
+        description: 'Please enter the complete 5-digit code',
         variant: 'destructive'
       });
       return;
@@ -79,7 +79,7 @@ export default function OTPVerification({ onBack, onSuccess }: OTPVerificationPr
           description: 'The verification code is incorrect. Please try again.',
           variant: 'destructive'
         });
-        setOtp(['', '', '', '', '', '']);
+        setOtp(['', '', '', '', '']);
       }
     } catch (error) {
       toast({
@@ -120,7 +120,7 @@ export default function OTPVerification({ onBack, onSuccess }: OTPVerificationPr
             Verify Your Number
           </CardTitle>
           <p className="text-muted-foreground">
-            We've sent a 6-digit code to<br />
+            We've sent a 5-digit code to<br />
             <span className="font-semibold text-foreground">
               {authState.user?.countryCode} {authState.user?.mobile}
             </span>
@@ -150,7 +150,7 @@ export default function OTPVerification({ onBack, onSuccess }: OTPVerificationPr
 
             <div className="text-center space-y-2">
               <p className="text-sm text-muted-foreground">
-                Use code: <span className="font-mono font-bold text-primary">123456</span> for demo
+                Use code: <span className="font-mono font-bold text-primary">12345</span> for demo
               </p>
               {canResend ? (
                 <Button
@@ -173,7 +173,7 @@ export default function OTPVerification({ onBack, onSuccess }: OTPVerificationPr
               variant="mobile" 
               size="mobile" 
               className="w-full"
-              disabled={isSubmitting || otp.join('').length !== 6}
+              disabled={isSubmitting || otp.join('').length !== 5}
             >
               {isSubmitting ? 'Verifying...' : 'Verify Code'}
             </Button>
