@@ -341,6 +341,28 @@ export default function ProfileTab() {
         </CardContent>
       </Card>
 
+      {/* Admin Tools */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Shield className="h-5 w-5" />
+            Admin Tools
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground mb-4">
+            Access badge generation and admin features
+          </p>
+          <Button
+            variant="outline"
+            onClick={() => window.location.href = '/admin/badges'}
+            className="w-full"
+          >
+            Open Badge Generator
+          </Button>
+        </CardContent>
+      </Card>
+
       {/* Account Actions */}
       <Card className="border-destructive/50">
         <CardHeader>

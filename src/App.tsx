@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import AuthProvider from "./components/auth/AuthProvider";
 import LoopllyApp from "./components/LoopllyApp";
 import AdminPanel from "./components/admin/AdminPanel";
+import AdminBadges from "./pages/AdminBadges";
 
 const queryClient = new QueryClient();
 
@@ -18,6 +19,7 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/admin" element={<AdminPanel />} />
+            <Route path="/admin/badges" element={<AdminBadges />} />
             <Route path="/*" element={<LoopllyApp />} />
           </Routes>
         </BrowserRouter>
