@@ -42,7 +42,12 @@ export const useEarningActivities = () => {
         console.error('Error fetching activities:', error);
         setActivities([]);
       } else {
-        setActivities((data as EarningActivity[]) || []);
+        // Map database fields to EarningActivity interface
+        const mappedData = data?.map(activity => ({
+          ...activity,
+          updated_at: activity.created_at // Use created_at as fallback for updated_at
+        })) || [];
+        setActivities(mappedData as EarningActivity[]);
       }
     } catch (error) {
       console.error('Error fetching activities:', error);

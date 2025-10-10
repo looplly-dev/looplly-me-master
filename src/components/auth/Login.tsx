@@ -3,9 +3,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, UserPlus } from 'lucide-react';
 
 interface LoginProps {
   onForgotPassword: () => void;
@@ -20,11 +21,13 @@ export default function Login({ onForgotPassword, onRegister }: LoginProps) {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSignupPrompt, setShowSignupPrompt] = useState(false);
   const { login } = useAuth();
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setShowSignupPrompt(false);
     
     if (!formData.email || !formData.password) {
       toast({
@@ -42,22 +45,20 @@ export default function Login({ onForgotPassword, onRegister }: LoginProps) {
       const success = await login(formData.email, formData.password);
       
       if (!success) {
-        toast({
-          title: 'Login Failed',
-          description: 'Invalid email or password',
-          variant: 'destructive'
-        });
+        // Show inline signup prompt instead of just an error
+        setShowSignupPrompt(true);
       }
     } catch (error: any) {
       console.error('Login component error:', error);
-      toast({
-        title: 'Error',
-        description: error?.message || 'Something went wrong. Please try again.',
-        variant: 'destructive'
-      });
+      setShowSignupPrompt(true);
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleSignupRedirect = () => {
+    // Pass the email to the register form for a seamless experience
+    onRegister();
   };
 
   const handleMockLogin = async () => {
@@ -92,6 +93,32 @@ export default function Login({ onForgotPassword, onRegister }: LoginProps) {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
+            {showSignupPrompt && (
+              <Alert className="border-primary/20 bg-primary/5">
+                <UserPlus className="h-4 w-4 text-primary" />
+                <AlertDescription className="ml-2">
+                  <div className="space-y-3">
+                    <p className="text-foreground font-medium">
+                      Don't have an account yet?
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Join now and start earning rewards! It only takes a minute.
+                    </p>
+                    <Button
+                      type="button"
+                      variant="mobile"
+                      size="mobile"
+                      className="w-full"
+                      onClick={handleSignupRedirect}
+                    >
+                      <UserPlus className="mr-2 h-4 w-4" />
+                      Create Free Account
+                    </Button>
+                  </div>
+                </AlertDescription>
+              </Alert>
+            )}
+
             <div className="space-y-2">
               <Label htmlFor="email">Email Address</Label>
               <Input
@@ -99,7 +126,10 @@ export default function Login({ onForgotPassword, onRegister }: LoginProps) {
                 type="email"
                 placeholder="Enter your email"
                 value={formData.email}
-                onChange={(e) => setFormData({...formData, email: e.target.value})}
+                onChange={(e) => {
+                  setFormData({...formData, email: e.target.value});
+                  setShowSignupPrompt(false);
+                }}
                 className="h-12"
                 required
               />
@@ -113,7 +143,10 @@ export default function Login({ onForgotPassword, onRegister }: LoginProps) {
                   type={showPassword ? 'text' : 'password'}
                   placeholder="Enter your password"
                   value={formData.password}
-                  onChange={(e) => setFormData({...formData, password: e.target.value})}
+                  onChange={(e) => {
+                    setFormData({...formData, password: e.target.value});
+                    setShowSignupPrompt(false);
+                  }}
                   className="h-12 pr-10"
                   required
                 />
@@ -152,7 +185,15 @@ export default function Login({ onForgotPassword, onRegister }: LoginProps) {
 
             <div className="text-center mt-4">
               <p className="text-sm text-muted-foreground">
-                Access restricted to authorized test users only
+                New here?{' '}
+                <Button
+                  type="button"
+                  variant="link"
+                  className="p-0 h-auto text-primary font-semibold"
+                  onClick={handleSignupRedirect}
+                >
+                  Create an account
+                </Button>
               </p>
             </div>
           </form>

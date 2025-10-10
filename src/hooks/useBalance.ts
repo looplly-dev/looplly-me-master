@@ -31,8 +31,17 @@ export const useBalance = () => {
       if (error && error.code !== 'PGRST116') {
         console.error('Error fetching balance:', error);
         setBalance(null);
+      } else if (data) {
+        // Map database fields to UserBalance interface
+        setBalance({
+          total_earned: data.lifetime_earnings || 0,
+          available_balance: data.balance || 0,
+          pending_balance: data.pending_balance || 0,
+          lifetime_withdrawn: 0 // Not in database yet, default to 0
+        });
       } else {
-        setBalance(data || {
+        // Fallback mock data
+        setBalance({
           total_earned: 12.50,
           available_balance: 4.00,
           pending_balance: 2.50,
@@ -67,7 +76,13 @@ export const useBalance = () => {
         },
         (payload) => {
           console.log('Balance updated:', payload);
-          setBalance(payload.new as UserBalance);
+          const newData = payload.new as any;
+          setBalance({
+            total_earned: newData.lifetime_earnings || 0,
+            available_balance: newData.balance || 0,
+            pending_balance: newData.pending_balance || 0,
+            lifetime_withdrawn: 0
+          });
         }
       )
       .subscribe();
