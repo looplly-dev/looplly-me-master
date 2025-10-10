@@ -8,7 +8,6 @@ import MultiStepProfileSetup from './auth/MultiStepProfileSetup';
 import CommunicationPreferences from './auth/CommunicationPreferences';
 import Dashboard from './dashboard/Dashboard';
 import ForgotPassword from './auth/ForgotPassword';
-import AdminPanel from './admin/AdminPanel';
 
 export default function LoopllyApp() {
   const [authFlow, setAuthFlow] = useState<'login' | 'register' | 'forgot' | 'profile' | 'communication' | 'otp'>('login');
