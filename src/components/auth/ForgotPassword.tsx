@@ -175,68 +175,6 @@ export default function ForgotPassword({ onBack }: ForgotPasswordProps) {
               </Button>
             </div>
           )}
-
-          {step === 'reset' && (
-            <form onSubmit={handlePasswordReset} className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="new-password">New Password</Label>
-                <div className="relative">
-                  <Input
-                    id="new-password"
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder="Enter new password"
-                    value={passwords.password}
-                    onChange={(e) => setPasswords({...passwords, password: e.target.value})}
-                    className="h-12 pr-10"
-                    required
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-0 top-0 h-12 px-3"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </Button>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="confirm-password">Confirm Password</Label>
-                <div className="relative">
-                  <Input
-                    id="confirm-password"
-                    type={showConfirmPassword ? 'text' : 'password'}
-                    placeholder="Confirm new password"
-                    value={passwords.confirmPassword}
-                    onChange={(e) => setPasswords({...passwords, confirmPassword: e.target.value})}
-                    className="h-12 pr-10"
-                    required
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-0 top-0 h-12 px-3"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  >
-                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </Button>
-                </div>
-              </div>
-
-              <Button 
-                type="submit" 
-                variant="mobile" 
-                size="mobile" 
-                className="w-full"
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? 'Resetting...' : 'Reset Password'}
-              </Button>
-            </form>
-          )}
         </CardContent>
       </Card>
     </div>
