@@ -11,13 +11,13 @@ interface GenerateBadgeParams {
 }
 
 /**
- * Generate a single badge or tier icon using Gemini AI
+ * Generate a single badge or tier icon using the Badge Service API
  */
 export async function generateBadgeImage(params: GenerateBadgeParams): Promise<string | null> {
   try {
     console.log(`Generating image for ${params.badgeName}...`);
     
-    const { data, error } = await supabase.functions.invoke('generate-badge-image', {
+    const { data, error } = await supabase.functions.invoke('badge-service-api/generate', {
       body: {
         badgeName: params.badgeName,
         tier: params.tier,

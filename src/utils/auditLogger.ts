@@ -1,91 +1,94 @@
 import { supabase } from '@/integrations/supabase/client';
 
-export interface AuditLogEntry {
-  user_id?: string;
+interface AuditLogEntry {
+  tenant_id?: string | null;
+  user_id?: string | null;
   action: string;
   resource_type: string;
-  resource_id?: string;
+  resource_id?: string | null;
   metadata?: Record<string, any>;
-  ip_address?: string;
-  user_agent?: string;
+  ip_address?: string | null;
+  user_agent?: string | null;
 }
 
 class AuditLogger {
-  private logQueue: AuditLogEntry[] = [];
-  private flushInterval: NodeJS.Timeout | null = null;
+  private queue: AuditLogEntry[] = [];
+  private flushInterval: number = 5000; // 5 seconds
+  private timer: ReturnType<typeof setInterval> | null = null;
 
   constructor() {
-    // Flush logs every 30 seconds
-    this.flushInterval = setInterval(() => {
-      this.flushLogs();
-    }, 30000);
+    this.startFlushTimer();
   }
 
-  public async log(entry: Omit<AuditLogEntry, 'ip_address' | 'user_agent'>): Promise<void> {
+  /**
+   * Log an audit event
+   */
+  async log(entry: Omit<AuditLogEntry, 'ip_address' | 'user_agent'>): Promise<void> {
+    const enhancedEntry: AuditLogEntry = {
+      ...entry,
+      user_agent: navigator.userAgent,
+      ip_address: null, // IP will be captured server-side if needed
+    };
+
+    this.queue.push(enhancedEntry);
+
+    // For critical actions, flush immediately
+    const criticalActions = ['user.delete', 'badge.award', 'balance.adjust', 'redemption.approve'];
+    if (criticalActions.includes(entry.action)) {
+      await this.flush();
+    }
+  }
+
+  /**
+   * Flush queued logs to database
+   */
+  private async flush(): Promise<void> {
+    if (this.queue.length === 0) return;
+
+    const batch = [...this.queue];
+    this.queue = [];
+
     try {
-      const enhancedEntry: AuditLogEntry = {
-        ...entry,
-        user_agent: navigator.userAgent,
-        // IP address would be set server-side in a real application
-      };
+      // Note: audit_logs table will be created by Phase 1 migration
+      // Types will be auto-generated after migration runs
+      const { error } = await (supabase as any)
+        .from('audit_logs')
+        .insert(batch);
 
-      this.logQueue.push(enhancedEntry);
-
-      // Flush immediately for critical actions
-      if (this.isCriticalAction(entry.action)) {
-        await this.flushLogs();
+      if (error) {
+        console.error('Failed to flush audit logs:', error);
+        // Re-queue failed items
+        this.queue.push(...batch);
       }
     } catch (error) {
-      console.error('Failed to queue audit log:', error);
+      console.error('Error flushing audit logs:', error);
+      // Re-queue failed items
+      this.queue.push(...batch);
     }
   }
 
-  private isCriticalAction(action: string): boolean {
-    const criticalActions = [
-      'admin_login',
-      'role_change',
-      'user_deletion',
-      'permission_grant',
-      'permission_revoke',
-      'sensitive_data_access',
-    ];
-    return criticalActions.includes(action);
+  /**
+   * Start automatic flush timer
+   */
+  private startFlushTimer(): void {
+    this.timer = setInterval(() => {
+      this.flush();
+    }, this.flushInterval);
   }
 
-  private async flushLogs(): Promise<void> {
-    if (this.logQueue.length === 0) return;
-
-    const logsToFlush = [...this.logQueue];
-    this.logQueue = [];
-
-    try {
-      // In a real application, you would send these to a secure audit log table
-      // For now, we'll log them to console with a clear audit format
-      logsToFlush.forEach(entry => {
-        console.log('🔍 AUDIT LOG:', {
-          timestamp: new Date().toISOString(),
-          ...entry,
-        });
-      });
-
-      // You could also store in local audit table if needed
-      // await supabase.from('audit_logs').insert(logsToFlush);
-    } catch (error) {
-      console.error('Failed to flush audit logs:', error);
-      // Re-queue failed logs
-      this.logQueue.unshift(...logsToFlush);
+  /**
+   * Stop flush timer and perform final flush
+   */
+  destroy(): void {
+    if (this.timer) {
+      clearInterval(this.timer);
+      this.timer = null;
     }
-  }
-
-  public destroy(): void {
-    if (this.flushInterval) {
-      clearInterval(this.flushInterval);
-      this.flushInterval = null;
-    }
-    this.flushLogs(); // Final flush
+    this.flush();
   }
 }
 
+// Singleton instance
 export const auditLogger = new AuditLogger();
 
 // Helper functions for common audit actions
@@ -93,50 +96,70 @@ export const auditActions = {
   login: (userId: string, metadata?: Record<string, any>) =>
     auditLogger.log({
       user_id: userId,
-      action: 'user_login',
-      resource_type: 'authentication',
+      action: 'auth.login',
+      resource_type: 'user',
+      resource_id: userId,
       metadata,
     }),
 
-  logout: (userId: string, metadata?: Record<string, any>) =>
+  logout: (userId: string) =>
     auditLogger.log({
       user_id: userId,
-      action: 'user_logout',
-      resource_type: 'authentication',
-      metadata,
-    }),
-
-  adminLogin: (userId: string, metadata?: Record<string, any>) =>
-    auditLogger.log({
-      user_id: userId,
-      action: 'admin_login',
-      resource_type: 'admin_access',
-      metadata,
+      action: 'auth.logout',
+      resource_type: 'user',
+      resource_id: userId,
     }),
 
   dataAccess: (userId: string, resourceType: string, resourceId: string, metadata?: Record<string, any>) =>
     auditLogger.log({
       user_id: userId,
-      action: 'data_access',
+      action: `${resourceType}.view`,
       resource_type: resourceType,
       resource_id: resourceId,
       metadata,
     }),
 
-  roleChange: (userId: string, targetUserId: string, newRole: string, metadata?: Record<string, any>) =>
+  dataModify: (userId: string, action: string, resourceType: string, resourceId: string, metadata?: Record<string, any>) =>
     auditLogger.log({
       user_id: userId,
-      action: 'role_change',
-      resource_type: 'user_role',
-      resource_id: targetUserId,
-      metadata: { new_role: newRole, ...metadata },
+      action: `${resourceType}.${action}`,
+      resource_type: resourceType,
+      resource_id: resourceId,
+      metadata,
     }),
 
-  sensitiveOperation: (userId: string, operation: string, metadata?: Record<string, any>) =>
+  balanceAdjust: (adminUserId: string, targetUserId: string, amount: number, reason: string) =>
+    auditLogger.log({
+      user_id: adminUserId,
+      action: 'balance.adjust',
+      resource_type: 'user',
+      resource_id: targetUserId,
+      metadata: { amount, reason },
+    }),
+
+  badgeAward: (adminUserId: string, targetUserId: string, badgeId: string, badgeName: string) =>
+    auditLogger.log({
+      user_id: adminUserId,
+      action: 'badge.award',
+      resource_type: 'badge',
+      resource_id: badgeId,
+      metadata: { targetUserId, badgeName },
+    }),
+
+  roleChange: (adminUserId: string, targetUserId: string, oldRole: string, newRole: string) =>
+    auditLogger.log({
+      user_id: adminUserId,
+      action: 'role.change',
+      resource_type: 'user',
+      resource_id: targetUserId,
+      metadata: { oldRole, newRole },
+    }),
+
+  badgeGenerate: (userId: string, badgeName: string, tier: string, category: string) =>
     auditLogger.log({
       user_id: userId,
-      action: 'sensitive_operation',
-      resource_type: 'system',
-      metadata: { operation, ...metadata },
+      action: 'badge.generate',
+      resource_type: 'badge',
+      metadata: { badgeName, tier, category },
     }),
 };
