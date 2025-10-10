@@ -35,7 +35,7 @@ export default function LoopllyApp() {
     // Check if user needs OTP verification after login
     if (authState.step === 'otp-verification') {
       console.log('LoopllyApp - Showing OTP verification');
-      return <OTPVerification onBack={() => {}} />;
+      return <OTPVerification onBack={() => {}} onSuccess={() => {}} />;
     }
     
     // Check if user needs to complete profile
@@ -71,6 +71,17 @@ export default function LoopllyApp() {
     return (
       <Register
         onBack={() => setAuthFlow('login')}
+        onSuccess={() => setAuthFlow('login')}
+        onOTPRequired={() => setAuthFlow('otp')}
+      />
+    );
+  }
+
+  if (authFlow === 'otp') {
+    console.log('LoopllyApp - Showing OTP verification');
+    return (
+      <OTPVerification 
+        onBack={() => setAuthFlow('register')}
         onSuccess={() => setAuthFlow('login')}
       />
     );

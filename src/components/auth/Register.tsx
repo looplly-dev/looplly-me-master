@@ -17,9 +17,10 @@ import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
 interface RegisterProps {
   onBack: () => void;
   onSuccess: () => void;
+  onOTPRequired: () => void;
 }
 
-export default function Register({ onBack, onSuccess }: RegisterProps) {
+export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterProps) {
   const defaultCountry = getDefaultCountry();
   
   const {
@@ -67,9 +68,9 @@ export default function Register({ onBack, onSuccess }: RegisterProps) {
       if (success) {
         toast({
           title: 'Account Created!',
-          description: 'Registration successful! You can now log in.',
+          description: 'Please verify your account with the OTP sent to your mobile.',
         });
-        onSuccess();
+        onOTPRequired();
       } else {
         toast({
           title: 'Error',

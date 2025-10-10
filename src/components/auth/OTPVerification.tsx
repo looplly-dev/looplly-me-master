@@ -9,9 +9,10 @@ import { ArrowLeft, Shield } from 'lucide-react';
 
 interface OTPVerificationProps {
   onBack: () => void;
+  onSuccess: () => void;
 }
 
-export default function OTPVerification({ onBack }: OTPVerificationProps) {
+export default function OTPVerification({ onBack, onSuccess }: OTPVerificationProps) {
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [resendTimer, setResendTimer] = useState(30);
@@ -66,7 +67,13 @@ export default function OTPVerification({ onBack }: OTPVerificationProps) {
     
     try {
       const success = await verifyOTP(otpCode);
-      if (!success) {
+      if (success) {
+        toast({
+          title: 'Verified!',
+          description: 'Your account has been verified. Please log in.',
+        });
+        onSuccess();
+      } else {
         toast({
           title: 'Invalid Code',
           description: 'The verification code is incorrect. Please try again.',
