@@ -2,7 +2,9 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/hooks/useAuth';
-import { Coins, Wallet, User, Users, Trophy, MessageSquare, LogOut, Settings, HelpCircle } from 'lucide-react';
+import { useRole } from '@/hooks/useRole';
+import { Coins, Wallet, User, Users, Trophy, MessageSquare, LogOut, Settings, HelpCircle, Shield } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import SimplifiedEarnTab from './SimplifiedEarnTab';
 import WalletTab from './WalletTab';
 import ProfileTab from './ProfileTab';
@@ -23,6 +25,7 @@ export default function Dashboard({ triggerOnboarding = false }: DashboardProps)
   const [showSettings, setShowSettings] = useState(false);
   const [showSupport, setShowSupport] = useState(false);
   const { authState, logout } = useAuth();
+  const { isAdmin } = useRole();
   const { showOnboarding, completeOnboarding, skipOnboarding } = useOnboarding(triggerOnboarding);
 
   const handleLogout = () => {
@@ -113,6 +116,18 @@ export default function Dashboard({ triggerOnboarding = false }: DashboardProps)
             </p>
           </div>
           <div className="flex items-center gap-2">
+            {isAdmin() && (
+              <Button
+                variant="ghost"
+                size="sm"
+                asChild
+                className="text-muted-foreground hover:text-primary"
+              >
+                <Link to="/admin">
+                  <Shield className="h-4 w-4" />
+                </Link>
+              </Button>
+            )}
             <Button
               variant="ghost"
               size="sm"
