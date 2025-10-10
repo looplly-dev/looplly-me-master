@@ -279,11 +279,42 @@ export const useAuthLogic = () => {
       const success = await updateUserProfile(authState.user.id, profileData);
       
       if (success) {
-        // Trigger a refresh of auth state
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session) {
-          // The auth state listener will handle the update
+        // Fetch the updated profile to get the complete data
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('user_id', authState.user.id)
+          .single();
+
+        if (profileError) {
+          console.error('Error fetching updated profile:', profileError);
         }
+
+        // Update the auth state with profile complete flag
+        setAuthState(prev => ({
+          ...prev,
+          user: prev.user ? {
+            ...prev.user,
+            profileComplete: true,
+            profile: profile ? {
+              sec: (profile.sec as 'A' | 'B' | 'C1' | 'C2' | 'D' | 'E') || 'B',
+              gender: (profile.gender as 'male' | 'female' | 'other') || 'other',
+              dateOfBirth: profile.date_of_birth ? new Date(profile.date_of_birth) : new Date(),
+              address: profile.address || '',
+              gpsEnabled: profile.gps_enabled || false,
+              firstName: profile.first_name || '',
+              lastName: profile.last_name || '',
+              email: profile.email || ''
+            } : prev.user.profile
+          } : null,
+          step: 'dashboard'
+        }));
+
+        // Audit log profile completion
+        auditActions.dataModify(authState.user.id, 'complete', 'profile', authState.user.id, { 
+          profile_completed: true
+        }).catch(console.error);
+
         return true;
       }
       return false;
