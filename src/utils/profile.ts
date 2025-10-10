@@ -10,6 +10,7 @@ export interface ProfileUpdateData {
   household_income?: string;
   ethnicity?: string;
   sec?: 'A' | 'B' | 'C1' | 'C2' | 'D' | 'E';
+  gps_enabled?: boolean;
   profile_complete?: boolean;
 }
 
@@ -23,6 +24,7 @@ export const formatProfileForDatabase = (profile: any): ProfileUpdateData => {
     household_income: profile.householdIncome,
     ethnicity: profile.ethnicity,
     sec: profile.sec as 'A' | 'B' | 'C1' | 'C2' | 'D' | 'E',
+    gps_enabled: profile.gpsEnabled || false,
     profile_complete: true
   };
 };

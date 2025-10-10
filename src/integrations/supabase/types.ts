@@ -275,9 +275,11 @@ export type Database = {
           created_at: string | null
           date_of_birth: string | null
           email: string | null
+          ethnicity: string | null
           first_name: string | null
           gender: string | null
           gps_enabled: boolean | null
+          household_income: string | null
           is_verified: boolean | null
           last_name: string | null
           mobile: string | null
@@ -293,9 +295,11 @@ export type Database = {
           created_at?: string | null
           date_of_birth?: string | null
           email?: string | null
+          ethnicity?: string | null
           first_name?: string | null
           gender?: string | null
           gps_enabled?: boolean | null
+          household_income?: string | null
           is_verified?: boolean | null
           last_name?: string | null
           mobile?: string | null
@@ -311,9 +315,11 @@ export type Database = {
           created_at?: string | null
           date_of_birth?: string | null
           email?: string | null
+          ethnicity?: string | null
           first_name?: string | null
           gender?: string | null
           gps_enabled?: boolean | null
+          household_income?: string | null
           is_verified?: boolean | null
           last_name?: string | null
           mobile?: string | null
