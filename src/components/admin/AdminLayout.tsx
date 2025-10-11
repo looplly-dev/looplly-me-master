@@ -8,6 +8,7 @@ import {
   DollarSign,
   BarChart3,
   Shield,
+  Home,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -15,6 +16,7 @@ import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
+  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -22,6 +24,7 @@ import {
   SidebarTrigger,
   useSidebar,
 } from '@/components/ui/sidebar';
+import { Button } from '@/components/ui/button';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -55,6 +58,17 @@ function AdminSidebar() {
 
   return (
     <Sidebar className={isCollapsed ? 'w-14' : 'w-60'} collapsible="icon">
+      <SidebarHeader className="p-2">
+        <NavLink to="/" className="block">
+          <Button 
+            variant="outline" 
+            className="w-full justify-start gap-2 border-primary/50 hover:bg-primary/10"
+          >
+            <Home className="h-4 w-4" />
+            {!isCollapsed && <span>Back to Dashboard</span>}
+          </Button>
+        </NavLink>
+      </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>
