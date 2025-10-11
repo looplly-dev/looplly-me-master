@@ -30,10 +30,10 @@ export interface UserBadge {
 }
 
 export interface GenerateBadgeParams {
-  name: string;
+  badgeName: string;
   tier: Badge['tier'];
   category?: string;
-  icon_theme?: string;
+  iconTheme?: string;
   type?: 'badge' | 'tier-icon';
 }
 
@@ -150,6 +150,81 @@ export function useBadgeService() {
     }
   };
 
+  const updateBadge = async (badgeId: string, updates: Partial<Badge>) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const { data, error: updateError } = await supabase
+        .from('badge_catalog')
+        .update(updates)
+        .eq('id', badgeId)
+        .select()
+        .single();
+
+      if (updateError) throw updateError;
+      return data as Badge;
+    } catch (err) {
+      const error = err instanceof Error ? err : new Error('Failed to update badge');
+      setError(error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const toggleBadgeStatus = async (badgeId: string, currentStatus: boolean) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const { data, error: updateError } = await supabase
+        .from('badge_catalog')
+        .update({ is_active: !currentStatus })
+        .eq('id', badgeId)
+        .select()
+        .single();
+
+      if (updateError) throw updateError;
+      return data as Badge;
+    } catch (err) {
+      const error = err instanceof Error ? err : new Error('Failed to toggle badge status');
+      setError(error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const deleteBadge = async (badgeId: string, iconUrl?: string) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      // Delete from catalog
+      const { error: deleteError } = await supabase
+        .from('badge_catalog')
+        .delete()
+        .eq('id', badgeId);
+
+      if (deleteError) throw deleteError;
+
+      // Clean up storage file if exists
+      if (iconUrl) {
+        const filename = iconUrl.split('/').pop();
+        if (filename) {
+          await supabase.storage.from('badges').remove([filename]);
+        }
+      }
+    } catch (err) {
+      const error = err instanceof Error ? err : new Error('Failed to delete badge');
+      setError(error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return {
     isLoading,
     error,
@@ -157,5 +232,8 @@ export function useBadgeService() {
     listBadges,
     awardBadge,
     getUserBadges,
+    updateBadge,
+    toggleBadgeStatus,
+    deleteBadge,
   };
 }

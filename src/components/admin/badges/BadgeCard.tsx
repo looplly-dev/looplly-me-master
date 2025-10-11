@@ -2,11 +2,12 @@ import { Badge as BadgeType } from '@/hooks/useBadgeService';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Edit, Eye, Power } from 'lucide-react';
+import { Edit, Eye, Power, Trash2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
 import { BadgePreview } from './BadgePreview';
+import { useBadgeService } from '@/hooks/useBadgeService';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -41,9 +42,12 @@ const CATEGORY_EMOJI: Record<string, string> = {
 
 export function BadgeCard({ badge, onUpdate }: BadgeCardProps) {
   const { toast } = useToast();
+  const { deleteBadge } = useBadgeService();
   const [isToggling, setIsToggling] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
+  const [showToggleConfirm, setShowToggleConfirm] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const handleToggleStatus = async () => {
     setIsToggling(true);
@@ -71,13 +75,36 @@ export function BadgeCard({ badge, onUpdate }: BadgeCardProps) {
       });
     } finally {
       setIsToggling(false);
-      setShowConfirm(false);
+      setShowToggleConfirm(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    try {
+      await deleteBadge(badge.id, badge.icon_url || undefined);
+
+      toast({
+        title: 'Badge Deleted',
+        description: `${badge.name} has been permanently removed`,
+      });
+
+      onUpdate();
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to delete badge',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteConfirm(false);
     }
   };
 
   const initiateToggle = () => {
     if (badge.is_active) {
-      setShowConfirm(true);
+      setShowToggleConfirm(true);
     } else {
       handleToggleStatus();
     }
@@ -148,11 +175,24 @@ export function BadgeCard({ badge, onUpdate }: BadgeCardProps) {
           <Button
             variant="outline"
             size="sm"
-            className="flex-1"
             onClick={() => setShowPreview(true)}
           >
-            <Eye className="h-4 w-4 mr-2" />
-            Preview
+            <Eye className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => window.dispatchEvent(new CustomEvent('edit-badge', { detail: badge }))}
+          >
+            <Edit className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowDeleteConfirm(true)}
+            disabled={isDeleting}
+          >
+            <Trash2 className="h-4 w-4" />
           </Button>
           <Button
             variant={badge.is_active ? 'destructive' : 'default'}
@@ -173,7 +213,7 @@ export function BadgeCard({ badge, onUpdate }: BadgeCardProps) {
         onOpenChange={setShowPreview}
       />
 
-      <AlertDialog open={showConfirm} onOpenChange={setShowConfirm}>
+      <AlertDialog open={showToggleConfirm} onOpenChange={setShowToggleConfirm}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Deactivate Badge?</AlertDialogTitle>
@@ -185,6 +225,27 @@ export function BadgeCard({ badge, onUpdate }: BadgeCardProps) {
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleToggleStatus}>
               Deactivate
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Badge Permanently?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete <strong>{badge.name}</strong> from the catalog. 
+              Users who have earned this badge will lose it. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete Permanently
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

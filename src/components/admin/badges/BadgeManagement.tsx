@@ -1,14 +1,15 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { BadgeGrid } from './BadgeGrid';
 import { BadgeForm } from './BadgeForm';
-import { useBadgeService } from '@/hooks/useBadgeService';
+import { useBadgeService, Badge } from '@/hooks/useBadgeService';
 import { useQuery } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
 
 export function BadgeManagement() {
   const { listBadges } = useBadgeService();
   const [activeTab, setActiveTab] = useState('all');
+  const [editingBadge, setEditingBadge] = useState<Badge | null>(null);
 
   const { data: badges, isLoading, refetch } = useQuery({
     queryKey: ['badges', 'all'],
@@ -17,6 +18,16 @@ export function BadgeManagement() {
 
   const activeBadges = badges?.filter(b => b.is_active) || [];
   const inactiveBadges = badges?.filter(b => !b.is_active) || [];
+
+  // Listen for edit badge events
+  useEffect(() => {
+    const handleEdit = (e: CustomEvent) => {
+      setEditingBadge(e.detail);
+      setActiveTab('create');
+    };
+    window.addEventListener('edit-badge' as any, handleEdit);
+    return () => window.removeEventListener('edit-badge' as any, handleEdit);
+  }, []);
 
   if (isLoading) {
     return (
@@ -56,7 +67,9 @@ export function BadgeManagement() {
           <TabsTrigger value="inactive">
             Inactive ({inactiveBadges.length})
           </TabsTrigger>
-          <TabsTrigger value="create">+ Create New</TabsTrigger>
+          <TabsTrigger value="create" onClick={() => setEditingBadge(null)}>
+            + Create New
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="all" className="mt-6">
@@ -82,10 +95,14 @@ export function BadgeManagement() {
         </TabsContent>
 
         <TabsContent value="create" className="mt-6">
-          <BadgeForm onSuccess={() => {
-            refetch();
-            setActiveTab('all');
-          }} />
+          <BadgeForm 
+            badge={editingBadge || undefined}
+            onSuccess={() => {
+              refetch();
+              setEditingBadge(null);
+              setActiveTab('all');
+            }} 
+          />
         </TabsContent>
       </Tabs>
     </div>

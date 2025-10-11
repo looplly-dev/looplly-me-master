@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -31,20 +31,39 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 interface BadgeFormProps {
+  badge?: BadgeType;
   onSuccess: () => void;
 }
 
-export function BadgeForm({ onSuccess }: BadgeFormProps) {
-  const { generateBadge } = useBadgeService();
+type BadgeType = z.infer<typeof formSchema> & { id?: string; tenant_id?: string; icon_url?: string; created_at?: string; updated_at?: string; metadata?: any };
+
+export function BadgeForm({ badge, onSuccess }: BadgeFormProps) {
+  const { generateBadge, updateBadge } = useBadgeService();
   const { toast } = useToast();
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [previewImage, setPreviewImage] = useState<string | null>(badge?.icon_url || null);
   const [showPreview, setShowPreview] = useState(false);
+
+  // Update preview when badge prop changes
+  useEffect(() => {
+    setPreviewImage(badge?.icon_url || null);
+  }, [badge?.id]);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
+    defaultValues: badge ? {
+      name: badge.name || '',
+      description: badge.description || '',
+      category: badge.category || '',
+      tier: badge.tier || 'bronze',
+      rarity: badge.rarity || 'Common',
+      rep_points: badge.rep_points || 10,
+      requirement: badge.requirement || '',
+      icon_theme: (badge.metadata as any)?.icon_theme || '',
+      shape: badge.shape || 'circle',
+      is_active: badge.is_active ?? false,
+    } : {
       name: '',
       description: '',
       category: '',
@@ -73,10 +92,10 @@ export function BadgeForm({ onSuccess }: BadgeFormProps) {
     setIsGenerating(true);
     try {
       const result = await generateBadge({
-        name: values.name,
+        badgeName: values.name,
         tier: values.tier,
         category: values.category,
-        icon_theme: values.icon_theme,
+        iconTheme: values.icon_theme,
         type: 'badge',
       });
 
@@ -133,11 +152,9 @@ export function BadgeForm({ onSuccess }: BadgeFormProps) {
         .from('badges')
         .getPublicUrl(filename);
 
-      // Insert badge into catalog
-      const { error: insertError } = await supabase
-        .from('badge_catalog')
-        .insert({
-          tenant_id: profile.tenant_id,
+      if (badge?.id) {
+        // Update existing badge
+        await updateBadge(badge.id, {
           name: values.name,
           description: values.description,
           tier: values.tier,
@@ -151,12 +168,36 @@ export function BadgeForm({ onSuccess }: BadgeFormProps) {
           metadata: { icon_theme: values.icon_theme },
         });
 
-      if (insertError) throw insertError;
+        toast({
+          title: 'Badge Updated',
+          description: `${values.name} has been updated successfully`,
+        });
+      } else {
+        // Insert new badge
+        const { error: insertError } = await supabase
+          .from('badge_catalog')
+          .insert({
+            tenant_id: profile.tenant_id,
+            name: values.name,
+            description: values.description,
+            tier: values.tier,
+            category: values.category,
+            rarity: values.rarity,
+            rep_points: values.rep_points,
+            requirement: values.requirement,
+            shape: values.shape || 'circle',
+            icon_url: publicUrl,
+            is_active: values.is_active,
+            metadata: { icon_theme: values.icon_theme },
+          });
 
-      toast({
-        title: 'Badge Created',
-        description: `${values.name} has been added to the catalog`,
-      });
+        if (insertError) throw insertError;
+
+        toast({
+          title: 'Badge Created',
+          description: `${values.name} has been added to the catalog`,
+        });
+      }
 
       form.reset();
       setPreviewImage(null);
@@ -178,7 +219,7 @@ export function BadgeForm({ onSuccess }: BadgeFormProps) {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Create New Badge</CardTitle>
+          <CardTitle>{badge ? 'Edit Badge' : 'Create New Badge'}</CardTitle>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -421,12 +462,12 @@ export function BadgeForm({ onSuccess }: BadgeFormProps) {
                 {isGenerating ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Generating...
+                    {badge ? 'Regenerating...' : 'Generating...'}
                   </>
                 ) : (
                   <>
                     <Sparkles className="mr-2 h-4 w-4" />
-                    Generate Preview
+                    {badge ? 'Regenerate Preview' : 'Generate Preview'}
                   </>
                 )}
               </Button>
