@@ -134,7 +134,8 @@ export default function RepTab() {
   })).filter(cat => cat.badges.length > 0);
 
   const handleBadgeClick = (badge: any) => {
-    setSelectedBadge(badge);
+    console.info('Badge clicked (preview mode)', { preview: !!profile?.badge_preview_mode, earned: !!badge?.earned, id: badge?.id });
+    setSelectedBadge({ ...badge, earned: (!!profile?.badge_preview_mode) || !!badge.earned });
     setIsModalOpen(true);
   };
 
@@ -656,6 +657,7 @@ export default function RepTab() {
         badge={selectedBadge}
         open={isModalOpen}
         onOpenChange={setIsModalOpen}
+        previewEarned={!!profile?.badge_preview_mode}
       />
     </div>
   );

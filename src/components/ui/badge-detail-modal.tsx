@@ -28,10 +28,13 @@ interface BadgeDetailModalProps {
   badge: any
   open: boolean
   onOpenChange: (open: boolean) => void
+  previewEarned?: boolean
 }
 
-export function BadgeDetailModal({ badge, open, onOpenChange }: BadgeDetailModalProps) {
+export function BadgeDetailModal({ badge, open, onOpenChange, previewEarned }: BadgeDetailModalProps) {
   if (!badge) return null
+  
+  const isEarned = (previewEarned ?? false) || !!badge.earned;
   
   // Resolve icon component (matching CollectibleBadge pattern)
   const IconComponent = iconMap[badge.icon as keyof typeof iconMap] || Shield;
@@ -115,7 +118,7 @@ export function BadgeDetailModal({ badge, open, onOpenChange }: BadgeDetailModal
   }
 
   const getCategoryStyle = (tier: string, rarity: string) => {
-    if (!badge.earned) {
+    if (!isEarned) {
       // Show tier gradient with reduced opacity for unearned badges
       const earnedStyle = getTierGradient(tier);
       return {
@@ -166,8 +169,8 @@ export function BadgeDetailModal({ badge, open, onOpenChange }: BadgeDetailModal
             <div
               className={cn(
                 "w-32 h-32 flex items-center justify-center shadow-lg transition-all duration-300 rounded-full",
-                getRarityEffects(badge.rarity, badge.earned),
-                badge.earned ? "opacity-100" : "opacity-40 grayscale"
+                getRarityEffects(badge.rarity, isEarned),
+                isEarned ? "opacity-100" : "opacity-40 grayscale"
               )}
               style={getCategoryStyle(badge.tier, badge.rarity)}
             >
@@ -176,7 +179,7 @@ export function BadgeDetailModal({ badge, open, onOpenChange }: BadgeDetailModal
               </div>
               
               {/* Earned indicator */}
-              {badge.earned && (
+              {isEarned && (
                 <div className="absolute -top-2 -right-2 w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center z-20 ring-2 ring-background shadow-lg">
                   <CheckCircle className="h-4 w-4 text-white" />
                 </div>
