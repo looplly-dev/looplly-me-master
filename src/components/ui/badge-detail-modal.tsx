@@ -37,12 +37,16 @@ export function BadgeDetailModal({ badge, open, onOpenChange, previewEarned }: B
   const isEarned = (previewEarned ?? false) || !!badge.earned;
   const points = badge.points ?? badge.repPoints;
   
+  const mediaUrl = badge.imageUrl || badge.icon_url;
+  
   console.info('BadgeDetailModal opened', { 
     name: badge.name, 
     isEarned, 
     previewEarned, 
     categoryLabel: badge.categoryLabel,
-    points 
+    points,
+    hasImage: !!mediaUrl,
+    mediaUrl
   });
   
   // Resolve icon component (matching CollectibleBadge pattern)
@@ -189,7 +193,24 @@ export function BadgeDetailModal({ badge, open, onOpenChange, previewEarned }: B
               style={getCategoryStyle(badge.tier, badge.rarity)}
             >
               <div className="absolute inset-0 flex items-center justify-center">
-                <IconComponent className="h-12 w-12 text-white drop-shadow-lg" />
+                {mediaUrl ? (
+                  <img
+                    src={mediaUrl}
+                    alt={badge.name}
+                    className="object-cover rounded-full w-32 h-32"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                      const iconElement = e.currentTarget.nextElementSibling;
+                      if (iconElement) iconElement.classList.remove('hidden');
+                    }}
+                  />
+                ) : null}
+                <IconComponent
+                  className={cn(
+                    'h-12 w-12 text-white drop-shadow-lg',
+                    mediaUrl && 'hidden'
+                  )}
+                />
               </div>
               
               {/* Earned indicator */}
