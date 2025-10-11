@@ -42,6 +42,7 @@ function AdminDashboardContent() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-profile'] });
+      queryClient.invalidateQueries({ queryKey: ['user-profile'] });
       toast({
         title: 'Badge Preview Updated',
         description: profile?.badge_preview_mode 
