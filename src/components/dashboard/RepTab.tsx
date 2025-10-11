@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -41,6 +41,12 @@ export default function RepTab() {
   const [selectedBadge, setSelectedBadge] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { listBadges, getUserBadges } = useBadgeService();
+
+  useEffect(() => {
+    if (selectedBadge) {
+      console.info('Modal will render badge', { id: selectedBadge.id, name: selectedBadge.name });
+    }
+  }, [selectedBadge]);
 
   // Fetch admin's badge preview setting
   const { data: profile } = useQuery({
@@ -664,9 +670,13 @@ export default function RepTab() {
 
       {/* Badge Detail Modal */}
       <BadgeDetailModal
+        key={selectedBadge?.id || 'no-badge'}
         badge={selectedBadge}
         open={isModalOpen}
-        onOpenChange={setIsModalOpen}
+        onOpenChange={(open) => {
+          setIsModalOpen(open);
+          if (!open) setSelectedBadge(null);
+        }}
         previewEarned={!!profile?.badge_preview_mode}
       />
     </div>
