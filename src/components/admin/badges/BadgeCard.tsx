@@ -110,9 +110,19 @@ export function BadgeCard({ badge, onUpdate }: BadgeCardProps) {
     }
   };
 
+  const tierColors: Record<string, string> = {
+    bronze: 'border-l-4 border-l-orange-500/70',
+    silver: 'border-l-4 border-l-gray-400/70',
+    gold: 'border-l-4 border-l-yellow-500/70',
+    platinum: 'border-l-4 border-l-cyan-500/70',
+    diamond: 'border-l-4 border-l-purple-500/70',
+  };
+
+  const tierColorClass = tierColors[badge.tier || 'bronze'] || '';
+
   return (
     <>
-      <Card className="overflow-hidden">
+      <Card className={`overflow-hidden ${tierColorClass}`}>
         <CardContent className="p-6 space-y-4">
           {/* Status Indicator */}
           <div className="flex items-center justify-between">

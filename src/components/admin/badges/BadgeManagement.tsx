@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { BadgeGrid } from './BadgeGrid';
 import { BadgeForm } from './BadgeForm';
+import { BadgeSeeder } from './BadgeSeeder';
 import { useBadgeService, Badge } from '@/hooks/useBadgeService';
 import { useQuery } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
@@ -55,6 +56,9 @@ export function BadgeManagement() {
           </span>
         </div>
       </div>
+
+      {/* Show seeder only when no badges exist */}
+      {badges?.length === 0 && <BadgeSeeder />}
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>

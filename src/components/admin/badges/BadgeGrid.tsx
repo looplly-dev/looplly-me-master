@@ -16,14 +16,28 @@ export function BadgeGrid({ badges, onUpdate, showAll = false }: BadgeGridProps)
   const [tierFilter, setTierFilter] = useState<string>('all');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
 
-  const filteredBadges = badges.filter(badge => {
-    const matchesSearch = badge.name.toLowerCase().includes(search.toLowerCase()) ||
-                         badge.description?.toLowerCase().includes(search.toLowerCase());
-    const matchesTier = tierFilter === 'all' || badge.tier === tierFilter;
-    const matchesCategory = categoryFilter === 'all' || badge.category === categoryFilter;
-    
-    return matchesSearch && matchesTier && matchesCategory;
-  });
+  const tierOrder = ['bronze', 'silver', 'gold', 'platinum', 'diamond'];
+  
+  const filteredBadges = badges
+    .filter(badge => {
+      const matchesSearch = badge.name.toLowerCase().includes(search.toLowerCase()) ||
+                           badge.description?.toLowerCase().includes(search.toLowerCase());
+      const matchesTier = tierFilter === 'all' || badge.tier === tierFilter;
+      const matchesCategory = categoryFilter === 'all' || badge.category === categoryFilter;
+      
+      return matchesSearch && matchesTier && matchesCategory;
+    })
+    .sort((a, b) => {
+      const tierA = tierOrder.indexOf(a.tier || 'bronze');
+      const tierB = tierOrder.indexOf(b.tier || 'bronze');
+      return tierA - tierB;
+    });
+
+  const tierCounts = badges.reduce((acc, badge) => {
+    const tier = badge.tier || 'bronze';
+    acc[tier] = (acc[tier] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
 
   if (badges.length === 0) {
     return (
@@ -52,12 +66,12 @@ export function BadgeGrid({ badges, onUpdate, showAll = false }: BadgeGridProps)
             <SelectValue placeholder="Filter by tier" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Tiers</SelectItem>
-            <SelectItem value="bronze">🥉 Bronze</SelectItem>
-            <SelectItem value="silver">🥈 Silver</SelectItem>
-            <SelectItem value="gold">🥇 Gold</SelectItem>
-            <SelectItem value="platinum">💎 Platinum</SelectItem>
-            <SelectItem value="diamond">💠 Diamond</SelectItem>
+            <SelectItem value="all">All Tiers ({badges.length})</SelectItem>
+            <SelectItem value="bronze">🥉 Bronze ({tierCounts['bronze'] || 0})</SelectItem>
+            <SelectItem value="silver">🥈 Silver ({tierCounts['silver'] || 0})</SelectItem>
+            <SelectItem value="gold">🥇 Gold ({tierCounts['gold'] || 0})</SelectItem>
+            <SelectItem value="platinum">💎 Platinum ({tierCounts['platinum'] || 0})</SelectItem>
+            <SelectItem value="diamond">💠 Diamond ({tierCounts['diamond'] || 0})</SelectItem>
           </SelectContent>
         </Select>
 
@@ -75,10 +89,31 @@ export function BadgeGrid({ badges, onUpdate, showAll = false }: BadgeGridProps)
         </Select>
       </div>
 
+      {/* Tier Header when filtering */}
+      {tierFilter !== 'all' && (
+        <div className="bg-muted/50 p-4 rounded-lg border">
+          <h3 className="text-lg font-semibold flex items-center gap-2">
+            <span className="text-2xl">
+              {tierFilter === 'bronze' && '🥉'}
+              {tierFilter === 'silver' && '🥈'}
+              {tierFilter === 'gold' && '🥇'}
+              {tierFilter === 'platinum' && '💎'}
+              {tierFilter === 'diamond' && '💠'}
+            </span>
+            {tierFilter.charAt(0).toUpperCase() + tierFilter.slice(1)} Tier
+          </h3>
+          <p className="text-sm text-muted-foreground mt-1">
+            Showing {filteredBadges.length} badge{filteredBadges.length !== 1 ? 's' : ''} in this tier
+          </p>
+        </div>
+      )}
+
       {/* Results count */}
-      <p className="text-sm text-muted-foreground">
-        Showing {filteredBadges.length} of {badges.length} badges
-      </p>
+      {tierFilter === 'all' && (
+        <p className="text-sm text-muted-foreground">
+          Showing {filteredBadges.length} of {badges.length} badges
+        </p>
+      )}
 
       {/* Badge Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -1,1 +1,13 @@
 project_id = "kzqcfrubjccxrwfkkrze"
+
+[functions.badge-service-api]
+verify_jwt = false
+
+[functions.delete-user]
+verify_jwt = true
+
+[functions.generate-badge-image]
+verify_jwt = true
+
+[functions.seed-badges]
+verify_jwt = true
