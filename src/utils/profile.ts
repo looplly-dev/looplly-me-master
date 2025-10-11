@@ -12,6 +12,7 @@ export interface ProfileUpdateData {
   sec?: 'A' | 'B' | 'C1' | 'C2' | 'D' | 'E';
   gps_enabled?: boolean;
   profile_complete?: boolean;
+  badge_preview_mode?: boolean;
 }
 
 export const formatProfileForDatabase = (profile: any): ProfileUpdateData => {

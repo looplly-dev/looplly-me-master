@@ -286,6 +286,7 @@ export type Database = {
       profiles: {
         Row: {
           address: string | null
+          badge_preview_mode: boolean | null
           country_code: string | null
           created_at: string | null
           date_of_birth: string | null
@@ -306,6 +307,7 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          badge_preview_mode?: boolean | null
           country_code?: string | null
           created_at?: string | null
           date_of_birth?: string | null
@@ -326,6 +328,7 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          badge_preview_mode?: boolean | null
           country_code?: string | null
           created_at?: string | null
           date_of_birth?: string | null

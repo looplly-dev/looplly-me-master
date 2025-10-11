@@ -1,9 +1,63 @@
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Users, DollarSign, Award, TrendingUp } from 'lucide-react';
+import { Users, DollarSign, Award, TrendingUp, Eye } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useToast } from '@/hooks/use-toast';
 
 function AdminDashboardContent() {
+  const { authState } = useAuth();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  // Fetch admin's badge preview setting
+  const { data: profile } = useQuery({
+    queryKey: ['admin-profile', authState.user?.id],
+    queryFn: async () => {
+      if (!authState.user?.id) return null;
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('badge_preview_mode')
+        .eq('user_id', authState.user.id)
+        .single();
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!authState.user?.id,
+  });
+
+  // Update badge preview mode
+  const updatePreviewMode = useMutation({
+    mutationFn: async (enabled: boolean) => {
+      if (!authState.user?.id) throw new Error('No user ID');
+      const { error } = await supabase
+        .from('profiles')
+        .update({ badge_preview_mode: enabled })
+        .eq('user_id', authState.user.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-profile'] });
+      toast({
+        title: 'Badge Preview Updated',
+        description: profile?.badge_preview_mode 
+          ? 'All badges will now show as locked based on your actual progress'
+          : 'All badges will now appear unlocked for preview',
+      });
+    },
+    onError: () => {
+      toast({
+        title: 'Error',
+        description: 'Failed to update badge preview mode',
+        variant: 'destructive',
+      });
+    },
+  });
+
   return (
     <div className="space-y-6">
       <div>
@@ -81,12 +135,29 @@ function AdminDashboardContent() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <Eye className="h-5 w-5" />
+              Badge Preview Mode
+            </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-2">
+          <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              Common admin tasks and shortcuts will appear here
+              When enabled, all badges appear unlocked in your Rep tab for preview purposes
             </p>
+            <div className="flex items-center justify-between p-4 rounded-lg bg-muted/50">
+              <Label htmlFor="badge-preview" className="cursor-pointer">
+                <div>
+                  <p className="font-medium">Show All Badges as Earned</p>
+                  <p className="text-sm text-muted-foreground">Preview all badges in unlocked state</p>
+                </div>
+              </Label>
+              <Switch
+                id="badge-preview"
+                checked={profile?.badge_preview_mode || false}
+                onCheckedChange={(checked) => updatePreviewMode.mutate(checked)}
+                disabled={updatePreviewMode.isPending}
+              />
+            </div>
           </CardContent>
         </Card>
       </div>

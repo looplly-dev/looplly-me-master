@@ -33,6 +33,7 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { useBadgeService } from '@/hooks/useBadgeService';
 import { useQuery } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 export default function RepTab() {
   const { authState } = useAuth();
@@ -40,6 +41,22 @@ export default function RepTab() {
   const [selectedBadge, setSelectedBadge] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { listBadges, getUserBadges } = useBadgeService();
+
+  // Fetch admin's badge preview setting
+  const { data: profile } = useQuery({
+    queryKey: ['user-profile', authState.user?.id],
+    queryFn: async () => {
+      if (!authState.user?.id) return null;
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('badge_preview_mode')
+        .eq('user_id', authState.user.id)
+        .single();
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!authState.user?.id,
+  });
 
   // Fetch all badges from database
   const { data: allBadges = [], isLoading: badgesLoading } = useQuery({
@@ -93,13 +110,17 @@ export default function RepTab() {
       .filter(badge => badge.category === key)
       .map(badge => {
         const userBadge = userBadges.find(ub => ub.badge_id === badge.id);
+        const isEarned = earnedBadgeIds.has(badge.id);
+        // Apply badge preview mode: if enabled, show all badges as earned
+        const displayAsEarned = profile?.badge_preview_mode || isEarned;
+        
         return {
           id: badge.id,
           name: badge.name,
           description: badge.description || '',
           tier: badge.tier?.charAt(0).toUpperCase() + badge.tier?.slice(1) || 'Bronze',
           repPoints: badge.rep_points || 0,
-          earned: earnedBadgeIds.has(badge.id),
+          earned: displayAsEarned,
           rarity: badge.rarity || 'Common',
           icon: badge.icon_name || 'Star',
           shape: (badge.shape as 'circle' | 'hexagon' | 'shield' | 'star' | 'diamond') || 'circle',
