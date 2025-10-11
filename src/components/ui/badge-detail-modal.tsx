@@ -228,21 +228,21 @@ export function BadgeDetailModal({ badge, open, onOpenChange }: BadgeDetailModal
                 </div>
               )}
               
-              {badge.requirements && (
+              {((badge.requirements && badge.requirements.length > 0) || badge.requirement) && (
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 text-sm font-medium">
                     <Target className="h-3 w-3" />
                     Requirements
                   </div>
                   <ul className="text-xs text-muted-foreground space-y-1 ml-5">
-                    {badge.requirements.map((req: string, idx: number) => (
+                    {(badge.requirements ?? [badge.requirement]).map((req: string, idx: number) => (
                       <li key={idx} className="list-disc">{req}</li>
                     ))}
                   </ul>
                 </div>
               )}
 
-              {badge.points && (
+              {(badge.points ?? badge.repPoints) && (
                 <div className="flex items-center gap-2 text-sm">
                   <Trophy className="h-3 w-3 text-yellow-500" />
                   <span className="font-medium">{badge.points} Reputation Points</span>
