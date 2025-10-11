@@ -126,6 +126,7 @@ export default function RepTab() {
           icon: badge.icon_name || 'Star',
           shape: (badge.shape as 'circle' | 'hexagon' | 'shield' | 'star' | 'diamond') || 'circle',
           category: badge.category || '',
+          categoryLabel: categoryMap[badge.category as keyof typeof categoryMap]?.name || badge.category?.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) || 'Other',
           requirements: badge.requirement ? [badge.requirement] : undefined,
           earnedAt: userBadge?.awarded_at,
           imageUrl: badge.icon_url || undefined,
@@ -134,8 +135,17 @@ export default function RepTab() {
   })).filter(cat => cat.badges.length > 0);
 
   const handleBadgeClick = (badge: any) => {
-    console.info('Badge clicked (preview mode)', { preview: !!profile?.badge_preview_mode, earned: !!badge?.earned, id: badge?.id });
-    setSelectedBadge({ ...badge, earned: (!!profile?.badge_preview_mode) || !!badge.earned });
+    console.info('Badge clicked', { 
+      id: badge?.id, 
+      earned: !!badge?.earned, 
+      preview: !!profile?.badge_preview_mode, 
+      categoryKey: badge?.category,
+      categoryLabel: badge?.categoryLabel 
+    });
+    setSelectedBadge({ 
+      ...badge, 
+      earned: (!!profile?.badge_preview_mode) || !!badge.earned 
+    });
     setIsModalOpen(true);
   };
 

@@ -1,6 +1,6 @@
 import React from "react"
 import { X, Calendar, Trophy, Target, Clock, Shield, Flame, Users, Star, MapPin, Award, Zap, Crown, CheckCircle, Hexagon, Diamond, Medal, Sparkles } from "lucide-react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { cn } from "@/lib/utils"
@@ -35,6 +35,15 @@ export function BadgeDetailModal({ badge, open, onOpenChange, previewEarned }: B
   if (!badge) return null
   
   const isEarned = (previewEarned ?? false) || !!badge.earned;
+  const points = badge.points ?? badge.repPoints;
+  
+  console.info('BadgeDetailModal opened', { 
+    name: badge.name, 
+    isEarned, 
+    previewEarned, 
+    categoryLabel: badge.categoryLabel,
+    points 
+  });
   
   // Resolve icon component (matching CollectibleBadge pattern)
   const IconComponent = iconMap[badge.icon as keyof typeof iconMap] || Shield;
@@ -151,6 +160,11 @@ export function BadgeDetailModal({ badge, open, onOpenChange, previewEarned }: B
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md mx-auto bg-background/95 backdrop-blur-sm border-2 p-0 overflow-hidden">
+        <DialogHeader className="sr-only">
+          <DialogTitle>{badge.name}</DialogTitle>
+          <DialogDescription>Detailed information about this badge and how to earn it</DialogDescription>
+        </DialogHeader>
+        
         {/* Header with close button */}
         <div className="relative p-6 pb-4">
           <button
@@ -190,13 +204,13 @@ export function BadgeDetailModal({ badge, open, onOpenChange, previewEarned }: B
             {/* Badge Info */}
             <div className="text-center space-y-3">
               <div className="space-y-1">
-                <DialogTitle className="text-2xl font-bold">{badge.name}</DialogTitle>
+                <h2 className="text-2xl font-bold">{badge.name}</h2>
                 <div className="flex items-center justify-center gap-2">
                   <Badge variant="secondary" className="text-xs">
                     {badge.tier}
                   </Badge>
                   <Badge variant="outline" className="text-xs">
-                    {badge.category}
+                    {badge.categoryLabel || badge.category}
                   </Badge>
                 </div>
               </div>
@@ -245,10 +259,10 @@ export function BadgeDetailModal({ badge, open, onOpenChange, previewEarned }: B
                 </div>
               )}
 
-              {(badge.points ?? badge.repPoints) && (
+              {points && (
                 <div className="flex items-center gap-2 text-sm">
                   <Trophy className="h-3 w-3 text-yellow-500" />
-                  <span className="font-medium">{badge.points} Reputation Points</span>
+                  <span className="font-medium">{points} Reputation Points</span>
                 </div>
               )}
             </div>
