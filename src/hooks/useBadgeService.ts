@@ -6,13 +6,18 @@ export interface Badge {
   tenant_id: string;
   name: string;
   description: string | null;
-  tier: 'bronze' | 'silver' | 'gold' | 'platinum' | 'diamond';
+  tier: 'bronze' | 'silver' | 'gold' | 'platinum' | 'diamond' | 'elite';
   category: string | null;
   icon_url: string | null;
   metadata: Record<string, any>;
   is_active: boolean;
   created_at: string;
   updated_at: string;
+  rarity?: 'Common' | 'Rare' | 'Epic' | 'Legendary';
+  rep_points?: number;
+  requirement?: string;
+  shape?: 'circle' | 'hexagon' | 'star' | 'diamond';
+  icon_name?: string;
 }
 
 export interface UserBadge {

@@ -15,15 +15,13 @@ function AdminBadgesContent() {
       <BadgeGenerator />
 
       <div className="bg-muted/50 p-4 rounded-lg space-y-2 text-sm">
-        <h3 className="font-semibold">Instructions:</h3>
-        <ol className="list-decimal list-inside space-y-1 text-muted-foreground">
-          <li>Click "Generate All Badges & Icons" to start the batch generation</li>
-          <li>Wait for all images to be generated (this takes a few minutes)</li>
-          <li>Click "Download All Images" to save them to your computer</li>
-          <li>Manually save badge images to <code className="bg-muted px-1 rounded">/public/badges/</code></li>
-          <li>Save tier icons to <code className="bg-muted px-1 rounded">/public/tier-icons/</code></li>
-          <li>Update badge data with the new image paths</li>
-        </ol>
+        <h3 className="font-semibold">Quick Guide:</h3>
+        <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+          <li><strong>All Badges:</strong> View and manage all badges with status filters</li>
+          <li><strong>Active:</strong> Badges currently visible to users on their dashboards</li>
+          <li><strong>Inactive:</strong> Draft or deactivated badges (hidden from users)</li>
+          <li><strong>Create New:</strong> Design and generate new badges with AI</li>
+        </ul>
       </div>
     </div>
   );

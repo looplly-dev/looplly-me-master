@@ -73,11 +73,16 @@ export type Database = {
           category: string | null
           created_at: string | null
           description: string | null
+          icon_name: string | null
           icon_url: string | null
           id: string
           is_active: boolean | null
           metadata: Json | null
           name: string
+          rarity: string | null
+          rep_points: number | null
+          requirement: string | null
+          shape: string | null
           tenant_id: string
           tier: string | null
           updated_at: string | null
@@ -86,11 +91,16 @@ export type Database = {
           category?: string | null
           created_at?: string | null
           description?: string | null
+          icon_name?: string | null
           icon_url?: string | null
           id?: string
           is_active?: boolean | null
           metadata?: Json | null
           name: string
+          rarity?: string | null
+          rep_points?: number | null
+          requirement?: string | null
+          shape?: string | null
           tenant_id: string
           tier?: string | null
           updated_at?: string | null
@@ -99,11 +109,16 @@ export type Database = {
           category?: string | null
           created_at?: string | null
           description?: string | null
+          icon_name?: string | null
           icon_url?: string | null
           id?: string
           is_active?: boolean | null
           metadata?: Json | null
           name?: string
+          rarity?: string | null
+          rep_points?: number | null
+          requirement?: string | null
+          shape?: string | null
           tenant_id?: string
           tier?: string | null
           updated_at?: string | null
