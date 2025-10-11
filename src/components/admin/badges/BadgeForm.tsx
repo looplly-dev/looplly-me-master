@@ -276,10 +276,13 @@ export function BadgeForm({ badge, onSuccess }: BadgeFormProps) {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="Social">👥 Social</SelectItem>
-                          <SelectItem value="Speed">⚡ Speed</SelectItem>
-                          <SelectItem value="Perfection">✨ Perfection</SelectItem>
-                          <SelectItem value="Exploration">🔍 Exploration</SelectItem>
+                          <SelectItem value="identity_security">🛡️ Identity & Security</SelectItem>
+                          <SelectItem value="consistency">🔥 Consistency Mastery</SelectItem>
+                          <SelectItem value="excellence">🏆 Excellence & Impact</SelectItem>
+                          <SelectItem value="social">👥 Social Network</SelectItem>
+                          <SelectItem value="speed">⚡ Speed Masters</SelectItem>
+                          <SelectItem value="perfection">✨ Perfection Elite</SelectItem>
+                          <SelectItem value="exploration">🔍 Exploration Heroes</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />

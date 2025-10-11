@@ -81,10 +81,13 @@ export function BadgeGrid({ badges, onUpdate, showAll = false }: BadgeGridProps)
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Categories</SelectItem>
-            <SelectItem value="social">👥 Social</SelectItem>
-            <SelectItem value="speed">⚡ Speed</SelectItem>
-            <SelectItem value="perfection">✨ Perfection</SelectItem>
-            <SelectItem value="exploration">🔍 Exploration</SelectItem>
+            <SelectItem value="identity_security">🛡️ Identity & Security</SelectItem>
+            <SelectItem value="consistency">🔥 Consistency Mastery</SelectItem>
+            <SelectItem value="excellence">🏆 Excellence & Impact</SelectItem>
+            <SelectItem value="social">👥 Social Network</SelectItem>
+            <SelectItem value="speed">⚡ Speed Masters</SelectItem>
+            <SelectItem value="perfection">✨ Perfection Elite</SelectItem>
+            <SelectItem value="exploration">🔍 Exploration Heroes</SelectItem>
           </SelectContent>
         </Select>
       </div>

@@ -43,12 +43,27 @@ export function BadgeSeeder() {
           Quick Start: Seed Badge Collection
         </CardTitle>
         <CardDescription>
-          Populate your badge catalog with 25 pre-designed badges across all tiers (Bronze, Silver, Gold, Platinum, Diamond)
+          Populate your badge catalog with 35 pre-designed badges across 7 thematic categories and all tiers
         </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          <div className="grid grid-cols-4 gap-4 text-sm">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 text-sm">
+            <div className="text-center p-3 bg-muted/50 rounded-lg">
+              <div className="text-2xl mb-1">🛡️</div>
+              <div className="font-semibold">5 Identity</div>
+              <div className="text-xs text-muted-foreground">Security badges</div>
+            </div>
+            <div className="text-center p-3 bg-muted/50 rounded-lg">
+              <div className="text-2xl mb-1">🔥</div>
+              <div className="font-semibold">5 Consistency</div>
+              <div className="text-xs text-muted-foreground">Streak rewards</div>
+            </div>
+            <div className="text-center p-3 bg-muted/50 rounded-lg">
+              <div className="text-2xl mb-1">🏆</div>
+              <div className="font-semibold">5 Excellence</div>
+              <div className="text-xs text-muted-foreground">Quality & Impact</div>
+            </div>
             <div className="text-center p-3 bg-muted/50 rounded-lg">
               <div className="text-2xl mb-1">👥</div>
               <div className="font-semibold">5 Social</div>
@@ -85,7 +100,7 @@ export function BadgeSeeder() {
             ) : (
               <>
                 <Sparkles className="mr-2 h-4 w-4" />
-                Seed All 25 Badges
+                Seed All 35 Badges
               </>
             )}
           </Button>

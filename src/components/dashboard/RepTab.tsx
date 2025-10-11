@@ -23,19 +23,35 @@ import {
   Minimize2,
   Zap
 } from 'lucide-react';
-import { userStats, badgeSystem } from '@/data/mockData';
+import { userStats } from '@/data/mockData';
 import { useAuth } from '@/hooks/useAuth';
 import { CollectibleBadge } from '@/components/ui/collectible-badge';
 import { BadgeDetailModal } from '@/components/ui/badge-detail-modal';
 import { StreakProgress } from '@/components/ui/streak-progress';
 import { CollapsibleSection } from '@/components/ui/collapsible-section';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import { useBadgeService } from '@/hooks/useBadgeService';
+import { useQuery } from '@tanstack/react-query';
+import { Loader2 } from 'lucide-react';
 
 export default function RepTab() {
   const { authState } = useAuth();
   const [isCompactView, setIsCompactView] = useState(true);
   const [selectedBadge, setSelectedBadge] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { listBadges, getUserBadges } = useBadgeService();
+
+  // Fetch all badges from database
+  const { data: allBadges = [], isLoading: badgesLoading } = useQuery({
+    queryKey: ['badges'],
+    queryFn: () => listBadges(true),
+  });
+
+  // Fetch user's earned badges
+  const { data: userBadges = [], isLoading: userBadgesLoading } = useQuery({
+    queryKey: ['user-badges'],
+    queryFn: () => getUserBadges(),
+  });
   // Endless reputation system with tiers and prestige
   const getLevel = (score: number) => {
     if (score >= 2000) return { name: 'Elite', tier: 'Elite', color: 'text-gradient', icon: '👑', min: 2000, max: Infinity };
@@ -57,16 +73,43 @@ export default function RepTab() {
     ? 100 
     : ((userStats.reputation.score - level.min) / (level.max - level.min + 1)) * 100;
 
-  // Combine all badge categories into carousel sections
-  const badgeCategories = [
-    { name: 'Identity & Security', icon: Shield, badges: badgeSystem.coreVerification },
-    { name: 'Consistency Mastery', icon: Flame, badges: badgeSystem.streakAchievements },
-    { name: 'Excellence & Impact', icon: Award, badges: badgeSystem.qualityAchievements },
-    { name: 'Social Network', icon: Users, badges: badgeSystem.socialConnector },
-    { name: 'Speed Masters', icon: Zap, badges: badgeSystem.speedDemon },
-    { name: 'Perfection Elite', icon: Target, badges: badgeSystem.perfectionist },
-    { name: 'Exploration Heroes', icon: MapPin, badges: badgeSystem.explorer }
-  ];
+  // Map database badges to categories with earned status
+  const earnedBadgeIds = new Set(userBadges.map(ub => ub.badge_id));
+  
+  const categoryMap: Record<string, { name: string; icon: any; dbKey: string }> = {
+    identity_security: { name: 'Identity & Security', icon: Shield, dbKey: 'identity_security' },
+    consistency: { name: 'Consistency Mastery', icon: Flame, dbKey: 'consistency' },
+    excellence: { name: 'Excellence & Impact', icon: Award, dbKey: 'excellence' },
+    social: { name: 'Social Network', icon: Users, dbKey: 'social' },
+    speed: { name: 'Speed Masters', icon: Zap, dbKey: 'speed' },
+    perfection: { name: 'Perfection Elite', icon: Target, dbKey: 'perfection' },
+    exploration: { name: 'Exploration Heroes', icon: MapPin, dbKey: 'exploration' },
+  };
+
+  const badgeCategories = Object.entries(categoryMap).map(([key, value]) => ({
+    name: value.name,
+    icon: value.icon,
+    badges: allBadges
+      .filter(badge => badge.category === key)
+      .map(badge => {
+        const userBadge = userBadges.find(ub => ub.badge_id === badge.id);
+        return {
+          id: badge.id,
+          name: badge.name,
+          description: badge.description || '',
+          tier: badge.tier?.charAt(0).toUpperCase() + badge.tier?.slice(1) || 'Bronze',
+          repPoints: badge.rep_points || 0,
+          earned: earnedBadgeIds.has(badge.id),
+          rarity: badge.rarity || 'Common',
+          icon: badge.icon_name || 'Star',
+          shape: (badge.shape as 'circle' | 'hexagon' | 'shield' | 'star' | 'diamond') || 'circle',
+          category: badge.category || '',
+          requirement: badge.rep_points || 0,
+          earnedAt: userBadge?.awarded_at,
+          imageUrl: badge.icon_url || undefined,
+        };
+      }),
+  })).filter(cat => cat.badges.length > 0);
 
   const handleBadgeClick = (badge: any) => {
     setSelectedBadge(badge);
@@ -110,6 +153,18 @@ export default function RepTab() {
       action: 'Enable'
     }
   ];
+
+  // Show loading state
+  if (badgesLoading || userBadgesLoading) {
+    return (
+      <div className="p-4 md:p-6 lg:p-8 pb-24 md:pb-20 lg:pb-8 flex items-center justify-center min-h-[400px]">
+        <div className="text-center space-y-4">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
+          <p className="text-muted-foreground">Loading your badges...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-4 md:p-6 lg:p-8 pb-24 md:pb-20 lg:pb-8 space-y-4 md:space-y-6">
