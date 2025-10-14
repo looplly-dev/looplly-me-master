@@ -916,7 +916,7 @@ export default function SimplifiedEarnTab() {
                     </div>
 
                     {/* App Usage Patterns */}
-                    <div className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                    <div className="p-4 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex items-center gap-3">
                           <Smartphone className="h-4 w-4 text-gray-600 flex-shrink-0" />
@@ -948,7 +948,7 @@ export default function SimplifiedEarnTab() {
                     </div>
 
                     {/* Financial Behavior */}
-                    <div className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                    <div className="p-4 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex items-center gap-3">
                           <CreditCard className="h-4 w-4 text-yellow-600 flex-shrink-0" />
@@ -980,15 +980,15 @@ export default function SimplifiedEarnTab() {
                     </div>
                   </div>
                   
-                  <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-100">
+                  <div className="mt-4 p-3 bg-info/10 rounded-lg border border-info/20">
                     <div className="flex items-start gap-2">
-                      <Shield className="h-4 w-4 text-blue-600 mt-0.5" />
+                      <Shield className="h-4 w-4 text-info mt-0.5" />
                       <div>
-                        <p className="text-xs font-medium text-blue-800 mb-1">Privacy & Transparency</p>
-                        <p className="text-xs text-blue-600">
+                        <p className="text-xs font-medium text-info-foreground mb-1">Privacy & Transparency</p>
+                        <p className="text-xs text-info">
                           All data is anonymized, aggregated, and never sold with personal identifiers. You earn a share of revenue each time your data contributes to research insights sold to partners.
                         </p>
-                        <button className="text-xs text-blue-600 underline mt-1 hover:text-blue-800">
+                        <button className="text-xs text-info underline mt-1 hover:text-info-foreground">
                           Learn more about our data practices →
                         </button>
                       </div>
@@ -1013,7 +1013,7 @@ export default function SimplifiedEarnTab() {
             <CardContent>
               <div className="space-y-2">
                  {completedTasks.slice(0, 2).map((activity) => (
-                   <div key={activity.id} className="flex items-center justify-between p-2 bg-green-50 rounded">
+                   <div key={activity.id} className="flex items-center justify-between p-2 bg-success/10 rounded">
                     <span className="text-sm font-medium">{activity.title}</span>
                     <span className="text-sm font-bold text-success">
                       +${activity.reward_amount.toFixed(2)}
@@ -1072,7 +1072,7 @@ export default function SimplifiedEarnTab() {
             </div>
           </div>
           
-           <div className="p-3 bg-blue-50 rounded-lg border border-blue-100">
+           <div className="p-3 bg-info/10 rounded-lg border border-info/20">
              <p className="text-xs text-info font-medium">
                💡 <strong>Pro Tip:</strong> Check in daily and complete quality tasks to build Rep fast. Higher Rep = Higher earnings!
              </p>
