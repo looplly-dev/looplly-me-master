@@ -429,7 +429,7 @@ export default function SimplifiedEarnTab() {
                           Start
                         </Button>
                       </div>
-                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                      <div className="flex items-center gap-3 md:gap-4 text-sm text-muted-foreground flex-wrap">
                         <span className="flex items-center gap-1">
                           <Clock className="h-4 w-4" />
                           {survey.time_estimate} min
@@ -441,9 +441,9 @@ export default function SimplifiedEarnTab() {
                         <span className="flex items-center gap-1 text-sm">
                           <Star className="h-4 w-4 text-warning fill-warning" />
                           <span className="font-medium text-foreground">{(survey.qualification_score / 20).toFixed(1)}</span>
-                          <span className="text-muted-foreground">({survey.completion_rate} reviews)</span>
+                          <span className="text-muted-foreground hidden md:inline">({survey.completion_rate} reviews)</span>
                         </span>
-                        <span className="flex items-center gap-1">
+                        <span className="hidden md:flex items-center gap-1">
                           <Target className="h-4 w-4" />
                           {survey.qualification_score}% match
                         </span>
@@ -489,7 +489,7 @@ export default function SimplifiedEarnTab() {
                           </Button>
                         </div>
                       </div>
-                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                      <div className="flex items-center gap-3 md:gap-4 text-sm text-muted-foreground flex-wrap">
                         <span className="flex items-center gap-1">
                           <Clock className="h-4 w-4" />
                           {activity.time_estimate || 5} min
@@ -501,9 +501,9 @@ export default function SimplifiedEarnTab() {
                         <span className="flex items-center gap-1 text-sm">
                           <Star className="h-4 w-4 text-warning fill-warning" />
                           <span className="font-medium text-foreground">{((activity.metadata?.qualification_score || 90) / 20).toFixed(1)}</span>
-                          <span className="text-muted-foreground">(94 reviews)</span>
+                          <span className="text-muted-foreground hidden md:inline">(94 reviews)</span>
                         </span>
-                        <div className="flex items-center gap-1">
+                        <div className="hidden md:flex items-center gap-1">
                           <Target className="h-4 w-4" />
                           {activity.metadata?.qualification_score || 90}% match
                         </div>
