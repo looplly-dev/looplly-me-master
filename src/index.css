@@ -8,6 +8,34 @@
   .touch-manipulation {
     touch-action: manipulation;
   }
+
+  /* Slim, subtle scrollbar (Firefox + WebKit) */
+  .scrollbar-thin {
+    /* Firefox */
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--muted-foreground) / 0.35) transparent;
+  }
+  /* WebKit (Chromium/Safari) */
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 3px;
+    height: 3px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--muted-foreground) / 0.35);
+    border-radius: 9999px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background-color: hsl(var(--muted-foreground) / 0.55);
+  }
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  /* Small right gutter so the bar isn't glued to card edges */
+  .scrollbar-gutter {
+    padding-right: 0.5rem; /* 8px */
+    scrollbar-gutter: stable; /* avoids layout shimmy when scrollbars appear */
+  }
 }
 
 /* Looplly Design System - Mobile-first rewards app

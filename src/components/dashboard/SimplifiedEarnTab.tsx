@@ -404,7 +404,7 @@ export default function SimplifiedEarnTab() {
                 </TabsTrigger>
               </TabsList>
 
-              <TabsContent value="surveys" className="space-y-3 mt-4 max-h-[400px] overflow-y-auto scroll-smooth pb-4">
+              <TabsContent value="surveys" className="space-y-3 mt-4 max-h-[400px] overflow-y-auto scroll-smooth pb-4 scrollbar-thin scrollbar-gutter">
                 {/* Cint Premium Surveys */}
                 {cintLoading ? (
                   <div className="space-y-3">
@@ -520,7 +520,7 @@ export default function SimplifiedEarnTab() {
                 )}
               </TabsContent>
 
-              <TabsContent value="videos" className="space-y-3 mt-4 max-h-[400px] overflow-y-auto scroll-smooth pb-4">
+              <TabsContent value="videos" className="space-y-3 mt-4 max-h-[400px] overflow-y-auto scroll-smooth pb-4 scrollbar-thin scrollbar-gutter">
                 {availableTasks.filter(a => a.activity_type === 'video').length === 0 ? (
                   <div className="text-center py-8">
                     <Play className="h-12 w-12 mx-auto mb-3 text-muted-foreground/50" />
@@ -571,7 +571,7 @@ export default function SimplifiedEarnTab() {
                 )}
               </TabsContent>
 
-              <TabsContent value="tasks" className="space-y-3 mt-4 max-h-[400px] overflow-y-auto scroll-smooth pb-4">
+              <TabsContent value="tasks" className="space-y-3 mt-4 max-h-[400px] overflow-y-auto scroll-smooth pb-4 scrollbar-thin scrollbar-gutter">
                 {availableTasks.filter(a => a.activity_type === 'task').length === 0 ? (
                   <div className="text-center py-8">
                     <Zap className="h-12 w-12 mx-auto mb-3 text-muted-foreground/50" />
@@ -621,7 +621,7 @@ export default function SimplifiedEarnTab() {
                 )}
               </TabsContent>
 
-              <TabsContent value="data" className="space-y-3 mt-4 max-h-[400px] overflow-y-auto scroll-smooth pb-4">
+              <TabsContent value="data" className="space-y-3 mt-4 max-h-[400px] overflow-y-auto scroll-smooth pb-4 scrollbar-thin scrollbar-gutter">
                 <div className="p-4 border rounded-lg bg-card shadow-sm">
                   <div className="flex gap-3 mb-4">
                     <div className="p-2 bg-primary/10 rounded-lg">

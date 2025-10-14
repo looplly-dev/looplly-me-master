@@ -553,7 +553,7 @@ export default function RepTab() {
           </div>
         }
       >
-        <div className="space-y-3 max-h-64 overflow-y-auto">
+        <div className="space-y-3 max-h-64 overflow-y-auto scrollbar-thin scrollbar-gutter">
           {userStats.reputation.history.map((entry, index) => (
             <div key={index} className="flex items-center gap-3 p-3 bg-white border border-gray-200 rounded-lg shadow-sm transition-all hover:shadow-md">
               <div className={`p-2 rounded-full ${
