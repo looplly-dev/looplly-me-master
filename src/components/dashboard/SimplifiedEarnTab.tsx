@@ -522,10 +522,10 @@ export default function SimplifiedEarnTab() {
                   </div>
                 ) : (
                   availableTasks.filter(a => a.activity_type === 'video').map((activity) => (
-                    <div key={activity.id} className="p-4 border rounded-lg bg-card shadow-sm border-l-4 border-l-accent/50 hover:shadow-md transition-shadow">
+                    <div key={activity.id} className="p-4 border rounded-lg bg-card shadow-sm border-l-4 border-l-warning/50 hover:shadow-md transition-shadow">
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-3">
-                          <Play className="h-5 w-5 text-accent" />
+                          <Play className="h-5 w-5 text-warning" />
                           <div>
                             <h3 className="font-semibold">{activity.title}</h3>
                             <p className="text-sm text-muted-foreground">
@@ -551,13 +551,11 @@ export default function SimplifiedEarnTab() {
                           <span className="font-bold text-success">${activity.reward_amount.toFixed(2)}</span>
                         </span>
                         <div className="flex items-center gap-1">
-                          <Star className="h-4 w-4 text-warning fill-current" />
-                          <span className="font-medium">
-                            {activity.metadata?.rating || '4.2'}
+                          <Target className="h-4 w-4 text-primary" />
+                          <span className="font-medium text-primary">
+                            {activity.metadata?.qualification_score || 85}% match
                           </span>
-                          <span className="text-muted-foreground">
-                            ({activity.metadata?.reviews || '284'})
-                          </span>
+                          <span className="text-muted-foreground">🎯</span>
                         </div>
                       </div>
                     </div>
