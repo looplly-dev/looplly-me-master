@@ -50,7 +50,7 @@
   }
 
   .earn-card {
-    @apply py-4 pr-4 pl-2;
+    @apply py-4 pr-4 pl-2 bg-muted/50;
   }
 }
 
