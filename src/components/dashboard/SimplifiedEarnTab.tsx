@@ -32,7 +32,8 @@ import {
   ShoppingBag,
   Smartphone,
   CreditCard,
-  Share2
+  Share2,
+  Info
 } from 'lucide-react';
 import { useBalance } from '@/hooks/useBalance';
 import { useEarningActivities } from '@/hooks/useEarningActivities';
@@ -661,7 +662,7 @@ export default function SimplifiedEarnTab() {
                     </div>
 
                     {/* Cookie Tracking */}
-                    <div className="p-4 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
+                    <div className="p-4 bg-muted/50 rounded-lg hover:bg-muted transition-colors relative">
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex items-center gap-3">
                           <Cookie className="h-4 w-4 text-orange-600 flex-shrink-0" />
@@ -690,10 +691,20 @@ export default function SimplifiedEarnTab() {
                         </div>
                       </div>
                       <p className="text-xs text-muted-foreground pl-7">Website cookies for advertising optimization</p>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button className="absolute bottom-2 right-2 text-muted-foreground hover:text-foreground transition-colors">
+                            <Info className="h-3 w-3" />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-xs">
+                          <p className="text-xs">Tracks website cookies to help advertisers optimize their campaigns. Your identity is protected through pseudonymization.</p>
+                        </TooltipContent>
+                      </Tooltip>
                     </div>
 
                     {/* Browser History */}
-                    <div className="p-4 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
+                    <div className="p-4 bg-muted/50 rounded-lg hover:bg-muted transition-colors relative">
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex items-center gap-3">
                           <Globe className="h-4 w-4 text-purple-600 flex-shrink-0" />
@@ -722,10 +733,20 @@ export default function SimplifiedEarnTab() {
                         </div>
                       </div>
                       <p className="text-xs text-muted-foreground pl-7">Websites visited and browsing patterns</p>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button className="absolute bottom-2 right-2 text-muted-foreground hover:text-foreground transition-colors">
+                            <Info className="h-3 w-3" />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-xs">
+                          <p className="text-xs">Aggregates browsing history data to identify trends. Your data is combined with thousands of others for complete anonymity.</p>
+                        </TooltipContent>
+                      </Tooltip>
                     </div>
 
                     {/* Search History */}
-                    <div className="p-4 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
+                    <div className="p-4 bg-muted/50 rounded-lg hover:bg-muted transition-colors relative">
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex items-center gap-3">
                           <Search className="h-4 w-4 text-orange-600 flex-shrink-0" />
@@ -754,10 +775,20 @@ export default function SimplifiedEarnTab() {
                         </div>
                       </div>
                       <p className="text-xs text-muted-foreground pl-7">Search queries and interests</p>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button className="absolute bottom-2 right-2 text-muted-foreground hover:text-foreground transition-colors">
+                            <Info className="h-3 w-3" />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-xs">
+                          <p className="text-xs">Helps understand search trends and user interests. Data is aggregated across many users to maintain privacy.</p>
+                        </TooltipContent>
+                      </Tooltip>
                     </div>
 
                     {/* Cross-Site Tracking */}
-                    <div className="p-4 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
+                    <div className="p-4 bg-muted/50 rounded-lg hover:bg-muted transition-colors relative">
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex items-center gap-3">
                           <Eye className="h-4 w-4 text-red-600 flex-shrink-0" />
@@ -786,10 +817,20 @@ export default function SimplifiedEarnTab() {
                         </div>
                       </div>
                       <p className="text-xs text-muted-foreground pl-7">Website activity across multiple domains</p>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button className="absolute bottom-2 right-2 text-muted-foreground hover:text-foreground transition-colors">
+                            <Info className="h-3 w-3" />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-xs">
+                          <p className="text-xs">Premium data tracking your activity across websites. Enhanced privacy protections and encryption ensure your data security.</p>
+                        </TooltipContent>
+                      </Tooltip>
                     </div>
 
                     {/* Ad Preferences */}
-                    <div className="p-4 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
+                    <div className="p-4 bg-muted/50 rounded-lg hover:bg-muted transition-colors relative">
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex items-center gap-3">
                           <Eye className="h-4 w-4 text-pink-600 flex-shrink-0" />
@@ -818,10 +859,20 @@ export default function SimplifiedEarnTab() {
                         </div>
                       </div>
                       <p className="text-xs text-muted-foreground pl-7">Ad clicks, views, and interaction patterns</p>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button className="absolute bottom-2 right-2 text-muted-foreground hover:text-foreground transition-colors">
+                            <Info className="h-3 w-3" />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-xs">
+                          <p className="text-xs">Tracks your ad interactions to improve targeting. Data is aggregated to protect your identity.</p>
+                        </TooltipContent>
+                      </Tooltip>
                     </div>
 
                     {/* Shopping Behavior */}
-                    <div className="p-4 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
+                    <div className="p-4 bg-muted/50 rounded-lg hover:bg-muted transition-colors relative">
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex items-center gap-3">
                           <ShoppingBag className="h-4 w-4 text-green-600 flex-shrink-0" />
@@ -850,10 +901,20 @@ export default function SimplifiedEarnTab() {
                         </div>
                       </div>
                       <p className="text-xs text-muted-foreground pl-7">Purchase patterns and product preferences</p>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button className="absolute bottom-2 right-2 text-muted-foreground hover:text-foreground transition-colors">
+                            <Info className="h-3 w-3" />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-xs">
+                          <p className="text-xs">Analyzes your shopping patterns and preferences to help retailers. Your personal information stays private.</p>
+                        </TooltipContent>
+                      </Tooltip>
                     </div>
 
                     {/* Social Media Activity */}
-                    <div className="p-4 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
+                    <div className="p-4 bg-muted/50 rounded-lg hover:bg-muted transition-colors relative">
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex items-center gap-3">
                           <Share2 className="h-4 w-4 text-blue-500 flex-shrink-0" />
@@ -882,10 +943,20 @@ export default function SimplifiedEarnTab() {
                         </div>
                       </div>
                       <p className="text-xs text-muted-foreground pl-7">Social engagement and sharing patterns</p>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button className="absolute bottom-2 right-2 text-muted-foreground hover:text-foreground transition-colors">
+                            <Info className="h-3 w-3" />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-xs">
+                          <p className="text-xs">Premium insights into social media engagement. Includes enhanced security and data encryption for your protection.</p>
+                        </TooltipContent>
+                      </Tooltip>
                     </div>
 
                     {/* E-commerce Behavior */}
-                    <div className="p-4 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
+                    <div className="p-4 bg-muted/50 rounded-lg hover:bg-muted transition-colors relative">
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex items-center gap-3">
                           <Globe className="h-4 w-4 text-indigo-600 flex-shrink-0" />
@@ -914,10 +985,20 @@ export default function SimplifiedEarnTab() {
                         </div>
                       </div>
                       <p className="text-xs text-muted-foreground pl-7">Online shopping journey and cart behavior</p>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button className="absolute bottom-2 right-2 text-muted-foreground hover:text-foreground transition-colors">
+                            <Info className="h-3 w-3" />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-xs">
+                          <p className="text-xs">Premium e-commerce data including shopping cart and checkout behavior. Enhanced encryption protects your transaction details.</p>
+                        </TooltipContent>
+                      </Tooltip>
                     </div>
 
                     {/* App Usage Patterns */}
-                    <div className="p-4 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
+                    <div className="p-4 bg-muted/50 rounded-lg hover:bg-muted transition-colors relative">
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex items-center gap-3">
                           <Smartphone className="h-4 w-4 text-gray-600 flex-shrink-0" />
@@ -946,10 +1027,20 @@ export default function SimplifiedEarnTab() {
                         </div>
                       </div>
                       <p className="text-xs text-muted-foreground pl-7">Mobile app engagement and usage insights</p>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button className="absolute bottom-2 right-2 text-muted-foreground hover:text-foreground transition-colors">
+                            <Info className="h-3 w-3" />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-xs">
+                          <p className="text-xs">Tracks how you use mobile apps to improve user experiences. Data is aggregated across many users.</p>
+                        </TooltipContent>
+                      </Tooltip>
                     </div>
 
                     {/* Financial Behavior */}
-                    <div className="p-4 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
+                    <div className="p-4 bg-muted/50 rounded-lg hover:bg-muted transition-colors relative">
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex items-center gap-3">
                           <CreditCard className="h-4 w-4 text-yellow-600 flex-shrink-0" />
@@ -978,6 +1069,16 @@ export default function SimplifiedEarnTab() {
                         </div>
                       </div>
                       <p className="text-xs text-muted-foreground pl-7">Spending patterns and financial preferences</p>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button className="absolute bottom-2 right-2 text-muted-foreground hover:text-foreground transition-colors">
+                            <Info className="h-3 w-3" />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-xs">
+                          <p className="text-xs">High-value financial behavior insights with maximum security. Bank-level encryption and strict privacy controls protect your data.</p>
+                        </TooltipContent>
+                      </Tooltip>
                     </div>
                   </div>
                   
