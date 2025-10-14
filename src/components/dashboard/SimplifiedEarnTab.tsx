@@ -483,6 +483,8 @@ export default function SimplifiedEarnTab() {
                         </div>
                         <div className="flex flex-col items-end">
                           <Button
+                            size="sm"
+                            className="w-20"
                             onClick={() => handleStartTask(activity.activity_type, activity.title, activity.reward_amount)}
                           >
                             Start
@@ -537,6 +539,8 @@ export default function SimplifiedEarnTab() {
                         </div>
                         <div className="flex flex-col items-end">
                           <Button
+                            size="sm"
+                            className="w-20"
                             onClick={() => handleStartTask(activity.activity_type, activity.title, activity.reward_amount)}
                           >
                             Start
@@ -588,6 +592,8 @@ export default function SimplifiedEarnTab() {
                         </div>
                         <div className="flex flex-col items-end">
                           <Button
+                            size="sm"
+                            className="w-20"
                             onClick={() => handleStartTask(activity.activity_type, activity.title, activity.reward_amount)}
                           >
                             Start
