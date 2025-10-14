@@ -257,7 +257,7 @@ export default function SimplifiedEarnTab() {
 
   return (
     <TooltipProvider>
-      <div className="p-4 md:p-6 lg:p-8 pb-24 md:pb-20 lg:pb-8 space-y-6">
+      <div className="px-6 py-4 md:p-6 lg:p-8 pb-24 md:pb-20 lg:pb-8 space-y-6">
         {/* Enhanced Balance Card with Progress */}
         <Card className="bg-card border-0 shadow-lg">
           <CardContent className="p-6">
@@ -288,15 +288,15 @@ export default function SimplifiedEarnTab() {
 
       {/* Daily Check-in - More Prominent */}
       <Card className="border-primary/20 bg-card shadow-sm">
-        <CardContent className="p-3 sm:p-4">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="p-2 sm:p-3 bg-primary/20 rounded-xl">
-                <Trophy className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+        <CardContent className="p-4 sm:p-5 md:p-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-center gap-3 sm:gap-4">
+              <div className="p-3 bg-primary/20 rounded-xl">
+                <Trophy className="h-6 w-6 text-primary" />
               </div>
               <div>
-                <h3 className="font-bold text-base sm:text-lg">Daily Streak Boost</h3>
-                <p className="text-xs sm:text-sm text-muted-foreground flex items-center gap-1">
+                <h3 className="font-bold text-lg">Daily Streak Boost</h3>
+                <p className="text-sm text-muted-foreground flex items-center gap-1">
                   <Star className="h-3 w-3 text-warning" />
                   Day {userStats.streaks.currentStreak} • +{userStats.streaks.currentStreak >= 30 ? 25 : userStats.streaks.currentStreak >= 14 ? 15 : userStats.streaks.currentStreak >= 7 ? 10 : 5} Rep daily
                 </p>
@@ -304,7 +304,7 @@ export default function SimplifiedEarnTab() {
             </div>
             <Button
               variant={checkInDone ? "secondary" : "default"}
-              size="default"
+              size="lg"
               onClick={handleCheckIn}
               disabled={checkInDone}
               className={cn(
@@ -329,21 +329,21 @@ export default function SimplifiedEarnTab() {
       </Card>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-3 md:grid-cols-3 lg:grid-cols-3 gap-3 md:gap-4">
+      <div className="grid grid-cols-3 md:grid-cols-3 lg:grid-cols-3 gap-4 md:gap-4">
         <Card className="bg-card shadow-sm border">
-          <CardContent className="p-3 text-center">
+          <CardContent className="p-4 text-center">
             <p className="text-2xl font-bold text-primary">{completedTasks.length}</p>
             <p className="text-xs text-muted-foreground">Tasks Done</p>
           </CardContent>
         </Card>
         <Card className="bg-card shadow-sm border">
-          <CardContent className="p-3 text-center">
+          <CardContent className="p-4 text-center">
             <p className="text-2xl font-bold text-warning">{totalAvailable}</p>
             <p className="text-xs text-muted-foreground">Available</p>
           </CardContent>
         </Card>
         <Card className="bg-card shadow-sm border">
-          <CardContent className="p-3 text-center">
+          <CardContent className="p-4 text-center">
             <p className="text-2xl font-bold text-success">
               ${(balance?.total_earned || 0).toFixed(0)}
             </p>
