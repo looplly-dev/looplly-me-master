@@ -530,7 +530,7 @@ export default function SimplifiedEarnTab() {
                           <Play className="h-5 w-5 text-warning" />
                           <div>
                             <h3 className="font-semibold">{activity.title}</h3>
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-sm text-muted-foreground line-clamp-1">
                               {activity.description}
                             </p>
                           </div>
@@ -581,7 +581,7 @@ export default function SimplifiedEarnTab() {
                           <Zap className="h-5 w-5 text-warning" />
                           <div>
                             <h3 className="font-semibold">{activity.title}</h3>
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-sm text-muted-foreground line-clamp-1">
                               {activity.description}
                             </p>
                           </div>
