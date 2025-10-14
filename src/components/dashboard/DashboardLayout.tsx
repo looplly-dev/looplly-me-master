@@ -1,10 +1,12 @@
-import { ReactNode, useState } from 'react';
+import { ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { useRole } from '@/hooks/useRole';
 import { useDarkMode } from '@/hooks/useDarkMode';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { Coins, Wallet, User, Users, Trophy, MessageSquare, LogOut, Settings as SettingsIcon, HelpCircle, Shield, Moon, Sun } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
+import { HeaderActionsMenu } from './HeaderActionsMenu';
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -15,6 +17,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const { authState, logout } = useAuth();
   const { isAdmin } = useRole();
   const { isDarkMode, toggleDarkMode } = useDarkMode();
+  const isMobile = useIsMobile();
 
   const handleLogout = () => {
     logout();
@@ -35,21 +38,21 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     <div className="min-h-screen bg-background pb-20">
       {/* Header */}
       <div className="bg-card/95 backdrop-blur-md border-b sticky top-0 z-40 shadow-sm">
-        <div className="max-w-md md:max-w-2xl lg:max-w-5xl mx-auto px-4 md:px-6 lg:px-8 py-4 flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold text-primary">
+        <div className="max-w-md md:max-w-2xl lg:max-w-5xl mx-auto px-4 md:px-6 lg:px-8 py-3 md:py-4 flex items-center justify-between">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-xl md:text-2xl font-bold text-primary truncate">
               Hello, {authState.user?.firstName || 'User'}!
             </h1>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-xs md:text-sm text-muted-foreground hidden sm:block">
               Welcome back to Looplly
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 md:gap-3">
             {isAdmin() && (
               <Link to="/admin">
-                <Button variant="ghost" size="icon">
-                  <Shield className="h-5 w-5" />
+                <Button variant="ghost" size="icon" className="h-10 w-10 md:h-9 md:w-9">
+                  <Shield className="h-6 w-6 md:h-5 md:w-5" />
                 </Button>
               </Link>
             )}
@@ -58,33 +61,41 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
               variant="ghost"
               size="icon"
               onClick={toggleDarkMode}
+              className="h-10 w-10 md:h-9 md:w-9"
             >
               {isDarkMode ? (
-                <Sun className="h-5 w-5" />
+                <Sun className="h-6 w-6 md:h-5 md:w-5" />
               ) : (
-                <Moon className="h-5 w-5" />
+                <Moon className="h-6 w-6 md:h-5 md:w-5" />
               )}
             </Button>
 
-            <Link to="/settings">
-              <Button variant="ghost" size="icon">
-                <SettingsIcon className="h-5 w-5" />
-              </Button>
-            </Link>
+            {isMobile ? (
+              <HeaderActionsMenu onLogout={handleLogout} />
+            ) : (
+              <>
+                <Link to="/settings">
+                  <Button variant="ghost" size="icon" className="h-9 w-9">
+                    <SettingsIcon className="h-5 w-5" />
+                  </Button>
+                </Link>
 
-            <Link to="/support">
-              <Button variant="ghost" size="icon">
-                <HelpCircle className="h-5 w-5" />
-              </Button>
-            </Link>
+                <Link to="/support">
+                  <Button variant="ghost" size="icon" className="h-9 w-9">
+                    <HelpCircle className="h-5 w-5" />
+                  </Button>
+                </Link>
 
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleLogout}
-            >
-              <LogOut className="h-5 w-5" />
-            </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleLogout}
+                  className="h-9 w-9"
+                >
+                  <LogOut className="h-5 w-5" />
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </div>
