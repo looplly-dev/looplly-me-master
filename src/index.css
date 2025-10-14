@@ -41,8 +41,8 @@
 @layer components {
 .earn-card-content {
   @apply min-h-[500px] max-h-[650px] overflow-visible;
-  padding-left: 0;
-  padding-right: 0;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
 }
   
   .earn-tab-content {
