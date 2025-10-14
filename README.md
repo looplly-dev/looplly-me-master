@@ -70,20 +70,25 @@ This project is built with:
 
 ## Environment Configuration
 
-This project uses a secure environment variable management system. Key features:
+This project uses a hybrid environment management system combining traditional .env files with Supabase-based configuration. Key features:
 
 - 🔐 **Secure by default**: Environment files are excluded from Git
 - 🛡️ **Validation**: Automatic validation of environment variables on startup
 - 📝 **Templates**: Example files for easy setup
 - 🌍 **Multi-environment**: Support for development, production, and test environments
+- 📊 **Dynamic Configuration**: Supabase-managed settings that update without redeploy
+- 🔒 **Centralized Secrets**: Store sensitive configuration in your Supabase database
 
 ### Quick Setup
 ```sh
 # Create your local environment file
 npm run env:setup
 
-# Validate your environment configuration
-npm run env:validate
+# Initialize Supabase configuration system
+npm run config:init
+
+# View configuration documentation
+npm run config:docs
 ```
 
 ### Required Environment Variables
@@ -91,7 +96,9 @@ npm run env:validate
 - `VITE_SUPABASE_PUBLISHABLE_KEY`: Your Supabase anon key
 - `VITE_SUPABASE_PROJECT_ID`: Your Supabase project ID
 
-For detailed setup instructions, see: [Environment Setup Guide](docs/ENVIRONMENT_SETUP.md)
+For detailed setup instructions, see:
+- [Environment Setup Guide](docs/ENVIRONMENT_SETUP.md) - Traditional .env management
+- [Supabase Configuration Management](docs/SUPABASE_CONFIG_MANAGEMENT.md) - Dynamic configuration system
 
 ## How can I deploy this project?
 

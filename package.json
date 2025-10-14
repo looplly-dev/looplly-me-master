@@ -11,6 +11,8 @@
     "preview": "vite preview",
     "env:validate": "node scripts/validate-env.js",
     "env:setup": "cp .env.example .env && echo '✅ Created .env file. Please update with your actual values.'",
+    "config:init": "echo '📊 Initializing Supabase configuration system...' && npm run env:validate",
+    "config:docs": "echo '📖 Configuration documentation:' && echo '  - Environment Setup: docs/ENVIRONMENT_SETUP.md' && echo '  - Supabase Config: docs/SUPABASE_CONFIG_MANAGEMENT.md'",
     "postinstall": "npm run env:validate"
   },
   "dependencies": {
@@ -84,6 +86,7 @@
     "@types/react-dom": "^18.3.7",
     "@vitejs/plugin-react-swc": "^3.11.0",
     "autoprefixer": "^10.4.21",
+    "dotenv": "^17.2.3",
     "eslint": "^9.32.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
