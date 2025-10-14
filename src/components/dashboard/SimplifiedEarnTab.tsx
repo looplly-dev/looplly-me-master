@@ -438,9 +438,9 @@ export default function SimplifiedEarnTab() {
                           <Coins className="h-4 w-4 text-success" />
                           <span className="font-bold text-success">${survey.reward_amount.toFixed(2)}</span>
                         </span>
-                        <span className="flex items-center gap-1">
-                          <Star className="h-4 w-4 text-warning fill-current" />
-                          <span className="font-medium">{(survey.qualification_score / 20).toFixed(1)}</span>
+                        <span className="flex items-center gap-1 text-sm">
+                          <Star className="h-4 w-4 text-warning fill-warning" />
+                          <span className="font-medium text-foreground">{(survey.qualification_score / 20).toFixed(1)}</span>
                           <span className="text-muted-foreground">({survey.completion_rate} reviews)</span>
                         </span>
                         <span className="flex items-center gap-1">
@@ -498,9 +498,10 @@ export default function SimplifiedEarnTab() {
                           <Coins className="h-4 w-4 text-success" />
                           <span className="font-bold text-success">${activity.reward_amount.toFixed(2)}</span>
                         </span>
-                        <span className="flex items-center gap-1">
-                          <Star className="h-4 w-4 text-warning fill-current" />
-                          <span className="font-medium">{((activity.metadata?.qualification_score || 90) / 20).toFixed(1)}</span>
+                        <span className="flex items-center gap-1 text-sm">
+                          <Star className="h-4 w-4 text-warning fill-warning" />
+                          <span className="font-medium text-foreground">{((activity.metadata?.qualification_score || 90) / 20).toFixed(1)}</span>
+                          <span className="text-muted-foreground">(94 reviews)</span>
                         </span>
                         <div className="flex items-center gap-1">
                           <Target className="h-4 w-4" />
