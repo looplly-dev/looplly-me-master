@@ -629,7 +629,7 @@ export default function SimplifiedEarnTab() {
                   
                   <div className="space-y-6">
                     {/* Location Data - Already Active */}
-                    <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+                    <div className="p-4 bg-success/10 rounded-lg border border-success/20">
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex items-center gap-3">
                           <MapPin className="h-4 w-4 text-green-600 flex-shrink-0" />
@@ -660,7 +660,7 @@ export default function SimplifiedEarnTab() {
                     </div>
 
                     {/* Cookie Tracking */}
-                    <div className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                    <div className="p-4 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex items-center gap-3">
                           <Cookie className="h-4 w-4 text-orange-600 flex-shrink-0" />
@@ -692,7 +692,7 @@ export default function SimplifiedEarnTab() {
                     </div>
 
                     {/* Browser History */}
-                    <div className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                    <div className="p-4 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex items-center gap-3">
                           <Globe className="h-4 w-4 text-purple-600 flex-shrink-0" />
@@ -724,7 +724,7 @@ export default function SimplifiedEarnTab() {
                     </div>
 
                     {/* Search History */}
-                    <div className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                    <div className="p-4 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex items-center gap-3">
                           <Search className="h-4 w-4 text-orange-600 flex-shrink-0" />
@@ -756,7 +756,7 @@ export default function SimplifiedEarnTab() {
                     </div>
 
                     {/* Cross-Site Tracking */}
-                    <div className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                    <div className="p-4 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex items-center gap-3">
                           <Eye className="h-4 w-4 text-red-600 flex-shrink-0" />
@@ -788,7 +788,7 @@ export default function SimplifiedEarnTab() {
                     </div>
 
                     {/* Ad Preferences */}
-                    <div className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                    <div className="p-4 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex items-center gap-3">
                           <Eye className="h-4 w-4 text-pink-600 flex-shrink-0" />
@@ -820,7 +820,7 @@ export default function SimplifiedEarnTab() {
                     </div>
 
                     {/* Shopping Behavior */}
-                    <div className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                    <div className="p-4 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex items-center gap-3">
                           <ShoppingBag className="h-4 w-4 text-green-600 flex-shrink-0" />
