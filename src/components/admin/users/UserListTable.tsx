@@ -8,14 +8,16 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle2, XCircle, User } from 'lucide-react';
+import { CheckCircle2, XCircle, User, Ban } from 'lucide-react';
 import { format } from 'date-fns';
+import { UserActionsMenu } from './UserActionsMenu';
 
 interface UserListTableProps {
   users: AdminUser[];
+  onUpdate: () => void;
 }
 
-export function UserListTable({ users }: UserListTableProps) {
+export function UserListTable({ users, onUpdate }: UserListTableProps) {
   if (users.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
@@ -36,6 +38,7 @@ export function UserListTable({ users }: UserListTableProps) {
             <TableHead>Role</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Joined</TableHead>
+            <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -69,21 +72,30 @@ export function UserListTable({ users }: UserListTableProps) {
               </TableCell>
               <TableCell>
                 <div className="flex items-center gap-2">
-                  {user.is_verified ? (
-                    <div className="flex items-center gap-1 text-green-600 dark:text-green-400">
-                      <CheckCircle2 className="h-4 w-4" />
-                      <span className="text-xs">Verified</span>
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-1 text-muted-foreground">
-                      <XCircle className="h-4 w-4" />
-                      <span className="text-xs">Unverified</span>
-                    </div>
-                  )}
-                  {user.profile_complete && (
-                    <Badge variant="outline" className="text-xs">
-                      Complete
+                  {user.is_suspended ? (
+                    <Badge variant="destructive" className="text-xs">
+                      <Ban className="h-3 w-3 mr-1" />
+                      Suspended
                     </Badge>
+                  ) : (
+                    <>
+                      {user.is_verified ? (
+                        <div className="flex items-center gap-1 text-green-600 dark:text-green-400">
+                          <CheckCircle2 className="h-4 w-4" />
+                          <span className="text-xs">Verified</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-1 text-muted-foreground">
+                          <XCircle className="h-4 w-4" />
+                          <span className="text-xs">Unverified</span>
+                        </div>
+                      )}
+                      {user.profile_complete && (
+                        <Badge variant="outline" className="text-xs">
+                          Complete
+                        </Badge>
+                      )}
+                    </>
                   )}
                 </div>
               </TableCell>
@@ -91,6 +103,9 @@ export function UserListTable({ users }: UserListTableProps) {
                 {user.created_at
                   ? format(new Date(user.created_at), 'MMM d, yyyy')
                   : 'N/A'}
+              </TableCell>
+              <TableCell className="text-right">
+                <UserActionsMenu user={user} onUpdate={onUpdate} />
               </TableCell>
             </TableRow>
           ))}

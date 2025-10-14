@@ -520,6 +520,7 @@ export type Database = {
           gender: string | null
           gps_enabled: boolean | null
           household_income: string | null
+          is_suspended: boolean | null
           is_verified: boolean | null
           last_name: string | null
           mobile: string | null
@@ -541,6 +542,7 @@ export type Database = {
           gender?: string | null
           gps_enabled?: boolean | null
           household_income?: string | null
+          is_suspended?: boolean | null
           is_verified?: boolean | null
           last_name?: string | null
           mobile?: string | null
@@ -562,6 +564,7 @@ export type Database = {
           gender?: string | null
           gps_enabled?: boolean | null
           household_income?: string | null
+          is_suspended?: boolean | null
           is_verified?: boolean | null
           last_name?: string | null
           mobile?: string | null

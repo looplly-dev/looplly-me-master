@@ -11,7 +11,7 @@ import { useDebounce } from '@/hooks/use-debounce';
 function AdminUsersContent() {
   const [searchQuery, setSearchQuery] = useState('');
   const debouncedSearch = useDebounce(searchQuery, 500);
-  const { users, isLoading, error } = useAdminUsers(debouncedSearch);
+  const { users, isLoading, error, refetch } = useAdminUsers(debouncedSearch);
 
   return (
     <div className="space-y-6">
@@ -53,7 +53,7 @@ function AdminUsersContent() {
               <p className="text-sm text-destructive">Error: {error}</p>
             </div>
           ) : (
-            <UserListTable users={users} />
+            <UserListTable users={users} onUpdate={refetch} />
           )}
         </CardContent>
       </Card>
