@@ -420,10 +420,10 @@ export default function SimplifiedEarnTab() {
                     <div key={survey.id} className="earn-card border rounded-lg shadow-sm border-l-4 border-l-primary/50 hover:shadow-md transition-shadow">
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-3 flex-1">
-                          <Search className="h-5 w-5 text-primary" />
-                    <div>
+                          <Search className="h-5 w-5 text-primary flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
                       <h3 className="font-semibold">Survey #{survey.id.toString().slice(0, 8)}</h3>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm text-muted-foreground break-words max-w-[200px] sm:max-w-[250px] md:max-w-[300px] lg:max-w-[350px]">
                         Complete this survey to earn rewards
                       </p>
                           </div>
@@ -480,10 +480,10 @@ export default function SimplifiedEarnTab() {
                     <div key={activity.id} className="earn-card border rounded-lg shadow-sm border-l-4 border-l-primary/50 hover:shadow-md transition-shadow">
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-3 flex-1">
-                          <FileText className="h-5 w-5 text-primary" />
-                    <div>
+                          <FileText className="h-5 w-5 text-primary flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
                       <h3 className="font-semibold">Survey #{activity.id.slice(0, 8)}</h3>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm text-muted-foreground break-words max-w-[200px] sm:max-w-[250px] md:max-w-[300px] lg:max-w-[350px]">
                         Complete this survey to earn rewards
                       </p>
                           </div>
@@ -534,10 +534,10 @@ export default function SimplifiedEarnTab() {
                     <div key={activity.id} className="earn-card border rounded-lg shadow-sm border-l-4 border-l-warning/50 hover:shadow-md transition-shadow">
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-3 flex-1">
-                          <Play className="h-5 w-5 text-warning" />
-                          <div>
+                          <Play className="h-5 w-5 text-warning flex-shrink-0" />
+                          <div className="flex-1 min-w-0">
                             <h3 className="font-semibold">{activity.title}</h3>
-                            <p className="text-sm text-muted-foreground line-clamp-1">
+                            <p className="text-sm text-muted-foreground break-words max-w-[200px] sm:max-w-[250px] md:max-w-[300px] lg:max-w-[350px]">
                               {activity.description}
                             </p>
                           </div>
@@ -585,10 +585,10 @@ export default function SimplifiedEarnTab() {
                     <div key={activity.id} className="earn-card border rounded-lg shadow-sm border-l-4 border-l-warning/50 hover:shadow-md transition-shadow">
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-3 flex-1">
-                          <Zap className="h-5 w-5 text-warning" />
-                          <div>
+                          <Zap className="h-5 w-5 text-warning flex-shrink-0" />
+                          <div className="flex-1 min-w-0">
                             <h3 className="font-semibold">{activity.title}</h3>
-                            <p className="text-sm text-muted-foreground line-clamp-1">
+                            <p className="text-sm text-muted-foreground break-words max-w-[200px] sm:max-w-[250px] md:max-w-[300px] lg:max-w-[350px]">
                               {activity.description}
                             </p>
                           </div>
