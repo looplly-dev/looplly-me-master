@@ -441,7 +441,7 @@ export default function SimplifiedEarnTab() {
                         <span className="flex items-center gap-1 text-sm">
                           <Star className="h-4 w-4 text-warning fill-warning" />
                           <span className="font-medium text-foreground">{(survey.qualification_score / 20).toFixed(1)}</span>
-                          <span className="text-muted-foreground hidden md:inline">({survey.completion_rate} reviews)</span>
+                          <span className="text-muted-foreground hidden md:inline">({survey.completion_rate})</span>
                         </span>
                         <span className="hidden md:flex items-center gap-1">
                           <Target className="h-4 w-4" />
@@ -606,7 +606,7 @@ export default function SimplifiedEarnTab() {
                         <span className="flex items-center gap-1 text-sm">
                           <Star className="h-4 w-4 text-warning fill-warning" />
                           <span className="font-medium text-foreground">{activity.metadata?.rating || '4.5'}</span>
-                          <span className="text-muted-foreground hidden md:inline">({activity.metadata?.reviews || '92'} reviews)</span>
+                          <span className="text-muted-foreground hidden md:inline">({activity.metadata?.reviews || '92'})</span>
                         </span>
                       </div>
                     </div>
