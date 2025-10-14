@@ -1041,7 +1041,7 @@ export default function SimplifiedEarnTab() {
       >
         <div className="space-y-4">
           <div className="grid grid-cols-1 gap-3">
-            <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">
               <div className="p-2 bg-primary/10 rounded-lg">
                 <Zap className="h-4 w-4 text-primary" />
               </div>
@@ -1053,7 +1053,7 @@ export default function SimplifiedEarnTab() {
               </div>
             </div>
             
-            <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">
               <div className="p-2 bg-success/10 rounded-lg">
                 <Trophy className="h-4 w-4 text-success" />
               </div>
@@ -1065,7 +1065,7 @@ export default function SimplifiedEarnTab() {
               </div>
             </div>
             
-            <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">
               <div className="p-2 bg-accent/10 rounded-lg">
                 <Award className="h-4 w-4 text-accent" />
               </div>
