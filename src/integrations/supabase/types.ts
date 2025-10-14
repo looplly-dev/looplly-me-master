@@ -772,6 +772,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_auth_users_with_phones: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          email: string
+          phone: string
+          user_id: string
+        }[]
+      }
       get_user_tenant_id: {
         Args: { p_user_id: string }
         Returns: string
