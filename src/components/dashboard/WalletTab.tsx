@@ -307,7 +307,8 @@ export default function WalletTab() {
                       )}
                     </div>
                     <div>
-                      <p className="text-sm font-semibold">{transaction.description}</p>
+                      <p className="text-xs font-semibold sm:text-sm">{transaction.description}</p>
+                      <p className="text-[10px] sm:text-xs text-muted-foreground/70 font-mono mt-0.5">ID: {transaction.id}</p>
                       {isMobile ? (
                         <div className="flex items-center justify-between mt-1">
                           <p className="text-xs text-muted-foreground">
