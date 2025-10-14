@@ -53,8 +53,8 @@ export default function Dashboard({ triggerOnboarding = false }: DashboardProps)
   // Show support page
   if (showSupport) {
     return (
-      <div className="min-h-screen bg-white">
-      <div className="bg-white border-b sticky top-0 z-40 shadow-sm">
+      <div className="min-h-screen bg-background">
+      <div className="bg-card/95 backdrop-blur-md border-b sticky top-0 z-40 shadow-sm">
         <div className="max-w-md md:max-w-2xl lg:max-w-5xl mx-auto px-4 md:px-6 lg:px-8 py-4 flex items-center justify-between">
             <Button
               variant="ghost"
@@ -80,8 +80,8 @@ export default function Dashboard({ triggerOnboarding = false }: DashboardProps)
   // Show settings page
   if (showSettings) {
     return (
-      <div className="min-h-screen bg-white">
-      <div className="bg-white border-b sticky top-0 z-40 shadow-sm">
+      <div className="min-h-screen bg-background">
+      <div className="bg-card/95 backdrop-blur-md border-b sticky top-0 z-40 shadow-sm">
         <div className="max-w-md md:max-w-2xl lg:max-w-5xl mx-auto px-4 md:px-6 lg:px-8 py-4 flex items-center justify-between">
             <Button
               variant="ghost"
@@ -105,9 +105,9 @@ export default function Dashboard({ triggerOnboarding = false }: DashboardProps)
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="bg-white border-b sticky top-0 z-40 shadow-sm">
+      <div className="bg-card/95 backdrop-blur-md border-b sticky top-0 z-40 shadow-sm">
         <div className="max-w-md md:max-w-2xl lg:max-w-5xl mx-auto px-4 md:px-6 lg:px-8 py-4 flex items-center justify-between">
           <div>
             <h1 className="text-xl md:text-2xl font-bold text-primary">
@@ -142,9 +142,14 @@ export default function Dashboard({ triggerOnboarding = false }: DashboardProps)
               variant="ghost"
               size="sm"
               onClick={toggleDarkMode}
-              className="text-muted-foreground hover:text-primary transition-transform active:scale-95"
+              className="text-muted-foreground hover:text-primary transition-all duration-200 active:scale-95"
+              aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
             >
-              {isDarkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              {isDarkMode ? (
+                <Sun className="h-4 w-4 text-amber-500 dark:text-amber-400" />
+              ) : (
+                <Moon className="h-4 w-4 text-indigo-600" />
+              )}
             </Button>
             <Button
               variant="ghost"
@@ -192,7 +197,7 @@ export default function Dashboard({ triggerOnboarding = false }: DashboardProps)
           <div aria-hidden="true" className="h-24 md:h-20 lg:h-8" />
 
           {/* Bottom Navigation */}
-          <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-sm pb-[env(safe-area-inset-bottom)]">
+          <div className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-md border-t shadow-lg pb-[env(safe-area-inset-bottom)]">
             <div className="max-w-md md:max-w-2xl lg:max-w-5xl mx-auto">
               <TabsList className="grid w-full grid-cols-6 h-16 md:h-14 bg-transparent">
                 <TabsTrigger 

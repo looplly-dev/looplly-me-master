@@ -230,7 +230,7 @@ export default function RepTab() {
         </Button>
       </div>
       {/* Enhanced Reputation Score - Always Visible */}
-      <Card className="bg-white shadow-sm border border-primary/20">
+      <Card className="bg-card shadow-sm border border-primary/20">
         <CardContent className={isCompactView ? "p-4" : "p-6"}>
           <div className="text-center">
             <div className={isCompactView ? "text-4xl mb-1" : "text-6xl mb-2"}>{level.icon}</div>

@@ -179,63 +179,91 @@ All colors MUST be HSL.
   }
 
   .dark {
-    --background: 220 15% 12%;
-    --foreground: 210 40% 98%;
-
-    --card: 220 15% 15%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 220 15% 15%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 25 95% 65%; /* Bright accessible orange for dark mode */
-    --primary-foreground: 0 0% 100%;
-    --primary-glow: 25 85% 75%;
-
-    --secondary: 220 15% 20%; /* Lighter for better contrast */
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 220 15% 20%;
-    --muted-foreground: 215 20% 70%; /* Increased from 65% for better readability */
-
-    --accent: 215 25% 25%; /* More visible borders/accents */
-    --accent-foreground: 210 40% 98%;
-
-    /* Dark mode premium colors */
-    --premium: 25 95% 65%; /* Bright orange */
-    --premium-glow: 25 85% 75%; /* More vibrant orange glow */
-
-    --destructive: 0 63% 31%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 215 25% 25%; /* More pronounced borders */
-    --input: 220 15% 18%; /* Clearer input fields */
-    --ring: 213 94% 45%;
-
-    --success: 155 80% 50%; /* Better visibility */
-    --success-foreground: 0 0% 100%;
-    --success-glow: 155 75% 65%;
-
-    --warning: 45 100% 65%; /* Golden yellow for dark mode */
-    --warning-foreground: 220 13% 9%;
-
-    --info: 220 100% 75%; /* Electric blue for dark mode */
-    --info-foreground: 220 13% 9%;
-
-    --crypto: 280 100% 80%; /* Electric purple for dark mode */
-    --crypto-foreground: 220 13% 9%;
-
-    --mpesa: 155 85% 55%; /* Rich emerald for dark mode */
-    --mpesa-foreground: 220 13% 9%;
+    /* === BACKGROUNDS === */
+    --background: 215 28% 9%;        /* Deep charcoal (GitHub-inspired) */
+    --foreground: 213 15% 92%;       /* Soft white for text */
     
-    --sidebar-background: 220 15% 12%;
-    --sidebar-foreground: 215 20% 70%;
-    --sidebar-primary: 25 95% 65%;
+    /* === SURFACES === */
+    --card: 215 25% 12%;             /* Elevated from background */
+    --card-foreground: 213 15% 92%;
+    
+    --popover: 215 25% 14%;          /* Even more elevated */
+    --popover-foreground: 213 15% 92%;
+    
+    /* === INTERACTIVE ELEMENTS === */
+    --primary: 25 95% 58%;           /* Warmer, brighter orange */
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 25 90% 68%;      /* More vibrant glow */
+    
+    --secondary: 215 20% 18%;        /* Subtle secondary */
+    --secondary-foreground: 213 15% 92%;
+    
+    /* === MUTED/BORDERS === */
+    --muted: 215 20% 18%;            /* Subtle backgrounds */
+    --muted-foreground: 215 15% 68%; /* Readable muted text */
+    
+    --border: 215 20% 22%;           /* Visible but subtle borders */
+    --input: 215 25% 16%;            /* Distinct input fields */
+    --ring: 25 90% 58%;              /* Match primary for focus rings */
+    
+    /* === ACCENT === */
+    --accent: 215 25% 18%;           /* Hover states */
+    --accent-foreground: 213 15% 92%;
+    
+    /* === STATUS COLORS === */
+    --success: 155 70% 48%;          /* Vibrant green */
+    --success-foreground: 0 0% 100%;
+    --success-glow: 155 65% 58%;
+    
+    --warning: 45 95% 58%;           /* Bright gold */
+    --warning-foreground: 215 28% 9%;
+    
+    --info: 210 90% 60%;             /* Electric blue */
+    --info-foreground: 0 0% 100%;
+    
+    --destructive: 0 75% 55%;        /* Bright red */
+    --destructive-foreground: 0 0% 100%;
+    
+    /* === BRAND COLORS === */
+    --crypto: 280 95% 70%;           /* Vibrant purple */
+    --crypto-foreground: 0 0% 100%;
+    
+    --mpesa: 155 80% 48%;            /* M-Pesa green */
+    --mpesa-foreground: 0 0% 100%;
+    
+    /* === SIDEBAR === */
+    --sidebar-background: 215 28% 9%;
+    --sidebar-foreground: 215 15% 68%;
+    --sidebar-primary: 25 95% 58%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 15% 20%;
-    --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 215 25% 25%;
-    --sidebar-ring: 263 70% 50%;
+    --sidebar-accent: 215 25% 18%;
+    --sidebar-accent-foreground: 213 15% 92%;
+    --sidebar-border: 215 20% 22%;
+    --sidebar-ring: 25 90% 58%;
+    
+    /* === PREMIUM EFFECTS === */
+    --premium: 25 95% 58%;
+    --premium-glow: 25 90% 68%;
+  }
+  
+  /* Global Dark Mode Enhancements */
+  @layer base {
+    html {
+      color-scheme: light dark;
+    }
+    
+    .dark * {
+      @apply transition-colors duration-200;
+    }
+    
+    .dark img:not([class*="no-dark-adjust"]) {
+      opacity: 0.9;
+    }
+    
+    .dark ::selection {
+      background: hsl(var(--primary) / 0.3);
+      color: hsl(var(--foreground));
+    }
   }
 }
 

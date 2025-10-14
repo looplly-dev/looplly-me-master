@@ -116,8 +116,8 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
   const selectedCountry = getCountryByDialCode(formData.countryCode);
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center p-4">
-      <Card className="w-full max-w-md shadow-lg bg-white border">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <Card className="w-full max-w-md shadow-lg bg-card border">
         <CardHeader className="text-center pb-6">
           <Button 
             variant="ghost" 

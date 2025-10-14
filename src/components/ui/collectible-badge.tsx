@@ -164,13 +164,13 @@ export function CollectibleBadge({ badge, size = 'md', onClick }: CollectibleBad
     
     switch (rarity) {
       case 'Legendary': 
-        return 'ring-4 ring-[hsl(var(--psychedelic-magenta)/0.8)] ring-offset-2 ring-offset-background shadow-2xl animate-pulse';
+        return 'ring-4 ring-[hsl(var(--psychedelic-magenta)/0.8)] ring-offset-2 ring-offset-background shadow-2xl shadow-yellow-500/30 dark:shadow-yellow-500/40 animate-pulse';
       case 'Epic': 
-        return 'ring-3 ring-[hsl(var(--psychedelic-purple)/0.7)] ring-offset-1 ring-offset-background shadow-xl';
+        return 'ring-3 ring-[hsl(var(--psychedelic-purple)/0.7)] ring-offset-1 ring-offset-background shadow-xl shadow-pink-500/20 dark:shadow-pink-500/30';
       case 'Rare': 
-        return 'ring-2 ring-[hsl(var(--electric-cyan)/0.6)] ring-offset-1 ring-offset-background shadow-lg';
+        return 'ring-2 ring-[hsl(var(--electric-cyan)/0.6)] ring-offset-1 ring-offset-background shadow-lg shadow-purple-500/20 dark:shadow-purple-500/30';
       case 'Common':
-        return 'ring-1 ring-[hsl(var(--neon-green)/0.5)] shadow-md';
+        return 'ring-1 ring-[hsl(var(--neon-green)/0.5)] shadow-md shadow-green-500/20 dark:shadow-green-500/30';
       default: 
         return '';
     }

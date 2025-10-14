@@ -128,12 +128,12 @@ export function BadgeCard({ badge, onUpdate }: BadgeCardProps) {
           <div className="flex items-center justify-between">
             {badge.is_active ? (
               <Badge variant="default" className="gap-1 bg-green-500">
-                <div className="w-2 h-2 rounded-full bg-white" />
+                <div className="w-2 h-2 rounded-full bg-card" />
                 Active
               </Badge>
             ) : (
               <Badge variant="secondary" className="gap-1">
-                <div className="w-2 h-2 rounded-full bg-gray-400" />
+                <div className="w-2 h-2 rounded-full bg-muted-foreground" />
                 Inactive
               </Badge>
             )}

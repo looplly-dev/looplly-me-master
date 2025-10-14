@@ -281,7 +281,7 @@ export default function SimplifiedEarnTab() {
         </Card>
 
       {/* Daily Check-in - More Prominent */}
-      <Card className="border-primary/20 bg-white shadow-sm">
+      <Card className="border-primary/20 bg-card shadow-sm">
         <CardContent className="p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -321,19 +321,19 @@ export default function SimplifiedEarnTab() {
 
       {/* Quick Stats */}
       <div className="grid grid-cols-3 md:grid-cols-3 lg:grid-cols-3 gap-3 md:gap-4">
-        <Card className="bg-white shadow-sm border">
+        <Card className="bg-card shadow-sm border">
           <CardContent className="p-3 text-center">
             <p className="text-2xl font-bold text-primary">{completedTasks.length}</p>
             <p className="text-xs text-muted-foreground">Tasks Done</p>
           </CardContent>
         </Card>
-        <Card className="bg-white shadow-sm border">
+        <Card className="bg-card shadow-sm border">
           <CardContent className="p-3 text-center">
             <p className="text-2xl font-bold text-warning">{availableTasks.length}</p>
             <p className="text-xs text-muted-foreground">Available</p>
           </CardContent>
         </Card>
-        <Card className="bg-white shadow-sm border">
+        <Card className="bg-card shadow-sm border">
           <CardContent className="p-3 text-center">
             <p className="text-2xl font-bold text-success">
               ${(balance?.total_earned || 0).toFixed(0)}
@@ -346,7 +346,7 @@ export default function SimplifiedEarnTab() {
       {/* Simplified Task Sections */}
       <div className="space-y-4">
         {/* Ready to Earn with Tabs */}
-        <Card className="bg-white shadow-sm border">
+        <Card className="bg-card shadow-sm border">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center justify-between">
               <span className="flex items-center gap-2">

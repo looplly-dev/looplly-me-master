@@ -89,8 +89,8 @@ export default function Login({ onForgotPassword, onRegister }: LoginProps) {
   };
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center p-4">
-      <Card className="w-full max-w-md shadow-lg bg-white border">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <Card className="w-full max-w-md shadow-lg bg-card border">
         <CardHeader className="text-center pb-6">
           <div className="mx-auto mb-4 w-16 h-16 bg-primary rounded-2xl flex items-center justify-center">
             <span className="text-2xl font-bold text-white">L</span>

@@ -136,7 +136,7 @@ export default function SimplifiedSupportTab() {
   return (
     <div className="p-4 pb-20 space-y-6">
       {/* Quick Help Section */}
-      <Card className="bg-white shadow-sm border border-primary/20">
+      <Card className="bg-card shadow-sm border border-primary/20">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Lightbulb className="h-5 w-5 text-primary" />
@@ -171,7 +171,7 @@ export default function SimplifiedSupportTab() {
 
       {/* Contact Options */}
       <div className="grid grid-cols-1 gap-4">
-        <Card className="bg-white shadow-sm border border-green-200">
+        <Card className="bg-card shadow-sm border border-green-200 dark:border-green-900/30">
           <CardContent className="p-4">
             <div className="flex items-center gap-3 mb-3">
               <div className="p-2 bg-success/20 rounded-lg">
@@ -192,7 +192,7 @@ export default function SimplifiedSupportTab() {
           </CardContent>
         </Card>
 
-        <Card className="bg-white shadow-sm border border-blue-200">
+        <Card className="bg-card shadow-sm border border-blue-200 dark:border-blue-900/30">
           <CardContent className="p-4">
             <div className="flex items-center gap-3 mb-3">
               <div className="p-2 bg-info/20 rounded-lg">
@@ -215,7 +215,7 @@ export default function SimplifiedSupportTab() {
       </div>
 
       {/* Response Time Info */}
-      <Card className="bg-white shadow-sm border border-amber-200">
+      <Card className="bg-card shadow-sm border border-amber-200 dark:border-amber-900/30">
         <CardContent className="p-4">
           <div className="flex gap-3">
             <CheckCircle className="h-5 w-5 text-warning flex-shrink-0 mt-0.5" />
