@@ -50,8 +50,11 @@ export function UserListTable({ users }: UserListTableProps) {
               <TableCell>
                 {user.mobile ? (
                   <span className="font-mono text-sm">
-                    {user.country_code ? `${user.country_code} ` : ''}
-                    {user.mobile}
+                    {user.mobile.startsWith('+')
+                      ? user.mobile
+                      : user.country_code
+                      ? `${user.country_code}${user.mobile.replace(/^0+/, '')}`
+                      : user.mobile}
                   </span>
                 ) : (
                   'N/A'
