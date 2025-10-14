@@ -27,12 +27,14 @@ import {
 import { useBalance } from '@/hooks/useBalance';
 import { useTransactions } from '@/hooks/useTransactions';
 import { useAuth } from '@/hooks/useAuth';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { mockTransactions, getAccountantStatusText, getAccountantStatusColor } from '@/data/mockTransactionsData';
 
 export default function WalletTab() {
   const { balance, isLoading: balanceLoading } = useBalance();
   const { transactions, isLoading: transactionsLoading } = useTransactions();
   const { authState } = useAuth();
+  const isMobile = useIsMobile();
 
   // Use mock transactions for demonstration
   const displayTransactions = mockTransactions;
@@ -306,20 +308,39 @@ export default function WalletTab() {
                     </div>
                     <div>
                       <p className="text-sm font-semibold">{transaction.description}</p>
-                      <div className="flex items-center gap-2 mt-1">
-                        <p className="text-xs text-muted-foreground">
-                          {new Date(transaction.created_at).toLocaleDateString()}
-                        </p>
-                        <span className="text-muted-foreground">•</span>
-                        <div className="flex items-center gap-1">
-                          <Bot className="h-3 w-3 text-primary" />
-                          <span className={`text-xs font-medium ${getAccountantStatusColor(transaction.accountant_status)}`}>
-                            {getAccountantStatusText(transaction.accountant_status)}
-                          </span>
+                      {isMobile ? (
+                        <div className="flex items-center justify-between mt-1">
+                          <p className="text-xs text-muted-foreground">
+                            {new Date(transaction.created_at).toLocaleDateString()}
+                          </p>
+                          {transaction.accountant_status === 'completed' && (
+                            <CheckCircle2 className="h-4 w-4 text-success" />
+                          )}
+                          {transaction.accountant_status === 'awaiting_funds' && (
+                            <Clock className="h-4 w-4 text-warning" />
+                          )}
+                          {(transaction.accountant_status === 'verifying' || transaction.accountant_status === 'funds_received') && (
+                            <Bot className="h-4 w-4 text-primary" />
+                          )}
                         </div>
-                      </div>
-                      {transaction.method && (
-                        <p className="text-xs text-muted-foreground mt-1">via {transaction.method}</p>
+                      ) : (
+                        <>
+                          <div className="flex items-center gap-2 mt-1">
+                            <p className="text-xs text-muted-foreground">
+                              {new Date(transaction.created_at).toLocaleDateString()}
+                            </p>
+                            <span className="text-muted-foreground">•</span>
+                            <div className="flex items-center gap-1">
+                              <Bot className="h-3 w-3 text-primary" />
+                              <span className={`text-xs font-medium ${getAccountantStatusColor(transaction.accountant_status)}`}>
+                                {getAccountantStatusText(transaction.accountant_status)}
+                              </span>
+                            </div>
+                          </div>
+                          {transaction.method && (
+                            <p className="text-xs text-muted-foreground mt-1">via {transaction.method}</p>
+                          )}
+                        </>
                       )}
                     </div>
                   </div>
