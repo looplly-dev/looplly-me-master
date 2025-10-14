@@ -38,17 +38,6 @@
   }
 }
 
-/* Earn Tab Reusable Components */
-@layer components {
-  .earn-card-content {
-    @apply min-h-[500px] max-h-[650px] overflow-visible px-1;
-  }
-  
-  .earn-tab-content {
-    @apply space-y-3 mt-4 max-h-[400px] overflow-y-auto scroll-smooth pb-4 pl-3 pr-1 scrollbar-thin scrollbar-gutter;
-  }
-}
-
 /* Looplly Design System - Mobile-first rewards app
 All colors MUST be HSL.
 */
