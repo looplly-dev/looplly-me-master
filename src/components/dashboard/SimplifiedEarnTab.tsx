@@ -431,7 +431,7 @@ export default function SimplifiedEarnTab() {
                         <Button 
                           size="sm" 
                           onClick={() => startSurvey(survey)}
-                          className="w-20"
+                          className="w-16"
                         >
                           Start
                         </Button>
@@ -490,7 +490,7 @@ export default function SimplifiedEarnTab() {
                         </div>
                         <Button
                           size="sm"
-                          className="w-20"
+                          className="w-16"
                           onClick={() => handleStartTask(activity.activity_type, activity.title, activity.reward_amount)}
                         >
                           Start
@@ -544,7 +544,7 @@ export default function SimplifiedEarnTab() {
                         </div>
                         <Button
                           size="sm"
-                          className="w-20"
+                          className="w-16"
                           onClick={() => handleStartTask(activity.activity_type, activity.title, activity.reward_amount)}
                         >
                           Start
@@ -595,7 +595,7 @@ export default function SimplifiedEarnTab() {
                         </div>
                         <Button
                           size="sm"
-                          className="w-20"
+                          className="w-16"
                           onClick={() => handleStartTask(activity.activity_type, activity.title, activity.reward_amount)}
                         >
                           Start
