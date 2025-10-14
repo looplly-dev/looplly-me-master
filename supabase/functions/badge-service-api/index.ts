@@ -228,7 +228,6 @@ async function handleAward(req: Request, supabase: any, tenantId: string | null,
     .from('user_badges')
     .insert({
       user_id: targetUserId,
-      tenant_id: tenantId,
       badge_id: badgeId
     })
     .select()
@@ -279,7 +278,7 @@ async function handleUserBadges(req: Request, supabase: any, tenantId: string | 
       badge:badge_catalog(*)
     `)
     .eq('user_id', targetUserId)
-    .order('earned_at', { ascending: false });
+    .order('awarded_at', { ascending: false });
 
   if (error) {
     throw error;
