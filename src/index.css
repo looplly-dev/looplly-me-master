@@ -184,7 +184,7 @@ All colors MUST be HSL.
     --foreground: 213 15% 92%;       /* Soft white for text */
     
     /* === SURFACES === */
-    --card: 215 25% 12%;             /* Elevated from background */
+    --card: 215 25% 16%;             /* Elevated from background */
     --card-foreground: 213 15% 92%;
     
     --popover: 215 25% 14%;          /* Even more elevated */
