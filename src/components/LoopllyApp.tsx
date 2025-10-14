@@ -1,18 +1,24 @@
 import { useState } from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import Login from './auth/Login';
 import Register from './auth/Register';
 import OTPVerification from './auth/OTPVerification';
-import ProfileSetup from './auth/ProfileSetup';
 import MultiStepProfileSetup from './auth/MultiStepProfileSetup';
 import CommunicationPreferences from './auth/CommunicationPreferences';
-import Dashboard from './dashboard/Dashboard';
 import ForgotPassword from './auth/ForgotPassword';
+import Earn from '@/pages/Earn';
+import Wallet from '@/pages/Wallet';
+import Profile from '@/pages/Profile';
+import Refer from '@/pages/Refer';
+import Community from '@/pages/Community';
+import Rep from '@/pages/Rep';
+import Settings from '@/pages/Settings';
+import Support from '@/pages/Support';
 
 export default function LoopllyApp() {
   const [authFlow, setAuthFlow] = useState<'login' | 'register' | 'forgot' | 'profile' | 'communication' | 'otp'>('login');
   const [justCompletedProfile, setJustCompletedProfile] = useState(false);
-  // Removed isAdmin state - now handled by role-based authentication
   const { authState } = useAuth();
 
   console.log('LoopllyApp - Current authState:', authState);
@@ -27,9 +33,6 @@ export default function LoopllyApp() {
       </div>
     );
   }
-
-  // Admin route is now handled by App.tsx routing and ProtectedRoute
-  // Removed insecure admin checks
 
   // If user is authenticated, handle post-login flow
   if (authState.isAuthenticated) {
@@ -46,7 +49,6 @@ export default function LoopllyApp() {
         <MultiStepProfileSetup 
           onBack={() => {}}
           onComplete={() => {
-            // Mark that user just completed profile
             setJustCompletedProfile(true);
           }}
         />
@@ -64,9 +66,21 @@ export default function LoopllyApp() {
       );
     }
     
-    // User has completed all steps, show dashboard
-    console.log('LoopllyApp - Showing dashboard');
-    return <Dashboard triggerOnboarding={justCompletedProfile} />;
+    // User has completed all steps, show dashboard routes
+    console.log('LoopllyApp - Showing dashboard routes');
+    return (
+      <Routes>
+        <Route path="/" element={<Earn />} />
+        <Route path="/wallet" element={<Wallet />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/refer" element={<Refer />} />
+        <Route path="/community" element={<Community />} />
+        <Route path="/rep" element={<Rep />} />
+        <Route path="/settings" element={<Settings />} />
+        <Route path="/support" element={<Support />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    );
   }
 
   // Auth screens
