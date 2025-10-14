@@ -489,7 +489,7 @@ export default function SimplifiedEarnTab() {
                           </Button>
                         </div>
                       </div>
-                      <div className="flex items-center gap-4 text-sm">
+                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
                         <span className="flex items-center gap-1">
                           <Clock className="h-4 w-4" />
                           {activity.time_estimate || 5} min
@@ -498,11 +498,13 @@ export default function SimplifiedEarnTab() {
                           <Coins className="h-4 w-4 text-success" />
                           <span className="font-bold text-success">${activity.reward_amount.toFixed(2)}</span>
                         </span>
+                        <span className="flex items-center gap-1">
+                          <Star className="h-4 w-4 text-warning fill-current" />
+                          <span className="font-medium">{((activity.metadata?.qualification_score || 90) / 20).toFixed(1)}</span>
+                        </span>
                         <div className="flex items-center gap-1">
-                          <Target className="h-4 w-4 text-muted-foreground" />
-                          <span className="text-sm text-muted-foreground">
-                            {activity.metadata?.qualification_score || 90}% match
-                          </span>
+                          <Target className="h-4 w-4" />
+                          {activity.metadata?.qualification_score || 90}% match
                         </div>
                       </div>
                     </div>
