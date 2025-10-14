@@ -412,11 +412,11 @@ export default function SimplifiedEarnTab() {
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-3">
                           <Search className="h-5 w-5 text-primary" />
-                          <div>
-                            <h3 className="font-semibold">{survey.title}</h3>
-                            <p className="text-sm text-muted-foreground">
-                              {survey.description}
-                            </p>
+                    <div>
+                      <h3 className="font-semibold">Survey #{survey.id.toString().slice(0, 8)}</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Complete this survey to earn rewards
+                      </p>
                           </div>
                         </div>
                         <Button 
@@ -472,11 +472,11 @@ export default function SimplifiedEarnTab() {
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-3">
                           <FileText className="h-5 w-5 text-primary" />
-                          <div>
-                            <h3 className="font-semibold">{activity.title}</h3>
-                            <p className="text-sm text-muted-foreground">
-                              {activity.description}
-                            </p>
+                    <div>
+                      <h3 className="font-semibold">Survey #{activity.id.slice(0, 8)}</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Complete this survey to earn rewards
+                      </p>
                           </div>
                         </div>
                         <div className="flex flex-col items-end">
