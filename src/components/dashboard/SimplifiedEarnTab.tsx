@@ -358,7 +358,7 @@ export default function SimplifiedEarnTab() {
                 <Target className="h-5 w-5 text-primary" />
                 Ready to Earn
               </span>
-              <Badge variant="secondary" className="bg-primary/10 text-primary">
+              <Badge variant="secondary" className="bg-primary/20 text-primary border border-primary/30 text-sm px-3 py-1 font-semibold">
                 {totalAvailable} available
               </Badge>
             </CardTitle>
