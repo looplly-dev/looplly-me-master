@@ -33,7 +33,8 @@ import {
   Smartphone,
   CreditCard,
   Share2,
-  Info
+  Info,
+  Copy
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useBalance } from '@/hooks/useBalance';
@@ -423,7 +424,7 @@ export default function SimplifiedEarnTab() {
                           <Search className="h-5 w-5 text-primary flex-shrink-0" />
                     <div className="flex-1 min-w-0">
                       <h3 className="font-semibold">Survey #{survey.id.toString().slice(0, 8)}</h3>
-                      <p className="text-sm text-muted-foreground break-words max-w-[200px] sm:max-w-[250px] md:max-w-[300px] lg:max-w-[350px]">
+                      <p className="text-sm text-muted-foreground line-clamp-2">
                         Complete this survey to earn rewards
                       </p>
                           </div>
@@ -455,6 +456,22 @@ export default function SimplifiedEarnTab() {
                           {survey.qualification_score}% match
                         </span>
                       </div>
+                      <div className="mt-2 pt-2 border-t border-border/50">
+                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground/70">
+                          <span className="font-mono truncate">ID: {survey.id.toString().slice(0, 12)}...</span>
+                          <button 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigator.clipboard.writeText(survey.id.toString());
+                              toast({ title: "Task ID copied!" });
+                            }}
+                            className="hover:text-primary transition-colors"
+                            title="Copy full ID"
+                          >
+                            <Copy className="h-3 w-3" />
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   ))
                 ) : (
@@ -483,7 +500,7 @@ export default function SimplifiedEarnTab() {
                           <FileText className="h-5 w-5 text-primary flex-shrink-0" />
                     <div className="flex-1 min-w-0">
                       <h3 className="font-semibold">Survey #{activity.id.slice(0, 8)}</h3>
-                      <p className="text-sm text-muted-foreground break-words max-w-[200px] sm:max-w-[250px] md:max-w-[300px] lg:max-w-[350px]">
+                      <p className="text-sm text-muted-foreground line-clamp-2">
                         Complete this survey to earn rewards
                       </p>
                           </div>
@@ -515,6 +532,22 @@ export default function SimplifiedEarnTab() {
                           {activity.metadata?.qualification_score || 90}% match
                         </div>
                       </div>
+                      <div className="mt-2 pt-2 border-t border-border/50">
+                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground/70">
+                          <span className="font-mono truncate">ID: {activity.id.slice(0, 12)}...</span>
+                          <button 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigator.clipboard.writeText(activity.id);
+                              toast({ title: "Task ID copied!" });
+                            }}
+                            className="hover:text-primary transition-colors"
+                            title="Copy full ID"
+                          >
+                            <Copy className="h-3 w-3" />
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   ))
                 )}
@@ -537,7 +570,7 @@ export default function SimplifiedEarnTab() {
                           <Play className="h-5 w-5 text-warning flex-shrink-0" />
                           <div className="flex-1 min-w-0">
                             <h3 className="font-semibold">{activity.title}</h3>
-                            <p className="text-sm text-muted-foreground break-words max-w-[200px] sm:max-w-[250px] md:max-w-[300px] lg:max-w-[350px]">
+                            <p className="text-sm text-muted-foreground line-clamp-2">
                               {activity.description}
                             </p>
                           </div>
@@ -566,6 +599,22 @@ export default function SimplifiedEarnTab() {
                           </span>
                         </div>
                       </div>
+                      <div className="mt-2 pt-2 border-t border-border/50">
+                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground/70">
+                          <span className="font-mono truncate">ID: {activity.id.slice(0, 12)}...</span>
+                          <button 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigator.clipboard.writeText(activity.id);
+                              toast({ title: "Task ID copied!" });
+                            }}
+                            className="hover:text-primary transition-colors"
+                            title="Copy full ID"
+                          >
+                            <Copy className="h-3 w-3" />
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   ))
                 )}
@@ -588,7 +637,7 @@ export default function SimplifiedEarnTab() {
                           <Zap className="h-5 w-5 text-warning flex-shrink-0" />
                           <div className="flex-1 min-w-0">
                             <h3 className="font-semibold">{activity.title}</h3>
-                            <p className="text-sm text-muted-foreground break-words max-w-[200px] sm:max-w-[250px] md:max-w-[300px] lg:max-w-[350px]">
+                            <p className="text-sm text-muted-foreground line-clamp-2">
                               {activity.description}
                             </p>
                           </div>
@@ -615,6 +664,22 @@ export default function SimplifiedEarnTab() {
                           <span className="font-medium text-foreground">{activity.metadata?.rating || '4.5'}</span>
                           <span className="text-muted-foreground hidden md:inline">({activity.metadata?.reviews || '92'})</span>
                         </span>
+                      </div>
+                      <div className="mt-2 pt-2 border-t border-border/50">
+                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground/70">
+                          <span className="font-mono truncate">ID: {activity.id.slice(0, 12)}...</span>
+                          <button 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigator.clipboard.writeText(activity.id);
+                              toast({ title: "Task ID copied!" });
+                            }}
+                            className="hover:text-primary transition-colors"
+                            title="Copy full ID"
+                          >
+                            <Copy className="h-3 w-3" />
+                          </button>
+                        </div>
                       </div>
                     </div>
                   ))
