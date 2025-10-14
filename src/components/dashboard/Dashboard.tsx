@@ -3,7 +3,8 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/hooks/useAuth';
 import { useRole } from '@/hooks/useRole';
-import { Coins, Wallet, User, Users, Trophy, MessageSquare, LogOut, Settings, HelpCircle, Shield } from 'lucide-react';
+import { useDarkMode } from '@/hooks/useDarkMode';
+import { Coins, Wallet, User, Users, Trophy, MessageSquare, LogOut, Settings, HelpCircle, Shield, Moon, Sun } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import SimplifiedEarnTab from './SimplifiedEarnTab';
 import WalletTab from './WalletTab';
@@ -26,6 +27,7 @@ export default function Dashboard({ triggerOnboarding = false }: DashboardProps)
   const [showSupport, setShowSupport] = useState(false);
   const { authState, logout } = useAuth();
   const { isAdmin } = useRole();
+  const { isDarkMode, toggleDarkMode } = useDarkMode();
   const { showOnboarding, completeOnboarding, skipOnboarding } = useOnboarding(triggerOnboarding);
 
   const handleLogout = () => {
@@ -135,6 +137,14 @@ export default function Dashboard({ triggerOnboarding = false }: DashboardProps)
               className="text-muted-foreground hover:text-primary"
             >
               <HelpCircle className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={toggleDarkMode}
+              className="text-muted-foreground hover:text-primary transition-transform active:scale-95"
+            >
+              {isDarkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </Button>
             <Button
               variant="ghost"
