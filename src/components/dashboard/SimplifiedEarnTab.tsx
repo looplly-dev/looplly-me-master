@@ -497,12 +497,9 @@ export default function SimplifiedEarnTab() {
                           <span className="font-bold text-success">${activity.reward_amount.toFixed(2)}</span>
                         </span>
                         <div className="flex items-center gap-1">
-                          <Star className="h-4 w-4 text-warning fill-current" />
-                          <span className="font-medium">
-                            {activity.metadata?.rating || '4.2'}
-                          </span>
-                          <span className="text-muted-foreground">
-                            ({activity.metadata?.reviews || '284'})
+                          <Target className="h-4 w-4 text-muted-foreground" />
+                          <span className="text-sm text-muted-foreground">
+                            {activity.metadata?.qualification_score || 90}% match
                           </span>
                         </div>
                       </div>
@@ -551,11 +548,10 @@ export default function SimplifiedEarnTab() {
                           <span className="font-bold text-success">${activity.reward_amount.toFixed(2)}</span>
                         </span>
                         <div className="flex items-center gap-1">
-                          <Target className="h-4 w-4 text-primary" />
-                          <span className="font-medium text-primary">
+                          <Target className="h-4 w-4 text-muted-foreground" />
+                          <span className="text-sm text-muted-foreground">
                             {activity.metadata?.qualification_score || 85}% match
                           </span>
-                          <span className="text-muted-foreground">🎯</span>
                         </div>
                       </div>
                     </div>
