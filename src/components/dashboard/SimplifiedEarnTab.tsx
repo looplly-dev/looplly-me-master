@@ -39,6 +39,7 @@ import { useEarningActivities } from '@/hooks/useEarningActivities';
 import { useTransactions } from '@/hooks/useTransactions';
 import { useAuth } from '@/hooks/useAuth';
 import { useCintSurveys } from '@/hooks/useCintSurveys';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { addMissingDemoActivities } from '@/utils/addMissingDemoActivities';
 import { addMockEarningActivities } from '@/utils/mockEarningActivities';
 import { userStats } from '@/data/mockData';
@@ -64,6 +65,7 @@ export default function SimplifiedEarnTab() {
   const { addTransaction } = useTransactions();
   const { authState } = useAuth();
   const { surveys: cintSurveys, isLoading: cintLoading, startSurvey } = useCintSurveys();
+  const isMobile = useIsMobile();
 
   // Using static mock data - no database calls needed
 
@@ -364,7 +366,7 @@ export default function SimplifiedEarnTab() {
                 <TabsTrigger value="surveys" className="text-xs relative">
                   Surveys
                   {surveyCount > 0 && (
-                    <span className="absolute -top-1 -right-1 h-5 w-5 bg-primary text-white text-xs rounded-full flex items-center justify-center font-medium z-10">
+                    <span className={`absolute ${isMobile ? '-top-1.5 -right-1.5 h-6 w-6 text-xs' : '-top-2 -right-2 h-7 w-7 text-sm'} bg-primary text-white rounded-full flex items-center justify-center font-medium z-10`}>
                       {surveyCount}
                     </span>
                   )}
@@ -372,7 +374,7 @@ export default function SimplifiedEarnTab() {
                 <TabsTrigger value="videos" className="text-xs relative">
                   Videos
                   {videoCount > 0 && (
-                    <span className="absolute -top-1 -right-1 h-5 w-5 bg-accent text-white text-xs rounded-full flex items-center justify-center font-medium z-10">
+                    <span className={`absolute ${isMobile ? '-top-1.5 -right-1.5 h-6 w-6 text-xs' : '-top-2 -right-2 h-7 w-7 text-sm'} bg-accent text-white rounded-full flex items-center justify-center font-medium z-10`}>
                       {videoCount}
                     </span>
                   )}
@@ -380,7 +382,7 @@ export default function SimplifiedEarnTab() {
                 <TabsTrigger value="tasks" className="text-xs relative">
                   Tasks
                   {taskCount > 0 && (
-                    <span className="absolute -top-1 -right-1 h-5 w-5 bg-warning text-white text-xs rounded-full flex items-center justify-center font-medium z-10">
+                    <span className={`absolute ${isMobile ? '-top-1.5 -right-1.5 h-6 w-6 text-xs' : '-top-2 -right-2 h-7 w-7 text-sm'} bg-warning text-white rounded-full flex items-center justify-center font-medium z-10`}>
                       {taskCount}
                     </span>
                   )}
@@ -388,7 +390,7 @@ export default function SimplifiedEarnTab() {
                 <TabsTrigger value="data" className="text-xs relative">
                   Data
                   {dataCount > 0 && (
-                    <span className="absolute -top-1 -right-1 h-5 w-5 bg-success text-white text-xs rounded-full flex items-center justify-center font-medium z-10">
+                    <span className={`absolute ${isMobile ? '-top-1.5 -right-1.5 h-6 w-6 text-xs' : '-top-2 -right-2 h-7 w-7 text-sm'} bg-success text-white rounded-full flex items-center justify-center font-medium z-10`}>
                       {dataCount}
                     </span>
                   )}
