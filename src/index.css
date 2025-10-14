@@ -46,8 +46,7 @@
 }
 
 .earn-tabs-list {
-  padding-left: 0.75rem !important;
-  padding-right: 0.75rem !important;
+  padding: 0.25rem 0.75rem !important;
 }
   
   .earn-tab-content {
