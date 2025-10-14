@@ -35,6 +35,7 @@ import {
   Share2,
   Info
 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { useBalance } from '@/hooks/useBalance';
 import { useEarningActivities } from '@/hooks/useEarningActivities';
 import { useTransactions } from '@/hooks/useTransactions';
@@ -287,15 +288,15 @@ export default function SimplifiedEarnTab() {
 
       {/* Daily Check-in - More Prominent */}
       <Card className="border-primary/20 bg-card shadow-sm">
-        <CardContent className="p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-3 bg-primary/20 rounded-xl">
-                <Trophy className="h-6 w-6 text-primary" />
+        <CardContent className="p-3 sm:p-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="p-2 sm:p-3 bg-primary/20 rounded-xl">
+                <Trophy className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
               </div>
               <div>
-                <h3 className="font-bold text-lg">Daily Streak Boost</h3>
-                <p className="text-sm text-muted-foreground flex items-center gap-1">
+                <h3 className="font-bold text-base sm:text-lg">Daily Streak Boost</h3>
+                <p className="text-xs sm:text-sm text-muted-foreground flex items-center gap-1">
                   <Star className="h-3 w-3 text-warning" />
                   Day {userStats.streaks.currentStreak} • +{userStats.streaks.currentStreak >= 30 ? 25 : userStats.streaks.currentStreak >= 14 ? 15 : userStats.streaks.currentStreak >= 7 ? 10 : 5} Rep daily
                 </p>
@@ -303,10 +304,13 @@ export default function SimplifiedEarnTab() {
             </div>
             <Button
               variant={checkInDone ? "secondary" : "default"}
-              size="lg"
+              size="default"
               onClick={handleCheckIn}
               disabled={checkInDone}
-              className={checkInDone ? "" : "bg-primary hover:bg-primary/90"}
+              className={cn(
+                "w-full sm:w-auto",
+                checkInDone ? "" : "bg-primary hover:bg-primary/90"
+              )}
             >
               {checkInDone ? (
                 <>
