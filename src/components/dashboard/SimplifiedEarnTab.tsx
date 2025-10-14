@@ -374,7 +374,7 @@ export default function SimplifiedEarnTab() {
                 <TabsTrigger value="videos" className="text-xs relative">
                   Videos
                   {videoCount > 0 && (
-                    <span className={`absolute ${isMobile ? '-top-1.5 -right-1.5 h-6 w-6 text-xs' : '-top-2 -right-2 h-7 w-7 text-sm'} bg-accent text-white rounded-full flex items-center justify-center font-medium z-10`}>
+                    <span className={`absolute ${isMobile ? '-top-1.5 -right-1.5 h-6 w-6 text-xs' : '-top-2 -right-2 h-7 w-7 text-sm'} bg-background border-2 border-current rounded-full flex items-center justify-center font-medium z-10`}>
                       {videoCount}
                     </span>
                   )}
