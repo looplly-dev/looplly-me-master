@@ -251,7 +251,7 @@ export default function SimplifiedEarnTab() {
   // Only show data dot if there are items to opt into
   const dataCount = Object.values(dataOptIns).filter(opt => !opt).length;
   // Total available tasks across all categories
-  const totalAvailable = surveyCount + videoCount + taskCount;
+  const totalAvailable = surveyCount + videoCount + taskCount + dataCount;
 
 
   return (
