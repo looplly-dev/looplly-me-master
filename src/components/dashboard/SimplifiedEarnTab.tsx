@@ -408,36 +408,24 @@ export default function SimplifiedEarnTab() {
                   </div>
                 ) : cintSurveys.length > 0 ? (
                   cintSurveys.map((survey) => (
-                    <Card key={survey.id} className="p-4 hover:shadow-md transition-shadow">
+                    <div key={survey.id} className="p-4 border rounded-lg bg-card shadow-sm border-l-4 border-l-primary/50 hover:shadow-md transition-shadow">
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-3">
-                          <div className="p-2 bg-primary/10 rounded-lg">
-                            <Search className="h-5 w-5 text-primary" />
-                          </div>
+                          <Search className="h-5 w-5 text-primary" />
                           <div>
                             <h3 className="font-semibold">{survey.title}</h3>
                             <p className="text-sm text-muted-foreground">
                               {survey.description}
                             </p>
-                            <p className="text-xs text-muted-foreground mt-1">
-                              {survey.category} • {survey.completion_rate}% completion rate
-                            </p>
                           </div>
                         </div>
-                        <div className="text-right">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Badge variant="outline" className="text-xs">
-                              Cint Premium
-                            </Badge>
-                          </div>
-                          <Button 
-                            size="sm" 
-                            onClick={() => startSurvey(survey)}
-                            className="w-20"
-                          >
-                            Start
-                          </Button>
-                        </div>
+                        <Button 
+                          size="sm" 
+                          onClick={() => startSurvey(survey)}
+                          className="w-20"
+                        >
+                          Start
+                        </Button>
                       </div>
                       <div className="flex items-center gap-4 text-sm text-muted-foreground">
                         <span className="flex items-center gap-1">
@@ -449,11 +437,12 @@ export default function SimplifiedEarnTab() {
                           <span className="font-bold text-success">${survey.reward_amount.toFixed(2)}</span>
                         </span>
                         <span className="flex items-center gap-1">
-                          <Target className="h-4 w-4" />
-                          {survey.qualification_score}% match score
+                          <Star className="h-4 w-4 text-warning fill-current" />
+                          <span className="font-medium">{(survey.qualification_score / 20).toFixed(1)}</span>
+                          <span className="text-muted-foreground">({survey.completion_rate} reviews)</span>
                         </span>
                       </div>
-                    </Card>
+                    </div>
                   ))
                 ) : (
                   <div className="text-center py-8">
