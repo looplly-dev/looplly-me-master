@@ -11,6 +11,7 @@ import AdminContent from "./pages/AdminContent";
 import AdminBadges from "./pages/AdminBadges";
 import AdminRedemptions from "./pages/AdminRedemptions";
 import AdminAnalytics from "./pages/AdminAnalytics";
+import AdminAgents from "./pages/AdminAgents";
 import ResetPassword from "./components/auth/ResetPassword";
 
 const queryClient = new QueryClient();
@@ -29,6 +30,7 @@ const App = () => (
             <Route path="/admin/badges" element={<AdminBadges />} />
             <Route path="/admin/redemptions" element={<AdminRedemptions />} />
             <Route path="/admin/analytics" element={<AdminAnalytics />} />
+            <Route path="/admin/agents" element={<AdminAgents />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/*" element={<LoopllyApp />} />
           </Routes>

@@ -14,6 +14,230 @@ export type Database = {
   }
   public: {
     Tables: {
+      agent_configs: {
+        Row: {
+          agent_id: string
+          config_key: string
+          config_value: Json
+          created_at: string
+          data_type: Database["public"]["Enums"]["config_data_type"]
+          description: string | null
+          id: string
+          is_secret: boolean
+          tenant_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          agent_id: string
+          config_key: string
+          config_value?: Json
+          created_at?: string
+          data_type?: Database["public"]["Enums"]["config_data_type"]
+          description?: string | null
+          id?: string
+          is_secret?: boolean
+          tenant_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          agent_id?: string
+          config_key?: string
+          config_value?: Json
+          created_at?: string
+          data_type?: Database["public"]["Enums"]["config_data_type"]
+          description?: string | null
+          id?: string
+          is_secret?: boolean
+          tenant_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_configs_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "ai_agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_configs_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      agent_dependencies: {
+        Row: {
+          created_at: string
+          dependency_type: Database["public"]["Enums"]["dependency_type"]
+          dependent_agent_id: string
+          id: string
+          is_active: boolean
+          parent_agent_id: string
+        }
+        Insert: {
+          created_at?: string
+          dependency_type: Database["public"]["Enums"]["dependency_type"]
+          dependent_agent_id: string
+          id?: string
+          is_active?: boolean
+          parent_agent_id: string
+        }
+        Update: {
+          created_at?: string
+          dependency_type?: Database["public"]["Enums"]["dependency_type"]
+          dependent_agent_id?: string
+          id?: string
+          is_active?: boolean
+          parent_agent_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_dependencies_dependent_agent_id_fkey"
+            columns: ["dependent_agent_id"]
+            isOneToOne: false
+            referencedRelation: "ai_agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_dependencies_parent_agent_id_fkey"
+            columns: ["parent_agent_id"]
+            isOneToOne: false
+            referencedRelation: "ai_agents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      agent_executions: {
+        Row: {
+          agent_id: string
+          api_calls_made: number | null
+          api_cost_usd: number | null
+          completed_at: string | null
+          created_at: string
+          error_message: string | null
+          error_type: string | null
+          execution_id: string
+          id: string
+          metadata: Json | null
+          response_time_ms: number | null
+          started_at: string
+          status: Database["public"]["Enums"]["execution_status"]
+          tenant_id: string | null
+          trigger_data: Json | null
+          trigger_type: string
+          user_id: string | null
+        }
+        Insert: {
+          agent_id: string
+          api_calls_made?: number | null
+          api_cost_usd?: number | null
+          completed_at?: string | null
+          created_at?: string
+          error_message?: string | null
+          error_type?: string | null
+          execution_id: string
+          id?: string
+          metadata?: Json | null
+          response_time_ms?: number | null
+          started_at: string
+          status: Database["public"]["Enums"]["execution_status"]
+          tenant_id?: string | null
+          trigger_data?: Json | null
+          trigger_type: string
+          user_id?: string | null
+        }
+        Update: {
+          agent_id?: string
+          api_calls_made?: number | null
+          api_cost_usd?: number | null
+          completed_at?: string | null
+          created_at?: string
+          error_message?: string | null
+          error_type?: string | null
+          execution_id?: string
+          id?: string
+          metadata?: Json | null
+          response_time_ms?: number | null
+          started_at?: string
+          status?: Database["public"]["Enums"]["execution_status"]
+          tenant_id?: string | null
+          trigger_data?: Json | null
+          trigger_type?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_executions_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "ai_agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_executions_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_agents: {
+        Row: {
+          category: string
+          created_at: string
+          description: string
+          icon_name: string
+          id: string
+          is_system: boolean
+          name: string
+          purpose: string
+          slug: string
+          status: Database["public"]["Enums"]["agent_status"]
+          tenant_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description: string
+          icon_name: string
+          id?: string
+          is_system?: boolean
+          name: string
+          purpose: string
+          slug: string
+          status?: Database["public"]["Enums"]["agent_status"]
+          tenant_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string
+          icon_name?: string
+          id?: string
+          is_system?: boolean
+          name?: string
+          purpose?: string
+          slug?: string
+          status?: Database["public"]["Enums"]["agent_status"]
+          tenant_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_agents_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_logs: {
         Row: {
           action: string
@@ -573,7 +797,11 @@ export type Database = {
       }
     }
     Enums: {
+      agent_status: "active" | "inactive" | "testing"
       app_role: "admin" | "user"
+      config_data_type: "string" | "number" | "boolean" | "json"
+      dependency_type: "triggers" | "requires" | "observes"
+      execution_status: "success" | "failure" | "timeout" | "cancelled"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -701,7 +929,11 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      agent_status: ["active", "inactive", "testing"],
       app_role: ["admin", "user"],
+      config_data_type: ["string", "number", "boolean", "json"],
+      dependency_type: ["triggers", "requires", "observes"],
+      execution_status: ["success", "failure", "timeout", "cancelled"],
     },
   },
 } as const

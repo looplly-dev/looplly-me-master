@@ -7,6 +7,7 @@ import {
   Award,
   DollarSign,
   BarChart3,
+  Brain,
   Shield,
   Home,
 } from 'lucide-react';
@@ -41,6 +42,7 @@ const adminNavItems = [
   { title: 'Badges', url: '/admin/badges', icon: Award },
   { title: 'Redemptions', url: '/admin/redemptions', icon: DollarSign },
   { title: 'Analytics', url: '/admin/analytics', icon: BarChart3 },
+  { title: 'AI Agents', url: '/admin/agents', icon: Brain },
 ];
 
 function AdminSidebar() {
@@ -115,6 +117,7 @@ function AdminBreadcrumb() {
       badges: 'Badge Generator',
       redemptions: 'Redemptions',
       analytics: 'Analytics',
+      agents: 'AI Agents',
     };
     return labels[segment] || segment.charAt(0).toUpperCase() + segment.slice(1);
   };
