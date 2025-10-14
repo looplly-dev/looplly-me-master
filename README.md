@@ -29,10 +29,17 @@ git clone <YOUR_GIT_URL>
 # Step 2: Navigate to the project directory.
 cd <YOUR_PROJECT_NAME>
 
-# Step 3: Install the necessary dependencies.
+# Step 3: Set up environment variables.
+npm run env:setup
+# Edit .env file with your actual Supabase credentials
+
+# Step 4: Install the necessary dependencies.
 npm i
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Step 5: Validate your environment setup.
+npm run env:validate
+
+# Step 6: Start the development server with auto-reloading and an instant preview.
 npm run dev
 ```
 
@@ -59,6 +66,32 @@ This project is built with:
 - React
 - shadcn-ui
 - Tailwind CSS
+- Supabase (Backend as a Service)
+
+## Environment Configuration
+
+This project uses a secure environment variable management system. Key features:
+
+- 🔐 **Secure by default**: Environment files are excluded from Git
+- 🛡️ **Validation**: Automatic validation of environment variables on startup
+- 📝 **Templates**: Example files for easy setup
+- 🌍 **Multi-environment**: Support for development, production, and test environments
+
+### Quick Setup
+```sh
+# Create your local environment file
+npm run env:setup
+
+# Validate your environment configuration
+npm run env:validate
+```
+
+### Required Environment Variables
+- `VITE_SUPABASE_URL`: Your Supabase project URL
+- `VITE_SUPABASE_PUBLISHABLE_KEY`: Your Supabase anon key
+- `VITE_SUPABASE_PROJECT_ID`: Your Supabase project ID
+
+For detailed setup instructions, see: [Environment Setup Guide](docs/ENVIRONMENT_SETUP.md)
 
 ## How can I deploy this project?
 
