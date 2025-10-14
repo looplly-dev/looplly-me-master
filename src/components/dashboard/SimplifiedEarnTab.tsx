@@ -441,6 +441,10 @@ export default function SimplifiedEarnTab() {
                           <span className="font-medium">{(survey.qualification_score / 20).toFixed(1)}</span>
                           <span className="text-muted-foreground">({survey.completion_rate} reviews)</span>
                         </span>
+                        <span className="flex items-center gap-1">
+                          <Target className="h-4 w-4" />
+                          {survey.qualification_score}% match
+                        </span>
                       </div>
                     </div>
                   ))
