@@ -631,7 +631,7 @@ export default function SimplifiedEarnTab() {
                   
                   <div className="space-y-6">
                     {/* Location Data - Already Active */}
-                    <div className="p-4 bg-success/10 rounded-lg border border-success/20">
+                    <div className="p-4 bg-success/10 rounded-lg border border-success/20 relative">
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex items-center gap-3">
                           <MapPin className="h-4 w-4 text-green-600 flex-shrink-0" />
@@ -659,6 +659,18 @@ export default function SimplifiedEarnTab() {
                         </div>
                       </div>
                       <p className="text-xs text-muted-foreground pl-7">Anonymous location insights for market research</p>
+                      
+                      {/* Info Icon */}
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className="absolute bottom-2 right-2 cursor-help">
+                            <Info className="h-3 w-3 text-muted-foreground hover:text-foreground transition-colors" />
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p className="max-w-xs">Your location data is anonymized and used for market research, helping businesses understand regional trends without tracking individuals.</p>
+                        </TooltipContent>
+                      </Tooltip>
                     </div>
 
                     {/* Cookie Tracking */}
