@@ -481,15 +481,13 @@ export default function SimplifiedEarnTab() {
                       </p>
                           </div>
                         </div>
-                        <div className="flex flex-col items-end">
-                          <Button
-                            size="sm"
-                            className="w-20"
-                            onClick={() => handleStartTask(activity.activity_type, activity.title, activity.reward_amount)}
-                          >
-                            Start
-                          </Button>
-                        </div>
+                        <Button
+                          size="sm"
+                          className="w-20"
+                          onClick={() => handleStartTask(activity.activity_type, activity.title, activity.reward_amount)}
+                        >
+                          Start
+                        </Button>
                       </div>
                       <div className="flex items-center gap-3 md:gap-4 text-sm text-muted-foreground flex-wrap">
                         <span className="flex items-center gap-1">
@@ -537,15 +535,13 @@ export default function SimplifiedEarnTab() {
                             </p>
                           </div>
                         </div>
-                        <div className="flex flex-col items-end">
-                          <Button
-                            size="sm"
-                            className="w-20"
-                            onClick={() => handleStartTask(activity.activity_type, activity.title, activity.reward_amount)}
-                          >
-                            Start
-                          </Button>
-                        </div>
+                        <Button
+                          size="sm"
+                          className="w-20"
+                          onClick={() => handleStartTask(activity.activity_type, activity.title, activity.reward_amount)}
+                        >
+                          Start
+                        </Button>
                       </div>
                       <div className="flex items-center gap-4 text-sm">
                         <span className="flex items-center gap-1">
@@ -590,15 +586,13 @@ export default function SimplifiedEarnTab() {
                             </p>
                           </div>
                         </div>
-                        <div className="flex flex-col items-end">
-                          <Button
-                            size="sm"
-                            className="w-20"
-                            onClick={() => handleStartTask(activity.activity_type, activity.title, activity.reward_amount)}
-                          >
-                            Start
-                          </Button>
-                        </div>
+                        <Button
+                          size="sm"
+                          className="w-20"
+                          onClick={() => handleStartTask(activity.activity_type, activity.title, activity.reward_amount)}
+                        >
+                          Start
+                        </Button>
                       </div>
                       <div className="flex items-center gap-4 text-sm">
                         <span className="flex items-center gap-1">
