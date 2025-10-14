@@ -603,15 +603,11 @@ export default function SimplifiedEarnTab() {
                           <Coins className="h-4 w-4 text-success" />
                           <span className="font-bold text-success">${activity.reward_amount.toFixed(2)}</span>
                         </span>
-                        <div className="flex items-center gap-1">
-                          <Star className="h-4 w-4 text-warning fill-current" />
-                          <span className="font-medium">
-                            {activity.metadata?.rating || '4.5'}
-                          </span>
-                          <span className="text-muted-foreground">
-                            ({activity.metadata?.reviews || '92'})
-                          </span>
-                        </div>
+                        <span className="flex items-center gap-1 text-sm">
+                          <Star className="h-4 w-4 text-warning fill-warning" />
+                          <span className="font-medium text-foreground">{activity.metadata?.rating || '4.5'}</span>
+                          <span className="text-muted-foreground hidden md:inline">({activity.metadata?.reviews || '92'} reviews)</span>
+                        </span>
                       </div>
                     </div>
                   ))
