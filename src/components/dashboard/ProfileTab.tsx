@@ -49,7 +49,7 @@ export default function ProfileTab() {
   };
 
   return (
-    <div className="p-4 md:p-6 lg:p-8 pb-24 md:pb-20 lg:pb-8 space-y-6">
+    <div className="py-4 md:p-6 lg:p-8 pb-24 md:pb-20 lg:pb-8 space-y-6">
       {/* Profile Header */}
       <Card>
         <CardContent className="p-6">

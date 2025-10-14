@@ -73,7 +73,7 @@ export default function WalletTab() {
   };
 
   return (
-    <div className="p-4 md:p-6 lg:p-8 pb-32 md:pb-20 lg:pb-8 space-y-6">
+    <div className="py-4 md:p-6 lg:p-8 pb-32 md:pb-20 lg:pb-8 space-y-6">
       {/* Balance Hero Section */}
       <Card className="border-0 shadow-lg bg-card">
         <CardContent className="p-6">

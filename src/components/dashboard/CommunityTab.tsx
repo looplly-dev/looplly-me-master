@@ -157,7 +157,7 @@ export default function CommunityTab() {
   };
 
   return (
-    <div className="space-y-6 p-4 pb-20">
+    <div className="space-y-6 py-4 pb-20">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
