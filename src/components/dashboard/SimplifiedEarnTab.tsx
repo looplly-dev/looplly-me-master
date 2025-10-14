@@ -369,7 +369,7 @@ export default function SimplifiedEarnTab() {
           </CardHeader>
           <CardContent className="earn-card-content">
             <Tabs defaultValue="surveys" className="w-full">
-              <TabsList className="grid w-full grid-cols-4">
+              <TabsList className="grid w-full grid-cols-4 px-3">
                 <TabsTrigger value="surveys" className="text-xs relative">
                   Surveys
                   {surveyCount > 0 && (
