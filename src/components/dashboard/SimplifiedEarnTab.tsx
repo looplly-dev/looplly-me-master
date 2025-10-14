@@ -620,7 +620,7 @@ export default function SimplifiedEarnTab() {
               </TabsContent>
 
               <TabsContent value="data" className="space-y-3 mt-4 max-h-[400px] overflow-y-auto scroll-smooth pb-4">
-                <div className="p-4 border rounded-lg bg-white shadow-sm">
+                <div className="p-4 border rounded-lg bg-card shadow-sm">
                   <div className="flex gap-3 mb-4">
                     <div className="p-2 bg-primary/10 rounded-lg">
                       <Share2 className="h-5 w-5 text-primary" />
@@ -1009,7 +1009,7 @@ export default function SimplifiedEarnTab() {
 
         {/* Completed Tasks (if any) */}
         {completedTasks.length > 0 && (
-          <Card className="bg-white shadow-sm border border-success/30">
+          <Card className="shadow-sm border border-success/30">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-success">
                 <CheckCircle className="h-5 w-5" />
