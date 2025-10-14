@@ -1,8 +1,16 @@
+import { useState } from 'react';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { AgentGrid } from '@/components/admin/agents/AgentGrid';
+import { AgentsDashboard } from '@/components/admin/agents/AgentsDashboard';
+import { AgentFilters } from '@/components/admin/agents/AgentFilters';
 
 function AdminAgentsContent() {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('All Categories');
+  const [statusFilter, setStatusFilter] = useState('All Statuses');
+  const [sortBy, setSortBy] = useState('category');
+
   return (
     <div className="space-y-6">
       <div className="space-y-2">
@@ -12,7 +20,25 @@ function AdminAgentsContent() {
         </p>
       </div>
 
-      <AgentGrid />
+      <AgentsDashboard />
+
+      <AgentFilters
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        categoryFilter={categoryFilter}
+        onCategoryChange={setCategoryFilter}
+        statusFilter={statusFilter}
+        onStatusChange={setStatusFilter}
+        sortBy={sortBy}
+        onSortChange={setSortBy}
+      />
+
+      <AgentGrid
+        searchQuery={searchQuery}
+        categoryFilter={categoryFilter}
+        statusFilter={statusFilter}
+        sortBy={sortBy}
+      />
     </div>
   );
 }
