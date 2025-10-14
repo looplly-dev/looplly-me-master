@@ -250,6 +250,8 @@ export default function SimplifiedEarnTab() {
   const taskCount = availableTasks.filter(a => a.activity_type === 'task').length;
   // Only show data dot if there are items to opt into
   const dataCount = Object.values(dataOptIns).filter(opt => !opt).length;
+  // Total available tasks across all categories
+  const totalAvailable = surveyCount + videoCount + taskCount;
 
 
   return (
@@ -332,7 +334,7 @@ export default function SimplifiedEarnTab() {
         </Card>
         <Card className="bg-card shadow-sm border">
           <CardContent className="p-3 text-center">
-            <p className="text-2xl font-bold text-warning">{availableTasks.length}</p>
+            <p className="text-2xl font-bold text-warning">{totalAvailable}</p>
             <p className="text-xs text-muted-foreground">Available</p>
           </CardContent>
         </Card>
@@ -357,7 +359,7 @@ export default function SimplifiedEarnTab() {
                 Ready to Earn
               </span>
               <Badge variant="secondary" className="bg-primary/10 text-primary">
-                {availableTasks.length} available
+                {totalAvailable} available
               </Badge>
             </CardTitle>
           </CardHeader>
