@@ -1,0 +1,98 @@
+import { AdminUser } from '@/hooks/useAdminUsers';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { CheckCircle2, XCircle, User } from 'lucide-react';
+import { format } from 'date-fns';
+
+interface UserListTableProps {
+  users: AdminUser[];
+}
+
+export function UserListTable({ users }: UserListTableProps) {
+  if (users.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 text-center">
+        <User className="h-12 w-12 text-muted-foreground/50 mb-4" />
+        <p className="text-muted-foreground">No users found</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-md border">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Name</TableHead>
+            <TableHead>Email</TableHead>
+            <TableHead>Mobile</TableHead>
+            <TableHead>Role</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Joined</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {users.map((user) => (
+            <TableRow key={user.user_id}>
+              <TableCell className="font-medium">
+                {user.first_name && user.last_name
+                  ? `${user.first_name} ${user.last_name}`
+                  : user.first_name || user.last_name || 'N/A'}
+              </TableCell>
+              <TableCell>{user.email || 'N/A'}</TableCell>
+              <TableCell>
+                {user.mobile ? (
+                  <span className="font-mono text-sm">
+                    {user.country_code ? `${user.country_code} ` : ''}
+                    {user.mobile}
+                  </span>
+                ) : (
+                  'N/A'
+                )}
+              </TableCell>
+              <TableCell>
+                <Badge
+                  variant={user.role === 'admin' ? 'default' : 'secondary'}
+                >
+                  {user.role}
+                </Badge>
+              </TableCell>
+              <TableCell>
+                <div className="flex items-center gap-2">
+                  {user.is_verified ? (
+                    <div className="flex items-center gap-1 text-green-600 dark:text-green-400">
+                      <CheckCircle2 className="h-4 w-4" />
+                      <span className="text-xs">Verified</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-1 text-muted-foreground">
+                      <XCircle className="h-4 w-4" />
+                      <span className="text-xs">Unverified</span>
+                    </div>
+                  )}
+                  {user.profile_complete && (
+                    <Badge variant="outline" className="text-xs">
+                      Complete
+                    </Badge>
+                  )}
+                </div>
+              </TableCell>
+              <TableCell className="text-muted-foreground text-sm">
+                {user.created_at
+                  ? format(new Date(user.created_at), 'MMM d, yyyy')
+                  : 'N/A'}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+  );
+}
