@@ -257,7 +257,7 @@ export default function SimplifiedEarnTab() {
 
   return (
     <TooltipProvider>
-      <div className="px-6 py-4 md:p-6 lg:p-8 pb-24 md:pb-20 lg:pb-8 space-y-6">
+      <div className="px-4 py-4 md:p-6 lg:p-8 pb-24 md:pb-20 lg:pb-8 space-y-6">
         {/* Enhanced Balance Card with Progress */}
         <Card className="bg-card border-0 shadow-lg">
           <CardContent className="p-6">
@@ -288,7 +288,7 @@ export default function SimplifiedEarnTab() {
 
       {/* Daily Check-in - More Prominent */}
       <Card className="border-primary/20 bg-card shadow-sm">
-        <CardContent className="p-4 sm:p-5 md:p-6">
+        <CardContent className="p-4 md:p-5 lg:p-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center gap-3 sm:gap-4">
               <div className="p-3 bg-primary/20 rounded-xl">
@@ -329,7 +329,7 @@ export default function SimplifiedEarnTab() {
       </Card>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-3 md:grid-cols-3 lg:grid-cols-3 gap-4 md:gap-4">
+      <div className="grid grid-cols-3 md:grid-cols-3 lg:grid-cols-3 gap-3 md:gap-4">
         <Card className="bg-card shadow-sm border">
           <CardContent className="p-4 text-center">
             <p className="text-2xl font-bold text-primary">{completedTasks.length}</p>
