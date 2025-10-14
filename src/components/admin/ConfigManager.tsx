@@ -145,21 +145,21 @@ export const ConfigManager: React.FC = () => {
   }, []);
 
   return (
-    <div className=\"space-y-6\">
-      <div className=\"flex items-center justify-between\">
-        <h2 className=\"text-2xl font-bold\">Configuration Manager</h2>
-        <div className=\"flex items-center space-x-2\">
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold">Configuration Manager</h2>
+        <div className="flex items-center space-x-2">
           <Button
-            variant=\"outline\"
-            size=\"sm\"
+            variant="outline"
+            size="sm"
             onClick={() => setShowSecrets(!showSecrets)}
           >
-            {showSecrets ? <EyeOff className=\"h-4 w-4\" /> : <Eye className=\"h-4 w-4\" />}
+            {showSecrets ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             {showSecrets ? 'Hide' : 'Show'} Secrets
           </Button>
           <Button
-            variant=\"outline\"
-            size=\"sm\"
+            variant="outline"
+            size="sm"
             onClick={fetchConfigs}
             disabled={loading}
           >
@@ -172,123 +172,123 @@ export const ConfigManager: React.FC = () => {
       {/* Add New Configuration */}
       <Card>
         <CardHeader>
-          <CardTitle className=\"flex items-center\">
-            <Plus className=\"h-5 w-5 mr-2\" />
+          <CardTitle className="flex items-center">
+            <Plus className="h-5 w-5 mr-2" />
             Add New Configuration
           </CardTitle>
         </CardHeader>
-        <CardContent className=\"space-y-4\">
-          <div className=\"grid grid-cols-1 md:grid-cols-2 gap-4\">
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor=\"new-key\">Key</Label>
+              <Label htmlFor="new-key">Key</Label>
               <Input
-                id=\"new-key\"
+                id="new-key"
                 value={newConfig.key}
                 onChange={(e) => setNewConfig({ ...newConfig, key: e.target.value })}
-                placeholder=\"VITE_APP_SETTING\"
+                placeholder="VITE_APP_SETTING"
               />
             </div>
             <div>
-              <Label htmlFor=\"new-value\">Value</Label>
+              <Label htmlFor="new-value">Value</Label>
               <Input
-                id=\"new-value\"
+                id="new-value"
                 type={newConfig.is_secret ? 'password' : 'text'}
                 value={newConfig.value}
                 onChange={(e) => setNewConfig({ ...newConfig, value: e.target.value })}
-                placeholder=\"Configuration value\"
+                placeholder="Configuration value"
               />
             </div>
           </div>
           
           <div>
-            <Label htmlFor=\"new-description\">Description</Label>
+            <Label htmlFor="new-description">Description</Label>
             <Textarea
-              id=\"new-description\"
+              id="new-description"
               value={newConfig.description}
               onChange={(e) => setNewConfig({ ...newConfig, description: e.target.value })}
-              placeholder=\"Optional description\"
+              placeholder="Optional description"
               rows={2}
             />
           </div>
 
-          <div className=\"grid grid-cols-1 md:grid-cols-3 gap-4\">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <Label htmlFor=\"new-environment\">Environment</Label>
+              <Label htmlFor="new-environment">Environment</Label>
               <Select
                 value={newConfig.environment}
                 onValueChange={(value) => setNewConfig({ ...newConfig, environment: value })}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder=\"Select environment\" />
+                  <SelectValue placeholder="Select environment" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value=\"all\">All</SelectItem>
-                  <SelectItem value=\"development\">Development</SelectItem>
-                  <SelectItem value=\"production\">Production</SelectItem>
-                  <SelectItem value=\"test\">Test</SelectItem>
+                  <SelectItem value="all">All</SelectItem>
+                  <SelectItem value="development">Development</SelectItem>
+                  <SelectItem value="production">Production</SelectItem>
+                  <SelectItem value="test">Test</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             
-            <div className=\"flex items-center space-x-2\">
+            <div className="flex items-center space-x-2">
               <Switch
-                id=\"new-is-secret\"
+                id="new-is-secret"
                 checked={newConfig.is_secret}
                 onCheckedChange={(checked) => setNewConfig({ ...newConfig, is_secret: checked })}
               />
-              <Label htmlFor=\"new-is-secret\">Is Secret</Label>
+              <Label htmlFor="new-is-secret">Is Secret</Label>
             </div>
             
-            <div className=\"flex items-center space-x-2\">
+            <div className="flex items-center space-x-2">
               <Switch
-                id=\"new-is-active\"
+                id="new-is-active"
                 checked={newConfig.is_active}
                 onCheckedChange={(checked) => setNewConfig({ ...newConfig, is_active: checked })}
               />
-              <Label htmlFor=\"new-is-active\">Is Active</Label>
+              <Label htmlFor="new-is-active">Is Active</Label>
             </div>
           </div>
 
-          <Button onClick={handleAddConfig} className=\"w-full\">
+          <Button onClick={handleAddConfig} className="w-full">
             Add Configuration
           </Button>
         </CardContent>
       </Card>
 
       {/* Existing Configurations */}
-      <div className=\"space-y-4\">
-        <h3 className=\"text-lg font-semibold\">Existing Configurations</h3>
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold">Existing Configurations</h3>
         {loading ? (
-          <div className=\"text-center py-8\">Loading configurations...</div>
+          <div className="text-center py-8">Loading configurations...</div>
         ) : configs.length === 0 ? (
-          <div className=\"text-center py-8 text-muted-foreground\">
+          <div className="text-center py-8 text-muted-foreground">
             No configurations found. Add your first configuration above.
           </div>
         ) : (
           configs.map((config) => (
             <Card key={config.key}>
-              <CardContent className=\"pt-6\">
-                <div className=\"flex items-center justify-between mb-4\">
-                  <div className=\"flex items-center space-x-2\">
-                    <h4 className=\"font-medium\">{config.key}</h4>
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center space-x-2">
+                    <h4 className="font-medium">{config.key}</h4>
                     {config.is_secret && (
-                      <Badge variant=\"secondary\">Secret</Badge>
+                      <Badge variant="secondary">Secret</Badge>
                     )}
                     {!config.is_active && (
-                      <Badge variant=\"outline\">Inactive</Badge>
+                      <Badge variant="outline">Inactive</Badge>
                     )}
-                    <Badge variant=\"outline\">{config.environment}</Badge>
+                    <Badge variant="outline">{config.environment}</Badge>
                   </div>
                   <Button
-                    variant=\"destructive\"
-                    size=\"sm\"
+                    variant="destructive"
+                    size="sm"
                     onClick={() => handleDeleteConfig(config.key)}
                   >
-                    <Trash2 className=\"h-4 w-4\" />
+                    <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
                 
-                <div className=\"space-y-2\">
+                <div className="space-y-2">
                   <div>
                     <Label>Value</Label>
                     <Input
@@ -307,7 +307,7 @@ export const ConfigManager: React.FC = () => {
                   {config.description && (
                     <div>
                       <Label>Description</Label>
-                      <p className=\"text-sm text-muted-foreground\">{config.description}</p>
+                      <p className="text-sm text-muted-foreground">{config.description}</p>
                     </div>
                   )}
                 </div>
