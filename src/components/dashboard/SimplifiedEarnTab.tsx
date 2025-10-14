@@ -852,7 +852,7 @@ export default function SimplifiedEarnTab() {
                     </div>
 
                     {/* Social Media Activity */}
-                    <div className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                    <div className="p-4 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex items-center gap-3">
                           <Share2 className="h-4 w-4 text-blue-500 flex-shrink-0" />
@@ -884,7 +884,7 @@ export default function SimplifiedEarnTab() {
                     </div>
 
                     {/* E-commerce Behavior */}
-                    <div className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                    <div className="p-4 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex items-center gap-3">
                           <Globe className="h-4 w-4 text-indigo-600 flex-shrink-0" />
