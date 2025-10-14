@@ -10,6 +10,7 @@ import {
   Brain,
   Shield,
   Home,
+  ArrowRightLeft,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -43,6 +44,7 @@ const adminNavItems = [
   { title: 'Redemptions', url: '/admin/redemptions', icon: DollarSign },
   { title: 'Analytics', url: '/admin/analytics', icon: BarChart3 },
   { title: 'AI Agents', url: '/admin/agents', icon: Brain },
+  { title: 'Migration', url: '/admin/migration', icon: ArrowRightLeft },
 ];
 
 function AdminSidebar() {
@@ -118,6 +120,7 @@ function AdminBreadcrumb() {
       redemptions: 'Redemptions',
       analytics: 'Analytics',
       agents: 'AI Agents',
+      migration: 'Migration Helper',
     };
     return labels[segment] || segment.charAt(0).toUpperCase() + segment.slice(1);
   };
