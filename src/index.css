@@ -33,7 +33,7 @@
 
   /* Small right gutter so the bar isn't glued to card edges */
   .scrollbar-gutter {
-    padding-right: 0.5rem; /* 8px */
+    padding-right: 1rem; /* 16px */
     scrollbar-gutter: stable; /* avoids layout shimmy when scrollbars appear */
   }
 }
