@@ -475,7 +475,7 @@ export default function SimplifiedEarnTab() {
                   </div>
                 ) : (
                   availableTasks.filter(a => a.activity_type === 'survey').map((activity) => (
-                    <div key={activity.id} className="p-4 border rounded-lg bg-white shadow-sm border-l-4 border-l-primary/50 hover:shadow-md transition-shadow">
+                    <div key={activity.id} className="p-4 border rounded-lg bg-card shadow-sm border-l-4 border-l-primary/50 hover:shadow-md transition-shadow">
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-3">
                           <FileText className="h-5 w-5 text-primary" />
@@ -529,7 +529,7 @@ export default function SimplifiedEarnTab() {
                   </div>
                 ) : (
                   availableTasks.filter(a => a.activity_type === 'video').map((activity) => (
-                    <div key={activity.id} className="p-4 border rounded-lg bg-white shadow-sm border-l-4 border-l-accent/50 hover:shadow-md transition-shadow">
+                    <div key={activity.id} className="p-4 border rounded-lg bg-card shadow-sm border-l-4 border-l-accent/50 hover:shadow-md transition-shadow">
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-3">
                           <Play className="h-5 w-5 text-accent" />
@@ -583,7 +583,7 @@ export default function SimplifiedEarnTab() {
                   </div>
                 ) : (
                   availableTasks.filter(a => a.activity_type === 'task').map((activity) => (
-                    <div key={activity.id} className="p-4 border rounded-lg bg-white shadow-sm border-l-4 border-l-warning/50 hover:shadow-md transition-shadow">
+                    <div key={activity.id} className="p-4 border rounded-lg bg-card shadow-sm border-l-4 border-l-warning/50 hover:shadow-md transition-shadow">
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-3">
                           <Zap className="h-5 w-5 text-warning" />
