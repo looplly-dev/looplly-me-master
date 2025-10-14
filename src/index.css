@@ -302,5 +302,26 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--muted-foreground) / 0.35) transparent;
+  }
+
+  /* WebKit scrollbar for body */
+  body::-webkit-scrollbar {
+    width: 3px;
+    height: 3px;
+  }
+
+  body::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--muted-foreground) / 0.35);
+    border-radius: 9999px;
+  }
+
+  body::-webkit-scrollbar-thumb:hover {
+    background-color: hsl(var(--muted-foreground) / 0.55);
+  }
+
+  body::-webkit-scrollbar-track {
+    background: transparent;
   }
 }
