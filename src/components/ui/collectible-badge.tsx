@@ -223,12 +223,6 @@ export function CollectibleBadge({ badge, size = 'md', onClick }: CollectibleBad
           />
         </div>
 
-        {/* Simplified earned indicator */}
-        {badge.earned && (
-          <div className="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-white flex items-center justify-center shadow-md z-10">
-            <CheckCircle className="h-2 w-2 text-white" />
-          </div>
-        )}
 
         {/* Progress indicator for unearned badges */}
         {!badge.earned && badge.progress !== undefined && badge.target && (
