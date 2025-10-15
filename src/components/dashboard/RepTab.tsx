@@ -418,11 +418,11 @@ export default function RepTab() {
           </div>
         }
       >
-        <div className="space-y-6">
+        <div className="space-y-4">
           {badgeCategories.map((category) => (
-            <div key={category.name} className="space-y-4">
+            <div key={category.name}>
               {/* Category Header with Progress */}
-              <div className="flex items-center justify-between mb-4 pb-3 border-b border-border/50">
+              <div className="flex items-center justify-between mb-3 pb-2 border-b border-border/50">
                 <h3 className="text-lg font-bold text-foreground flex items-center gap-3">
                   <div className="p-2 bg-primary/10 rounded-lg">
                     <category.icon className="h-5 w-5 text-primary" />
@@ -446,7 +446,7 @@ export default function RepTab() {
                 }}
                 className="w-full"
               >
-                <CarouselContent className="ml-0 gap-10 py-8">
+                <CarouselContent className="ml-0 gap-8 py-4">
                   {category.badges.map((badge, index) => (
                     <CarouselItem key={badge.id} index={index} className="basis-auto pl-0">
                       <CollectibleBadge 
