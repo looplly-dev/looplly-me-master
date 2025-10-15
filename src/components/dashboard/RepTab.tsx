@@ -454,7 +454,7 @@ export default function RepTab() {
                 }}
                 className="w-full"
               >
-                <CarouselContent className="ml-0 gap-3">
+                <CarouselContent className="ml-0 gap-3 py-1">
                   {category.badges.map((badge) => (
                     <CarouselItem key={badge.id} className="basis-auto pl-0">
                       <CollectibleBadge 
