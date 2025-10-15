@@ -458,16 +458,6 @@ export default function RepTab() {
                   ))}
                 </CarouselContent>
               </Carousel>
-
-              {/* Progress Bar for Category */}
-              <div className="w-full bg-muted rounded-full h-1.5 overflow-hidden">
-                <div 
-                  className="h-full bg-primary rounded-full transition-all duration-500"
-                  style={{ 
-                    width: `${(category.badges.filter(b => b.earned).length / category.badges.length) * 100}%` 
-                  }}
-                />
-              </div>
             </div>
           ))}
 
