@@ -423,13 +423,13 @@ export default function RepTab() {
             <div key={category.name}>
               {/* Category Header with Progress */}
               <div className="flex items-center justify-between mb-3 pb-2 border-b border-border/50">
-                <h3 className="text-lg font-bold text-foreground flex items-center gap-3">
+                <h3 className="text-base font-bold text-foreground flex items-center gap-3">
                   <div className="p-2 bg-primary/10 rounded-lg">
-                    <category.icon className="h-5 w-5 text-primary" />
+                    <category.icon className="h-4 w-4 text-primary" />
                   </div>
                   {category.name}
                 </h3>
-                <Badge variant="secondary" className="text-sm font-semibold px-3 py-1">
+                <Badge variant="secondary" className="text-xs font-semibold px-3 py-1">
                   {Math.round((category.badges.filter(b => b.earned).length / category.badges.length) * 100)}%
                 </Badge>
               </div>
