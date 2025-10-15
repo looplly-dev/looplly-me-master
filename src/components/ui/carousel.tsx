@@ -180,14 +180,43 @@ const CarouselItem = React.forwardRef<
 >(({ className, index, ...props }, ref) => {
   const { orientation, api, selectedIndex } = useCarousel()
   const [scale, setScale] = React.useState(1)
+  const [opacity, setOpacity] = React.useState(1)
+  const [blur, setBlur] = React.useState(0)
+  const [zIndex, setZIndex] = React.useState(0)
 
   React.useEffect(() => {
     if (!api || index === undefined) return
 
     const onScroll = () => {
       const distance = Math.abs(selectedIndex - index)
-      const newScale = distance === 0 ? 1.1 : distance === 1 ? 0.95 : 0.85
+      
+      // Dramatic scale calculation
+      let newScale = 1
+      if (distance === 0) newScale = 1.5      // Center - BIG
+      else if (distance === 1) newScale = 0.9  // Adjacent
+      else if (distance === 2) newScale = 0.7  // Far
+      else newScale = 0.5                      // Very far
+      
+      // Opacity calculation for depth
+      let newOpacity = 1
+      if (distance === 0) newOpacity = 1
+      else if (distance === 1) newOpacity = 0.8
+      else if (distance === 2) newOpacity = 0.5
+      else newOpacity = 0.3
+      
+      // Blur calculation for depth
+      let newBlur = 0
+      if (distance === 1) newBlur = 0.5
+      else if (distance === 2) newBlur = 1
+      else if (distance > 2) newBlur = 2
+      
+      // Z-index for proper layering
+      const newZIndex = 10 - distance
+      
       setScale(newScale)
+      setOpacity(newOpacity)
+      setBlur(newBlur)
+      setZIndex(newZIndex)
     }
 
     api.on("scroll", onScroll)
@@ -205,9 +234,14 @@ const CarouselItem = React.forwardRef<
       ref={ref}
       role="group"
       aria-roledescription="slide"
-      style={{ transform: `scale(${scale})` }}
+      style={{ 
+        transform: `scale(${scale})`,
+        opacity: opacity,
+        filter: `blur(${blur}px)`,
+        zIndex: zIndex
+      }}
       className={cn(
-        "min-w-0 shrink-0 grow-0 basis-auto transition-transform duration-300 ease-out",
+        "min-w-0 shrink-0 grow-0 basis-auto transition-all duration-500 ease-out will-change-transform",
         orientation === "horizontal" ? "pl-4" : "pt-4",
         className
       )}
