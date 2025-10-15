@@ -49,9 +49,9 @@
   padding: 0.25rem 0.75rem !important;
 }
   
-  .earn-tab-content {
-    @apply space-y-3 mt-4 max-h-[400px] overflow-y-auto scroll-smooth pb-4 pl-3 pr-0 scrollbar-thin scrollbar-gutter;
-  }
+.earn-tab-content {
+  @apply space-y-3 mt-4 max-h-[400px] overflow-y-auto scroll-smooth pb-8 pl-3 pr-0 scrollbar-thin scrollbar-gutter;
+}
 
   .earn-card {
     @apply py-4 pr-2 pl-2 bg-muted/50;
