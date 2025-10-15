@@ -19,4 +19,51 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    // Optimize bundle size
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        // Manually chunk vendor libraries
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          ui: ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu'],
+          router: ['react-router-dom'],
+          query: ['@tanstack/react-query'],
+          utils: ['clsx', 'tailwind-merge', 'class-variance-authority']
+        },
+        // Optimize chunk names
+        chunkFileNames: 'assets/js/[name]-[hash].js',
+        entryFileNames: 'assets/js/[name]-[hash].js',
+        assetFileNames: 'assets/[ext]/[name]-[hash].[ext]'
+      }
+    },
+    // Enable minification
+    minify: 'esbuild',
+    // Source maps for debugging
+    sourcemap: mode === 'development',
+    // CSS code splitting
+    cssCodeSplit: true,
+    // Target modern browsers for better performance
+    target: ['es2020', 'edge88', 'firefox78', 'chrome87', 'safari13.1']
+  },
+  // Optimize dependency pre-bundling
+  optimizeDeps: {
+    include: [
+      'react',
+      'react-dom',
+      'react-router-dom',
+      '@tanstack/react-query',
+      'lucide-react',
+      'clsx',
+      'tailwind-merge'
+    ]
+  },
+  // Preview optimization
+  preview: {
+    port: 8080,
+    headers: {
+      'Cache-Control': 'public, max-age=31536000'
+    }
+  }
 }));

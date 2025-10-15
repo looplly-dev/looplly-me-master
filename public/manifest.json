@@ -1,0 +1,101 @@
+{
+  "name": "Looplly - Earn Real Money Online",
+  "short_name": "Looplly",
+  "description": "Turn your daily digital activities into cash with Looplly. Earn money through paid surveys, watching videos, sharing data insights, and referring friends.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#6366f1",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en-US",
+  "categories": ["finance", "productivity", "business"],
+  "icons": [
+    {
+      "src": "/favicon-16x16.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-32x32.png", 
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512x512.png",
+      "sizes": "512x512", 
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/earn-page.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "platform": "wide",
+      "label": "Earn money through surveys and videos"
+    },
+    {
+      "src": "/screenshots/wallet-page.png", 
+      "sizes": "390x844",
+      "type": "image/png",
+      "platform": "narrow",
+      "label": "Track your earnings and manage payouts"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Start Earning",
+      "url": "/",
+      "description": "Complete surveys and watch videos to earn money"
+    },
+    {
+      "name": "Check Wallet",
+      "url": "/wallet",
+      "description": "View your balance and transaction history"
+    },
+    {
+      "name": "Refer Friends",
+      "url": "/refer",
+      "description": "Earn money by inviting friends"
+    },
+    {
+      "name": "Community",
+      "url": "/community", 
+      "description": "Connect with other earners"
+    }
+  ],
+  "related_applications": [
+    {
+      "platform": "play",
+      "url": "https://play.google.com/store/apps/details?id=com.looplly.app"
+    },
+    {
+      "platform": "itunes",
+      "url": "https://apps.apple.com/app/looplly/id123456789"
+    }
+  ],
+  "prefer_related_applications": false,
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "protocol_handlers": [
+    {
+      "protocol": "web+looplly",
+      "url": "/refer?code=%s"
+    }
+  ]
+}

@@ -1,14 +1,115 @@
+# Robots.txt for Looplly.me
+# Allow search engines to crawl and index main content
+
+User-agent: *
+Allow: /
+Allow: /wallet
+Allow: /refer
+Allow: /community
+Allow: /profile
+Allow: /rep
+Allow: /settings
+Allow: /support
+
+# Block admin and authentication pages
+Disallow: /admin/
+Disallow: /reset-password
+Disallow: /login
+Disallow: /register
+Disallow: /otp
+Disallow: /api/
+
+# Block private user data
+Disallow: /user/
+Disallow: /account/
+Disallow: /dashboard/private/
+
+# Allow search engines to access important files
+Allow: /sitemap.xml
+Allow: /sitemap-*.xml
+Allow: /robots.txt
+Allow: /favicon.ico
+Allow: /*.css
+Allow: /*.js
+Allow: /*.png
+Allow: /*.jpg
+Allow: /*.jpeg
+Allow: /*.gif
+Allow: /*.svg
+Allow: /*.webp
+
+# Crawl delay to be respectful of server resources
+Crawl-delay: 1
+
+# Point to sitemap
+Sitemap: https://looplly.me/sitemap.xml
+
+# Specific directives for major search engines
 User-agent: Googlebot
 Allow: /
+Crawl-delay: 1
 
 User-agent: Bingbot
+Allow: /
+Crawl-delay: 2
+
+User-agent: Slurp
+Allow: /
+Crawl-delay: 2
+
+# Block aggressive crawlers that don't provide value
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+# AI training crawlers - allow with restrictions
+User-agent: GPTBot
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Crawl-delay: 5
+
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Crawl-delay: 5
+
+User-agent: CCBot
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Crawl-delay: 5
+
+User-agent: anthropic-ai
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Crawl-delay: 5
+
+User-agent: Claude-Web
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Crawl-delay: 5
+
+# Social media crawlers
+User-agent: facebookexternalhit/*
 Allow: /
 
 User-agent: Twitterbot
 Allow: /
 
-User-agent: facebookexternalhit
+User-agent: LinkedInBot
 Allow: /
 
-User-agent: *
+User-agent: WhatsApp
+Allow: /
+
+User-agent: TelegramBot
 Allow: /
