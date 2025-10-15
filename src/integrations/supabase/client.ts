@@ -1,11 +1,13 @@
-// This file uses hybrid environment configuration to work in all deployment scenarios
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
-import { coreSupabaseConfig } from '@/config/hybridEnv';
 
-// Use core config for immediate Supabase client creation
-const SUPABASE_URL = coreSupabaseConfig.VITE_SUPABASE_URL;
-const SUPABASE_PUBLISHABLE_KEY = coreSupabaseConfig.VITE_SUPABASE_PUBLISHABLE_KEY;
+// Use direct environment variables to avoid initialization issues
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+
+if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
+  throw new Error('Missing Supabase environment variables. Please check your .env file.');
+}
 
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
