@@ -357,13 +357,16 @@ export default function SimplifiedEarnTab() {
       <div className="space-y-4">
         {/* Ready to Earn with Tabs */}
         <Card className="bg-card shadow-sm border">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center justify-between">
-              <span className="flex items-center gap-2">
-                <Target className="h-5 w-5 text-primary" />
-                Ready to Earn
+          <CardHeader className="pb-3 px-4 pt-4">
+            <CardTitle className="flex items-center justify-between gap-2">
+              <span className="flex items-center gap-1.5 md:gap-2 text-base md:text-2xl">
+                <Target className="h-4 w-4 md:h-5 md:w-5 text-primary flex-shrink-0" />
+                <span className="leading-tight">Ready to Earn</span>
               </span>
-              <Badge variant="secondary" className="bg-primary/20 text-foreground border border-primary/30 text-sm px-3 py-1 font-semibold">
+              <Badge 
+                variant="secondary" 
+                className="bg-primary/20 text-foreground border border-primary/30 px-2 py-0.5 md:px-3 md:py-1 font-semibold text-xs md:text-sm whitespace-nowrap flex-shrink-0"
+              >
                 {totalAvailable} available
               </Badge>
             </CardTitle>

@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 export const useWebVitals = () => {
   const [vitals, setVitals] = useState<{
     lcp?: number;
-    fid?: number;
+    inp?: number;
     cls?: number;
     fcp?: number;
     ttfb?: number;
@@ -20,8 +20,8 @@ export const useWebVitals = () => {
           setVitals(prev => ({ ...prev, lcp: metric.value }));
         });
         
-        webVitals.onFID((metric) => {
-          setVitals(prev => ({ ...prev, fid: metric.value }));
+        webVitals.onINP((metric) => {
+          setVitals(prev => ({ ...prev, inp: metric.value }));
         });
         
         webVitals.onCLS((metric) => {
