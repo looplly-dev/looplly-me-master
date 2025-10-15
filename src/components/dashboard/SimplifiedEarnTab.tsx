@@ -261,7 +261,7 @@ export default function SimplifiedEarnTab() {
       <div className="py-4 md:p-6 lg:p-8 pb-24 md:pb-20 lg:pb-8 space-y-3">
         {/* Enhanced Balance Card with Progress */}
         <Card className="bg-card border-0 shadow-lg">
-          <CardContent className="p-6">
+          <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
                 <div className="flex items-center gap-2 mb-2">
