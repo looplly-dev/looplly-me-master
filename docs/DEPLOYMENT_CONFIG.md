@@ -35,9 +35,9 @@ This application uses a **hybrid configuration system** that works seamlessly ac
 Add these **3 variables** in Netlify Site Settings → Environment Variables:
 
 ```bash
-VITE_SUPABASE_URL=https://chlqpvzreztzxmjjdjpk.supabase.co
-VITE_SUPABASE_PUBLISHABLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNobHFwdnpyZXp0enhtampkanBrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjg4OTc3OTIsImV4cCI6MjA0NDQ3Mzc5Mn0.your-actual-anon-key-here
-VITE_SUPABASE_PROJECT_ID=chlqpvzreztzxmjjdjpk
+VITE_SUPABASE_URL=https://your-project-id.supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=your-anon-key-here
+VITE_SUPABASE_PROJECT_ID=your-project-id
 ```
 
 ### Optional Variables
