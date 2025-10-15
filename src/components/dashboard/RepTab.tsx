@@ -430,19 +430,16 @@ export default function RepTab() {
           {badgeCategories.map((category) => (
             <div key={category.name} className="space-y-4">
               {/* Category Header with Progress */}
-              <div className="flex items-center justify-between">
-                <h4 className="text-sm font-semibold text-foreground flex items-center gap-2">
-                  <category.icon className="h-4 w-4" />
-                  {category.name}
-                </h4>
-                <div className="flex items-center gap-2">
-                  <Badge variant="outline" className="text-xs">
-                    {category.badges.filter(b => b.earned).length}/{category.badges.length}
-                  </Badge>
-                  <div className="text-xs text-muted-foreground">
-                    Tap for details
+              <div className="flex items-center justify-between mb-6 pb-3 border-b border-border/50">
+                <h3 className="text-lg font-bold text-foreground flex items-center gap-3">
+                  <div className="p-2 bg-primary/10 rounded-lg">
+                    <category.icon className="h-5 w-5 text-primary" />
                   </div>
-                </div>
+                  {category.name}
+                </h3>
+                <Badge variant="secondary" className="text-sm font-semibold px-3 py-1">
+                  {category.badges.filter(b => b.earned).length}/{category.badges.length}
+                </Badge>
               </div>
 
               {/* Badge Carousel */}
@@ -468,8 +465,6 @@ export default function RepTab() {
                     </CarouselItem>
                   ))}
                 </CarouselContent>
-                <CarouselPrevious className="hidden sm:flex" />
-                <CarouselNext className="hidden sm:flex" />
               </Carousel>
 
               {/* Progress Bar for Category */}
