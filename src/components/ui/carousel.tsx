@@ -26,6 +26,7 @@ type CarouselContextProps = {
   scrollNext: () => void
   canScrollPrev: boolean
   canScrollNext: boolean
+  selectedIndex: number
 } & CarouselProps
 
 const CarouselContext = React.createContext<CarouselContextProps | null>(null)
@@ -65,6 +66,7 @@ const Carousel = React.forwardRef<
     )
     const [canScrollPrev, setCanScrollPrev] = React.useState(false)
     const [canScrollNext, setCanScrollNext] = React.useState(false)
+    const [selectedIndex, setSelectedIndex] = React.useState(0)
 
     const onSelect = React.useCallback((api: CarouselApi) => {
       if (!api) {
@@ -73,6 +75,7 @@ const Carousel = React.forwardRef<
 
       setCanScrollPrev(api.canScrollPrev())
       setCanScrollNext(api.canScrollNext())
+      setSelectedIndex(api.selectedScrollSnap())
     }, [])
 
     const scrollPrev = React.useCallback(() => {
@@ -130,6 +133,7 @@ const Carousel = React.forwardRef<
           scrollNext,
           canScrollPrev,
           canScrollNext,
+          selectedIndex,
         }}
       >
         <div
@@ -172,17 +176,38 @@ CarouselContent.displayName = "CarouselContent"
 
 const CarouselItem = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => {
-  const { orientation } = useCarousel()
+  React.HTMLAttributes<HTMLDivElement> & { index?: number }
+>(({ className, index, ...props }, ref) => {
+  const { orientation, api, selectedIndex } = useCarousel()
+  const [scale, setScale] = React.useState(1)
+
+  React.useEffect(() => {
+    if (!api || index === undefined) return
+
+    const onScroll = () => {
+      const distance = Math.abs(selectedIndex - index)
+      const newScale = distance === 0 ? 1.1 : distance === 1 ? 0.95 : 0.85
+      setScale(newScale)
+    }
+
+    api.on("scroll", onScroll)
+    api.on("select", onScroll)
+    onScroll() // Initial calculation
+
+    return () => {
+      api.off("scroll", onScroll)
+      api.off("select", onScroll)
+    }
+  }, [api, selectedIndex, index])
 
   return (
     <div
       ref={ref}
       role="group"
       aria-roledescription="slide"
+      style={{ transform: `scale(${scale})` }}
       className={cn(
-        "min-w-0 shrink-0 grow-0 basis-full",
+        "min-w-0 shrink-0 grow-0 basis-auto transition-transform duration-300 ease-out",
         orientation === "horizontal" ? "pl-4" : "pt-4",
         className
       )}

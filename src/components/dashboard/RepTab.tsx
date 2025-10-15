@@ -448,15 +448,16 @@ export default function RepTab() {
               {/* Badge Carousel */}
               <Carousel
                 opts={{
-                  align: "start",
-                  loop: false,
+                  align: "center",
+                  loop: true,
                   dragFree: true,
+                  containScroll: "trimSnaps",
                 }}
                 className="w-full"
               >
-                <CarouselContent className="ml-0 gap-3 py-1">
-                  {category.badges.map((badge) => (
-                    <CarouselItem key={badge.id} className="basis-auto pl-0">
+                <CarouselContent className="ml-0 gap-6 py-6">
+                  {category.badges.map((badge, index) => (
+                    <CarouselItem key={badge.id} index={index} className="basis-auto pl-0">
                       <CollectibleBadge 
                         badge={badge} 
                         size="md"
