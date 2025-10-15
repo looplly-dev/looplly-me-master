@@ -430,7 +430,7 @@ export default function RepTab() {
                   {category.name}
                 </h3>
                 <Badge variant="secondary" className="text-sm font-semibold px-3 py-1">
-                  {category.badges.filter(b => b.earned).length}/{category.badges.length}
+                  {Math.round((category.badges.filter(b => b.earned).length / category.badges.length) * 100)}%
                 </Badge>
               </div>
 
