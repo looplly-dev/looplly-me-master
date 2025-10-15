@@ -238,7 +238,8 @@ const CarouselItem = React.forwardRef<
         transform: `scale(${scale})`,
         opacity: opacity,
         filter: `blur(${blur}px)`,
-        zIndex: zIndex
+        zIndex: zIndex,
+        transformOrigin: 'center center'
       }}
       className={cn(
         "min-w-0 shrink-0 grow-0 basis-auto transition-all duration-500 ease-out will-change-transform",
