@@ -1,5 +1,4 @@
 import { auditLogger } from './auditLogger';
-import { isProduction } from '@/config/env';
 
 export interface SecurityError extends Error {
   code?: string;
@@ -18,7 +17,7 @@ class ErrorHandler {
     /session/i,
   ];
 
-  private isProduction = isProduction;
+  private isProduction = import.meta.env.NODE_ENV === 'production';
 
   public sanitizeError(error: any): { message: string; code?: string } {
     if (!error) {
