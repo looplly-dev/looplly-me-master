@@ -357,7 +357,7 @@ export default function SimplifiedEarnTab() {
       <div className="space-y-4">
         {/* Ready to Earn with Tabs */}
         <Card className="bg-card shadow-sm border">
-          <CardHeader className="pb-3 px-4 pt-4">
+          <CardHeader className="pb-3 px-4 pt-2">
             <CardTitle className="flex items-center justify-between gap-2">
               <span className="flex items-center gap-1.5 md:gap-2 text-lg md:text-[26px]">
                 <Target className="h-4 w-4 md:h-5 md:w-5 text-primary flex-shrink-0" />
