@@ -183,7 +183,7 @@ export function CollectibleBadge({ badge, size = 'md', onClick }: CollectibleBad
 
   return (
     <div 
-      className="relative group touch-manipulation cursor-pointer"
+      className="relative group touch-manipulation cursor-pointer overflow-visible"
       onClick={onClick}
     >
       <div
