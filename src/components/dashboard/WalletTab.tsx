@@ -28,7 +28,7 @@ import { useBalance } from '@/hooks/useBalance';
 import { useTransactions } from '@/hooks/useTransactions';
 import { useAuth } from '@/hooks/useAuth';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { mockTransactions, getAccountantStatusText, getAccountantStatusColor } from '@/data/mockTransactionsData';
+import { mockTransactions, getAccountantStatusText, getAccountantStatusColor } from '@/mock_data';
 
 export default function WalletTab() {
   const { balance, isLoading: balanceLoading } = useBalance();

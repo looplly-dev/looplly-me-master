@@ -25,7 +25,7 @@ import {
   CheckCircle,
   Star
 } from 'lucide-react';
-import { mockCommunityPosts, CommunityPost } from '@/data/mockData';
+import { mockCommunityPosts, type CommunityPost } from '@/mock_data';
 import { useToast } from '@/hooks/use-toast';
 
 export default function CommunityTab() {

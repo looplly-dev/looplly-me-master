@@ -1,5 +1,13 @@
 import { supabase } from '@/integrations/supabase/client';
-import { expandedBadgeCategories } from '@/data/expandedBadges';
+import { badgeSystem } from '@/mock_data';
+
+// Create expandedBadgeCategories for backward compatibility
+const expandedBadgeCategories = {
+  socialConnector: badgeSystem.socialConnector,
+  speedDemon: badgeSystem.speedDemon,
+  perfectionist: badgeSystem.perfectionist,
+  explorer: badgeSystem.explorer
+};
 
 interface GenerateBadgeParams {
   badgeId: string;

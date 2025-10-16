@@ -23,7 +23,7 @@ import {
   Minimize2,
   Zap
 } from 'lucide-react';
-import { userStats } from '@/data/mockData';
+import { userStats } from '@/mock_data';
 import { useAuth } from '@/hooks/useAuth';
 import { CollectibleBadge } from '@/components/ui/collectible-badge';
 import { BadgeDetailModal } from '@/components/ui/badge-detail-modal';

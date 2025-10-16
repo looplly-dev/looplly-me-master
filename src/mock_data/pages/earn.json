@@ -1,0 +1,114 @@
+{
+  "surveys": [
+    {
+      "id": "1",
+      "title": "Shopping Habits Survey",
+      "estimatedMinutes": 12,
+      "reward": 2.50,
+      "status": "available",
+      "description": "Tell us about your shopping preferences",
+      "category": "Consumer Research",
+      "rating": {
+        "average": 4.2,
+        "count": 284
+      }
+    },
+    {
+      "id": "2",
+      "title": "Food & Dining Preferences",
+      "estimatedMinutes": 8,
+      "reward": 1.50,
+      "status": "available",
+      "description": "Share your dining and food preferences",
+      "category": "Food & Beverage",
+      "rating": {
+        "average": 4.7,
+        "count": 156
+      }
+    },
+    {
+      "id": "3",
+      "title": "Technology Usage Study",
+      "estimatedMinutes": 15,
+      "reward": 3.00,
+      "status": "ineligible",
+      "description": "Survey about technology and device usage",
+      "category": "Technology",
+      "rating": {
+        "average": 3.8,
+        "count": 92
+      }
+    },
+    {
+      "id": "4",
+      "title": "Travel & Vacation Survey",
+      "estimatedMinutes": 10,
+      "reward": 2.00,
+      "status": "completed",
+      "description": "Your travel experiences and preferences",
+      "category": "Travel",
+      "rating": {
+        "average": 4.5,
+        "count": 203
+      }
+    }
+  ],
+  "videos": [
+    {
+      "id": "1",
+      "title": "Product Demo: Smart Home Devices",
+      "estimatedMinutes": 3,
+      "reward": 0.50,
+      "status": "available",
+      "thumbnail": "🏠",
+      "description": "Watch a demo of the latest smart home technology"
+    },
+    {
+      "id": "2",
+      "title": "Financial Planning Tips",
+      "estimatedMinutes": 5,
+      "reward": 0.75,
+      "status": "available",
+      "thumbnail": "💰",
+      "description": "Learn about saving and investment strategies"
+    },
+    {
+      "id": "3",
+      "title": "Health & Wellness Guide",
+      "estimatedMinutes": 4,
+      "reward": 0.60,
+      "status": "completed",
+      "thumbnail": "🏃‍♂️",
+      "description": "Tips for maintaining a healthy lifestyle"
+    }
+  ],
+  "microTasks": [
+    {
+      "id": "1",
+      "title": "Rate this Advertisement",
+      "type": "rating",
+      "reward": 0.25,
+      "status": "available",
+      "description": "Rate the effectiveness of this ad",
+      "estimatedMinutes": 1
+    },
+    {
+      "id": "2",
+      "title": "Quick Poll: Favorite Color",
+      "type": "poll",
+      "reward": 0.15,
+      "status": "available",
+      "description": "One-question poll about color preferences",
+      "estimatedMinutes": 1
+    },
+    {
+      "id": "3",
+      "title": "Logo Preference Survey",
+      "type": "quick_survey",
+      "reward": 0.30,
+      "status": "completed",
+      "description": "Choose your preferred logo design",
+      "estimatedMinutes": 2
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "demoActivities": [
+    {
+      "activity_type": "survey",
+      "title": "Consumer Preferences Survey",
+      "description": "Share your shopping preferences to help brands improve their products",
+      "reward_amount": 2.50,
+      "time_estimate": 8,
+      "status": "available",
+      "provider": "Pollfish",
+      "metadata": { "difficulty": "easy", "category": "shopping" }
+    },
+    {
+      "activity_type": "video",
+      "title": "Tech Product Demo",
+      "description": "Watch a 3-minute product demonstration video",
+      "reward_amount": 0.75,
+      "time_estimate": 3,
+      "status": "available",
+      "provider": "AdColony",
+      "metadata": { "category": "technology" }
+    },
+    {
+      "activity_type": "task",
+      "title": "App Store Review",
+      "description": "Download and write a review for a mobile app",
+      "reward_amount": 1.25,
+      "time_estimate": 5,
+      "status": "available",
+      "provider": "AppLovin",
+      "metadata": { "platform": "mobile" }
+    },
+    {
+      "activity_type": "task",
+      "title": "Enroll in Qual Study",
+      "description": "Join a focus group or research study in your area - higher rewards for in-person participation",
+      "reward_amount": 75.00,
+      "time_estimate": 90,
+      "status": "available",
+      "provider": "Research Partners",
+      "metadata": { "platform": "in-person", "category": "research", "difficulty": "easy", "rating": "4.8", "reviews": "127" }
+    },
+    {
+      "activity_type": "survey",
+      "title": "Food & Dining Habits",
+      "description": "Tell us about your eating habits and restaurant preferences",
+      "reward_amount": 3.00,
+      "time_estimate": 12,
+      "status": "available",
+      "provider": "SurveyMonkey",
+      "metadata": { "difficulty": "medium", "category": "lifestyle" }
+    }
+  ],
+  "minimalDemoActivities": [
+    {
+      "activity_type": "task",
+      "title": "Enroll in Qual Study",
+      "description": "Join a focus group or research study in your area - higher rewards for in-person participation",
+      "reward_amount": 75.00,
+      "time_estimate": 90,
+      "status": "available",
+      "provider": "Research Partners",
+      "metadata": { "platform": "in-person", "category": "research", "difficulty": "easy", "rating": "4.8", "reviews": "127" }
+    },
+    {
+      "activity_type": "task",
+      "title": "App Store Review",
+      "description": "Download and write a review for a mobile app",
+      "reward_amount": 1.25,
+      "time_estimate": 5,
+      "status": "available",
+      "provider": "AppLovin",
+      "metadata": { "platform": "mobile", "rating": "4.2", "reviews": "89" }
+    }
+  ]
+}

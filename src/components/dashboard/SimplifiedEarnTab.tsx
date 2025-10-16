@@ -45,7 +45,7 @@ import { useCintSurveys } from '@/hooks/useCintSurveys';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { addMissingDemoActivities } from '@/utils/addMissingDemoActivities';
 import { addMockEarningActivities } from '@/utils/mockEarningActivities';
-import { userStats } from '@/data/mockData';
+import { userStats } from '@/mock_data';
 
 export default function SimplifiedEarnTab() {
   const [checkInDone, setCheckInDone] = useState(false);

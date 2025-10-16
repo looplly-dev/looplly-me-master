@@ -1,0 +1,77 @@
+{
+  "userStats": {
+    "totalEarnings": "$186.25",
+    "currentBalance": "$12.50",
+    "surveysCompleted": 47,
+    "videosWatched": 23,
+    "tasksCompleted": 35,
+    "streaks": {
+      "currentStreak": 32,
+      "longestStreak": 89,
+      "daysUntilMonthlyMilestone": 28,
+      "monthsUntilYearly": 11,
+      "milestones": {
+        "weekly": { "achieved": true, "count": 4 },
+        "monthly": { "achieved": true, "count": 1 },
+        "quarterly": { "achieved": false, "count": 0 },
+        "yearly": { "achieved": false, "count": 0 }
+      }
+    },
+    "referrals": {
+      "invited": 3,
+      "joined": 2,
+      "qualified": 1,
+      "earnings": "$1.50"
+    },
+    "reputation": {
+      "score": 1247,
+      "level": "Diamond I",
+      "tier": "Diamond",
+      "prestige": 1,
+      "nextLevelThreshold": 2000,
+      "history": [
+        { "action": "Monthly Streak Milestone", "points": 50, "date": "2024-01-15" },
+        { "action": "Survey Completed", "points": 15, "date": "2024-01-15" },
+        { "action": "Daily Streak (Day 32)", "points": 25, "date": "2024-01-14" },
+        { "action": "KYC Verification Complete", "points": 50, "date": "2024-01-12" },
+        { "action": "Quality Bonus", "points": 10, "date": "2024-01-10" },
+        { "action": "Speed Penalty", "points": -5, "date": "2024-01-08" }
+      ],
+      "qualityMetrics": {
+        "surveysCompleted": 47,
+        "surveysRejected": 2,
+        "averageTime": "3m 45s",
+        "consistencyScore": 94,
+        "speedingRate": 4
+      }
+    },
+    "kyc": {
+      "verified": true,
+      "status": "verified",
+      "provider": "Soulbase Identity"
+    },
+    "verification": {
+      "otpVerified": true,
+      "gpsEnabled": true,
+      "kycVerified": true,
+      "cryptoToken": false,
+      "communicationsEnabled": true
+    },
+    "permissions": {
+      "sms": true,
+      "whatsapp": true,
+      "email": true,
+      "pushNotifications": true
+    },
+    "pendingPayments": [
+      { "id": "1", "amount": "$5.00", "method": "PayPal", "date": "2024-01-14", "status": "awaiting_revenue" },
+      { "id": "2", "amount": "$2.50", "method": "M-Pesa", "date": "2024-01-13", "status": "processing" }
+    ],
+    "community": {
+      "postsCreated": 5,
+      "totalVotes": 23,
+      "reputationFromPosts": 15,
+      "moderationPenalties": 0
+    }
+  }
+}

@@ -5,12 +5,10 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { CheckCircle, XCircle } from 'lucide-react';
 
+import { mockRedemptions } from '@/mock_data';
+
 function AdminRedemptionsContent() {
-  // Mock data - will be replaced with real data from database
-  const mockRedemptions = [
-    { id: 1, user: 'John Doe', amount: 500, status: 'pending', date: '2025-01-09' },
-    { id: 2, user: 'Jane Smith', amount: 1000, status: 'pending', date: '2025-01-08' },
-  ];
+  // Mock data from centralized location
 
   return (
     <div className="space-y-6">

@@ -1,0 +1,141 @@
+{
+  "posts": [
+    {
+      "id": "1",
+      "type": "tip",
+      "title": "Maximize Survey Earnings",
+      "content": "Always complete your profile 100% before starting surveys. This increases qualification rates by 40%!",
+      "author": {
+        "id": "user1",
+        "name": "Sarah M.",
+        "avatar": "👩‍💼",
+        "reputation": 89
+      },
+      "votes": { "up": 24, "down": 2 },
+      "createdAt": "2024-01-15T10:30:00Z",
+      "status": "approved",
+      "moderationScore": {
+        "relevance": 95,
+        "quality": 88,
+        "toxicity": 5
+      },
+      "category": "earnings",
+      "reputationImpact": 5
+    },
+    {
+      "id": "2",
+      "type": "poll",
+      "title": "What earning method do you prefer?",
+      "content": "Help us understand what types of activities our community enjoys most.",
+      "author": {
+        "id": "admin",
+        "name": "Looplly Team",
+        "avatar": "🎯",
+        "reputation": 100
+      },
+      "votes": { "up": 18, "down": 0 },
+      "createdAt": "2024-01-14T15:45:00Z",
+      "status": "approved",
+      "pollOptions": [
+        { "option": "Surveys", "votes": 45 },
+        { "option": "Video watching", "votes": 23 },
+        { "option": "Micro tasks", "votes": 31 },
+        { "option": "Focus groups", "votes": 12 }
+      ],
+      "category": "feedback"
+    },
+    {
+      "id": "3",
+      "type": "suggestion",
+      "title": "Add dark mode to the app",
+      "content": "Would love to see a dark mode option for better nighttime usage. Many other apps have this feature.",
+      "author": {
+        "id": "user2",
+        "name": "Mike R.",
+        "avatar": "🧑‍💻",
+        "reputation": 67
+      },
+      "votes": { "up": 15, "down": 3, "userVote": "up" },
+      "createdAt": "2024-01-13T20:15:00Z",
+      "status": "approved",
+      "moderationScore": {
+        "relevance": 85,
+        "quality": 75,
+        "toxicity": 0
+      },
+      "category": "feature-request",
+      "reputationImpact": 3
+    },
+    {
+      "id": "4",
+      "type": "tip",
+      "title": "Best times to check for new surveys",
+      "content": "I've noticed most new surveys are posted between 9-11 AM EST and 3-5 PM EST. Set reminders!",
+      "author": {
+        "id": "user3",
+        "name": "Lisa K.",
+        "avatar": "⏰",
+        "reputation": 72
+      },
+      "votes": { "up": 12, "down": 1 },
+      "createdAt": "2024-01-12T14:20:00Z",
+      "status": "approved",
+      "category": "timing",
+      "reputationImpact": 2
+    },
+    {
+      "id": "5",
+      "type": "suggestion",
+      "title": "Add cryptocurrency payout option",
+      "content": "Please consider adding Bitcoin or Ethereum as payout options alongside PayPal and bank transfers.",
+      "author": {
+        "id": "user4",
+        "name": "Alex P.",
+        "avatar": "₿",
+        "reputation": 45
+      },
+      "votes": { "up": 8, "down": 7 },
+      "createdAt": "2024-01-11T11:30:00Z",
+      "status": "pending",
+      "category": "payments"
+    },
+    {
+      "id": "6",
+      "type": "tip",
+      "title": "Avoid survey speeding penalties",
+      "content": "Take your time with surveys. I got penalized for completing a 15-minute survey in 3 minutes. Quality over speed!",
+      "author": {
+        "id": "user5",
+        "name": "Tom L.",
+        "avatar": "🐢",
+        "reputation": 55
+      },
+      "votes": { "up": 20, "down": 0 },
+      "createdAt": "2024-01-10T16:45:00Z",
+      "status": "approved",
+      "moderationScore": {
+        "relevance": 92,
+        "quality": 85,
+        "toxicity": 0
+      },
+      "category": "warnings",
+      "reputationImpact": 4
+    },
+    {
+      "id": "7",
+      "type": "suggestion",
+      "title": "More detailed survey descriptions",
+      "content": "Would be helpful to know the general topic before starting a survey to avoid disqualifications.",
+      "author": {
+        "id": "user6",
+        "name": "Emma W.",
+        "avatar": "📝",
+        "reputation": 61
+      },
+      "votes": { "up": 11, "down": 2 },
+      "createdAt": "2024-01-09T09:15:00Z",
+      "status": "approved",
+      "category": "user-experience"
+    }
+  ]
+}

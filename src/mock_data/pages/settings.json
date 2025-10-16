@@ -1,0 +1,16 @@
+{
+  "userPreferences": {
+    "notifications": {
+      "email": true,
+      "push": true,
+      "sms": false
+    },
+    "privacy": {
+      "profileVisible": true,
+      "showEarnings": false,
+      "showStreak": true
+    },
+    "language": "en",
+    "timezone": "UTC"
+  }
+}

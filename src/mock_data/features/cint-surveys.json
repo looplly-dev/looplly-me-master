@@ -1,0 +1,55 @@
+{
+  "surveys": [
+    {
+      "id": "cint-001",
+      "title": "Consumer Shopping Habits",
+      "description": "Share your thoughts on online shopping preferences and habits",
+      "reward_amount": 3.50,
+      "time_estimate": 8,
+      "category": "Consumer Research",
+      "provider": "cint",
+      "qualification_score": 85,
+      "completion_rate": 92,
+      "status": "available",
+      "metadata": {
+        "target_audience": "Adults 18-54",
+        "difficulty_level": "easy",
+        "survey_type": "consumer"
+      }
+    },
+    {
+      "id": "cint-002",
+      "title": "Brand Perception Study",
+      "description": "Help us understand how consumers view different brands",
+      "reward_amount": 5.00,
+      "time_estimate": 12,
+      "category": "Market Research",
+      "provider": "cint",
+      "qualification_score": 78,
+      "completion_rate": 89,
+      "status": "available",
+      "metadata": {
+        "target_audience": "Adults 25-65",
+        "difficulty_level": "medium",
+        "survey_type": "consumer"
+      }
+    },
+    {
+      "id": "cint-003",
+      "title": "Technology Usage Survey",
+      "description": "Share insights about your technology and device usage",
+      "reward_amount": 2.75,
+      "time_estimate": 6,
+      "category": "Technology",
+      "provider": "cint",
+      "qualification_score": 90,
+      "completion_rate": 94,
+      "status": "available",
+      "metadata": {
+        "target_audience": "Tech users 18-45",
+        "difficulty_level": "easy",
+        "survey_type": "consumer"
+      }
+    }
+  ]
+}
