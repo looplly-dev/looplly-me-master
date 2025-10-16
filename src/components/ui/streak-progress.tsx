@@ -55,7 +55,7 @@ export function StreakProgress({
       
       <CardContent className="space-y-3">
         {/* Current Streak Display */}
-        <div className="text-center p-3 bg-background/50 rounded-lg">
+        <div className="text-center p-3 bg-background/50 dark:bg-background/70 rounded-lg border border-border/50">
           <div className="text-3xl font-bold text-primary mb-1">
             {currentStreak}
           </div>
@@ -67,11 +67,11 @@ export function StreakProgress({
 
         {/* Streak Stats */}
         <div className="grid grid-cols-2 gap-3">
-          <div className="text-center p-2 bg-secondary/30 rounded-lg">
+          <div className="text-center p-2 bg-secondary/30 dark:bg-secondary/40 rounded-lg border border-secondary/20 dark:border-secondary/30">
             <p className="text-lg font-bold text-foreground">{longestStreak}</p>
             <p className="text-xs text-muted-foreground">Longest Streak</p>
           </div>
-          <div className="text-center p-2 bg-warning/10 rounded-lg">
+          <div className="text-center p-2 bg-warning/10 dark:bg-warning/20 rounded-lg border border-warning/20 dark:border-warning/30">
             <p className="text-lg font-bold text-warning">{daysUntilMonthlyMilestone}</p>
             <p className="text-xs text-muted-foreground">Days to Monthly</p>
           </div>
@@ -115,7 +115,7 @@ export function StreakProgress({
               'p-1.5 rounded border text-center',
               milestones.weekly.achieved 
                 ? 'bg-success/10 border-success/30' 
-                : 'bg-gray-50 border-gray-200'
+                : 'bg-muted/30 border-border dark:bg-muted/20 dark:border-muted'
             )}>
               <p className="text-xs font-medium">Week Warrior</p>
               <p className="text-xs text-muted-foreground">
@@ -127,7 +127,7 @@ export function StreakProgress({
               'p-1.5 rounded border text-center',
               milestones.monthly.achieved
                 ? 'bg-primary/10 border-primary/30' 
-                : 'bg-gray-50 border-gray-200'
+                : 'bg-muted/30 border-border dark:bg-muted/20 dark:border-muted'
             )}>
               <p className="text-xs font-medium">Month Master</p>
               <p className="text-xs text-muted-foreground">
@@ -139,7 +139,7 @@ export function StreakProgress({
               'p-1.5 rounded border text-center',
               milestones.quarterly.achieved
                 ? 'bg-warning/10 border-warning/30' 
-                : 'bg-gray-50 border-gray-200'
+                : 'bg-muted/30 border-border dark:bg-muted/20 dark:border-muted'
             )}>
               <p className="text-xs font-medium">Quarter Champion</p>
               <p className="text-xs text-muted-foreground">
@@ -151,7 +151,7 @@ export function StreakProgress({
               'p-1.5 rounded border text-center',
               milestones.yearly.achieved
                 ? 'bg-purple/10 border-purple/30' 
-                : 'bg-gray-50 border-gray-200'
+                : 'bg-muted/30 border-border dark:bg-muted/20 dark:border-muted'
             )}>
               <p className="text-xs font-medium">Annual Legend</p>
               <p className="text-xs text-muted-foreground">
