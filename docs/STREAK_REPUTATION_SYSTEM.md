@@ -1038,9 +1038,9 @@ Provides default reputation data for development and testing:
 
 **File**: `.env`
 ```env
-VITE_SUPABASE_URL=https://kzqcfrubjccxrwfkkrze.supabase.co
+VITE_SUPABASE_URL=https://chlqpvzreztzxmjjdjpk.supabase.co
 VITE_SUPABASE_PUBLISHABLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-VITE_SUPABASE_PROJECT_ID=kzqcfrubjccxrwfkkrze
+VITE_SUPABASE_PROJECT_ID=chlqpvzreztzxmjjdjpk
 ```
 
 **Behavior**:

@@ -30,9 +30,9 @@ export default function MigrationHelper() {
   });
 
   const currentConfig = {
-    projectId: 'kzqcfrubjccxrwfkkrze',
-    url: 'https://kzqcfrubjccxrwfkkrze.supabase.co',
-    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt6cWNmcnViamNjeHJ3ZmtrcnplIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwNjI4ODEsImV4cCI6MjA3NTYzODg4MX0.yCLjMC7QcM-RNHFxOdQb7O0C7yq0D9e3bP7kyrL0u3E',
+    projectId: 'chlqpvzreztzxmjjdjpk',
+    url: 'https://chlqpvzreztzxmjjdjpk.supabase.co',
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNobHFwdnpyZXp0enhtampkanBrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0MDUzOTcsImV4cCI6MjA3NTk4MTM5N30.2Gh1mfj43B4b_n78WEEPD9_8uS8eUgpl0AIEFC5T5_I',
   };
 
   const copyToClipboard = (text: string, label: string) => {

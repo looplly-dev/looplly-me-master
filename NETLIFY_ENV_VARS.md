@@ -7,9 +7,9 @@ Set these exact variables in your Netlify Dashboard:
 
 ```bash
 # Supabase Configuration
-VITE_SUPABASE_URL=https://kzqcfrubjccxrwfkkrze.supabase.co
-VITE_SUPABASE_PUBLISHABLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt6cWNmcnViamNjeHJ3ZmtrcnplIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwNjI4ODEsImV4cCI6MjA3NTYzODg4MX0.yCLjMC7QcM-RNHFxOdQb7O0C7yq0D9e3bP7kyrL0u3E
-VITE_SUPABASE_PROJECT_ID=kzqcfrubjccxrwfkkrze
+VITE_SUPABASE_URL=https://chlqpvzreztzxmjjdjpk.supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNobHFwdnpyZXp0enhtampkanBrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0MDUzOTcsImV4cCI6MjA3NTk4MTM5N30.2Gh1mfj43B4b_n78WEEPD9_8uS8eUgpl0AIEFC5T5_I
+VITE_SUPABASE_PROJECT_ID=chlqpvzreztzxmjjdjpk
 
 # Application Environment
 NODE_ENV=production
@@ -41,7 +41,7 @@ If you still see authentication errors:
 - Clear browser cache after deployment
 
 ## Project IDs Found:
-- **Current/Correct**: kzqcfrubjccxrwfkkrze (in local .env)
-- **Old/Incorrect**: chilqvzreetzamijdjqk (was in Netlify deployment)
+- **Current/Correct**: chlqpvzreztzxmjjdjpk (unified project)
+- **Old/Incorrect**: kzqcfrubjccxrwfkkrze (was in development)
 
 Make sure to use the **Current/Correct** project ID in all Netlify environment variables.
