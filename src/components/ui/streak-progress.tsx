@@ -135,58 +135,59 @@ export function StreakProgress({
         {/* Next Milestone Progress - Circular Design */}
         <div className={cn("p-4 rounded-lg border", nextMilestone.colorClass)}>
           <div className="flex items-center gap-4">
-            {/* Circular Progress */}
-            <div className="relative flex-shrink-0">
-              <svg className="w-24 h-24 transform -rotate-90">
-                {/* Background circle */}
-                <circle
-                  cx="48"
-                  cy="48"
-                  r="40"
-                  stroke="currentColor"
-                  strokeWidth="6"
-                  fill="none"
-                  className="text-muted/30"
-                />
-                {/* Progress circle */}
-                <circle
-                  cx="48"
-                  cy="48"
-                  r="40"
-                  stroke="currentColor"
-                  strokeWidth="6"
-                  fill="none"
-                  strokeDasharray={`${2 * Math.PI * 40}`}
-                  strokeDashoffset={`${2 * Math.PI * 40 * (1 - nextMilestone.progress / 100)}`}
-                  className={nextMilestone.textClass}
-                  strokeLinecap="round"
-                />
-              </svg>
-              {/* Center content */}
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-3xl">{nextMilestone.emoji}</span>
-                <span className={cn("text-lg font-bold", nextMilestone.textClass)}>
-                  {Math.round(nextMilestone.progress)}%
-                </span>
+            {/* Circular Progress with day count below */}
+            <div className="flex-shrink-0 flex flex-col items-center gap-1">
+              <div className="relative">
+                <svg className="w-24 h-24 transform -rotate-90">
+                  {/* Background circle */}
+                  <circle
+                    cx="48"
+                    cy="48"
+                    r="40"
+                    stroke="currentColor"
+                    strokeWidth="6"
+                    fill="none"
+                    className="text-muted/30"
+                  />
+                  {/* Progress circle */}
+                  <circle
+                    cx="48"
+                    cy="48"
+                    r="40"
+                    stroke="currentColor"
+                    strokeWidth="6"
+                    fill="none"
+                    strokeDasharray={`${2 * Math.PI * 40}`}
+                    strokeDashoffset={`${2 * Math.PI * 40 * (1 - nextMilestone.progress / 100)}`}
+                    className={nextMilestone.textClass}
+                    strokeLinecap="round"
+                  />
+                </svg>
+                {/* Center content */}
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <span className="text-3xl">{nextMilestone.emoji}</span>
+                  <span className={cn("text-lg font-bold", nextMilestone.textClass)}>
+                    {Math.round(nextMilestone.progress)}%
+                  </span>
+                </div>
               </div>
+              {/* Day count below circle */}
+              <p className="text-xs text-muted-foreground whitespace-nowrap">
+                {currentStreak} / {nextMilestone.target} days
+              </p>
             </div>
 
             {/* Milestone Info */}
-            <div className="flex-1 space-y-2">
-              <div className="flex items-start justify-between gap-2">
-                <div>
-                  <h4 className="font-semibold text-base text-foreground">
-                    {nextMilestone.name}
-                  </h4>
-                  <p className="text-sm text-muted-foreground">
-                    {currentStreak} / {nextMilestone.target} days
-                  </p>
-                </div>
+            <div className="flex-1 space-y-2 min-w-0">
+              <div className="flex items-start justify-between gap-3">
+                <h4 className="font-semibold text-base text-foreground whitespace-nowrap">
+                  {nextMilestone.name}
+                </h4>
                 <Badge 
                   variant="outline" 
                   className={cn(
                     nextMilestone.badgeClass,
-                    "flex-shrink-0"
+                    "flex-shrink-0 whitespace-nowrap"
                   )}
                 >
                   +{nextMilestone.reward} Rep
