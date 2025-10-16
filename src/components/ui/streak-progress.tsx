@@ -49,8 +49,8 @@ export function StreakProgress({
         reward: 25,
         progress: (currentStreak / 7) * 100,
         remaining: 7 - currentStreak,
-        colorClass: 'bg-primary/5 border-primary/20',
-        badgeClass: 'border-primary/30 text-primary',
+        colorClass: 'bg-primary/10 border-primary/40 dark:bg-primary/15 dark:border-primary/50',
+        badgeClass: 'bg-primary/20 border-primary/40 text-primary font-semibold',
         textClass: 'text-primary'
       };
     } else if (currentStreak < 30) {
@@ -61,8 +61,8 @@ export function StreakProgress({
         reward: 50,
         progress: (currentStreak / 30) * 100,
         remaining: 30 - currentStreak,
-        colorClass: 'bg-success/5 border-success/20',
-        badgeClass: 'border-success/30 text-success',
+        colorClass: 'bg-success/10 border-success/40 dark:bg-success/15 dark:border-success/50',
+        badgeClass: 'bg-success/20 border-success/40 text-success font-semibold',
         textClass: 'text-success'
       };
     } else if (currentStreak < 90) {
@@ -73,8 +73,8 @@ export function StreakProgress({
         reward: 150,
         progress: (currentStreak / 90) * 100,
         remaining: 90 - currentStreak,
-        colorClass: 'bg-info/5 border-info/20',
-        badgeClass: 'border-info/30 text-info',
+        colorClass: 'bg-info/10 border-info/40 dark:bg-info/15 dark:border-info/50',
+        badgeClass: 'bg-info/20 border-info/40 text-info font-semibold',
         textClass: 'text-info'
       };
     } else if (currentStreak < 365) {
@@ -85,8 +85,8 @@ export function StreakProgress({
         reward: 500,
         progress: (currentStreak / 365) * 100,
         remaining: 365 - currentStreak,
-        colorClass: 'bg-purple/5 border-purple/20',
-        badgeClass: 'border-purple/30 text-purple',
+        colorClass: 'bg-purple/10 border-purple/40 dark:bg-purple/15 dark:border-purple/50',
+        badgeClass: 'bg-purple/20 border-purple/40 text-purple font-semibold',
         textClass: 'text-purple'
       };
     } else {
@@ -97,8 +97,8 @@ export function StreakProgress({
         reward: 500,
         progress: 100,
         remaining: 0,
-        colorClass: 'bg-purple/5 border-purple/20',
-        badgeClass: 'border-purple/30 text-purple',
+        colorClass: 'bg-purple/10 border-purple/40 dark:bg-purple/15 dark:border-purple/50',
+        badgeClass: 'bg-purple/20 border-purple/40 text-purple font-semibold',
         textClass: 'text-purple'
       };
     }
@@ -133,29 +133,40 @@ export function StreakProgress({
         </div>
 
         {/* Next Milestone Progress */}
-        <div className={cn("space-y-2 p-3 rounded-lg", nextMilestone.colorClass)}>
-          <div className="flex items-center justify-between">
-            <span className="flex items-center gap-1.5 font-medium">
-              {nextMilestone.emoji} <span>Next: {nextMilestone.name}</span>
-            </span>
-            <Badge variant="outline" className={nextMilestone.badgeClass}>
+        <div className={cn("space-y-3 p-4 rounded-lg border", nextMilestone.colorClass)}>
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <span className="text-2xl">{nextMilestone.emoji}</span>
+              <span className="font-semibold text-base text-foreground">
+                Next: {nextMilestone.name}
+              </span>
+            </div>
+            <Badge 
+              variant="outline" 
+              className={cn(
+                nextMilestone.badgeClass,
+                "px-3 py-1"
+              )}
+            >
               +{nextMilestone.reward} Rep
             </Badge>
           </div>
-          <Progress value={nextMilestone.progress} className="h-2.5" />
-          <div className="flex items-center justify-between text-xs">
-            <span className="text-muted-foreground">
+          <div className="py-1">
+            <Progress value={nextMilestone.progress} className="h-3 bg-muted/50" />
+          </div>
+          <div className="flex items-center justify-between text-sm pt-1">
+            <span className="font-medium text-foreground">
               {currentStreak} / {nextMilestone.target} days
             </span>
             {nextMilestone.remaining > 0 ? (
               <span className={cn(
-                "font-medium",
-                nextMilestone.remaining <= 3 ? `${nextMilestone.textClass} animate-pulse` : "text-muted-foreground"
+                "font-semibold",
+                nextMilestone.remaining <= 7 ? `${nextMilestone.textClass} animate-pulse` : "text-foreground"
               )}>
                 {nextMilestone.remaining} {nextMilestone.remaining === 1 ? 'day' : 'days'} to go! 🎉
               </span>
             ) : (
-              <span className={cn("font-medium", nextMilestone.textClass)}>
+              <span className={cn("font-semibold", nextMilestone.textClass)}>
                 Completed! 🏆
               </span>
             )}
