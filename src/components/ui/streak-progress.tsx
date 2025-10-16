@@ -47,17 +47,17 @@ export function StreakProgress({
 
   return (
     <Card className="border-primary/30 bg-gradient-to-br from-primary/5 to-accent/5">
-      <CardHeader className="pb-3">
+      <CardHeader className="pb-2">
         <CardTitle className="flex items-center gap-2">
           <Flame className="h-5 w-5 text-primary" />
           Daily Streak Progress
         </CardTitle>
       </CardHeader>
       
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-3">
         {/* Current Streak Display */}
-        <div className="text-center p-4 bg-background/50 rounded-lg">
-          <div className="text-4xl font-bold text-primary mb-2">
+        <div className="text-center p-3 bg-background/50 rounded-lg">
+          <div className="text-3xl font-bold text-primary mb-1">
             {currentStreak}
           </div>
           <p className="text-sm text-muted-foreground mb-1">Current Streak</p>
@@ -68,11 +68,11 @@ export function StreakProgress({
 
         {/* Streak Stats */}
         <div className="grid grid-cols-2 gap-3">
-          <div className="text-center p-3 bg-secondary/30 rounded-lg">
+          <div className="text-center p-2 bg-secondary/30 rounded-lg">
             <p className="text-lg font-bold text-foreground">{longestStreak}</p>
             <p className="text-xs text-muted-foreground">Longest Streak</p>
           </div>
-          <div className="text-center p-3 bg-warning/10 rounded-lg">
+          <div className="text-center p-2 bg-warning/10 rounded-lg">
             <p className="text-lg font-bold text-warning">{daysUntilMonthlyMilestone}</p>
             <p className="text-xs text-muted-foreground">Days to Monthly</p>
           </div>
@@ -83,13 +83,13 @@ export function StreakProgress({
           <div className="flex items-center justify-between text-sm">
             <span className="flex items-center gap-1">
               <Calendar className="h-4 w-4" />
-              Next Monthly Milestone
+              Monthly Milestone
             </span>
             <span className="font-medium">+50 Rep</span>
           </div>
           <Progress value={progressToMonthly} className="h-2" />
           <p className="text-xs text-muted-foreground">
-            {daysUntilMonthlyMilestone} days until monthly bonus
+            {daysUntilMonthlyMilestone} days until bonus
           </p>
         </div>
 
@@ -98,13 +98,13 @@ export function StreakProgress({
           <div className="flex items-center justify-between text-sm">
             <span className="flex items-center gap-1">
               <Target className="h-4 w-4" />
-              Yearly Legend Status
+              Annual Legend
             </span>
             <span className="font-medium">+500 Rep</span>
           </div>
           <Progress value={progressToYearly} className="h-2" />
           <p className="text-xs text-muted-foreground">
-            {365 - currentStreak} days until Annual Legend badge
+            {365 - currentStreak} days until badge
           </p>
         </div>
 
@@ -113,7 +113,7 @@ export function StreakProgress({
           <h4 className="text-sm font-medium text-foreground">Streak Milestones</h4>
           <div className="grid grid-cols-2 gap-2">
             <div className={cn(
-              'p-2 rounded border text-center',
+              'p-1.5 rounded border text-center',
               milestones.weekly.achieved 
                 ? 'bg-success/10 border-success/30' 
                 : 'bg-gray-50 border-gray-200'
@@ -125,8 +125,8 @@ export function StreakProgress({
             </div>
             
             <div className={cn(
-              'p-2 rounded border text-center',
-              milestones.monthly.achieved 
+              'p-1.5 rounded border text-center',
+              milestones.monthly.achieved
                 ? 'bg-primary/10 border-primary/30' 
                 : 'bg-gray-50 border-gray-200'
             )}>
@@ -137,8 +137,8 @@ export function StreakProgress({
             </div>
             
             <div className={cn(
-              'p-2 rounded border text-center',
-              milestones.quarterly.achieved 
+              'p-1.5 rounded border text-center',
+              milestones.quarterly.achieved
                 ? 'bg-warning/10 border-warning/30' 
                 : 'bg-gray-50 border-gray-200'
             )}>
@@ -149,8 +149,8 @@ export function StreakProgress({
             </div>
             
             <div className={cn(
-              'p-2 rounded border text-center',
-              milestones.yearly.achieved 
+              'p-1.5 rounded border text-center',
+              milestones.yearly.achieved
                 ? 'bg-purple/10 border-purple/30' 
                 : 'bg-gray-50 border-gray-200'
             )}>
@@ -159,20 +159,6 @@ export function StreakProgress({
                 {milestones.yearly.achieved ? `✓ ${milestones.yearly.count}x` : 'Locked'}
               </p>
             </div>
-          </div>
-        </div>
-
-        {/* Streak Rewards Info */}
-        <div className="p-3 bg-info/5 rounded-lg">
-          <p className="text-xs text-muted-foreground mb-2">
-            <TrendingUp className="h-3 w-3 inline mr-1" />
-            <strong>Progressive Rewards:</strong>
-          </p>
-          <div className="text-xs text-muted-foreground space-y-1">
-            <p>• Days 1-6: +5 Rep daily</p>
-            <p>• Days 7-13: +10 Rep daily</p>
-            <p>• Days 14-29: +15 Rep daily</p>
-            <p>• Days 30+: +25 Rep daily</p>
           </div>
         </div>
       </CardContent>
