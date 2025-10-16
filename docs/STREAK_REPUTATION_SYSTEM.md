@@ -55,6 +55,10 @@ CREATE TABLE public.user_streaks (
   longest_streak INTEGER DEFAULT 0,
   last_activity_date DATE,
   streak_started_at TIMESTAMP WITH TIME ZONE,
+  consecutive_days_missed INTEGER DEFAULT 0,
+  grace_period_started_at TIMESTAMP WITH TIME ZONE,
+  unlocked_stages JSONB DEFAULT '{"stage1": true, "stage2": false}',
+  stage_unlock_history JSONB DEFAULT '[]',
   milestones JSONB DEFAULT '{
     "weekly": {"achieved": false, "count": 0},
     "monthly": {"achieved": false, "count": 0},
@@ -74,6 +78,10 @@ CREATE INDEX idx_user_streaks_user_id ON public.user_streaks(user_id);
 - **`longest_streak`**: Personal record for consecutive days (never decreases)
 - **`last_activity_date`**: ISO date string (YYYY-MM-DD) of last recorded activity
 - **`streak_started_at`**: Timestamp when the current streak began
+- **`consecutive_days_missed`**: Number of consecutive days without activity (resets on activity, used for 7-day grace period)
+- **`grace_period_started_at`**: Timestamp when grace period started (first missed day)
+- **`unlocked_stages`**: JSONB object tracking which stages user has unlocked (stage1 unlocked by default)
+- **`stage_unlock_history`**: Array of stage unlock events with timestamps
 - **`milestones`**: JSONB object tracking achievement status and repeat counts for each milestone tier
 
 ### Table: `user_reputation`
@@ -134,19 +142,106 @@ The system uses **ISO date strings** (YYYY-MM-DD) to determine consecutive days,
 
 ### Streak Breaking vs Resetting
 
-- **Broken Streak**: Missing 1+ days → `current_streak` resets to `1` (not `0`)
+- **Broken Streak**: Missing 7+ consecutive days → `current_streak` resets to `1` (not `0`)
 - **New User**: First activity → `current_streak` starts at `1`
-- **Grace Period**: Currently **NOT implemented** (future feature)
+- **Grace Period**: 7-day hardcoded grace period is active
+
+### Grace Period System
+
+The system includes a **7-day grace period** to prevent streaks from breaking due to missed days:
+
+- **Grace Period Duration**: 7 consecutive days
+- **Tracking**: The `consecutive_days_missed` field tracks missed days
+- **Logic**:
+  - If `consecutive_days_missed < 7`: Streak is maintained (not incremented) but not broken
+  - If `consecutive_days_missed >= 7`: Streak resets to 1 (broken)
+  - On any activity: `consecutive_days_missed` resets to 0
+- **User Experience**: Users can miss up to 6 consecutive days without losing their streak
 
 ### Example Scenarios
 
-| Scenario | Last Activity | Current Streak (Before) | Current Streak (After) |
-|----------|---------------|------------------------|----------------------|
-| First visit | `null` | 0 | 1 |
-| Daily consecutive | Yesterday | 5 | 6 |
-| Same day (duplicate) | Today | 5 | 5 (no change) |
-| Missed 1 day | 2 days ago | 10 | 1 (broken) |
-| Missed 7 days | 7 days ago | 30 | 1 (broken) |
+| Scenario | Last Activity | Consecutive Days Missed | Current Streak (Before) | Current Streak (After) |
+|----------|---------------|------------------------|------------------------|----------------------|
+| First visit | `null` | 0 | 0 | 1 |
+| Daily consecutive | Yesterday | 0 | 5 | 6 |
+| Same day (duplicate) | Today | 0 | 5 | 5 (no change) |
+| Missed 1 day (grace) | 2 days ago | 1 | 10 | 10 (maintained) |
+| Missed 6 days (grace) | 7 days ago | 6 | 30 | 30 (maintained) |
+| Missed 7+ days | 8 days ago | 7 | 30 | 1 (broken) |
+
+---
+
+## Stage-Based Streak Progression
+
+The streak system is divided into **stages** that control when and how streaks can progress. This prevents users from progressing indefinitely without completing key verification badges.
+
+### **Stage 1: Initial Streak Phase (Days 1-29)**
+
+- **Duration**: From day 1 to day 29
+- **Behavior**: Normal streak increment logic applies
+- **Grace Period**: 7-day grace period is active
+- **Unlocked by Default**: All users start in Stage 1
+- **Progression**: Users can freely progress from 1 to 29 days
+- **Daily Rep Bonuses**: Users earn increasing Rep based on streak length:
+  - Days 1-6: +5 Rep per day
+  - Days 7-13: +10 Rep per day
+  - Days 14-29: +15 Rep per day
+
+### **Stage 2: Badge-Gated Phase (Day 29 Freeze)**
+
+- **Trigger**: When user reaches 29 consecutive days
+- **Behavior**: 
+  - Streak **stops incrementing** at 29 days (frozen)
+  - User cannot progress to day 30+ until unlock requirements are met
+  - Grace period **still applies** (streak won't break for 7 consecutive missed days)
+  - Daily login still counts as activity (prevents breaking, but doesn't increment)
+- **Unlock Requirements**: 
+  - Must earn **4 out of 5** badges from the "Identity & Security" category:
+    1. Government ID Verification
+    2. Phone Number Verification
+    3. Email Verification
+    4. Selfie Verification
+    5. Address Verification
+  - **Note**: "Crypto Token" badge is excluded from this requirement
+- **User Experience**:
+  - `Stage2CapAlert` component displayed in UI showing:
+    - Badge progress indicator (X/5 badges earned)
+    - Progress bar visualization
+    - List of missing badges
+    - Clear call-to-action message
+- **Post-Unlock**: Once 4/5 badges are earned, streak resumes normal increment from day 29
+
+### Stage Unlock Configuration
+
+Stages are managed via the `streak_unlock_config` table, allowing dynamic configuration:
+
+| Stage | Config Key | Config Value | Description |
+|-------|-----------|--------------|-------------|
+| 1 | `max_streak_days` | `29` | Maximum days before Stage 2 freeze |
+| 2 | `required_badge_count` | `4` | Number of badges needed to unlock Stage 2 |
+| 2 | `required_badge_category` | `"Identity & Security"` | Badge category required for unlock |
+| 2 | `total_badges_in_category` | `5` | Total badges available in category |
+| 2 | `cap_message` | `"..."` | User-facing message displayed at cap |
+
+### Database Schema: `streak_unlock_config`
+
+```sql
+CREATE TABLE public.streak_unlock_config (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  stage INTEGER NOT NULL,
+  config_key TEXT NOT NULL,
+  config_value JSONB NOT NULL,
+  description TEXT,
+  is_active BOOLEAN DEFAULT true,
+  tenant_id UUID REFERENCES public.tenants(id),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+```
+
+### Future Stages
+
+**Note**: Stage 3 and Stage 4 were previously planned but have been **removed** from the current implementation. The system currently supports only Stage 1 (days 1-29) and Stage 2 (day 29 freeze with badge unlock).
 
 ---
 
@@ -287,6 +382,17 @@ export interface UserStreak {
   longest_streak: number;
   last_activity_date: string | null;
   streak_started_at: string | null;
+  consecutive_days_missed: number;
+  grace_period_started_at: string | null;
+  unlocked_stages: {
+    stage1: boolean;
+    stage2: boolean;
+  };
+  stage_unlock_history: Array<{
+    stage: number;
+    unlocked_at: string;
+    trigger: string;
+  }>;
   milestones: {
     weekly: { achieved: boolean; count: number };
     monthly: { achieved: boolean; count: number };
@@ -348,6 +454,133 @@ Persists milestone achievement data to the database.
 - `milestones`: Updated milestone object with `achieved` and `count` fields
 
 **Side Effects**: Invalidates `['user-streak', userId]` query
+
+---
+
+### `useStageUnlockLogic()`
+
+**Location**: `src/hooks/useStageUnlockLogic.ts`
+
+#### Purpose
+Manages the logic for checking stage unlock eligibility and unlocking stages based on badge requirements. Used primarily for Stage 2 badge-gated progression.
+
+#### Usage
+```typescript
+import { useStageUnlockLogic } from '@/hooks/useStageUnlockLogic';
+
+const { checkStage2Unlock, unlockStage, isUnlocking } = useStageUnlockLogic();
+```
+
+#### Returns
+- **`checkStage2Unlock`**: `object` - Stage 2 unlock status check
+  - `canUnlock`: `boolean` - Whether user meets Stage 2 unlock requirements
+  - `progress`: `number` - Number of required badges earned
+  - `total`: `number` - Total badges required (always 4)
+  - `isLoading`: `boolean` - Loading state for badge check query
+  - `error`: `Error | null` - Error state if query fails
+- **`unlockStage`**: `(stage: number) => void` - Function to unlock a specific stage
+- **`isUnlocking`**: `boolean` - Whether stage unlock mutation is in progress
+
+#### Stage 2 Unlock Logic
+
+The hook checks if the user has earned 4 out of 5 "Identity & Security" badges:
+
+1. Queries `user_badges` table joined with `badge_catalog`
+2. Filters for badges in "Identity & Security" category
+3. Excludes "Crypto Token" badge from count
+4. Returns `canUnlock: true` if `earnedCount >= 4`
+
+#### Example: Checking Stage 2 Unlock Status
+```typescript
+const { checkStage2Unlock } = useStageUnlockLogic();
+
+if (checkStage2Unlock.canUnlock) {
+  // User has earned 4/5 badges, can unlock Stage 2
+  console.log(`Progress: ${checkStage2Unlock.progress}/4 badges`);
+}
+```
+
+#### Example: Unlocking Stage 2
+```typescript
+const { unlockStage, isUnlocking } = useStageUnlockLogic();
+
+// When user clicks "Unlock Stage 2" button
+const handleUnlock = () => {
+  unlockStage(2);
+};
+
+// Shows toast on success: "🎉 Stage 2 Unlocked! Your streak can now continue."
+```
+
+#### Query Key
+- **Key**: `['stage2-unlock-check', userId]`
+- **Enabled**: Only when `user?.id` exists
+- **Stale Time**: 30 seconds (prevents excessive badge checks)
+
+#### Mutation Behavior
+- **On Success**: 
+  - Updates `unlocked_stages.stage2 = true` in `user_streaks` table
+  - Adds unlock event to `stage_unlock_history`
+  - Invalidates `['user-streak', userId]` query
+  - Shows success toast notification
+- **On Error**: Shows error toast with message
+
+---
+
+### `useStreakUnlockConfig()`
+
+**Location**: `src/hooks/useStreakUnlockConfig.ts`
+
+#### Purpose
+Fetches stage unlock configuration from the `streak_unlock_config` table. Used by admin tools and stage logic to determine unlock requirements.
+
+#### Usage
+```typescript
+import { useStreakUnlockConfig } from '@/hooks/useStreakUnlockConfig';
+
+// Fetch all active configs
+const { data: configs, isLoading } = useStreakUnlockConfig();
+
+// Fetch configs for specific stage
+const { data: stage2Configs } = useStreakUnlockConfig(2);
+```
+
+#### Parameters
+- **`stage`**: `number | undefined` - Optional stage number to filter configs
+
+#### Returns
+- **`data`**: `StreakUnlockConfig[]` - Array of configuration objects
+- **`isLoading`**: `boolean` - Loading state
+- **`error`**: `Error | null` - Error state
+
+#### Type: `StreakUnlockConfig`
+```typescript
+export interface StreakUnlockConfig {
+  id: string;
+  stage: number;
+  config_key: string;
+  config_value: any;
+  description: string | null;
+  is_active: boolean;
+  tenant_id: string | null;
+  created_at: string;
+  updated_at: string;
+}
+```
+
+#### Example Config Values
+```json
+{
+  "stage": 2,
+  "config_key": "badge_requirements",
+  "config_value": {
+    "required_badge_count": 4,
+    "required_badge_category": "Identity & Security",
+    "total_badges_in_category": 5,
+    "cap_message": "To continue your streak beyond 29 days, complete 4 core verification badges."
+  }
+}
+```
 
 ---
 
@@ -479,6 +712,57 @@ updateQualityMetrics({
 ---
 
 ## UI Components
+
+### `Stage2CapAlert` Component
+
+**Location**: `src/components/ui/stage-2-cap-alert.tsx`
+
+#### Purpose
+Displays an alert banner when a user's streak is frozen at 29 days due to insufficient "Identity & Security" badges. Provides clear feedback on unlock requirements and progress.
+
+#### Props
+```typescript
+interface Stage2CapAlertProps {
+  earnedBadgesCount: number;      // Number of required badges user has earned
+  requiredBadgesCount: number;    // Number of badges required to unlock (4)
+  missingBadgeNames: string[];    // Array of badge names user still needs
+}
+```
+
+#### Visual Features
+- **Alert Banner**: Amber-themed info alert with lock icon
+- **Title**: "🔒 Streak Capped at 29 Days"
+- **Description**: Clear explanation of unlock requirements
+- **Progress Bar**: Visual indicator showing X/Y badges earned
+- **Badge List**: Displays names of missing badges with shield icon
+- **Responsive**: Light/dark mode support via CSS variables
+
+#### Example Usage
+```typescript
+import { Stage2CapAlert } from '@/components/ui/stage-2-cap-alert';
+
+<Stage2CapAlert
+  earnedBadgesCount={2}
+  requiredBadgesCount={4}
+  missingBadgeNames={[
+    "Government ID Verification",
+    "Selfie Verification"
+  ]}
+/>
+```
+
+#### When Displayed
+- User has reached 29-day streak
+- `unlocked_stages.stage2 === false`
+- User has earned fewer than 4 "Identity & Security" badges
+- Shown prominently in Rep Tab above streak display
+
+#### Design Notes
+- Uses semantic color tokens (`amber-500`, `amber-900`, etc.)
+- Progress bar fills proportionally: `(earnedBadgesCount / requiredBadgesCount) * 100`
+- Lock icon changes to unlock icon when progress reaches 100%
+
+---
 
 ### `StreakProgress` Component
 
