@@ -460,6 +460,101 @@ export type Database = {
           },
         ]
       }
+      community_posts: {
+        Row: {
+          category: string | null
+          content: string
+          created_at: string | null
+          id: string
+          metadata: Json | null
+          moderation_score: Json | null
+          poll_options: Json | null
+          reputation_impact: number | null
+          status: string | null
+          title: string
+          type: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          category?: string | null
+          content: string
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          moderation_score?: Json | null
+          poll_options?: Json | null
+          reputation_impact?: number | null
+          status?: string | null
+          title: string
+          type: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          category?: string | null
+          content?: string
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          moderation_score?: Json | null
+          poll_options?: Json | null
+          reputation_impact?: number | null
+          status?: string | null
+          title?: string
+          type?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_posts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      community_votes: {
+        Row: {
+          created_at: string | null
+          id: string
+          post_id: string
+          user_id: string
+          vote_type: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          post_id: string
+          user_id: string
+          vote_type: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          post_id?: string
+          user_id?: string
+          vote_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_votes_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "community_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "community_votes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       earning_activities: {
         Row: {
           activity_type: string
@@ -502,6 +597,50 @@ export type Database = {
             foreignKeyName: "earning_activities_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      kyc_verifications: {
+        Row: {
+          created_at: string | null
+          id: string
+          metadata: Json | null
+          provider: string | null
+          status: string | null
+          updated_at: string | null
+          user_id: string
+          verification_date: string | null
+          verified: boolean | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          provider?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id: string
+          verification_date?: string | null
+          verified?: boolean | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          provider?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string
+          verification_date?: string | null
+          verified?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kyc_verifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
             referencedRelation: "profiles"
             referencedColumns: ["user_id"]
           },
@@ -741,6 +880,148 @@ export type Database = {
           },
         ]
       }
+      user_referral_stats: {
+        Row: {
+          created_at: string | null
+          id: string
+          invited_count: number | null
+          joined_count: number | null
+          qualified_count: number | null
+          total_earnings: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          invited_count?: number | null
+          joined_count?: number | null
+          qualified_count?: number | null
+          total_earnings?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          invited_count?: number | null
+          joined_count?: number | null
+          qualified_count?: number | null
+          total_earnings?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_referral_stats_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      user_referrals: {
+        Row: {
+          created_at: string | null
+          earnings: number | null
+          id: string
+          paid_at: string | null
+          qualified_at: string | null
+          referral_code: string | null
+          referred_user_id: string | null
+          referrer_user_id: string
+          status: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          earnings?: number | null
+          id?: string
+          paid_at?: string | null
+          qualified_at?: string | null
+          referral_code?: string | null
+          referred_user_id?: string | null
+          referrer_user_id: string
+          status?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          earnings?: number | null
+          id?: string
+          paid_at?: string | null
+          qualified_at?: string | null
+          referral_code?: string | null
+          referred_user_id?: string | null
+          referrer_user_id?: string
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_referrals_referred_user_id_fkey"
+            columns: ["referred_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "user_referrals_referrer_user_id_fkey"
+            columns: ["referrer_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      user_reputation: {
+        Row: {
+          created_at: string | null
+          history: Json | null
+          id: string
+          level: string | null
+          next_level_threshold: number | null
+          prestige: number | null
+          quality_metrics: Json | null
+          score: number | null
+          tier: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          history?: Json | null
+          id?: string
+          level?: string | null
+          next_level_threshold?: number | null
+          prestige?: number | null
+          quality_metrics?: Json | null
+          score?: number | null
+          tier?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          history?: Json | null
+          id?: string
+          level?: string | null
+          next_level_threshold?: number | null
+          prestige?: number | null
+          quality_metrics?: Json | null
+          score?: number | null
+          tier?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_reputation_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string | null
@@ -763,6 +1044,50 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "user_roles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      user_streaks: {
+        Row: {
+          created_at: string | null
+          current_streak: number | null
+          id: string
+          last_activity_date: string | null
+          longest_streak: number | null
+          milestones: Json | null
+          streak_started_at: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          current_streak?: number | null
+          id?: string
+          last_activity_date?: string | null
+          longest_streak?: number | null
+          milestones?: Json | null
+          streak_started_at?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          current_streak?: number | null
+          id?: string
+          last_activity_date?: string | null
+          longest_streak?: number | null
+          milestones?: Json | null
+          streak_started_at?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_streaks_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: true
             referencedRelation: "profiles"
