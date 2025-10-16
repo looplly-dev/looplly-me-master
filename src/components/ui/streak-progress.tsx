@@ -56,54 +56,52 @@ export function StreakProgress({
       <CardContent className="space-y-3">
         {/* Current Streak Display */}
         <div className="text-center p-3 bg-background/50 dark:bg-background/70 rounded-lg border border-border/50">
-          <div className="text-3xl font-bold text-primary mb-1">
-            {currentStreak}
+          <div className="text-3xl font-bold bg-gradient-to-r from-primary via-orange-500 to-primary bg-clip-text text-transparent mb-1">
+            🔥 {currentStreak}
           </div>
-          <p className="text-sm text-muted-foreground mb-1">Current Streak</p>
-          <Badge className="bg-primary/10 text-primary">
+          <p className="text-sm font-medium text-foreground mb-1">Day Streak</p>
+          <Badge className="bg-primary/20 text-primary border border-primary/30">
             +{getStreakReward(currentStreak)} Rep Today
           </Badge>
         </div>
 
         {/* Streak Stats */}
-        <div className="grid grid-cols-2 gap-3">
-          <div className="text-center p-2 bg-secondary/30 dark:bg-secondary/40 rounded-lg border border-secondary/20 dark:border-secondary/30">
-            <p className="text-lg font-bold text-foreground">{longestStreak}</p>
-            <p className="text-xs text-muted-foreground">Longest Streak</p>
-          </div>
-          <div className="text-center p-2 bg-accent/10 dark:bg-accent/20 rounded-lg border border-accent/30 dark:border-accent/40">
-            <p className="text-lg font-bold text-accent">{daysUntilMonthlyMilestone}</p>
-            <p className="text-xs text-muted-foreground">Days to Monthly</p>
-          </div>
+        <div className="text-center p-2 bg-secondary/30 dark:bg-secondary/40 rounded-lg border border-secondary/20 dark:border-secondary/30">
+          <p className="text-lg font-bold text-foreground">{longestStreak}</p>
+          <p className="text-xs text-muted-foreground">Longest Streak</p>
         </div>
 
         {/* Monthly Progress */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between text-sm">
-            <span className="flex items-center gap-1">
-              <Calendar className="h-4 w-4" />
-              Monthly Milestone
+        <div className="space-y-2 p-3 rounded-lg bg-primary/5 border border-primary/20">
+          <div className="flex items-center justify-between">
+            <span className="flex items-center gap-1.5 font-medium">
+              📅 <span>Monthly Milestone</span>
             </span>
-            <span className="font-medium">+50 Rep</span>
+            <Badge variant="outline" className="border-primary/30 text-primary">+50 Rep</Badge>
           </div>
-          <Progress value={progressToMonthly} className="h-2" />
-          <p className="text-xs text-muted-foreground">
-            {daysUntilMonthlyMilestone} days until bonus
-          </p>
+          <Progress value={progressToMonthly} className="h-2.5" />
+          <div className="flex items-center justify-between text-xs">
+            <span className="text-muted-foreground">{30 - daysUntilMonthlyMilestone} days done</span>
+            <span className={cn(
+              "font-medium",
+              daysUntilMonthlyMilestone <= 7 ? "text-primary animate-pulse" : "text-muted-foreground"
+            )}>
+              {daysUntilMonthlyMilestone} days to go! 🎉
+            </span>
+          </div>
         </div>
 
         {/* Yearly Progress */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between text-sm">
-            <span className="flex items-center gap-1">
-              <Target className="h-4 w-4" />
-              Annual Legend
+        <div className="space-y-2 p-3 rounded-lg bg-purple/5 border border-purple/20">
+          <div className="flex items-center justify-between">
+            <span className="flex items-center gap-1.5 font-medium">
+              🎯 <span>Annual Legend</span>
             </span>
-            <span className="font-medium">+500 Rep</span>
+            <Badge variant="outline" className="border-purple/30 text-purple">+500 Rep</Badge>
           </div>
-          <Progress value={progressToYearly} className="h-2" />
+          <Progress value={progressToYearly} className="h-2.5" />
           <p className="text-xs text-muted-foreground">
-            {365 - currentStreak} days until badge
+            {currentStreak} days done • {365 - currentStreak} days remaining
           </p>
         </div>
 
@@ -117,9 +115,9 @@ export function StreakProgress({
                 ? 'bg-success/10 border-success/30' 
                 : 'bg-muted/30 border-border dark:bg-muted/20 dark:border-muted'
             )}>
-              <p className="text-xs font-medium">Week Warrior</p>
+              <p className="text-xs font-medium">⚡ Week Warrior</p>
               <p className="text-xs text-muted-foreground">
-                {milestones.weekly.achieved ? `✓ ${milestones.weekly.count}x` : 'Locked'}
+                {milestones.weekly.achieved ? `✓ Earned ${milestones.weekly.count}x` : '7 days to unlock'}
               </p>
             </div>
             
@@ -129,9 +127,9 @@ export function StreakProgress({
                 ? 'bg-accent/10 border-accent/30 dark:bg-accent/15 dark:border-accent/40' 
                 : 'bg-muted/30 border-border dark:bg-muted/20 dark:border-muted'
             )}>
-              <p className="text-xs font-medium">Month Master</p>
+              <p className="text-xs font-medium">🌙 Month Master</p>
               <p className="text-xs text-muted-foreground">
-                {milestones.monthly.achieved ? `✓ ${milestones.monthly.count}x` : 'Locked'}
+                {milestones.monthly.achieved ? `✓ Earned ${milestones.monthly.count}x` : '30 days to unlock'}
               </p>
             </div>
             
@@ -141,9 +139,9 @@ export function StreakProgress({
                 ? 'bg-info/10 border-info/30 dark:bg-info/15 dark:border-info/40' 
                 : 'bg-muted/30 border-border dark:bg-muted/20 dark:border-muted'
             )}>
-              <p className="text-xs font-medium">Quarter Champion</p>
+              <p className="text-xs font-medium">🌟 Quarter Champion</p>
               <p className="text-xs text-muted-foreground">
-                {milestones.quarterly.achieved ? `✓ ${milestones.quarterly.count}x` : 'Locked'}
+                {milestones.quarterly.achieved ? `✓ Earned ${milestones.quarterly.count}x` : '90 days to unlock'}
               </p>
             </div>
             
@@ -153,9 +151,9 @@ export function StreakProgress({
                 ? 'bg-purple/10 border-purple/30' 
                 : 'bg-muted/30 border-border dark:bg-muted/20 dark:border-muted'
             )}>
-              <p className="text-xs font-medium">Annual Legend</p>
+              <p className="text-xs font-medium">👑 Annual Legend</p>
               <p className="text-xs text-muted-foreground">
-                {milestones.yearly.achieved ? `✓ ${milestones.yearly.count}x` : 'Locked'}
+                {milestones.yearly.achieved ? `✓ Earned ${milestones.yearly.count}x` : '365 days to unlock'}
               </p>
             </div>
           </div>
