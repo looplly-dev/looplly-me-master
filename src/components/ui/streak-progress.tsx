@@ -71,8 +71,8 @@ export function StreakProgress({
             <p className="text-lg font-bold text-foreground">{longestStreak}</p>
             <p className="text-xs text-muted-foreground">Longest Streak</p>
           </div>
-          <div className="text-center p-2 bg-warning/10 dark:bg-warning/20 rounded-lg border border-warning/20 dark:border-warning/30">
-            <p className="text-lg font-bold text-warning">{daysUntilMonthlyMilestone}</p>
+          <div className="text-center p-2 bg-accent/10 dark:bg-accent/20 rounded-lg border border-accent/30 dark:border-accent/40">
+            <p className="text-lg font-bold text-accent">{daysUntilMonthlyMilestone}</p>
             <p className="text-xs text-muted-foreground">Days to Monthly</p>
           </div>
         </div>
@@ -126,7 +126,7 @@ export function StreakProgress({
             <div className={cn(
               'p-1.5 rounded border text-center',
               milestones.monthly.achieved
-                ? 'bg-primary/10 border-primary/30' 
+                ? 'bg-accent/10 border-accent/30 dark:bg-accent/15 dark:border-accent/40' 
                 : 'bg-muted/30 border-border dark:bg-muted/20 dark:border-muted'
             )}>
               <p className="text-xs font-medium">Month Master</p>
@@ -138,7 +138,7 @@ export function StreakProgress({
             <div className={cn(
               'p-1.5 rounded border text-center',
               milestones.quarterly.achieved
-                ? 'bg-warning/10 border-warning/30' 
+                ? 'bg-info/10 border-info/30 dark:bg-info/15 dark:border-info/40' 
                 : 'bg-muted/30 border-border dark:bg-muted/20 dark:border-muted'
             )}>
               <p className="text-xs font-medium">Quarter Champion</p>
