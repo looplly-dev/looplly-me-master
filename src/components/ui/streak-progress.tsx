@@ -132,44 +132,80 @@ export function StreakProgress({
           <p className="text-xs text-muted-foreground">Longest Streak</p>
         </div>
 
-        {/* Next Milestone Progress */}
-        <div className={cn("space-y-3 p-4 rounded-lg border", nextMilestone.colorClass)}>
-          <div className="flex items-center justify-between gap-3 mb-2">
-            <div className="flex items-center gap-2 flex-1 min-w-0">
-              <span className="text-2xl flex-shrink-0">{nextMilestone.emoji}</span>
-              <span className="font-semibold text-base text-foreground whitespace-nowrap">
-                Next: {nextMilestone.name}
-              </span>
+        {/* Next Milestone Progress - Circular Design */}
+        <div className={cn("p-4 rounded-lg border", nextMilestone.colorClass)}>
+          <div className="flex items-center gap-4">
+            {/* Circular Progress */}
+            <div className="relative flex-shrink-0">
+              <svg className="w-24 h-24 transform -rotate-90">
+                {/* Background circle */}
+                <circle
+                  cx="48"
+                  cy="48"
+                  r="40"
+                  stroke="currentColor"
+                  strokeWidth="6"
+                  fill="none"
+                  className="text-muted/30"
+                />
+                {/* Progress circle */}
+                <circle
+                  cx="48"
+                  cy="48"
+                  r="40"
+                  stroke="currentColor"
+                  strokeWidth="6"
+                  fill="none"
+                  strokeDasharray={`${2 * Math.PI * 40}`}
+                  strokeDashoffset={`${2 * Math.PI * 40 * (1 - nextMilestone.progress / 100)}`}
+                  className={nextMilestone.textClass}
+                  strokeLinecap="round"
+                />
+              </svg>
+              {/* Center content */}
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <span className="text-3xl">{nextMilestone.emoji}</span>
+                <span className={cn("text-lg font-bold", nextMilestone.textClass)}>
+                  {Math.round(nextMilestone.progress)}%
+                </span>
+              </div>
             </div>
-            <Badge 
-              variant="outline" 
-              className={cn(
-                nextMilestone.badgeClass,
-                "px-3 py-1 flex-shrink-0"
+
+            {/* Milestone Info */}
+            <div className="flex-1 space-y-2">
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <h4 className="font-semibold text-base text-foreground">
+                    {nextMilestone.name}
+                  </h4>
+                  <p className="text-sm text-muted-foreground">
+                    {currentStreak} / {nextMilestone.target} days
+                  </p>
+                </div>
+                <Badge 
+                  variant="outline" 
+                  className={cn(
+                    nextMilestone.badgeClass,
+                    "flex-shrink-0"
+                  )}
+                >
+                  +{nextMilestone.reward} Rep
+                </Badge>
+              </div>
+              
+              {nextMilestone.remaining > 0 ? (
+                <p className={cn(
+                  "text-sm font-medium",
+                  nextMilestone.remaining <= 7 ? `${nextMilestone.textClass} animate-pulse` : "text-foreground"
+                )}>
+                  🎯 {nextMilestone.remaining} {nextMilestone.remaining === 1 ? 'day' : 'days'} to go!
+                </p>
+              ) : (
+                <p className={cn("text-sm font-semibold", nextMilestone.textClass)}>
+                  ✓ Completed! 🏆
+                </p>
               )}
-            >
-              +{nextMilestone.reward} Rep
-            </Badge>
-          </div>
-          <div className="py-1">
-            <Progress value={nextMilestone.progress} className="h-3 bg-muted/50" />
-          </div>
-          <div className="flex items-center justify-between text-sm pt-1">
-            <span className="font-medium text-foreground">
-              {currentStreak} / {nextMilestone.target} days
-            </span>
-            {nextMilestone.remaining > 0 ? (
-              <span className={cn(
-                "font-semibold",
-                nextMilestone.remaining <= 7 ? `${nextMilestone.textClass} animate-pulse` : "text-foreground"
-              )}>
-                {nextMilestone.remaining} {nextMilestone.remaining === 1 ? 'day' : 'days'} to go! 🎉
-              </span>
-            ) : (
-              <span className={cn("font-semibold", nextMilestone.textClass)}>
-                Completed! 🏆
-              </span>
-            )}
+            </div>
           </div>
         </div>
 
