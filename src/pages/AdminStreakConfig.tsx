@@ -77,7 +77,6 @@ export default function AdminStreakConfig() {
   }
 
   const stage2Config = configs?.find(c => c.stage === 2);
-  const stage3Config = configs?.find(c => c.stage === 3);
 
   const getConfigValue = (config: any, key: string) => {
     if (typeof config.config_value === 'object' && config.config_value !== null) {
@@ -149,44 +148,6 @@ export default function AdminStreakConfig() {
                 />
               </div>
               <Button onClick={() => handleSave(stage2Config)} disabled={updateConfigMutation.isPending}>
-                {updateConfigMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
-                Save Changes
-              </Button>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Stage 3 */}
-        {stage3Config && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Stage 3: Daily Rep Cap</CardTitle>
-              <CardDescription>{stage3Config.description}</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="stage3-days">Required Days</Label>
-                <Input
-                  id="stage3-days"
-                  type="number"
-                  min="1"
-                  max="365"
-                  value={editingConfig[stage3Config.id]?.requiredDays ?? getConfigValue(stage3Config, 'requiredDays')}
-                  onChange={(e) => handleChange(stage3Config.id, 'requiredDays', parseInt(e.target.value))}
-                />
-                <p className="text-xs text-muted-foreground mt-1">
-                  Number of days user must hit the daily reputation cap
-                </p>
-              </div>
-              <div>
-                <Label htmlFor="stage3-message">Display Message</Label>
-                <Input
-                  id="stage3-message"
-                  value={editingConfig[stage3Config.id]?.message ?? getConfigValue(stage3Config, 'message')}
-                  onChange={(e) => handleChange(stage3Config.id, 'message', e.target.value)}
-                />
-              </div>
-              <Button onClick={() => handleSave(stage3Config)} disabled={updateConfigMutation.isPending}>
                 {updateConfigMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
                 Save Changes
               </Button>

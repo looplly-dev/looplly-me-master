@@ -19,11 +19,8 @@ export interface UserStreak {
   unlocked_stages: {
     stage1: boolean;
     stage2: boolean;
-    stage3: boolean;
-    stage4: boolean;
   };
   stage_unlock_history: Array<{ stage: number; unlockedAt: string }>;
-  daily_rep_cap_hits: string[];
   consecutive_days_missed: number;
   grace_period_started_at: string | null;
   created_at: string;

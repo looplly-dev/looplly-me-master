@@ -1100,7 +1100,6 @@ export type Database = {
           consecutive_days_missed: number
           created_at: string | null
           current_streak: number | null
-          daily_rep_cap_hits: Json | null
           grace_period_started_at: string | null
           id: string
           last_activity_date: string | null
@@ -1116,7 +1115,6 @@ export type Database = {
           consecutive_days_missed?: number
           created_at?: string | null
           current_streak?: number | null
-          daily_rep_cap_hits?: Json | null
           grace_period_started_at?: string | null
           id?: string
           last_activity_date?: string | null
@@ -1132,7 +1130,6 @@ export type Database = {
           consecutive_days_missed?: number
           created_at?: string | null
           current_streak?: number | null
-          daily_rep_cap_hits?: Json | null
           grace_period_started_at?: string | null
           id?: string
           last_activity_date?: string | null
