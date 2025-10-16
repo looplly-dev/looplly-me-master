@@ -39,8 +39,11 @@ export function StreakProgress({
     return 5;
   };
 
-  // Progress to next monthly milestone (every 30 days)
-  const progressToMonthly = ((30 - daysUntilMonthlyMilestone) / 30) * 100;
+  // Calculate monthly cycle tracking
+  const monthlyCompletions = Math.floor(currentStreak / 30);
+  const daysIntoCurrentCycle = currentStreak % 30;
+  const daysToNextMonthly = daysIntoCurrentCycle === 0 ? 30 : 30 - daysIntoCurrentCycle;
+  const progressInCycle = daysIntoCurrentCycle === 0 ? 100 : (daysIntoCurrentCycle / 30) * 100;
   
   // Progress to yearly milestone (365 days total)
   const progressToYearly = (currentStreak / 365) * 100;
@@ -72,21 +75,30 @@ export function StreakProgress({
         </div>
 
         {/* Monthly Progress */}
-        <div className="space-y-2 p-3 rounded-lg bg-primary/5 border border-primary/20">
+        <div className="space-y-2 p-3 rounded-lg bg-success/5 border border-success/20">
           <div className="flex items-center justify-between">
-            <span className="flex items-center gap-1.5 font-medium">
-              📅 <span>Monthly Milestone</span>
-            </span>
-            <Badge variant="outline" className="border-primary/30 text-primary">+50 Rep</Badge>
+            <div className="flex items-center gap-2">
+              <span className="flex items-center gap-1.5 font-medium">
+                📅 <span>Monthly Bonus</span>
+              </span>
+              {monthlyCompletions > 0 && (
+                <Badge className="bg-success/20 text-success text-xs border-success/30">
+                  ✓ Earned {monthlyCompletions}x
+                </Badge>
+              )}
+            </div>
+            <Badge variant="outline" className="border-success/30 text-success">+50 Rep</Badge>
           </div>
-          <Progress value={progressToMonthly} className="h-2.5" />
+          <Progress value={progressInCycle} className="h-2.5" />
           <div className="flex items-center justify-between text-xs">
-            <span className="text-muted-foreground">{30 - daysUntilMonthlyMilestone} days done</span>
+            <span className="text-muted-foreground">
+              {monthlyCompletions > 0 ? `Cycle #${monthlyCompletions + 1} • ` : ''}{daysIntoCurrentCycle} days in
+            </span>
             <span className={cn(
               "font-medium",
-              daysUntilMonthlyMilestone <= 7 ? "text-primary animate-pulse" : "text-muted-foreground"
+              daysToNextMonthly <= 7 ? "text-success animate-pulse" : "text-muted-foreground"
             )}>
-              {daysUntilMonthlyMilestone} days to go! 🎉
+              {daysToNextMonthly} days to go! 🎉
             </span>
           </div>
         </div>
