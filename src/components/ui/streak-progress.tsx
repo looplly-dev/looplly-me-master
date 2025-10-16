@@ -134,10 +134,10 @@ export function StreakProgress({
 
         {/* Next Milestone Progress */}
         <div className={cn("space-y-3 p-4 rounded-lg border", nextMilestone.colorClass)}>
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2">
-              <span className="text-2xl">{nextMilestone.emoji}</span>
-              <span className="font-semibold text-base text-foreground">
+          <div className="flex items-center justify-between gap-3 mb-2">
+            <div className="flex items-center gap-2 flex-1 min-w-0">
+              <span className="text-2xl flex-shrink-0">{nextMilestone.emoji}</span>
+              <span className="font-semibold text-base text-foreground whitespace-nowrap">
                 Next: {nextMilestone.name}
               </span>
             </div>
@@ -145,7 +145,7 @@ export function StreakProgress({
               variant="outline" 
               className={cn(
                 nextMilestone.badgeClass,
-                "px-3 py-1"
+                "px-3 py-1 flex-shrink-0"
               )}
             >
               +{nextMilestone.reward} Rep
