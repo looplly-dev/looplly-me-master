@@ -134,7 +134,7 @@ export function StreakProgress({
 
         {/* Next Milestone Progress - Circular Design */}
         <div className={cn("p-4 rounded-lg border", nextMilestone.colorClass)}>
-          <div className="flex items-center gap-4">
+          <div className="flex items-start gap-3">
             {/* Circular Progress with day count below */}
             <div className="flex-shrink-0 flex flex-col items-center gap-1">
               <div className="relative">
@@ -177,12 +177,15 @@ export function StreakProgress({
               </p>
             </div>
 
-            {/* Milestone Info */}
-            <div className="flex-1 space-y-2 min-w-0">
-              <div className="flex items-start justify-between gap-3">
-                <h4 className="font-semibold text-base text-foreground whitespace-nowrap">
-                  {nextMilestone.name}
-                </h4>
+            {/* Milestone Info - Vertical Stack */}
+            <div className="flex-1 min-w-0 space-y-1">
+              {/* Title - Prominent and close to circle */}
+              <h4 className="font-bold text-lg text-foreground">
+                {nextMilestone.name}
+              </h4>
+              
+              {/* Rep Badge + Days Remaining Row */}
+              <div className="flex items-center gap-2 flex-wrap">
                 <Badge 
                   variant="outline" 
                   className={cn(
@@ -192,20 +195,20 @@ export function StreakProgress({
                 >
                   +{nextMilestone.reward} Rep
                 </Badge>
+                
+                {nextMilestone.remaining > 0 ? (
+                  <p className={cn(
+                    "text-sm font-medium",
+                    nextMilestone.remaining <= 7 ? `${nextMilestone.textClass} animate-pulse` : "text-foreground"
+                  )}>
+                    🎯 {nextMilestone.remaining} {nextMilestone.remaining === 1 ? 'day' : 'days'} to go!
+                  </p>
+                ) : (
+                  <p className={cn("text-sm font-semibold", nextMilestone.textClass)}>
+                    ✓ Completed! 🏆
+                  </p>
+                )}
               </div>
-              
-              {nextMilestone.remaining > 0 ? (
-                <p className={cn(
-                  "text-sm font-medium",
-                  nextMilestone.remaining <= 7 ? `${nextMilestone.textClass} animate-pulse` : "text-foreground"
-                )}>
-                  🎯 {nextMilestone.remaining} {nextMilestone.remaining === 1 ? 'day' : 'days'} to go!
-                </p>
-              ) : (
-                <p className={cn("text-sm font-semibold", nextMilestone.textClass)}>
-                  ✓ Completed! 🏆
-                </p>
-              )}
             </div>
           </div>
         </div>
