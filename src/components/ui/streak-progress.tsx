@@ -132,43 +132,73 @@ export function StreakProgress({
           <p className="text-xs text-muted-foreground">Longest Streak</p>
         </div>
 
-        {/* Next Milestone Progress */}
-        <div className={cn("space-y-3 p-4 rounded-lg border", nextMilestone.colorClass)}>
-          <div className="flex items-center justify-between gap-3 mb-2">
-            <div className="flex items-center gap-2 flex-1 min-w-0">
-              <span className="text-2xl flex-shrink-0">{nextMilestone.emoji}</span>
-              <span className="font-semibold text-base text-foreground whitespace-nowrap">
-                Next: {nextMilestone.name}
-              </span>
+        {/* Next Milestone Progress - Quest Card Style */}
+        <div className={cn("p-5 rounded-lg border space-y-4", nextMilestone.colorClass)}>
+          {/* Header with large emoji and title */}
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="text-5xl">{nextMilestone.emoji}</div>
+              <div>
+                <h4 className="font-bold text-lg text-foreground">
+                  {nextMilestone.name}
+                </h4>
+                <p className="text-sm text-muted-foreground">
+                  Milestone Achievement
+                </p>
+              </div>
             </div>
             <Badge 
               variant="outline" 
               className={cn(
                 nextMilestone.badgeClass,
-                "px-3 py-1 flex-shrink-0"
+                "px-3 py-1.5 text-sm font-bold"
               )}
             >
-              +{nextMilestone.reward} Rep
+              🎁 +{nextMilestone.reward} Rep
             </Badge>
           </div>
-          <div className="py-1">
-            <Progress value={nextMilestone.progress} className="h-3 bg-muted/50" />
-          </div>
-          <div className="flex items-center justify-between text-sm pt-1">
-            <span className="font-medium text-foreground">
-              {currentStreak} / {nextMilestone.target} days
-            </span>
-            {nextMilestone.remaining > 0 ? (
+
+          {/* Progress bar with gradient */}
+          <div className="space-y-2">
+            <div className="relative h-4 bg-muted/50 rounded-full overflow-hidden">
+              <div 
+                className={cn(
+                  "h-full rounded-full transition-all duration-500",
+                  "bg-gradient-to-r",
+                  nextMilestone.progress >= 75 ? "from-success via-primary to-primary" :
+                  nextMilestone.progress >= 50 ? "from-info via-primary to-primary" :
+                  nextMilestone.progress >= 25 ? "from-primary to-accent" :
+                  "from-muted-foreground to-primary"
+                )}
+                style={{ width: `${nextMilestone.progress}%` }}
+              />
+            </div>
+            <div className="flex items-center justify-between text-sm">
+              <span className="font-semibold text-foreground">
+                {currentStreak} / {nextMilestone.target} days
+              </span>
               <span className={cn(
-                "font-semibold",
+                "font-bold",
+                nextMilestone.textClass
+              )}>
+                {Math.round(nextMilestone.progress)}% Complete
+              </span>
+            </div>
+          </div>
+
+          {/* Status message */}
+          <div className="text-center py-2">
+            {nextMilestone.remaining > 0 ? (
+              <p className={cn(
+                "text-base font-bold",
                 nextMilestone.remaining <= 7 ? `${nextMilestone.textClass} animate-pulse` : "text-foreground"
               )}>
-                {nextMilestone.remaining} {nextMilestone.remaining === 1 ? 'day' : 'days'} to go! 🎉
-              </span>
+                🎯 Only {nextMilestone.remaining} more {nextMilestone.remaining === 1 ? 'day' : 'days'} to unlock! 🎉
+              </p>
             ) : (
-              <span className={cn("font-semibold", nextMilestone.textClass)}>
-                Completed! 🏆
-              </span>
+              <p className={cn("text-base font-bold", nextMilestone.textClass)}>
+                🏆 Achievement Unlocked! Congratulations! 🏆
+              </p>
             )}
           </div>
         </div>
