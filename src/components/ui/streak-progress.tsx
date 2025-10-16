@@ -132,122 +132,43 @@ export function StreakProgress({
           <p className="text-xs text-muted-foreground">Longest Streak</p>
         </div>
 
-        {/* Next Milestone Progress - Dot Path Timeline */}
-        <div className={cn("space-y-4 p-4 rounded-lg border", nextMilestone.colorClass)}>
-          {/* Header */}
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2">
-              <span className="text-2xl">{nextMilestone.emoji}</span>
-              <div>
-                <h4 className="font-semibold text-base text-foreground">
-                  {nextMilestone.name}
-                </h4>
-                <p className="text-xs text-muted-foreground">
-                  Next milestone unlocks at {nextMilestone.target} days
-                </p>
-              </div>
+        {/* Next Milestone Progress */}
+        <div className={cn("space-y-3 p-4 rounded-lg border", nextMilestone.colorClass)}>
+          <div className="flex items-center justify-between gap-3 mb-2">
+            <div className="flex items-center gap-2 flex-1 min-w-0">
+              <span className="text-2xl flex-shrink-0">{nextMilestone.emoji}</span>
+              <span className="font-semibold text-base text-foreground whitespace-nowrap">
+                Next: {nextMilestone.name}
+              </span>
             </div>
             <Badge 
               variant="outline" 
-              className={cn(nextMilestone.badgeClass, "flex-shrink-0")}
+              className={cn(
+                nextMilestone.badgeClass,
+                "px-3 py-1 flex-shrink-0"
+              )}
             >
               +{nextMilestone.reward} Rep
             </Badge>
           </div>
-
-          {/* Dot Path Progress */}
-          <div className="relative py-4">
-            {/* Progress Line */}
-            <div className="absolute left-0 right-0 top-1/2 h-1 bg-muted/30 rounded-full -translate-y-1/2" />
-            <div 
-              className={cn("absolute left-0 top-1/2 h-1 rounded-full -translate-y-1/2 transition-all duration-500", nextMilestone.textClass)}
-              style={{ width: `${nextMilestone.progress}%` }}
-            />
-            
-            {/* Progress Dots */}
-            <div className="relative flex justify-between items-center">
-              {/* Start Dot */}
-              <div className="flex flex-col items-center gap-1 z-10">
-                <div className={cn(
-                  "w-4 h-4 rounded-full border-2 bg-background",
-                  currentStreak > 0 ? `border-current ${nextMilestone.textClass}` : "border-muted"
-                )}>
-                  {currentStreak > 0 && (
-                    <div className={cn("w-full h-full rounded-full", nextMilestone.textClass)} />
-                  )}
-                </div>
-                <span className="text-xs font-medium text-muted-foreground">0</span>
-              </div>
-
-              {/* Mid-Checkpoint Dot (25%) */}
-              <div className="flex flex-col items-center gap-1 z-10">
-                <div className={cn(
-                  "w-3 h-3 rounded-full border-2 bg-background",
-                  nextMilestone.progress >= 25 ? `border-current ${nextMilestone.textClass}` : "border-muted"
-                )}>
-                  {nextMilestone.progress >= 25 && (
-                    <div className={cn("w-full h-full rounded-full scale-75", nextMilestone.textClass)} />
-                  )}
-                </div>
-                <span className="text-xs text-muted-foreground">{Math.floor(nextMilestone.target * 0.25)}</span>
-              </div>
-
-              {/* Mid-Checkpoint Dot (50%) */}
-              <div className="flex flex-col items-center gap-1 z-10">
-                <div className={cn(
-                  "w-3 h-3 rounded-full border-2 bg-background",
-                  nextMilestone.progress >= 50 ? `border-current ${nextMilestone.textClass}` : "border-muted"
-                )}>
-                  {nextMilestone.progress >= 50 && (
-                    <div className={cn("w-full h-full rounded-full scale-75", nextMilestone.textClass)} />
-                  )}
-                </div>
-                <span className="text-xs text-muted-foreground">{Math.floor(nextMilestone.target * 0.5)}</span>
-              </div>
-
-              {/* Mid-Checkpoint Dot (75%) */}
-              <div className="flex flex-col items-center gap-1 z-10">
-                <div className={cn(
-                  "w-3 h-3 rounded-full border-2 bg-background",
-                  nextMilestone.progress >= 75 ? `border-current ${nextMilestone.textClass}` : "border-muted"
-                )}>
-                  {nextMilestone.progress >= 75 && (
-                    <div className={cn("w-full h-full rounded-full scale-75", nextMilestone.textClass)} />
-                  )}
-                </div>
-                <span className="text-xs text-muted-foreground">{Math.floor(nextMilestone.target * 0.75)}</span>
-              </div>
-
-              {/* End Dot (Target) */}
-              <div className="flex flex-col items-center gap-1 z-10">
-                <div className={cn(
-                  "w-5 h-5 rounded-full border-2 bg-background flex items-center justify-center",
-                  nextMilestone.progress >= 100 ? `border-current ${nextMilestone.textClass}` : "border-muted"
-                )}>
-                  {nextMilestone.progress >= 100 ? (
-                    <span className="text-xs">🏆</span>
-                  ) : (
-                    <div className={cn("w-2 h-2 rounded-full", nextMilestone.progress >= 100 ? nextMilestone.textClass : "bg-muted")} />
-                  )}
-                </div>
-                <span className="text-xs font-medium text-muted-foreground">{nextMilestone.target}</span>
-              </div>
-            </div>
+          <div className="py-1">
+            <Progress value={nextMilestone.progress} className="h-3 bg-muted/50" />
           </div>
-
-          {/* Status Message */}
-          <div className="text-center">
+          <div className="flex items-center justify-between text-sm pt-1">
+            <span className="font-medium text-foreground">
+              {currentStreak} / {nextMilestone.target} days
+            </span>
             {nextMilestone.remaining > 0 ? (
-              <p className={cn(
-                "text-sm font-semibold",
+              <span className={cn(
+                "font-semibold",
                 nextMilestone.remaining <= 7 ? `${nextMilestone.textClass} animate-pulse` : "text-foreground"
               )}>
-                🎯 {nextMilestone.remaining} {nextMilestone.remaining === 1 ? 'day' : 'days'} until you unlock this milestone!
-              </p>
+                {nextMilestone.remaining} {nextMilestone.remaining === 1 ? 'day' : 'days'} to go! 🎉
+              </span>
             ) : (
-              <p className={cn("text-sm font-bold", nextMilestone.textClass)}>
-                🏆 Milestone Completed! Amazing work!
-              </p>
+              <span className={cn("font-semibold", nextMilestone.textClass)}>
+                Completed! 🏆
+              </span>
             )}
           </div>
         </div>
