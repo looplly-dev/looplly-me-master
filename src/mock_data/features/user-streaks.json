@@ -1,0 +1,14 @@
+{
+  "defaultStreak": {
+    "currentStreak": 14,
+    "longestStreak": 30,
+    "lastActivityDate": "2024-01-18",
+    "streakStartedAt": "2024-01-05T00:00:00Z",
+    "milestones": {
+      "weekly": { "achieved": true, "count": 12 },
+      "monthly": { "achieved": true, "count": 2 },
+      "quarterly": { "achieved": false, "count": 0 },
+      "yearly": { "achieved": false, "count": 0 }
+    }
+  }
+}
