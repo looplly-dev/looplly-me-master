@@ -723,6 +723,50 @@ export type Database = {
           },
         ]
       }
+      streak_unlock_config: {
+        Row: {
+          config_key: string
+          config_value: Json
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          stage: number
+          tenant_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          config_key: string
+          config_value: Json
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          stage: number
+          tenant_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          config_key?: string
+          config_value?: Json
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          stage?: number
+          tenant_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "streak_unlock_config_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tenants: {
         Row: {
           api_key: string
@@ -1055,33 +1099,42 @@ export type Database = {
         Row: {
           created_at: string | null
           current_streak: number | null
+          daily_rep_cap_hits: Json | null
           id: string
           last_activity_date: string | null
           longest_streak: number | null
           milestones: Json | null
+          stage_unlock_history: Json | null
           streak_started_at: string | null
+          unlocked_stages: Json
           updated_at: string | null
           user_id: string
         }
         Insert: {
           created_at?: string | null
           current_streak?: number | null
+          daily_rep_cap_hits?: Json | null
           id?: string
           last_activity_date?: string | null
           longest_streak?: number | null
           milestones?: Json | null
+          stage_unlock_history?: Json | null
           streak_started_at?: string | null
+          unlocked_stages?: Json
           updated_at?: string | null
           user_id: string
         }
         Update: {
           created_at?: string | null
           current_streak?: number | null
+          daily_rep_cap_hits?: Json | null
           id?: string
           last_activity_date?: string | null
           longest_streak?: number | null
           milestones?: Json | null
+          stage_unlock_history?: Json | null
           streak_started_at?: string | null
+          unlocked_stages?: Json
           updated_at?: string | null
           user_id?: string
         }

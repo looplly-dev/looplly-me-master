@@ -16,6 +16,14 @@ export interface UserStreak {
     quarterly: { achieved: boolean; count: number };
     yearly: { achieved: boolean; count: number };
   };
+  unlocked_stages: {
+    stage1: boolean;
+    stage2: boolean;
+    stage3: boolean;
+    stage4: boolean;
+  };
+  stage_unlock_history: Array<{ stage: number; unlockedAt: string }>;
+  daily_rep_cap_hits: string[];
   created_at: string;
   updated_at: string;
 }
