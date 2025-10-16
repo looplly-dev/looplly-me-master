@@ -24,6 +24,8 @@ export interface UserStreak {
   };
   stage_unlock_history: Array<{ stage: number; unlockedAt: string }>;
   daily_rep_cap_hits: string[];
+  consecutive_days_missed: number;
+  grace_period_started_at: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -80,45 +82,104 @@ export const useUserStreaks = () => {
       const today = new Date().toISOString().split('T')[0];
       const lastActivityDate = streak.last_activity_date;
 
+      // If already logged in today, do nothing
+      if (lastActivityDate === today) return;
+
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yesterdayStr = yesterday.toISOString().split('T')[0];
+
       let newCurrentStreak = streak.current_streak;
       let newLongestStreak = streak.longest_streak;
+      let newConsecutiveDaysMissed = streak.consecutive_days_missed || 0;
+      let newGracePeriodStartedAt = streak.grace_period_started_at;
+      let toastMessage = '';
+      let toastTitle = 'Streak Updated';
 
-      // Check if this is a new day
-      if (lastActivityDate !== today) {
-        const yesterday = new Date();
-        yesterday.setDate(yesterday.getDate() - 1);
-        const yesterdayStr = yesterday.toISOString().split('T')[0];
+      // Check Stage 2 unlock status
+      const isStage2Unlocked = streak.unlocked_stages?.stage2 || false;
+      const STAGE_2_CAP = 29;
+      const GRACE_PERIOD_DAYS = 7;
 
-        // If last activity was yesterday, increment streak
-        if (lastActivityDate === yesterdayStr) {
-          newCurrentStreak += 1;
+      // Calculate days missed
+      const daysMissed = lastActivityDate 
+        ? Math.floor((new Date(today).getTime() - new Date(lastActivityDate).getTime()) / (1000 * 60 * 60 * 24)) - 1
+        : 0;
+
+      // Consecutive day logic
+      if (lastActivityDate === yesterdayStr) {
+        // Check Stage 2 cap
+        if (!isStage2Unlocked && newCurrentStreak >= STAGE_2_CAP) {
+          // At cap, no increment
+          toastTitle = '🔒 Stage 2 Locked';
+          toastMessage = `Streak capped at ${STAGE_2_CAP} days. Unlock Stage 2 to continue!`;
+          newConsecutiveDaysMissed = 0;
+          newGracePeriodStartedAt = null;
         } else {
-          // Streak broken, reset to 1
-          newCurrentStreak = 1;
+          // Normal increment
+          newCurrentStreak += 1;
+          newConsecutiveDaysMissed = 0;
+          newGracePeriodStartedAt = null;
+          toastMessage = `${newCurrentStreak} day streak! Keep it going! 🔥`;
+        }
+      } else if (daysMissed > 0 && daysMissed <= GRACE_PERIOD_DAYS) {
+        // Grace period active
+        newConsecutiveDaysMissed += daysMissed;
+        
+        if (!newGracePeriodStartedAt) {
+          newGracePeriodStartedAt = new Date().toISOString();
         }
 
-        // Update longest streak if needed
-        newLongestStreak = Math.max(newLongestStreak, newCurrentStreak);
+        const graceDaysRemaining = GRACE_PERIOD_DAYS - newConsecutiveDaysMissed;
 
-        const { error } = await supabase
-          .from('user_streaks')
-          .update({
-            current_streak: newCurrentStreak,
-            longest_streak: newLongestStreak,
-            last_activity_date: today,
-            streak_started_at: streak.streak_started_at || new Date().toISOString()
-          })
-          .eq('user_id', authState.user.id);
-
-        if (error) throw error;
+        if (!isStage2Unlocked && newCurrentStreak >= STAGE_2_CAP) {
+          // At cap in grace period
+          toastTitle = '⚠️ Grace Period Active';
+          toastMessage = `Streak paused at ${STAGE_2_CAP} days. ${graceDaysRemaining} day${graceDaysRemaining !== 1 ? 's' : ''} left - unlock Stage 2 to continue!`;
+        } else {
+          // Normal grace period increment
+          newCurrentStreak += 1;
+          toastTitle = graceDaysRemaining <= 1 ? '🚨 Final Grace Day!' : '⚠️ Grace Period Active';
+          toastMessage = graceDaysRemaining <= 1
+            ? `Streak continued! But this is your last grace day - don't miss tomorrow! 🔥`
+            : `Streak continued to ${newCurrentStreak} days! ${graceDaysRemaining} grace day${graceDaysRemaining !== 1 ? 's' : ''} remaining.`;
+        }
+      } else {
+        // Streak reset
+        newCurrentStreak = 1;
+        newConsecutiveDaysMissed = 0;
+        newGracePeriodStartedAt = null;
+        toastTitle = '🎯 Starting Fresh!';
+        toastMessage = "Let's build an even longer streak this time! Day 1 begins now 💪";
       }
+
+      // Update longest streak if needed
+      newLongestStreak = Math.max(newLongestStreak, newCurrentStreak);
+
+      const { error } = await supabase
+        .from('user_streaks')
+        .update({
+          current_streak: newCurrentStreak,
+          longest_streak: newLongestStreak,
+          last_activity_date: today,
+          consecutive_days_missed: newConsecutiveDaysMissed,
+          grace_period_started_at: newGracePeriodStartedAt,
+          streak_started_at: streak.streak_started_at || new Date().toISOString()
+        })
+        .eq('user_id', authState.user.id);
+
+      if (error) throw error;
+
+      return { toastTitle, toastMessage };
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['user-streak', authState.user?.id] });
-      toast({
-        title: 'Streak Updated',
-        description: 'Your daily streak has been recorded!',
-      });
+      if (data?.toastMessage) {
+        toast({
+          title: data.toastTitle,
+          description: data.toastMessage,
+        });
+      }
     },
     onError: (error: Error) => {
       toast({

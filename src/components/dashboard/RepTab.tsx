@@ -29,6 +29,9 @@ import { CollectibleBadge } from '@/components/ui/collectible-badge';
 import { BadgeDetailModal } from '@/components/ui/badge-detail-modal';
 import { StreakProgress } from '@/components/ui/streak-progress';
 import { CollapsibleSection } from '@/components/ui/collapsible-section';
+import { Stage2CapAlert } from '@/components/ui/stage-2-cap-alert';
+import { useUserStreaks } from '@/hooks/useUserStreaks';
+import { useStageUnlockLogic } from '@/hooks/useStageUnlockLogic';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { useBadgeService } from '@/hooks/useBadgeService';
 import { useQuery } from '@tanstack/react-query';
@@ -41,6 +44,8 @@ export default function RepTab() {
   const [selectedBadge, setSelectedBadge] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { listBadges, getUserBadges } = useBadgeService();
+  const { streak } = useUserStreaks();
+  const { checkStage2Unlock } = useStageUnlockLogic();
 
   useEffect(() => {
     if (selectedBadge) {
@@ -363,6 +368,23 @@ export default function RepTab() {
           </div>
         </div>
       </CollapsibleSection>
+
+      {/* Stage 2 Cap Alert */}
+      {streak && !streak.unlocked_stages?.stage2 && streak.current_streak >= 29 && (
+        <Stage2CapAlert
+          earnedBadgesCount={checkStage2Unlock.data?.progress || 0}
+          requiredBadgesCount={checkStage2Unlock.data?.required || 4}
+          missingBadgeNames={
+            allBadges
+              .filter(badge => 
+                badge.category === 'identity_security' && 
+                badge.name !== 'Crypto Token Verification' &&
+                !earnedBadgeIds.has(badge.id)
+              )
+              .map(badge => badge.name)
+          }
+        />
+      )}
 
       {/* Daily Streak Progress */}
       <CollapsibleSection

@@ -78,7 +78,6 @@ export default function AdminStreakConfig() {
 
   const stage2Config = configs?.find(c => c.stage === 2);
   const stage3Config = configs?.find(c => c.stage === 3);
-  const stage4Config = configs?.find(c => c.stage === 4);
 
   const getConfigValue = (config: any, key: string) => {
     if (typeof config.config_value === 'object' && config.config_value !== null) {
@@ -195,50 +194,6 @@ export default function AdminStreakConfig() {
           </Card>
         )}
 
-        {/* Stage 4 */}
-        {stage4Config && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Stage 4: SMS Unlock Payment</CardTitle>
-              <CardDescription>{stage4Config.description}</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="stage4-amount">Payment Amount</Label>
-                  <Input
-                    id="stage4-amount"
-                    type="number"
-                    step="0.01"
-                    min="0.01"
-                    value={editingConfig[stage4Config.id]?.requiredAmount ?? getConfigValue(stage4Config, 'requiredAmount')}
-                    onChange={(e) => handleChange(stage4Config.id, 'requiredAmount', parseFloat(e.target.value))}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="stage4-currency">Currency</Label>
-                  <Input
-                    id="stage4-currency"
-                    disabled
-                    value={getConfigValue(stage4Config, 'currency')}
-                  />
-                </div>
-              </div>
-              <div>
-                <Label htmlFor="stage4-message">Display Message</Label>
-                <Input
-                  id="stage4-message"
-                  value={editingConfig[stage4Config.id]?.message ?? getConfigValue(stage4Config, 'message')}
-                  onChange={(e) => handleChange(stage4Config.id, 'message', e.target.value)}
-                />
-              </div>
-              <Button onClick={() => handleSave(stage4Config)} disabled={updateConfigMutation.isPending}>
-                {updateConfigMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
-                Save Changes
-              </Button>
-            </CardContent>
-          </Card>
-        )}
       </div>
     </div>
   );
