@@ -39,11 +39,72 @@ export function StreakProgress({
     return 5;
   };
 
-  // Progress to next monthly milestone (every 30 days)
-  const progressToMonthly = ((30 - daysUntilMonthlyMilestone) / 30) * 100;
-  
-  // Progress to yearly milestone (365 days total)
-  const progressToYearly = (currentStreak / 365) * 100;
+  // Determine next milestone to show
+  const getNextMilestone = () => {
+    if (currentStreak < 7) {
+      return {
+        name: 'Week Warrior',
+        emoji: '⚡',
+        target: 7,
+        reward: 25,
+        progress: (currentStreak / 7) * 100,
+        remaining: 7 - currentStreak,
+        colorClass: 'bg-primary/5 border-primary/20',
+        badgeClass: 'border-primary/30 text-primary',
+        textClass: 'text-primary'
+      };
+    } else if (currentStreak < 30) {
+      return {
+        name: 'Monthly Master',
+        emoji: '🌙',
+        target: 30,
+        reward: 50,
+        progress: (currentStreak / 30) * 100,
+        remaining: 30 - currentStreak,
+        colorClass: 'bg-success/5 border-success/20',
+        badgeClass: 'border-success/30 text-success',
+        textClass: 'text-success'
+      };
+    } else if (currentStreak < 90) {
+      return {
+        name: 'Quarter Champion',
+        emoji: '🌟',
+        target: 90,
+        reward: 150,
+        progress: (currentStreak / 90) * 100,
+        remaining: 90 - currentStreak,
+        colorClass: 'bg-info/5 border-info/20',
+        badgeClass: 'border-info/30 text-info',
+        textClass: 'text-info'
+      };
+    } else if (currentStreak < 365) {
+      return {
+        name: 'Annual Legend',
+        emoji: '👑',
+        target: 365,
+        reward: 500,
+        progress: (currentStreak / 365) * 100,
+        remaining: 365 - currentStreak,
+        colorClass: 'bg-purple/5 border-purple/20',
+        badgeClass: 'border-purple/30 text-purple',
+        textClass: 'text-purple'
+      };
+    } else {
+      return {
+        name: 'Legendary Status',
+        emoji: '🏆',
+        target: 365,
+        reward: 500,
+        progress: 100,
+        remaining: 0,
+        colorClass: 'bg-purple/5 border-purple/20',
+        badgeClass: 'border-purple/30 text-purple',
+        textClass: 'text-purple'
+      };
+    }
+  };
+
+  const nextMilestone = getNextMilestone();
 
   return (
     <Card className="border-primary/30 bg-gradient-to-br from-primary/5 to-accent/5">
@@ -71,38 +132,34 @@ export function StreakProgress({
           <p className="text-xs text-muted-foreground">Longest Streak</p>
         </div>
 
-        {/* Monthly Progress */}
-        <div className="space-y-2 p-3 rounded-lg bg-primary/5 border border-primary/20">
+        {/* Next Milestone Progress */}
+        <div className={cn("space-y-2 p-3 rounded-lg", nextMilestone.colorClass)}>
           <div className="flex items-center justify-between">
             <span className="flex items-center gap-1.5 font-medium">
-              📅 <span>Monthly Milestone</span>
+              {nextMilestone.emoji} <span>Next: {nextMilestone.name}</span>
             </span>
-            <Badge variant="outline" className="border-primary/30 text-primary">+50 Rep</Badge>
+            <Badge variant="outline" className={nextMilestone.badgeClass}>
+              +{nextMilestone.reward} Rep
+            </Badge>
           </div>
-          <Progress value={progressToMonthly} className="h-2.5" />
+          <Progress value={nextMilestone.progress} className="h-2.5" />
           <div className="flex items-center justify-between text-xs">
-            <span className="text-muted-foreground">{30 - daysUntilMonthlyMilestone} days done</span>
-            <span className={cn(
-              "font-medium",
-              daysUntilMonthlyMilestone <= 7 ? "text-primary animate-pulse" : "text-muted-foreground"
-            )}>
-              {daysUntilMonthlyMilestone} days to go! 🎉
+            <span className="text-muted-foreground">
+              {currentStreak} / {nextMilestone.target} days
             </span>
+            {nextMilestone.remaining > 0 ? (
+              <span className={cn(
+                "font-medium",
+                nextMilestone.remaining <= 3 ? `${nextMilestone.textClass} animate-pulse` : "text-muted-foreground"
+              )}>
+                {nextMilestone.remaining} {nextMilestone.remaining === 1 ? 'day' : 'days'} to go! 🎉
+              </span>
+            ) : (
+              <span className={cn("font-medium", nextMilestone.textClass)}>
+                Completed! 🏆
+              </span>
+            )}
           </div>
-        </div>
-
-        {/* Yearly Progress */}
-        <div className="space-y-2 p-3 rounded-lg bg-purple/5 border border-purple/20">
-          <div className="flex items-center justify-between">
-            <span className="flex items-center gap-1.5 font-medium">
-              🎯 <span>Annual Legend</span>
-            </span>
-            <Badge variant="outline" className="border-purple/30 text-purple">+500 Rep</Badge>
-          </div>
-          <Progress value={progressToYearly} className="h-2.5" />
-          <p className="text-xs text-muted-foreground">
-            {currentStreak} days done • {365 - currentStreak} days remaining
-          </p>
         </div>
 
         {/* Milestone Badges */}
