@@ -48,10 +48,9 @@ export function StreakProgress({
   return (
     <Card className="border-primary/30 bg-gradient-to-br from-primary/5 to-accent/5">
       <CardHeader className="pb-2">
-        <CardTitle className="flex items-center gap-2">
-          <Flame className="h-5 w-5 text-primary" />
-          Daily Streak Progress
-        </CardTitle>
+        <p className="text-sm text-muted-foreground">
+          Maintain your streak to earn bonus Rep and unlock exclusive milestone badges
+        </p>
       </CardHeader>
       
       <CardContent className="space-y-3">
