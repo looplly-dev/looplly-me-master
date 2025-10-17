@@ -115,28 +115,21 @@ export function StreakProgress({
       </CardHeader>
       
       <CardContent className="space-y-3">
-        {/* Streak Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {/* Left: Longest Streak - spans 2 rows on desktop */}
-          <div className="sm:row-span-2 flex flex-col items-center justify-center p-4 bg-secondary/30 dark:bg-secondary/40 rounded-lg border border-secondary/20 dark:border-secondary/30">
-            <p className="text-4xl font-bold text-foreground">{longestStreak}</p>
-            <p className="text-sm text-muted-foreground mt-1">Longest Streak</p>
+        {/* Current Streak Display */}
+        <div className="text-center p-3 bg-background/50 dark:bg-background/70 rounded-lg border border-border/50">
+          <div className="text-3xl font-bold bg-gradient-to-r from-primary via-orange-500 to-primary bg-clip-text text-transparent mb-1">
+            🔥 {currentStreak}
           </div>
-          
-          {/* Right Top: Day Streak */}
-          <div className="flex flex-col items-center justify-center p-3 bg-background/50 dark:bg-background/70 rounded-lg border border-border/50">
-            <div className="text-2xl font-bold bg-gradient-to-r from-primary via-orange-500 to-primary bg-clip-text text-transparent">
-              🔥 {currentStreak}
-            </div>
-            <p className="text-xs font-medium text-foreground mt-1">Day Streak</p>
-          </div>
-          
-          {/* Right Bottom: Daily Rep */}
-          <div className="flex items-center justify-center p-3 bg-background/50 dark:bg-background/70 rounded-lg border border-border/50">
-            <Badge className="bg-primary/20 text-primary border border-primary/30">
-              +{getStreakReward(currentStreak)} Rep Today
-            </Badge>
-          </div>
+          <p className="text-sm font-medium text-foreground mb-1">Day Streak</p>
+          <Badge className="bg-primary/20 text-primary border border-primary/30">
+            +{getStreakReward(currentStreak)} Rep Today
+          </Badge>
+        </div>
+
+        {/* Streak Stats */}
+        <div className="text-center p-2 bg-secondary/30 dark:bg-secondary/40 rounded-lg border border-secondary/20 dark:border-secondary/30">
+          <p className="text-lg font-bold text-foreground">{longestStreak}</p>
+          <p className="text-xs text-muted-foreground">Longest Streak</p>
         </div>
 
         {/* Next Milestone Progress - Circular Design */}
