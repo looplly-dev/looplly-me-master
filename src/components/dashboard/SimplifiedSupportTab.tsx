@@ -175,10 +175,10 @@ export default function SimplifiedSupportTab() {
       {/* Quick Help Section */}
       <Card className="bg-card shadow-sm border border-primary/20">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Lightbulb className="h-5 w-5 text-primary" />
-            Frequently Asked Questions
-          </CardTitle>
+            <CardTitle className="flex items-center gap-2 text-base sm:text-lg md:text-xl">
+              <Lightbulb className="h-4 w-4 sm:h-5 sm:w-5 text-primary flex-shrink-0" />
+              <span className="leading-tight">Frequently Asked Questions</span>
+            </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <Accordion type="single" collapsible defaultValue="earning" className="space-y-3">
@@ -189,10 +189,10 @@ export default function SimplifiedSupportTab() {
                   <AccordionTrigger className="px-4 hover:no-underline">
                     <div className="flex items-center gap-3">
                       <IconComponent className={`h-5 w-5 ${category.iconColor}`} />
-                      <div className="text-left">
-                        <div className="font-semibold">{category.title}</div>
-                        <div className="text-xs text-muted-foreground">{category.description}</div>
-                      </div>
+                  <div className="text-left min-w-0 flex-1">
+                    <div className="font-semibold text-sm sm:text-base truncate">{category.title}</div>
+                    <div className="text-xs text-muted-foreground truncate">{category.description}</div>
+                  </div>
                     </div>
                   </AccordionTrigger>
                   <AccordionContent className="px-4 pb-4">
@@ -207,7 +207,7 @@ export default function SimplifiedSupportTab() {
                                 className="w-full justify-between text-left h-auto p-0"
                                 onClick={() => setExpandedHelp(expandedHelp === faqKey ? null : faqKey)}
                               >
-                                <span className="font-medium text-sm">{item.question}</span>
+                                <span className="font-medium text-xs sm:text-sm leading-tight pr-2">{item.question}</span>
                                 <HelpCircle className="h-4 w-4 flex-shrink-0" />
                               </Button>
                               
