@@ -38,7 +38,7 @@ import { useBadgeService } from '@/hooks/useBadgeService';
 import { useQuery } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { ReputationOnboarding } from '@/components/ui/reputation-onboarding';
+import { RepOnboardingTour } from '@/components/ui/rep-onboarding-tour';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useUserReputation } from '@/hooks/useUserReputation';
 
@@ -767,12 +767,12 @@ export default function RepTab() {
         previewEarned={!!profile?.badge_preview_mode}
       />
 
-      {/* Reputation Onboarding Modal */}
-      <ReputationOnboarding
-        open={showOnboarding}
-        onClose={handleCloseOnboarding}
+      {/* Reputation Onboarding Tour */}
+      <RepOnboardingTour
+        isVisible={showOnboarding}
+        onComplete={handleCloseOnboarding}
+        onSkip={handleCloseOnboarding}
         isBetaCohort={reputation?.beta_cohort ?? false}
-        betaRepCap={reputation?.beta_rep_cap ?? 1000}
       />
     </div>
   );
