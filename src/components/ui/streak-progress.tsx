@@ -255,7 +255,7 @@ export function StreakProgress({
                 <p className="text-sm font-semibold text-foreground">Week Warrior</p>
               </div>
               <p className="text-xs text-muted-foreground">
-                {milestones.weekly.achieved ? '✓ Earned' : '7 days to unlock'}
+                {milestones.weekly.achieved ? '✓' : '7 days to unlock'}
               </p>
             </div>
             
@@ -271,7 +271,7 @@ export function StreakProgress({
                 <p className="text-sm font-semibold text-foreground">Month Master</p>
               </div>
               <p className="text-xs text-muted-foreground">
-                {milestones.monthly.achieved ? '✓ Earned' : '30 days to unlock'}
+                {milestones.monthly.achieved ? '✓' : '30 days to unlock'}
               </p>
             </div>
             
@@ -287,7 +287,7 @@ export function StreakProgress({
                 <p className="text-sm font-semibold text-foreground">Quarter Champion</p>
               </div>
               <p className="text-xs text-muted-foreground">
-                {milestones.quarterly.achieved ? '✓ Earned' : '90 days to unlock'}
+                {milestones.quarterly.achieved ? '✓' : '90 days to unlock'}
               </p>
             </div>
             
@@ -303,7 +303,7 @@ export function StreakProgress({
                 <p className="text-sm font-semibold text-foreground">Annual Legend</p>
               </div>
               <p className="text-xs text-muted-foreground">
-                {milestones.yearly.achieved ? '✓ Earned' : '365 days to unlock'}
+                {milestones.yearly.achieved ? '✓' : '365 days to unlock'}
               </p>
             </div>
           </div>
