@@ -13,6 +13,7 @@ interface CollapsibleSectionProps {
   className?: string;
   compactContent?: React.ReactNode;
   priority?: 'high' | 'medium' | 'low';
+  [key: string]: any; // Allow data-* attributes
 }
 
 export function CollapsibleSection({ 
@@ -23,7 +24,8 @@ export function CollapsibleSection({
   alwaysShowHeader = false,
   className,
   compactContent,
-  priority = 'medium'
+  priority = 'medium',
+  ...props
 }: CollapsibleSectionProps) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
   const [isCompact, setIsCompact] = useState(false);
@@ -35,12 +37,15 @@ export function CollapsibleSection({
   };
 
   return (
-    <Card className={cn(
-      'transition-all duration-200 hover:shadow-md',
-      priorityColors[priority],
-      className
-    )}>
-      <CardHeader 
+    <Card 
+      {...props}
+      className={cn(
+        'transition-all duration-200 hover:shadow-md',
+        priorityColors[priority],
+        className
+      )}
+    >
+      <CardHeader
         className={cn(
           'cursor-pointer select-none',
           !isOpen && !alwaysShowHeader ? 'pb-2' : ''

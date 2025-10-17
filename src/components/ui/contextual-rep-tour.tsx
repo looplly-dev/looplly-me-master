@@ -93,7 +93,7 @@ export function ContextualRepTour({ isActive, onStart, onComplete }: ContextualR
     const element = document.querySelector(currentStepData.targetSelector);
     if (element) {
       setTimeout(() => {
-        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        element.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
       }, 100);
     }
 
@@ -134,10 +134,21 @@ export function ContextualRepTour({ isActive, onStart, onComplete }: ContextualR
 
   if (!isActive || !currentStepData) return null;
 
+  // Calculate dynamic card position
+  const cardPosition = highlightRect 
+    ? {
+        top: highlightRect.bottom + 16 > window.innerHeight - 200
+          ? Math.max(16, highlightRect.top - 240) // Position above if not enough space below
+          : highlightRect.bottom + 16, // Position below
+        left: '50%',
+        transform: 'translateX(-50%)',
+      }
+    : { top: 80, left: '50%', transform: 'translateX(-50%)' };
+
   return (
     <>
-      {/* Dark backdrop with blur */}
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40" onClick={handleComplete} />
+      {/* Dark backdrop without blur */}
+      <div className="fixed inset-0 bg-black/60 z-40" onClick={handleComplete} />
 
       {/* Spotlight effect */}
       {highlightRect && (
@@ -148,15 +159,19 @@ export function ContextualRepTour({ isActive, onStart, onComplete }: ContextualR
             left: highlightRect.left - 8,
             width: highlightRect.width + 16,
             height: highlightRect.height + 16,
-            boxShadow: '0 0 0 4px hsl(var(--primary)), 0 0 0 9999px rgba(0, 0, 0, 0.5)',
+            boxShadow: '0 0 0 6px hsl(var(--primary)), 0 0 0 9999px rgba(0, 0, 0, 0.6)',
             borderRadius: '12px',
             transition: 'all 0.3s ease',
+            background: 'transparent',
           }}
         />
       )}
 
-      {/* Tour card */}
-      <div className="fixed z-50 left-1/2 -translate-x-1/2 top-20 w-full max-w-md px-4">
+      {/* Tour card with dynamic positioning */}
+      <div 
+        className="fixed z-50 w-full max-w-md px-4"
+        style={cardPosition}
+      >
         <Card className="shadow-xl">
           <CardHeader>
             <div className="flex items-start justify-between">
