@@ -107,163 +107,170 @@ export function StreakProgress({
   const nextMilestone = getNextMilestone();
 
   return (
-    <Card className="border-primary/30 bg-gradient-to-br from-primary/5 to-accent/5">
-      <CardHeader className="pb-1 pt-3">
-        <p className="text-xs text-muted-foreground">
-          Earn bonus Rep and unlock milestone badges
-        </p>
-      </CardHeader>
+    <div className="p-4 bg-slate-900/50 dark:bg-slate-950/60 rounded-xl border border-slate-700/40 dark:border-slate-800/50">
+      <p className="text-xs text-slate-400 mb-3 text-center">
+        Earn bonus Rep and unlock milestone badges
+      </p>
       
-      <CardContent className="space-y-2">
-        {/* Combined Streak Stats - Compact Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          {/* Left: Day Streak */}
-          <div className="text-center p-3 bg-background/50 dark:bg-background/70 rounded-lg border border-border/50">
-            <div className="text-3xl font-bold bg-gradient-to-r from-primary via-orange-500 to-primary bg-clip-text text-transparent mb-1">
-              🔥 {currentStreak}
+      <div className="space-y-3">
+        {/* Hero Stats - Unified Dark Card */}
+        <div className="relative p-4 bg-slate-900/90 dark:bg-slate-950/90 rounded-xl border border-slate-700/50 dark:border-slate-800/50">
+          <div className="flex items-center justify-between">
+            {/* Left: Current Streak */}
+            <div className="flex flex-col items-center flex-1">
+              <div className="text-5xl mb-2">🔥</div>
+              <div className="text-4xl font-bold text-orange-400">{currentStreak}</div>
+              <p className="text-sm font-medium text-slate-300 mb-2">Day Streak</p>
+              <Badge className="bg-orange-500/20 text-orange-300 border border-orange-400/30 text-xs font-semibold">
+                +{getStreakReward(currentStreak)} Rep Today
+              </Badge>
             </div>
-            <p className="text-sm font-medium text-foreground mb-1">Day Streak</p>
-            <Badge className="bg-primary/20 text-primary border border-primary/30 text-xs">
-              +{getStreakReward(currentStreak)} Rep Today
-            </Badge>
-          </div>
-
-          {/* Right: Longest Streak */}
-          <div className="flex flex-col items-center justify-center p-3 bg-secondary/30 dark:bg-secondary/40 rounded-lg border border-secondary/20 dark:border-secondary/30">
-            <p className="text-3xl font-bold text-foreground">{longestStreak}</p>
-            <p className="text-sm text-muted-foreground">Longest Streak</p>
+            
+            {/* Right: Longest Streak */}
+            <div className="flex flex-col items-center flex-1 border-l border-slate-700/50 dark:border-slate-800/50 pl-4">
+              <div className="text-4xl font-bold text-slate-300 mb-1">{longestStreak}</div>
+              <p className="text-sm text-slate-400">Longest Streak</p>
+            </div>
           </div>
         </div>
 
-        {/* Next Milestone Progress - Circular Design */}
-        <div className={cn("p-3 rounded-lg border", nextMilestone.colorClass)}>
-          <div className="flex flex-col items-center gap-2">
-            {/* Title - Centered Header */}
-            <h4 className="font-bold text-xl text-foreground text-center">
-              {nextMilestone.name}
-            </h4>
-            
-            {/* Rep Badge */}
-            <Badge 
-              variant="outline" 
-              className={cn(
-                "text-xs font-medium",
-                nextMilestone.colorClass
-              )}
-            >
+        {/* Next Milestone - Prominent Card */}
+        <div className="relative p-6 bg-gradient-to-br from-blue-900/40 via-blue-800/30 to-purple-900/40 dark:from-blue-950/60 dark:via-blue-900/40 dark:to-purple-950/60 rounded-xl border-2 border-blue-400/30 dark:border-blue-600/40">
+          {/* Title */}
+          <h4 className="font-bold text-2xl text-white text-center mb-2">
+            {nextMilestone.name}
+          </h4>
+          
+          {/* Rep Badge - Centered */}
+          <div className="flex justify-center mb-4">
+            <Badge className="bg-blue-500/30 text-blue-200 border border-blue-400/40 text-sm font-semibold px-4 py-1">
               +{nextMilestone.reward} Rep
             </Badge>
-
-            {/* Circular Progress */}
-            <div className="flex flex-col items-center gap-1">
-              <div className="relative">
-                <svg className="w-24 h-24 transform -rotate-90">
-                  {/* Background circle */}
-                  <circle
-                    cx="48"
-                    cy="48"
-                    r="40"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="6"
-                    className="text-border"
-                  />
-                  {/* Progress circle */}
-                  <circle
-                    cx="48"
-                    cy="48"
-                    r="40"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="6"
-                    strokeDasharray={`${2 * Math.PI * 40}`}
-                    strokeDashoffset={`${2 * Math.PI * 40 * (1 - nextMilestone.progress / 100)}`}
-                    className={nextMilestone.textClass}
-                    strokeLinecap="round"
-                  />
-                </svg>
-                {/* Emoji in center */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-3xl">{nextMilestone.emoji}</span>
-                </div>
-              </div>
-              
-              {/* Day count below circle */}
-              <p className="text-xs text-muted-foreground text-center">
-                {currentStreak} / {nextMilestone.target} days
-              </p>
-            </div>
-
-            {/* Days Remaining Message */}
-            {nextMilestone.remaining > 0 ? (
-              <p className={cn(
-                "text-sm font-medium text-center",
-                nextMilestone.remaining <= 7 ? `${nextMilestone.textClass} animate-pulse` : "text-foreground"
-              )}>
-                🎯 {nextMilestone.remaining} {nextMilestone.remaining === 1 ? 'day' : 'days'} to go!
-              </p>
-            ) : (
-              <p className={cn("text-sm font-semibold text-center", nextMilestone.textClass)}>
-                ✓ Completed! 🏆
-              </p>
-            )}
           </div>
+
+          {/* Circular Progress - Larger */}
+          <div className="flex flex-col items-center gap-2">
+            <div className="relative">
+              <svg className="w-32 h-32 transform -rotate-90">
+                {/* Background circle - darker */}
+                <circle
+                  cx="64"
+                  cy="64"
+                  r="56"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="8"
+                  className="text-slate-700/50 dark:text-slate-800/50"
+                />
+                {/* Progress circle - vibrant blue */}
+                <circle
+                  cx="64"
+                  cy="64"
+                  r="56"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="8"
+                  strokeDasharray={`${2 * Math.PI * 56}`}
+                  strokeDashoffset={`${2 * Math.PI * 56 * (1 - nextMilestone.progress / 100)}`}
+                  className="text-blue-400 dark:text-blue-500"
+                  strokeLinecap="round"
+                />
+              </svg>
+              {/* Emoji in center - larger */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-5xl">{nextMilestone.emoji}</span>
+              </div>
+            </div>
+            
+            {/* Progress Text */}
+            <p className="text-base text-slate-300 dark:text-slate-400 text-center font-medium">
+              {currentStreak} / {nextMilestone.target} days
+            </p>
+          </div>
+
+          {/* Days Remaining */}
+          {nextMilestone.remaining > 0 ? (
+            <p className="text-base font-semibold text-center mt-4 text-pink-300 dark:text-pink-400 flex items-center justify-center gap-2">
+              <span className="text-2xl">🎯</span>
+              {nextMilestone.remaining} day{nextMilestone.remaining !== 1 ? 's' : ''} to go!
+            </p>
+          ) : (
+            <p className="text-base font-semibold text-center mt-4 text-green-300 flex items-center justify-center gap-2">
+              <span className="text-2xl">✓</span> Completed! <span className="text-2xl">🏆</span>
+            </p>
+          )}
         </div>
 
-        {/* Milestone Badges */}
-        <div className="space-y-3">
-          <h4 className="text-sm font-medium text-foreground">Streak Milestones</h4>
-          <div className="grid grid-cols-2 gap-2">
+        {/* Milestone Grid */}
+        <div className="space-y-2">
+          <h4 className="text-sm font-semibold text-white">Streak Milestones</h4>
+          <div className="grid grid-cols-2 gap-3">
+            {/* Week Warrior */}
             <div className={cn(
-              'p-1.5 rounded border text-center',
+              'p-3 rounded-lg border text-left transition-all duration-300',
               milestones.weekly.achieved 
-                ? 'bg-success/10 border-success/30' 
-                : 'bg-muted/30 border-border dark:bg-muted/20 dark:border-muted'
+                ? 'bg-green-900/40 border-green-500/40 dark:bg-green-950/60 dark:border-green-600/40' 
+                : 'bg-slate-800/40 border-slate-700/40 dark:bg-slate-900/60 dark:border-slate-700/40'
             )}>
-              <p className="text-xs font-medium">⚡ Week Warrior</p>
-              <p className="text-xs text-muted-foreground">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-2xl">⚡</span>
+                <p className="text-sm font-semibold text-white">Week Warrior</p>
+              </div>
+              <p className="text-xs text-slate-400">
                 {milestones.weekly.achieved ? `✓ Earned ${milestones.weekly.count}x` : '7 days to unlock'}
               </p>
             </div>
             
+            {/* Month Master */}
             <div className={cn(
-              'p-1.5 rounded border text-center',
+              'p-3 rounded-lg border text-left transition-all duration-300',
               milestones.monthly.achieved
-                ? 'bg-accent/10 border-accent/30 dark:bg-accent/15 dark:border-accent/40' 
-                : 'bg-muted/30 border-border dark:bg-muted/20 dark:border-muted'
+                ? 'bg-green-900/40 border-green-500/40 dark:bg-green-950/60 dark:border-green-600/40' 
+                : 'bg-slate-800/40 border-slate-700/40 dark:bg-slate-900/60 dark:border-slate-700/40'
             )}>
-              <p className="text-xs font-medium">🌙 Month Master</p>
-              <p className="text-xs text-muted-foreground">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-2xl">🌙</span>
+                <p className="text-sm font-semibold text-white">Month Master</p>
+              </div>
+              <p className="text-xs text-slate-400">
                 {milestones.monthly.achieved ? `✓ Earned ${milestones.monthly.count}x` : '30 days to unlock'}
               </p>
             </div>
             
+            {/* Quarter Champion */}
             <div className={cn(
-              'p-1.5 rounded border text-center',
+              'p-3 rounded-lg border text-left transition-all duration-300',
               milestones.quarterly.achieved
-                ? 'bg-info/10 border-info/30 dark:bg-info/15 dark:border-info/40' 
-                : 'bg-muted/30 border-border dark:bg-muted/20 dark:border-muted'
+                ? 'bg-green-900/40 border-green-500/40 dark:bg-green-950/60 dark:border-green-600/40' 
+                : 'bg-slate-800/40 border-slate-700/40 dark:bg-slate-900/60 dark:border-slate-700/40'
             )}>
-              <p className="text-xs font-medium">🌟 Quarter Champion</p>
-              <p className="text-xs text-muted-foreground">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-2xl">🌟</span>
+                <p className="text-sm font-semibold text-white">Quarter Champion</p>
+              </div>
+              <p className="text-xs text-slate-400">
                 {milestones.quarterly.achieved ? `✓ Earned ${milestones.quarterly.count}x` : '90 days to unlock'}
               </p>
             </div>
             
+            {/* Annual Legend */}
             <div className={cn(
-              'p-1.5 rounded border text-center',
+              'p-3 rounded-lg border text-left transition-all duration-300',
               milestones.yearly.achieved
-                ? 'bg-purple/10 border-purple/30' 
-                : 'bg-muted/30 border-border dark:bg-muted/20 dark:border-muted'
+                ? 'bg-green-900/40 border-green-500/40 dark:bg-green-950/60 dark:border-green-600/40' 
+                : 'bg-slate-800/40 border-slate-700/40 dark:bg-slate-900/60 dark:border-slate-700/40'
             )}>
-              <p className="text-xs font-medium">👑 Annual Legend</p>
-              <p className="text-xs text-muted-foreground">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-2xl">🔥</span>
+                <p className="text-sm font-semibold text-white">Annual Legend</p>
+              </div>
+              <p className="text-xs text-slate-400">
                 {milestones.yearly.achieved ? `✓ Earned ${milestones.yearly.count}x` : '365 days to unlock'}
               </p>
             </div>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
