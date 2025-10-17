@@ -21,7 +21,8 @@ import {
   Settings,
   Maximize2,
   Minimize2,
-  Zap
+  Zap,
+  History
 } from 'lucide-react';
 import { userStats } from '@/mock_data';
 import { useAuth } from '@/hooks/useAuth';
@@ -37,15 +38,27 @@ import { useBadgeService } from '@/hooks/useBadgeService';
 import { useQuery } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { ReputationOnboarding } from '@/components/ui/reputation-onboarding';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { useUserReputation } from '@/hooks/useUserReputation';
 
 export default function RepTab() {
   const { authState } = useAuth();
   const [isCompactView, setIsCompactView] = useState(true);
   const [selectedBadge, setSelectedBadge] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(() => {
+    return !localStorage.getItem('rep_onboarding_completed');
+  });
   const { listBadges, getUserBadges } = useBadgeService();
   const { streak } = useUserStreaks();
   const { checkStage2Unlock } = useStageUnlockLogic();
+  const { reputation, isLoading: reputationLoading } = useUserReputation();
+
+  const handleCloseOnboarding = () => {
+    localStorage.setItem('rep_onboarding_completed', 'true');
+    setShowOnboarding(false);
+  };
 
   useEffect(() => {
     if (selectedBadge) {
@@ -386,6 +399,54 @@ export default function RepTab() {
         />
       )}
 
+      {/* Beta Cohort Progress Bar */}
+      {reputation?.beta_cohort && reputation.score > 500 && (
+        <Card className="p-4 bg-blue-50 dark:bg-blue-950/30 border-blue-200 dark:border-blue-800">
+          <div className="flex items-center justify-between mb-2">
+            <Badge variant="secondary">Beta Soft Cap Active</Badge>
+            <span className="text-sm text-muted-foreground">
+              {reputation.score} / {reputation.beta_rep_cap} Rep
+            </span>
+          </div>
+          <Progress 
+            value={(reputation.score / reputation.beta_rep_cap) * 100} 
+            className="h-2"
+          />
+          <p className="text-xs text-muted-foreground mt-2">
+            Gains are reduced by {Math.round((1 - Math.min(reputation.score / reputation.beta_rep_cap, 1)) * 100)}% 
+            due to Beta soft cap
+          </p>
+        </Card>
+      )}
+
+      {/* Quality Metrics Card */}
+      {reputation?.quality_metrics && (
+        <Card className="p-4">
+          <h3 className="font-semibold mb-3 flex items-center gap-2">
+            <TrendingUp className="h-4 w-4" />
+            Quality Metrics
+          </h3>
+          <div className="grid grid-cols-2 gap-3 text-sm">
+            <div>
+              <span className="text-muted-foreground">Surveys Completed</span>
+              <p className="font-semibold">{reputation.quality_metrics.surveysCompleted}</p>
+            </div>
+            <div>
+              <span className="text-muted-foreground">Surveys Rejected</span>
+              <p className="font-semibold text-red-600 dark:text-red-400">{reputation.quality_metrics.surveysRejected}</p>
+            </div>
+            <div>
+              <span className="text-muted-foreground">Consistency Score</span>
+              <p className="font-semibold">{reputation.quality_metrics.consistencyScore}%</p>
+            </div>
+            <div>
+              <span className="text-muted-foreground">Average Time</span>
+              <p className="font-semibold">{reputation.quality_metrics.averageTime}</p>
+            </div>
+          </div>
+        </Card>
+      )}
+
       {/* Daily Streak Progress */}
       <CollapsibleSection
         title="Daily Streak Progress"
@@ -542,42 +603,43 @@ export default function RepTab() {
         </div>
       </CollapsibleSection>
 
-      {/* Reputation History */}
-      <CollapsibleSection
-        title="Reputation History"
-        icon={<Clock className="h-5 w-5" />}
-        defaultOpen={false}
-        compactContent={
-          <div className="text-center">
-            <p className="text-sm text-muted-foreground">
-              {userStats.reputation.history.length} recent activities
-            </p>
-          </div>
-        }
-      >
-        <div className="space-y-3 max-h-64 overflow-y-auto scrollbar-thin scrollbar-gutter">
-          {userStats.reputation.history.map((entry, index) => (
-            <div key={index} className="flex items-center gap-3 p-3 bg-white border border-gray-200 rounded-lg shadow-sm transition-all hover:shadow-md">
-              <div className={`p-2 rounded-full ${
-                entry.points > 0 ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'
-              }`}>
-                {entry.points > 0 ? (
-                  <Plus className="h-4 w-4" />
-                ) : (
-                  <Minus className="h-4 w-4" />
-                )}
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-medium">{entry.action}</p>
-                <p className="text-xs text-muted-foreground">{entry.date}</p>
-              </div>
-              <Badge variant={entry.points > 0 ? "default" : "destructive"} className="text-sm">
-                {entry.points > 0 ? '+' : ''}{entry.points}
-              </Badge>
-            </div>
-          ))}
-        </div>
-      </CollapsibleSection>
+      {/* Reputation History - Enhanced with Database Data */}
+      {reputation?.history && reputation.history.length > 0 && (
+        <Collapsible>
+          <CollapsibleTrigger className="flex items-center gap-2 w-full p-4 bg-muted rounded-lg hover:bg-muted/80 transition-colors">
+            <History className="h-4 w-4" />
+            <span className="font-semibold">Reputation History</span>
+            <span className="text-sm text-muted-foreground ml-auto">
+              {reputation.history.length} transactions
+            </span>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="mt-2 space-y-2">
+            {reputation.history.slice().reverse().slice(0, 20).map((entry) => (
+              <Card key={entry.transaction_id} className="p-3">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Badge variant={entry.type === 'gain' ? 'default' : entry.type === 'loss' ? 'destructive' : 'secondary'}>
+                        {entry.category}
+                      </Badge>
+                      <span className="text-sm font-medium">{entry.action}</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {entry.description}
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {new Date(entry.date).toLocaleDateString()} - ID: {entry.transaction_id.slice(0, 8)}
+                    </p>
+                  </div>
+                  <span className={`font-bold text-lg ml-4 ${entry.points >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                    {entry.points >= 0 ? '+' : ''}{entry.points}
+                  </span>
+                </div>
+              </Card>
+            ))}
+          </CollapsibleContent>
+        </Collapsible>
+      )}
 
       {/* Reputation Benefits */}
       <CollapsibleSection
@@ -680,6 +742,14 @@ export default function RepTab() {
           if (!open) setSelectedBadge(null);
         }}
         previewEarned={!!profile?.badge_preview_mode}
+      />
+
+      {/* Reputation Onboarding Modal */}
+      <ReputationOnboarding
+        open={showOnboarding}
+        onClose={handleCloseOnboarding}
+        isBetaCohort={reputation?.beta_cohort ?? false}
+        betaRepCap={reputation?.beta_rep_cap ?? 1000}
       />
     </div>
   );
