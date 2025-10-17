@@ -183,11 +183,6 @@ export function StreakProgress({
                 <span className="text-4xl sm:text-5xl">{nextMilestone.emoji}</span>
               </div>
             </div>
-            
-            {/* Progress Text */}
-            <p className="text-base text-slate-300 dark:text-slate-400 text-center font-medium">
-              {currentStreak} / {nextMilestone.target} days
-            </p>
           </div>
 
           {/* Days Remaining */}
