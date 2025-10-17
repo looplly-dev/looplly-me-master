@@ -254,9 +254,15 @@ export function StreakProgress({
                 <span className="text-2xl">⚡</span>
                 <p className="text-sm font-semibold text-foreground">Week Warrior</p>
               </div>
-              <p className="text-xs text-muted-foreground">
-                {milestones.weekly.achieved ? '✓' : '7 days to unlock'}
-              </p>
+              <div className="text-xs text-muted-foreground">
+                {milestones.weekly.achieved ? (
+                  <div className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-cyan-500 text-white font-bold shadow-md">
+                    ✓
+                  </div>
+                ) : (
+                  '7 days to unlock'
+                )}
+              </div>
             </div>
             
             {/* Month Master */}
@@ -270,9 +276,15 @@ export function StreakProgress({
                 <span className="text-2xl">🌙</span>
                 <p className="text-sm font-semibold text-foreground">Month Master</p>
               </div>
-              <p className="text-xs text-muted-foreground">
-                {milestones.monthly.achieved ? '✓' : '30 days to unlock'}
-              </p>
+              <div className="text-xs text-muted-foreground">
+                {milestones.monthly.achieved ? (
+                  <div className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-cyan-500 text-white font-bold shadow-md">
+                    ✓
+                  </div>
+                ) : (
+                  '30 days to unlock'
+                )}
+              </div>
             </div>
             
             {/* Quarter Champion */}
@@ -286,9 +298,15 @@ export function StreakProgress({
                 <span className="text-2xl">🌟</span>
                 <p className="text-sm font-semibold text-foreground">Quarter Champion</p>
               </div>
-              <p className="text-xs text-muted-foreground">
-                {milestones.quarterly.achieved ? '✓' : '90 days to unlock'}
-              </p>
+              <div className="text-xs text-muted-foreground">
+                {milestones.quarterly.achieved ? (
+                  <div className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-cyan-500 text-white font-bold shadow-md">
+                    ✓
+                  </div>
+                ) : (
+                  '90 days to unlock'
+                )}
+              </div>
             </div>
             
             {/* Annual Legend */}
@@ -302,9 +320,15 @@ export function StreakProgress({
                 <span className="text-2xl">🔥</span>
                 <p className="text-sm font-semibold text-foreground">Annual Legend</p>
               </div>
-              <p className="text-xs text-muted-foreground">
-                {milestones.yearly.achieved ? '✓' : '365 days to unlock'}
-              </p>
+              <div className="text-xs text-muted-foreground">
+                {milestones.yearly.achieved ? (
+                  <div className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-cyan-500 text-white font-bold shadow-md">
+                    ✓
+                  </div>
+                ) : (
+                  '365 days to unlock'
+                )}
+              </div>
             </div>
           </div>
         </div>
