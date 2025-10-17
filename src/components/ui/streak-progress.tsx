@@ -107,90 +107,163 @@ export function StreakProgress({
   const nextMilestone = getNextMilestone();
 
   return (
-    <div className="space-y-3">
-      {/* Next Milestone - Horizontal Bar */}
-      <div className={cn("p-3 rounded-lg border", nextMilestone.colorClass)}>
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center gap-2">
-            <span className="text-2xl">{nextMilestone.emoji}</span>
-            <div>
-              <h4 className="font-bold text-sm">{nextMilestone.name}</h4>
-              <p className="text-xs text-muted-foreground">{currentStreak}/{nextMilestone.target} days</p>
+    <Card className="border-primary/30 bg-gradient-to-br from-primary/5 to-accent/5">
+      <CardHeader className="pb-1 pt-3">
+        <p className="text-xs text-muted-foreground">
+          Earn bonus Rep and unlock milestone badges
+        </p>
+      </CardHeader>
+      
+      <CardContent className="space-y-2">
+        {/* Combined Streak Stats - Compact Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          {/* Left: Day Streak */}
+          <div className="text-center p-3 bg-background/50 dark:bg-background/70 rounded-lg border border-border/50">
+            <div className="text-3xl font-bold bg-gradient-to-r from-primary via-orange-500 to-primary bg-clip-text text-transparent mb-1">
+              🔥 {currentStreak}
+            </div>
+            <p className="text-sm font-medium text-foreground mb-1">Day Streak</p>
+            <Badge className="bg-primary/20 text-primary border border-primary/30 text-xs">
+              +{getStreakReward(currentStreak)} Rep Today
+            </Badge>
+          </div>
+
+          {/* Right: Longest Streak */}
+          <div className="flex flex-col items-center justify-center p-3 bg-secondary/30 dark:bg-secondary/40 rounded-lg border border-secondary/20 dark:border-secondary/30">
+            <p className="text-3xl font-bold text-foreground">{longestStreak}</p>
+            <p className="text-sm text-muted-foreground">Longest Streak</p>
+          </div>
+        </div>
+
+        {/* Next Milestone Progress - Circular Design */}
+        <div className={cn("p-3 rounded-lg border", nextMilestone.colorClass)}>
+          <div className="flex flex-col items-center gap-2">
+            {/* Title - Centered Header */}
+            <h4 className="font-bold text-xl text-foreground text-center">
+              {nextMilestone.name}
+            </h4>
+            
+            {/* Rep Badge */}
+            <Badge 
+              variant="outline" 
+              className={cn(
+                "text-xs font-medium",
+                nextMilestone.colorClass
+              )}
+            >
+              +{nextMilestone.reward} Rep
+            </Badge>
+
+            {/* Circular Progress */}
+            <div className="flex flex-col items-center gap-1">
+              <div className="relative">
+                <svg className="w-24 h-24 transform -rotate-90">
+                  {/* Background circle */}
+                  <circle
+                    cx="48"
+                    cy="48"
+                    r="40"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="6"
+                    className="text-border"
+                  />
+                  {/* Progress circle */}
+                  <circle
+                    cx="48"
+                    cy="48"
+                    r="40"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="6"
+                    strokeDasharray={`${2 * Math.PI * 40}`}
+                    strokeDashoffset={`${2 * Math.PI * 40 * (1 - nextMilestone.progress / 100)}`}
+                    className={nextMilestone.textClass}
+                    strokeLinecap="round"
+                  />
+                </svg>
+                {/* Emoji in center */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-3xl">{nextMilestone.emoji}</span>
+                </div>
+              </div>
+              
+              {/* Day count below circle */}
+              <p className="text-xs text-muted-foreground text-center">
+                {currentStreak} / {nextMilestone.target} days
+              </p>
+            </div>
+
+            {/* Days Remaining Message */}
+            {nextMilestone.remaining > 0 ? (
+              <p className={cn(
+                "text-sm font-medium text-center",
+                nextMilestone.remaining <= 7 ? `${nextMilestone.textClass} animate-pulse` : "text-foreground"
+              )}>
+                🎯 {nextMilestone.remaining} {nextMilestone.remaining === 1 ? 'day' : 'days'} to go!
+              </p>
+            ) : (
+              <p className={cn("text-sm font-semibold text-center", nextMilestone.textClass)}>
+                ✓ Completed! 🏆
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* Milestone Badges */}
+        <div className="space-y-3">
+          <h4 className="text-sm font-medium text-foreground">Streak Milestones</h4>
+          <div className="grid grid-cols-2 gap-2">
+            <div className={cn(
+              'p-1.5 rounded border text-center',
+              milestones.weekly.achieved 
+                ? 'bg-success/10 border-success/30' 
+                : 'bg-muted/30 border-border dark:bg-muted/20 dark:border-muted'
+            )}>
+              <p className="text-xs font-medium">⚡ Week Warrior</p>
+              <p className="text-xs text-muted-foreground">
+                {milestones.weekly.achieved ? `✓ Earned ${milestones.weekly.count}x` : '7 days to unlock'}
+              </p>
+            </div>
+            
+            <div className={cn(
+              'p-1.5 rounded border text-center',
+              milestones.monthly.achieved
+                ? 'bg-accent/10 border-accent/30 dark:bg-accent/15 dark:border-accent/40' 
+                : 'bg-muted/30 border-border dark:bg-muted/20 dark:border-muted'
+            )}>
+              <p className="text-xs font-medium">🌙 Month Master</p>
+              <p className="text-xs text-muted-foreground">
+                {milestones.monthly.achieved ? `✓ Earned ${milestones.monthly.count}x` : '30 days to unlock'}
+              </p>
+            </div>
+            
+            <div className={cn(
+              'p-1.5 rounded border text-center',
+              milestones.quarterly.achieved
+                ? 'bg-info/10 border-info/30 dark:bg-info/15 dark:border-info/40' 
+                : 'bg-muted/30 border-border dark:bg-muted/20 dark:border-muted'
+            )}>
+              <p className="text-xs font-medium">🌟 Quarter Champion</p>
+              <p className="text-xs text-muted-foreground">
+                {milestones.quarterly.achieved ? `✓ Earned ${milestones.quarterly.count}x` : '90 days to unlock'}
+              </p>
+            </div>
+            
+            <div className={cn(
+              'p-1.5 rounded border text-center',
+              milestones.yearly.achieved
+                ? 'bg-purple/10 border-purple/30' 
+                : 'bg-muted/30 border-border dark:bg-muted/20 dark:border-muted'
+            )}>
+              <p className="text-xs font-medium">👑 Annual Legend</p>
+              <p className="text-xs text-muted-foreground">
+                {milestones.yearly.achieved ? `✓ Earned ${milestones.yearly.count}x` : '365 days to unlock'}
+              </p>
             </div>
           </div>
-          <Badge className={cn("text-xs font-semibold", nextMilestone.badgeClass)}>
-            +{nextMilestone.reward} Rep
-          </Badge>
         </div>
-        
-        {/* Horizontal Progress Bar */}
-        <div className="relative h-2 rounded-full overflow-hidden bg-border/30 dark:bg-border/20">
-          <div 
-            className={cn("absolute inset-y-0 left-0 rounded-full transition-all duration-500", nextMilestone.textClass)}
-            style={{ 
-              width: `${nextMilestone.progress}%`,
-              backgroundColor: 'currentColor'
-            }}
-          />
-        </div>
-        
-        {nextMilestone.remaining > 0 && (
-          <p className="text-xs text-center mt-2 text-muted-foreground">
-            🎯 {nextMilestone.remaining} day{nextMilestone.remaining !== 1 ? 's' : ''} to go!
-          </p>
-        )}
-      </div>
-
-      {/* Compact Milestone Badges - 4 Column */}
-      <div className="grid grid-cols-4 gap-1.5">
-        <div className={cn(
-          'p-1 rounded border text-center transition-all hover:scale-105',
-          milestones.weekly.achieved 
-            ? 'bg-success/10 border-success/30 dark:bg-success/20 dark:border-success/40' 
-            : 'bg-muted/30 border-border dark:bg-muted/20'
-        )}>
-          <p className="text-lg">⚡</p>
-          <p className="text-[10px] text-muted-foreground leading-tight">
-            {milestones.weekly.achieved ? `${milestones.weekly.count}x` : '7d'}
-          </p>
-        </div>
-        
-        <div className={cn(
-          'p-1 rounded border text-center transition-all hover:scale-105',
-          milestones.monthly.achieved
-            ? 'bg-accent/10 border-accent/30 dark:bg-accent/20 dark:border-accent/40' 
-            : 'bg-muted/30 border-border dark:bg-muted/20'
-        )}>
-          <p className="text-lg">🌙</p>
-          <p className="text-[10px] text-muted-foreground leading-tight">
-            {milestones.monthly.achieved ? `${milestones.monthly.count}x` : '30d'}
-          </p>
-        </div>
-        
-        <div className={cn(
-          'p-1 rounded border text-center transition-all hover:scale-105',
-          milestones.quarterly.achieved
-            ? 'bg-info/10 border-info/30 dark:bg-info/20 dark:border-info/40' 
-            : 'bg-muted/30 border-border dark:bg-muted/20'
-        )}>
-          <p className="text-lg">🌟</p>
-          <p className="text-[10px] text-muted-foreground leading-tight">
-            {milestones.quarterly.achieved ? `${milestones.quarterly.count}x` : '90d'}
-          </p>
-        </div>
-        
-        <div className={cn(
-          'p-1 rounded border text-center transition-all hover:scale-105',
-          milestones.yearly.achieved
-            ? 'bg-purple/10 border-purple/30 dark:bg-purple/20 dark:border-purple/40' 
-            : 'bg-muted/30 border-border dark:bg-muted/20'
-        )}>
-          <p className="text-lg">👑</p>
-          <p className="text-[10px] text-muted-foreground leading-tight">
-            {milestones.yearly.achieved ? `${milestones.yearly.count}x` : '365d'}
-          </p>
-        </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }
