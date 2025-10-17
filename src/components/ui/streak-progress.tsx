@@ -187,14 +187,24 @@ export function StreakProgress({
 
           {/* Days Remaining */}
           {nextMilestone.remaining > 0 ? (
-            <p className="text-sm sm:text-base font-semibold text-center mt-2 sm:mt-4 text-pink-300 dark:text-pink-400 flex items-center justify-center gap-2">
-              <span className="text-xl sm:text-2xl">🎯</span>
-              {nextMilestone.remaining} day{nextMilestone.remaining !== 1 ? 's' : ''} to go!
-            </p>
+            <div className="text-center mt-2 sm:mt-4">
+              <p className="text-sm sm:text-base font-semibold text-pink-300 dark:text-pink-400 flex items-center justify-center gap-2">
+                <span className="text-xl sm:text-2xl">🎯</span>
+                {nextMilestone.remaining} day{nextMilestone.remaining !== 1 ? 's' : ''} to go!
+              </p>
+              <p className="text-xs sm:text-sm text-slate-300 dark:text-slate-400 mt-1 italic">
+                to your next milestone
+              </p>
+            </div>
           ) : (
-            <p className="text-sm sm:text-base font-semibold text-center mt-2 sm:mt-4 text-green-300 flex items-center justify-center gap-2">
-              <span className="text-xl sm:text-2xl">✓</span> Completed! <span className="text-xl sm:text-2xl">🏆</span>
-            </p>
+            <div className="text-center mt-2 sm:mt-4">
+              <p className="text-sm sm:text-base font-semibold text-green-300 flex items-center justify-center gap-2">
+                <span className="text-xl sm:text-2xl">✓</span> Completed! <span className="text-xl sm:text-2xl">🏆</span>
+              </p>
+              <p className="text-xs sm:text-sm text-slate-300 dark:text-slate-400 mt-1 italic">
+                Keep going to reach the next level!
+              </p>
+            </div>
           )}
         </div>
 
