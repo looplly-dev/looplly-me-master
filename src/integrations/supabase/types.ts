@@ -1018,6 +1018,9 @@ export type Database = {
       }
       user_reputation: {
         Row: {
+          beta_cohort: boolean | null
+          beta_rep_cap: number | null
+          cohort_joined_at: string | null
           created_at: string | null
           history: Json | null
           id: string
@@ -1031,6 +1034,9 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          beta_cohort?: boolean | null
+          beta_rep_cap?: number | null
+          cohort_joined_at?: string | null
           created_at?: string | null
           history?: Json | null
           id?: string
@@ -1044,6 +1050,9 @@ export type Database = {
           user_id: string
         }
         Update: {
+          beta_cohort?: boolean | null
+          beta_rep_cap?: number | null
+          cohort_joined_at?: string | null
           created_at?: string | null
           history?: Json | null
           id?: string
@@ -1156,6 +1165,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_adjust_reputation: {
+        Args: {
+          p_admin_note: string
+          p_points: number
+          p_reason: string
+          p_user_id: string
+        }
+        Returns: undefined
+      }
       get_auth_users_with_phones: {
         Args: Record<PropertyKey, never>
         Returns: {

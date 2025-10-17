@@ -4,9 +4,14 @@ import { useAuth } from './useAuth';
 import { useToast } from './use-toast';
 
 export interface ReputationHistory {
-  action: string;
-  points: number;
-  date: string;
+  transaction_id: string; // UUID for admin lookup
+  action: string; // e.g., "Survey Completed"
+  points: number; // +50 or -10
+  date: string; // ISO timestamp
+  category: 'survey' | 'streak' | 'badge' | 'profile' | 'referral' | 'admin';
+  description: string; // Human-readable explanation
+  metadata?: Record<string, any>;
+  type: 'gain' | 'loss' | 'adjustment';
 }
 
 export interface QualityMetrics {
@@ -27,6 +32,9 @@ export interface UserReputation {
   next_level_threshold: number;
   history: ReputationHistory[];
   quality_metrics: QualityMetrics;
+  beta_cohort: boolean;
+  cohort_joined_at: string;
+  beta_rep_cap: number;
   created_at: string;
   updated_at: string;
 }
@@ -49,36 +57,8 @@ export const useUserReputation = () => {
 
       if (error) throw error;
 
-      // If no reputation exists, create one
-      if (!data) {
-        const { data: newReputation, error: insertError } = await supabase
-          .from('user_reputation')
-          .insert({
-            user_id: authState.user.id,
-            score: 0,
-            level: 'Bronze Novice',
-            tier: 'Bronze',
-            prestige: 0,
-            next_level_threshold: 100,
-            history: [],
-            quality_metrics: {
-              surveysCompleted: 0,
-              surveysRejected: 0,
-              averageTime: '0 min',
-              consistencyScore: 0,
-              speedingRate: 0
-            }
-          })
-          .select()
-          .single();
-
-        if (insertError) throw insertError;
-        return {
-          ...newReputation,
-          history: newReputation.history as unknown as ReputationHistory[],
-          quality_metrics: newReputation.quality_metrics as unknown as QualityMetrics,
-        } as UserReputation;
-      }
+      // Database trigger handles auto-creation, so just return null if not found
+      if (!data) return null;
 
       return {
         ...data,
@@ -90,16 +70,25 @@ export const useUserReputation = () => {
   });
 
   const addReputationPoints = useMutation({
-    mutationFn: async ({ points, action }: { points: number; action: string }) => {
+    mutationFn: async ({ points, action, category, description, metadata }: {
+      points: number;
+      action: string;
+      category?: ReputationHistory['category'];
+      description?: string;
+      metadata?: ReputationHistory['metadata'];
+    }) => {
       if (!authState.user?.id || !reputation) return;
 
-      const newScore = reputation.score + points;
-      const newHistory = [
-        { action, points, date: new Date().toISOString().split('T')[0] },
-        ...reputation.history
-      ].slice(0, 50); // Keep last 50 entries
+      // Apply soft cap for Beta users above 500 Rep
+      let actualPoints = points;
+      if (reputation.beta_cohort && reputation.score > 500) {
+        const softCapMultiplier = 1 - (reputation.score / reputation.beta_rep_cap);
+        actualPoints = Math.round(points * Math.max(0.1, softCapMultiplier));
+      }
 
-      // Calculate tier based on score
+      const newScore = Math.max(0, reputation.score + actualPoints); // Floor at 0
+
+      // Calculate tier based on newScore
       let tier = 'Bronze';
       let level = 'Bronze Novice';
       let nextThreshold = 100;
@@ -122,6 +111,23 @@ export const useUserReputation = () => {
         nextThreshold = 500;
       }
 
+      // Build new history entry with expanded schema
+      const newHistoryEntry: ReputationHistory = {
+        transaction_id: crypto.randomUUID(),
+        action,
+        points: actualPoints,
+        date: new Date().toISOString(),
+        category: category || 'profile',
+        description: description || action,
+        metadata: metadata || {},
+        type: actualPoints >= 0 ? 'gain' : 'loss'
+      };
+
+      const newHistory = [
+        newHistoryEntry,
+        ...reputation.history
+      ].slice(0, 50); // Keep last 50 entries
+
       const { error } = await supabase
         .from('user_reputation')
         .update({
@@ -135,7 +141,7 @@ export const useUserReputation = () => {
 
       if (error) throw error;
 
-      return { newScore, level, tier };
+      return { newScore, level, tier, actualPoints };
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['user-reputation', authState.user?.id] });
