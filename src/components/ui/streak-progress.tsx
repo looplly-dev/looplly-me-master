@@ -136,9 +136,9 @@ export function StreakProgress({
             </div>
             
             {/* Right: Longest Streak */}
-          <div className="flex flex-col items-center flex-[1] border-t sm:border-t-0 sm:border-l border-slate-200 dark:border-slate-700/50 pt-3 sm:pt-0 sm:pl-4 w-full sm:w-auto">
-            <div className="text-2xl font-bold text-foreground/80 mb-1">{longestStreak}</div>
-            <p className="text-xs text-muted-foreground/80">Longest Streak</p>
+          <div className="flex flex-row items-center justify-center gap-2 flex-[1] border-t sm:border-t-0 sm:border-l border-slate-200 dark:border-slate-700/50 pt-3 sm:pt-0 sm:pl-4 w-full sm:w-auto">
+            <div className="text-xl font-bold text-foreground/80">{longestStreak}</div>
+            <p className="text-xs text-muted-foreground/80 italic">Longest Streak</p>
           </div>
           </div>
         </div>
