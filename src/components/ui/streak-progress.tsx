@@ -245,90 +245,86 @@ export function StreakProgress({
           <div className="grid grid-cols-2 gap-2 sm:gap-3">
             {/* Week Warrior */}
             <div className={cn(
-              'p-2 sm:p-3 rounded-lg border text-left transition-all duration-300',
+              'relative p-2 sm:p-3 rounded-lg border text-left transition-all duration-300',
               milestones.weekly.achieved 
                 ? 'bg-green-50 dark:bg-green-900/40 border-green-200 dark:border-green-500/40' 
                 : 'bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700/40'
             )}>
+              {milestones.weekly.achieved && (
+                <div className="absolute -top-2 -right-2 inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-500 text-white font-bold shadow-lg z-10">
+                  ✓
+                </div>
+              )}
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-2xl">⚡</span>
                 <p className="text-sm font-semibold text-foreground">Week Warrior</p>
               </div>
-              <div className="text-xs text-muted-foreground">
-                {milestones.weekly.achieved ? (
-                  <div className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-cyan-500 text-white font-bold shadow-md">
-                    ✓
-                  </div>
-                ) : (
-                  '7 days to unlock'
-                )}
-              </div>
+              {!milestones.weekly.achieved && (
+                <p className="text-xs text-muted-foreground">7 days to unlock</p>
+              )}
             </div>
             
             {/* Month Master */}
             <div className={cn(
-              'p-2 sm:p-3 rounded-lg border text-left transition-all duration-300',
+              'relative p-2 sm:p-3 rounded-lg border text-left transition-all duration-300',
               milestones.monthly.achieved
                 ? 'bg-green-50 dark:bg-green-900/40 border-green-200 dark:border-green-500/40' 
                 : 'bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700/40'
             )}>
+              {milestones.monthly.achieved && (
+                <div className="absolute -top-2 -right-2 inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-500 text-white font-bold shadow-lg z-10">
+                  ✓
+                </div>
+              )}
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-2xl">🌙</span>
                 <p className="text-sm font-semibold text-foreground">Month Master</p>
               </div>
-              <div className="text-xs text-muted-foreground">
-                {milestones.monthly.achieved ? (
-                  <div className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-cyan-500 text-white font-bold shadow-md">
-                    ✓
-                  </div>
-                ) : (
-                  '30 days to unlock'
-                )}
-              </div>
+              {!milestones.monthly.achieved && (
+                <p className="text-xs text-muted-foreground">30 days to unlock</p>
+              )}
             </div>
             
             {/* Quarter Champion */}
             <div className={cn(
-              'p-2 sm:p-3 rounded-lg border text-left transition-all duration-300',
+              'relative p-2 sm:p-3 rounded-lg border text-left transition-all duration-300',
               milestones.quarterly.achieved
                 ? 'bg-green-50 dark:bg-green-900/40 border-green-200 dark:border-green-500/40' 
                 : 'bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700/40'
             )}>
+              {milestones.quarterly.achieved && (
+                <div className="absolute -top-2 -right-2 inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-500 text-white font-bold shadow-lg z-10">
+                  ✓
+                </div>
+              )}
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-2xl">🌟</span>
                 <p className="text-sm font-semibold text-foreground">Quarter Champion</p>
               </div>
-              <div className="text-xs text-muted-foreground">
-                {milestones.quarterly.achieved ? (
-                  <div className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-cyan-500 text-white font-bold shadow-md">
-                    ✓
-                  </div>
-                ) : (
-                  '90 days to unlock'
-                )}
-              </div>
+              {!milestones.quarterly.achieved && (
+                <p className="text-xs text-muted-foreground">90 days to unlock</p>
+              )}
             </div>
             
             {/* Annual Legend */}
             <div className={cn(
-              'p-2 sm:p-3 rounded-lg border text-left transition-all duration-300',
+              'relative p-2 sm:p-3 rounded-lg border text-left transition-all duration-300',
               milestones.yearly.achieved
                 ? 'bg-green-50 dark:bg-green-900/40 border-green-200 dark:border-green-500/40' 
                 : 'bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700/40'
             )}>
+              {milestones.yearly.achieved && (
+                <div className="absolute -top-2 -right-2 inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-500 text-white font-bold shadow-lg z-10">
+                  ✓
+                </div>
+              )}
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-2xl">🔥</span>
                 <p className="text-sm font-semibold text-foreground">Annual Legend</p>
               </div>
-              <div className="text-xs text-muted-foreground">
-                {milestones.yearly.achieved ? (
-                  <div className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-cyan-500 text-white font-bold shadow-md">
-                    ✓
-                  </div>
-                ) : (
-                  '365 days to unlock'
-                )}
-              </div>
+              {!milestones.yearly.achieved && (
+                <p className="text-xs text-muted-foreground">365 days to unlock</p>
+              )}
             </div>
           </div>
         </div>
