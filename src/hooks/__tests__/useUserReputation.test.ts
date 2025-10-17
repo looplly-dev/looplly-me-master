@@ -42,14 +42,12 @@ describe('useUserReputation - Beta Cohort Logic', () => {
 
   it('should NOT auto-create reputation (trigger handles this)', async () => {
     // Mock: no reputation exists
-    const mockFrom = {
-      select: jest.fn().mockReturnValue({
-        eq: jest.fn().mockReturnValue({
-          maybeSingle: jest.fn().mockResolvedValue({ data: null, error: null })
-        })
-      })
-    };
-    (supabase.from as any).mockReturnValue(mockFrom);
+    const mockMaybeSingle = jest.fn(() => Promise.resolve({ data: null, error: null }));
+    const mockEq = jest.fn(() => ({ maybeSingle: mockMaybeSingle }));
+    const mockSelect = jest.fn(() => ({ eq: mockEq }));
+    const mockFrom = jest.fn(() => ({ select: mockSelect }));
+    
+    (supabase.from as any) = mockFrom;
 
     const { result } = renderHook(() => useUserReputation(), { wrapper });
 
@@ -58,7 +56,7 @@ describe('useUserReputation - Beta Cohort Logic', () => {
     });
 
     // Verify NO insert was called (old behavior removed)
-    expect(mockFrom.select).toHaveBeenCalled();
+    expect(mockSelect).toHaveBeenCalled();
   });
 
   it('should apply soft cap for Beta users above 500 Rep', async () => {
@@ -85,18 +83,22 @@ describe('useUserReputation - Beta Cohort Logic', () => {
       updated_at: '2024-01-01T00:00:00Z'
     };
 
-    const mockUpdate = jest.fn().mockReturnValue({
-      eq: jest.fn().mockResolvedValue({ error: null })
+    const mockUpdateData = { score: 0, level: '', tier: '', next_level_threshold: 0, history: [] };
+    const mockEqUpdate = jest.fn(() => Promise.resolve({ error: null }));
+    const mockUpdate = jest.fn((data: any) => {
+      Object.assign(mockUpdateData, data);
+      return { eq: mockEqUpdate };
     });
 
-    (supabase.from as any).mockReturnValue({
-      select: jest.fn().mockReturnValue({
-        eq: jest.fn().mockReturnValue({
-          maybeSingle: jest.fn().mockResolvedValue({ data: mockReputation, error: null })
-        })
-      }),
+    const mockMaybeSingle = jest.fn(() => Promise.resolve({ data: mockReputation, error: null }));
+    const mockEq = jest.fn(() => ({ maybeSingle: mockMaybeSingle }));
+    const mockSelect = jest.fn(() => ({ eq: mockEq }));
+    const mockFrom = jest.fn((table: string) => ({
+      select: mockSelect,
       update: mockUpdate
-    });
+    }));
+
+    (supabase.from as any) = mockFrom;
 
     const { result } = renderHook(() => useUserReputation(), { wrapper });
 
@@ -114,10 +116,9 @@ describe('useUserReputation - Beta Cohort Logic', () => {
 
     await waitFor(() => {
       expect(mockUpdate).toHaveBeenCalled();
-      const updateCall = mockUpdate.mock.calls[0][0];
       
       // Expected: 600 + 40 = 640
-      expect(updateCall.score).toBeCloseTo(640, 0);
+      expect(mockUpdateData.score).toBeCloseTo(640, 0);
     });
   });
 
@@ -145,18 +146,22 @@ describe('useUserReputation - Beta Cohort Logic', () => {
       updated_at: '2024-01-01T00:00:00Z'
     };
 
-    const mockUpdate = jest.fn().mockReturnValue({
-      eq: jest.fn().mockResolvedValue({ error: null })
+    const mockUpdateData = { score: 0, level: '', tier: '', next_level_threshold: 0, history: [] };
+    const mockEqUpdate = jest.fn(() => Promise.resolve({ error: null }));
+    const mockUpdate = jest.fn((data: any) => {
+      Object.assign(mockUpdateData, data);
+      return { eq: mockEqUpdate };
     });
 
-    (supabase.from as any).mockReturnValue({
-      select: jest.fn().mockReturnValue({
-        eq: jest.fn().mockReturnValue({
-          maybeSingle: jest.fn().mockResolvedValue({ data: mockReputation, error: null })
-        })
-      }),
+    const mockMaybeSingle = jest.fn(() => Promise.resolve({ data: mockReputation, error: null }));
+    const mockEq = jest.fn(() => ({ maybeSingle: mockMaybeSingle }));
+    const mockSelect = jest.fn(() => ({ eq: mockEq }));
+    const mockFrom = jest.fn((table: string) => ({
+      select: mockSelect,
       update: mockUpdate
-    });
+    }));
+
+    (supabase.from as any) = mockFrom;
 
     const { result } = renderHook(() => useUserReputation(), { wrapper });
 
@@ -172,8 +177,7 @@ describe('useUserReputation - Beta Cohort Logic', () => {
 
     await waitFor(() => {
       expect(mockUpdate).toHaveBeenCalled();
-      const updateCall = mockUpdate.mock.calls[0][0];
-      expect(updateCall.score).toBe(700); // 600 + 100
+      expect(mockUpdateData.score).toBe(700); // 600 + 100
     });
   });
 
@@ -201,18 +205,22 @@ describe('useUserReputation - Beta Cohort Logic', () => {
       updated_at: '2024-01-01T00:00:00Z'
     };
 
-    const mockUpdate = jest.fn().mockReturnValue({
-      eq: jest.fn().mockResolvedValue({ error: null })
+    const mockUpdateData = { score: 0, level: '', tier: '', next_level_threshold: 0, history: [] as any[] };
+    const mockEqUpdate = jest.fn(() => Promise.resolve({ error: null }));
+    const mockUpdate = jest.fn((data: any) => {
+      Object.assign(mockUpdateData, data);
+      return { eq: mockEqUpdate };
     });
 
-    (supabase.from as any).mockReturnValue({
-      select: jest.fn().mockReturnValue({
-        eq: jest.fn().mockReturnValue({
-          maybeSingle: jest.fn().mockResolvedValue({ data: mockReputation, error: null })
-        })
-      }),
+    const mockMaybeSingle = jest.fn(() => Promise.resolve({ data: mockReputation, error: null }));
+    const mockEq = jest.fn(() => ({ maybeSingle: mockMaybeSingle }));
+    const mockSelect = jest.fn(() => ({ eq: mockEq }));
+    const mockFrom = jest.fn((table: string) => ({
+      select: mockSelect,
       update: mockUpdate
-    });
+    }));
+
+    (supabase.from as any) = mockFrom;
 
     const { result } = renderHook(() => useUserReputation(), { wrapper });
 
@@ -231,8 +239,7 @@ describe('useUserReputation - Beta Cohort Logic', () => {
 
     await waitFor(() => {
       expect(mockUpdate).toHaveBeenCalled();
-      const updateCall = mockUpdate.mock.calls[0][0];
-      const newHistory = updateCall.history[0];
+      const newHistory = mockUpdateData.history[0];
 
       expect(newHistory).toHaveProperty('transaction_id');
       expect(newHistory.category).toBe('streak');
@@ -266,18 +273,22 @@ describe('useUserReputation - Beta Cohort Logic', () => {
       updated_at: '2024-01-01T00:00:00Z'
     };
 
-    const mockUpdate = jest.fn().mockReturnValue({
-      eq: jest.fn().mockResolvedValue({ error: null })
+    const mockUpdateData = { score: 0, level: '', tier: '', next_level_threshold: 0, history: [] };
+    const mockEqUpdate = jest.fn(() => Promise.resolve({ error: null }));
+    const mockUpdate = jest.fn((data: any) => {
+      Object.assign(mockUpdateData, data);
+      return { eq: mockEqUpdate };
     });
 
-    (supabase.from as any).mockReturnValue({
-      select: jest.fn().mockReturnValue({
-        eq: jest.fn().mockReturnValue({
-          maybeSingle: jest.fn().mockResolvedValue({ data: mockReputation, error: null })
-        })
-      }),
+    const mockMaybeSingle = jest.fn(() => Promise.resolve({ data: mockReputation, error: null }));
+    const mockEq = jest.fn(() => ({ maybeSingle: mockMaybeSingle }));
+    const mockSelect = jest.fn(() => ({ eq: mockEq }));
+    const mockFrom = jest.fn((table: string) => ({
+      select: mockSelect,
       update: mockUpdate
-    });
+    }));
+
+    (supabase.from as any) = mockFrom;
 
     const { result } = renderHook(() => useUserReputation(), { wrapper });
 
@@ -293,8 +304,7 @@ describe('useUserReputation - Beta Cohort Logic', () => {
 
     await waitFor(() => {
       expect(mockUpdate).toHaveBeenCalled();
-      const updateCall = mockUpdate.mock.calls[0][0];
-      expect(updateCall.score).toBe(0); // Floored at 0, not -40
+      expect(mockUpdateData.score).toBe(0); // Floored at 0, not -40
     });
   });
 });
