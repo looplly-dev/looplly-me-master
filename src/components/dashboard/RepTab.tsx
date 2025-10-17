@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { 
   Trophy, 
   Shield, 
@@ -22,7 +23,8 @@ import {
   Maximize2,
   Minimize2,
   Zap,
-  History
+  History,
+  BookOpen
 } from 'lucide-react';
 import { userStats } from '@/mock_data';
 import { useAuth } from '@/hooks/useAuth';
@@ -226,28 +228,43 @@ export default function RepTab() {
 
   return (
     <div data-tour-step="page" className="py-4 md:p-6 lg:p-8 pb-24 md:pb-20 lg:pb-8 space-y-4 md:space-y-6">
-      {/* Header with Two Tour Buttons */}
-      <div className="flex justify-between items-center flex-wrap gap-2">
+      {/* Header with Icon-Only Tour Buttons */}
+      <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-foreground">Reputation</h1>
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowOnboarding(true)}
-            className="flex items-center gap-2"
-          >
-            <span className="text-base">📖</span>
-            Welcome Guide
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowContextualTour(true)}
-            className="flex items-center gap-2"
-          >
-            <MapPin className="h-4 w-4" />
-            Feature Tour
-          </Button>
+        <div className="flex gap-1">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setShowOnboarding(true)}
+                  className="h-8 w-8"
+                >
+                  <BookOpen className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Welcome Guide</p>
+              </TooltipContent>
+            </Tooltip>
+            
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setShowContextualTour(true)}
+                  className="h-8 w-8"
+                >
+                  <MapPin className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Feature Tour</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       </div>
       {/* Enhanced Reputation Score - Always Visible */}
