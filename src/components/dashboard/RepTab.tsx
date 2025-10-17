@@ -471,12 +471,14 @@ export default function RepTab() {
         icon={<Flame className="h-5 w-5" />}
         defaultOpen={true}
         compactContent={
-          <div className="flex items-center justify-center gap-4">
+          <div className="flex items-center justify-center gap-6">
             <div className="text-center">
+              <div className="text-3xl mb-1">🔥</div>
               <p className="text-lg font-bold text-primary">{userStats.streaks.currentStreak}</p>
               <p className="text-xs text-muted-foreground">Current</p>
             </div>
             <div className="text-center">
+              <div className="text-3xl mb-1">🏅</div>
               <p className="text-lg font-bold text-accent">{userStats.streaks.longestStreak}</p>
               <p className="text-xs text-muted-foreground">Best</p>
             </div>
@@ -526,8 +528,14 @@ export default function RepTab() {
               {/* Category Header with Progress */}
               <div className="flex items-center justify-between mb-3 pb-2 border-b border-border/50">
                 <h3 className="text-base font-bold text-foreground flex items-center gap-3">
-                  <div className="p-2 bg-primary/10 rounded-lg">
-                    <category.icon className="h-4 w-4 text-primary" />
+                  <div className="text-3xl">
+                    {category.name === 'Identity & Security' && '🛡️'}
+                    {category.name === 'Consistency Mastery' && '🔥'}
+                    {category.name === 'Excellence & Impact' && '🏆'}
+                    {category.name === 'Social Network' && '👥'}
+                    {category.name === 'Speed Masters' && '⚡'}
+                    {category.name === 'Perfection Elite' && '🎯'}
+                    {category.name === 'Exploration Heroes' && '🗺️'}
                   </div>
                   {category.name}
                 </h3>
@@ -590,41 +598,42 @@ export default function RepTab() {
       >
         <div className="space-y-4">
           {/* Success Rate Highlight */}
-          <div className="p-4 bg-muted/50 rounded-lg text-center">
+          <div className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30 rounded-xl border border-green-200 dark:border-green-800 shadow-sm hover:scale-105 transition-transform">
+            <div className="text-5xl mb-3">
+              {(() => {
+                const rate = Math.round((userStats.reputation.qualityMetrics.surveysCompleted / (userStats.reputation.qualityMetrics.surveysCompleted + userStats.reputation.qualityMetrics.surveysRejected)) * 100);
+                if (rate >= 95) return '🏆';
+                if (rate >= 85) return '🌟';
+                if (rate >= 75) return '⭐';
+                return '📊';
+              })()}
+            </div>
             <div className="text-sm text-muted-foreground mb-2">Success Rate</div>
-            <div className="text-3xl font-bold text-green-600 dark:text-green-400">
+            <div className="text-4xl font-bold text-green-700 dark:text-green-400">
               {Math.round((userStats.reputation.qualityMetrics.surveysCompleted / (userStats.reputation.qualityMetrics.surveysCompleted + userStats.reputation.qualityMetrics.surveysRejected)) * 100)}%
             </div>
           </div>
 
           {/* Detailed Metrics Grid */}
           <div className="grid grid-cols-2 gap-4">
-            <div className="text-center p-4 bg-green-50 dark:bg-green-950/30 rounded-xl border border-green-200 dark:border-green-800 shadow-sm">
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <span className="text-lg">✓</span>
-                <p className="text-sm text-muted-foreground">Surveys Done</p>
-              </div>
+            <div className="text-center p-4 bg-green-50 dark:bg-green-950/30 rounded-xl border border-green-200 dark:border-green-800 shadow-sm hover:scale-105 transition-transform">
+              <div className="text-4xl mb-2">✓</div>
+              <p className="text-sm text-muted-foreground mb-2">Surveys Done</p>
               <p className="text-2xl font-bold text-green-700 dark:text-green-400">{userStats.reputation.qualityMetrics.surveysCompleted}</p>
             </div>
-            <div className="text-center p-4 bg-purple-50 dark:bg-purple-950/30 rounded-xl border border-purple-200 dark:border-purple-800 shadow-sm">
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <span className="text-lg">⚡</span>
-                <p className="text-sm text-muted-foreground">Consistency</p>
-              </div>
+            <div className="text-center p-4 bg-purple-50 dark:bg-purple-950/30 rounded-xl border border-purple-200 dark:border-purple-800 shadow-sm hover:scale-105 transition-transform">
+              <div className="text-4xl mb-2">⚡</div>
+              <p className="text-sm text-muted-foreground mb-2">Consistency</p>
               <p className="text-2xl font-bold text-purple-700 dark:text-purple-400">{userStats.reputation.qualityMetrics.consistencyScore}%</p>
             </div>
-            <div className="text-center p-4 bg-red-50 dark:bg-red-950/30 rounded-xl border border-red-200 dark:border-red-800 shadow-sm">
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <span className="text-lg">✗</span>
-                <p className="text-sm text-muted-foreground">Rejected</p>
-              </div>
+            <div className="text-center p-4 bg-red-50 dark:bg-red-950/30 rounded-xl border border-red-200 dark:border-red-800 shadow-sm hover:scale-105 transition-transform">
+              <div className="text-4xl mb-2">✗</div>
+              <p className="text-sm text-muted-foreground mb-2">Rejected</p>
               <p className="text-2xl font-bold text-red-700 dark:text-red-400">{userStats.reputation.qualityMetrics.surveysRejected}</p>
             </div>
-            <div className="text-center p-4 bg-blue-50 dark:bg-blue-950/30 rounded-xl border border-blue-200 dark:border-blue-800 shadow-sm">
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <span className="text-lg">⏱️</span>
-                <p className="text-sm text-muted-foreground">Avg. Time</p>
-              </div>
+            <div className="text-center p-4 bg-blue-50 dark:bg-blue-950/30 rounded-xl border border-blue-200 dark:border-blue-800 shadow-sm hover:scale-105 transition-transform">
+              <div className="text-4xl mb-2">⏱️</div>
+              <p className="text-sm text-muted-foreground mb-2">Avg. Time</p>
               <p className="text-2xl font-bold text-blue-700 dark:text-blue-400">{userStats.reputation.qualityMetrics.averageTime}</p>
             </div>
           </div>
@@ -699,30 +708,30 @@ export default function RepTab() {
         }
       >
         <div className="space-y-3">
-          <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-green-200 shadow-sm">
-            <div className="w-3 h-3 bg-green-600 rounded-full"></div>
-            <span className="text-sm font-medium">Higher-paying survey opportunities</span>
-            <CheckCircle className="h-4 w-4 text-green-600 ml-auto" />
+          <div className="flex items-center gap-3 p-3 bg-green-50 dark:bg-green-950/30 rounded-lg border border-green-200 dark:border-green-800 shadow-sm hover:scale-105 transition-transform">
+            <div className="text-3xl">💰</div>
+            <span className="text-sm font-medium flex-1">Higher-paying survey opportunities</span>
+            <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
           </div>
-          <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-blue-200 shadow-sm">
-            <div className="w-3 h-3 bg-blue-600 rounded-full"></div>
-            <span className="text-sm font-medium">Priority access to new features</span>
-            <CheckCircle className="h-4 w-4 text-blue-600 ml-auto" />
+          <div className="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg border border-blue-200 dark:border-blue-800 shadow-sm hover:scale-105 transition-transform">
+            <div className="text-3xl">🚀</div>
+            <span className="text-sm font-medium flex-1">Priority access to new features</span>
+            <CheckCircle className="h-4 w-4 text-blue-600 dark:text-blue-400" />
           </div>
-          <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-purple-200 shadow-sm">
-            <div className="w-3 h-3 bg-purple-600 rounded-full"></div>
-            <span className="text-sm font-medium">Exclusive Gold+ member surveys</span>
-            <CheckCircle className="h-4 w-4 text-purple-600 ml-auto" />
+          <div className="flex items-center gap-3 p-3 bg-purple-50 dark:bg-purple-950/30 rounded-lg border border-purple-200 dark:border-purple-800 shadow-sm hover:scale-105 transition-transform">
+            <div className="text-3xl">👑</div>
+            <span className="text-sm font-medium flex-1">Exclusive Gold+ member surveys</span>
+            <CheckCircle className="h-4 w-4 text-purple-600 dark:text-purple-400" />
           </div>
-          <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-amber-200 shadow-sm">
-            <div className="w-3 h-3 bg-amber-600 rounded-full"></div>
-            <span className="text-sm font-medium">Faster payment processing</span>
-            <CheckCircle className="h-4 w-4 text-amber-600 ml-auto" />
+          <div className="flex items-center gap-3 p-3 bg-amber-50 dark:bg-amber-950/30 rounded-lg border border-amber-200 dark:border-amber-800 shadow-sm hover:scale-105 transition-transform">
+            <div className="text-3xl">⚡</div>
+            <span className="text-sm font-medium flex-1">Faster payment processing</span>
+            <CheckCircle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
           </div>
-          <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-orange-200 shadow-sm">
-            <div className="w-3 h-3 bg-orange-600 rounded-full"></div>
-            <span className="text-sm font-medium">Premium crypto verification access</span>
-            <CheckCircle className="h-4 w-4 text-orange-600 ml-auto" />
+          <div className="flex items-center gap-3 p-3 bg-orange-50 dark:bg-orange-950/30 rounded-lg border border-orange-200 dark:border-orange-800 shadow-sm hover:scale-105 transition-transform">
+            <div className="text-3xl">💎</div>
+            <span className="text-sm font-medium flex-1">Premium crypto verification access</span>
+            <CheckCircle className="h-4 w-4 text-orange-600 dark:text-orange-400" />
           </div>
         </div>
       </CollapsibleSection>
@@ -752,9 +761,9 @@ export default function RepTab() {
               <div className="flex items-start justify-between gap-3">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
-                    {tip.priority === 'high' && <AlertTriangle className="h-4 w-4 text-destructive" />}
-                    {tip.priority === 'medium' && <Clock className="h-4 w-4 text-warning" />}
-                    {tip.priority === 'low' && <CheckCircle className="h-4 w-4 text-info" />}
+                    {tip.priority === 'high' && <div className="text-3xl animate-pulse">🚨</div>}
+                    {tip.priority === 'medium' && <div className="text-2xl">⚠️</div>}
+                    {tip.priority === 'low' && <div className="text-2xl">💡</div>}
                     <h4 className="font-semibold text-sm">{tip.title}</h4>
                     <Badge variant="outline" className="text-xs font-medium">
                       {tip.points}
