@@ -41,15 +41,16 @@ import { supabase } from '@/integrations/supabase/client';
 import { RepOnboardingTour } from '@/components/ui/rep-onboarding-tour';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useUserReputation } from '@/hooks/useUserReputation';
+import { ContextualRepTour } from '@/components/ui/contextual-rep-tour';
 
 export default function RepTab() {
   const { authState } = useAuth();
-  const [isCompactView, setIsCompactView] = useState(true);
   const [selectedBadge, setSelectedBadge] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(() => {
     return !localStorage.getItem('rep_onboarding_completed');
   });
+  const [showContextualTour, setShowContextualTour] = useState(false);
   const { listBadges, getUserBadges } = useBadgeService();
   const { streak } = useUserStreaks();
   const { checkStage2Unlock } = useStageUnlockLogic();
@@ -224,100 +225,53 @@ export default function RepTab() {
   }
 
   return (
-    <div className="py-4 md:p-6 lg:p-8 pb-24 md:pb-20 lg:pb-8 space-y-4 md:space-y-6">
-      {/* View Toggle Controls */}
+    <div data-tour-step="page" className="py-4 md:p-6 lg:p-8 pb-24 md:pb-20 lg:pb-8 space-y-4 md:space-y-6">
+      {/* Header with Tour Button */}
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-foreground">Reputation</h1>
         <Button
           variant="outline"
           size="sm"
-          onClick={() => setIsCompactView(!isCompactView)}
+          onClick={() => setShowContextualTour(true)}
           className="flex items-center gap-2"
         >
-          {isCompactView ? (
-            <>
-              <Maximize2 className="h-4 w-4" />
-              Detailed View
-            </>
-          ) : (
-            <>
-              <Minimize2 className="h-4 w-4" />
-              Compact View
-            </>
-          )}
+          <MapPin className="h-4 w-4" />
+          Take a Tour
         </Button>
       </div>
       {/* Enhanced Reputation Score - Always Visible */}
-      <Card className="bg-card shadow-sm border border-primary/20">
-        <CardContent className={isCompactView ? "p-4" : "p-6"}>
+      <Card data-tour-step="rep-score" className="bg-card shadow-sm border border-primary/20">
+        <CardContent className="p-4 md:p-6">
           <div className="text-center">
-            <div className={isCompactView ? "text-4xl mb-1" : "text-6xl mb-2"}>{level.icon}</div>
-            <h2 className={isCompactView ? "text-xl font-bold mb-1" : "text-2xl font-bold mb-1"}>
+            <div className="text-5xl mb-2">{level.icon}</div>
+            <h2 className="text-2xl font-bold mb-1">
               {level.name} {prestigeName}
             </h2>
             <p className="text-muted-foreground text-sm mb-4">
               {userStats.reputation.score} Rep • {level.tier} Tier
             </p>
             
-            {!isCompactView && (
-              <>
-                <div className="relative w-32 h-32 mx-auto mb-4">
-                  <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 36 36">
-                    <path
-                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                      fill="none"
-                      stroke="hsl(var(--muted))"
-                      strokeWidth="2"
-                      opacity="0.3"
-                    />
-                    <path
-                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                      fill="none"
-                      stroke="hsl(var(--primary))"
-                      strokeWidth="2"
-                      strokeDasharray={`${Math.min(progressToNext, 100)}, 100`}
-                      strokeLinecap="round"
-                      style={{
-                        filter: 'drop-shadow(0 0 8px hsl(var(--primary) / 0.3))'
-                      }}
-                    />
-                  </svg>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-3xl font-bold text-foreground">{userStats.reputation.score}</span>
-                  </div>
-                </div>
-                
-                <p className="text-muted-foreground text-sm">
-                  {level.max === Infinity 
-                    ? 'Elite Level - Endless Progression!' 
-                    : `${nextLevelThreshold - userStats.reputation.score} points to next tier`
-                  }
-                </p>
-              </>
-            )}
-            
-            {isCompactView && (
-              <div className="flex justify-center items-center gap-4">
-                <div className="text-center">
-                  <p className="text-2xl font-bold">{userStats.reputation.score}</p>
-                  <p className="text-xs text-muted-foreground">Current</p>
-                </div>
-                <Progress value={progressToNext} className="w-20 h-2" />
-                <div className="text-center">
-                  <p className="text-lg font-semibold">{level.max === Infinity ? '∞' : nextLevelThreshold}</p>
-                  <p className="text-xs text-muted-foreground">Next</p>
-                </div>
+            <div className="flex justify-center items-center gap-4">
+              <div className="text-center">
+                <p className="text-2xl font-bold">{userStats.reputation.score}</p>
+                <p className="text-xs text-muted-foreground">Current</p>
               </div>
-            )}
+              <Progress value={progressToNext} className="w-20 h-2" />
+              <div className="text-center">
+                <p className="text-lg font-semibold">{level.max === Infinity ? '∞' : nextLevelThreshold}</p>
+                <p className="text-xs text-muted-foreground">Next</p>
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>
 
       {/* Tier Progression */}
       <CollapsibleSection
+        data-tour-step="tier-progression"
         title="Tier Progression" 
         icon={<TrendingUp className="h-5 w-5" />}
-        defaultOpen={!isCompactView}
+        defaultOpen={true}
         compactContent={
           <div className="flex items-center justify-center gap-2">
             <span className="text-sm text-muted-foreground">Current:</span>
@@ -449,9 +403,10 @@ export default function RepTab() {
 
       {/* Daily Streak Progress */}
       <CollapsibleSection
+        data-tour-step="streak-progress"
         title="Daily Streak Progress"
         icon={<Flame className="h-5 w-5" />}
-        defaultOpen={!isCompactView}
+        defaultOpen={true}
         compactContent={
           <div className="flex items-center justify-center gap-4">
             <div className="text-center">
@@ -476,9 +431,10 @@ export default function RepTab() {
 
       {/* Collectible Badges & Achievements */}
       <CollapsibleSection
+        data-tour-step="badges"
         title="Badge Collection"
         icon={<Star className="h-5 w-5" />}
-        defaultOpen={!isCompactView}
+        defaultOpen={true}
         priority="high"
         compactContent={
           <div className="flex justify-center gap-2 overflow-x-auto pb-2">
@@ -549,9 +505,10 @@ export default function RepTab() {
 
       {/* Survey Quality Metrics */}
       <CollapsibleSection
+        data-tour-step="performance"
         title="📊 Your Performance"
         icon={<CheckCircle className="h-5 w-5" />}
-        defaultOpen={!isCompactView}
+        defaultOpen={true}
         priority="medium"
         compactContent={
           <div className="flex justify-center gap-6">
@@ -666,6 +623,7 @@ export default function RepTab() {
 
       {/* Reputation Benefits */}
       <CollapsibleSection
+        data-tour-step="benefits"
         title="Reputation Benefits"
         icon={<Trophy className="h-5 w-5" />}
         defaultOpen={false}
@@ -708,9 +666,10 @@ export default function RepTab() {
 
       {/* Improvement Action Plan */}
       <CollapsibleSection
+        data-tour-step="action-plan"
         title="Action Plan to Improve"
         icon={<Target className="h-5 w-5" />}
-        defaultOpen={!isCompactView}
+        defaultOpen={true}
         priority="high"
         compactContent={
           <div className="text-center">
@@ -773,6 +732,13 @@ export default function RepTab() {
         onComplete={handleCloseOnboarding}
         onSkip={handleCloseOnboarding}
         isBetaCohort={reputation?.beta_cohort ?? false}
+      />
+
+      {/* Contextual Rep Tour */}
+      <ContextualRepTour
+        isActive={showContextualTour}
+        onStart={() => setShowContextualTour(true)}
+        onComplete={() => setShowContextualTour(false)}
       />
     </div>
   );
