@@ -228,7 +228,7 @@ export default function RepTab() {
   }
 
   return (
-    <div data-tour-step="page" className="py-4 md:p-6 lg:p-8 pb-24 md:pb-20 lg:pb-8 space-y-4 md:space-y-6">
+    <div data-tour-step="page" className="pt-2 px-0 md:px-6 lg:px-8 pb-24 md:pb-20 lg:pb-8 space-y-4 md:space-y-6">
       {/* Header with Icon-Only Tour Buttons */}
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-foreground">Reputation</h1>
