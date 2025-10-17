@@ -549,7 +549,7 @@ export default function RepTab() {
 
       {/* Survey Quality Metrics */}
       <CollapsibleSection
-        title="Data Quality Score"
+        title="📊 Your Performance"
         icon={<CheckCircle className="h-5 w-5" />}
         defaultOpen={!isCompactView}
         priority="medium"
@@ -557,7 +557,7 @@ export default function RepTab() {
           <div className="flex justify-center gap-6">
             <div className="text-center">
               <p className="text-lg font-bold text-success">{userStats.reputation.qualityMetrics.consistencyScore}%</p>
-              <p className="text-xs text-muted-foreground">Quality</p>
+              <p className="text-xs text-muted-foreground">Consistency</p>
             </div>
             <div className="text-center">
               <p className="text-lg font-bold text-primary">
@@ -569,25 +569,48 @@ export default function RepTab() {
         }
       >
         <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="text-center p-4 bg-green-50 rounded-xl border border-green-200 shadow-sm">
-              <p className="text-2xl font-bold text-green-700">{userStats.reputation.qualityMetrics.consistencyScore}%</p>
-              <p className="text-sm text-muted-foreground">Consistency</p>
+          {/* Success Rate Highlight */}
+          <div className="p-4 bg-muted/50 rounded-lg text-center">
+            <div className="text-sm text-muted-foreground mb-2">Success Rate</div>
+            <div className="text-3xl font-bold text-green-600 dark:text-green-400">
+              {Math.round((userStats.reputation.qualityMetrics.surveysCompleted / (userStats.reputation.qualityMetrics.surveysCompleted + userStats.reputation.qualityMetrics.surveysRejected)) * 100)}%
             </div>
-            <div className="text-center p-4 bg-blue-50 rounded-xl border border-blue-200 shadow-sm">
-              <p className="text-2xl font-bold text-blue-700">{userStats.reputation.qualityMetrics.averageTime}</p>
-              <p className="text-sm text-muted-foreground">Avg. Time</p>
+          </div>
+
+          {/* Detailed Metrics Grid */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="text-center p-4 bg-green-50 dark:bg-green-950/30 rounded-xl border border-green-200 dark:border-green-800 shadow-sm">
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <span className="text-lg">✓</span>
+                <p className="text-sm text-muted-foreground">Surveys Done</p>
+              </div>
+              <p className="text-2xl font-bold text-green-700 dark:text-green-400">{userStats.reputation.qualityMetrics.surveysCompleted}</p>
+            </div>
+            <div className="text-center p-4 bg-purple-50 dark:bg-purple-950/30 rounded-xl border border-purple-200 dark:border-purple-800 shadow-sm">
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <span className="text-lg">⚡</span>
+                <p className="text-sm text-muted-foreground">Consistency</p>
+              </div>
+              <p className="text-2xl font-bold text-purple-700 dark:text-purple-400">{userStats.reputation.qualityMetrics.consistencyScore}%</p>
+            </div>
+            <div className="text-center p-4 bg-red-50 dark:bg-red-950/30 rounded-xl border border-red-200 dark:border-red-800 shadow-sm">
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <span className="text-lg">✗</span>
+                <p className="text-sm text-muted-foreground">Rejected</p>
+              </div>
+              <p className="text-2xl font-bold text-red-700 dark:text-red-400">{userStats.reputation.qualityMetrics.surveysRejected}</p>
+            </div>
+            <div className="text-center p-4 bg-blue-50 dark:bg-blue-950/30 rounded-xl border border-blue-200 dark:border-blue-800 shadow-sm">
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <span className="text-lg">⏱️</span>
+                <p className="text-sm text-muted-foreground">Avg. Time</p>
+              </div>
+              <p className="text-2xl font-bold text-blue-700 dark:text-blue-400">{userStats.reputation.qualityMetrics.averageTime}</p>
             </div>
           </div>
           
-          <div className="space-y-3">
-            <div className="flex justify-between items-center p-3 bg-white border border-green-200 rounded-lg shadow-sm">
-              <span className="text-sm font-medium">Surveys Completed</span>
-              <Badge variant="default" className="bg-green-50 text-green-700 border border-green-200">
-                {userStats.reputation.qualityMetrics.surveysCompleted}
-              </Badge>
-            </div>
-            <div className="flex justify-between items-center p-3 bg-white border border-red-200 rounded-lg shadow-sm">
+          <div className="space-y-3 mt-4">
+            <div className="flex justify-between items-center p-3 bg-card border border-border rounded-lg shadow-sm">
               <span className="text-sm font-medium">Surveys Rejected</span>
               <Badge variant="destructive" className="bg-red-50 border border-red-200">
                 {userStats.reputation.qualityMetrics.surveysRejected}

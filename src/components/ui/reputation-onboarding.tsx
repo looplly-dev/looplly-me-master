@@ -21,66 +21,115 @@ export function ReputationOnboarding({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Info className="h-5 w-5" />
-            Welcome to Reputation System
+          <DialogTitle className="flex items-center gap-2 text-2xl">
+            🎯 Welcome to Your Rep Score!
           </DialogTitle>
-          <DialogDescription>
-            Your Reputation score unlocks surveys, faster payouts, and exclusive benefits.
+          <DialogDescription className="text-base">
+            Build your reputation to unlock better surveys and faster payments
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
-          {/* Beta Cohort Notice */}
+          {/* Founding Member Notice */}
           {isBetaCohort && (
-            <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <Badge variant="secondary">Beta Member</Badge>
-                <span className="text-sm font-medium">You're in the Beta Cohort!</span>
+            <div className="bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-lg p-5">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-2xl">🎁</span>
+                <div>
+                  <Badge variant="secondary" className="mb-1">Founding Member</Badge>
+                  <p className="text-sm font-semibold">You're one of our first users!</p>
+                </div>
               </div>
-              <p className="text-sm text-muted-foreground">
-                As a Beta member, you have a soft cap at <strong>{betaRepCap} Rep</strong>. 
-                After 500 Rep, gains gradually decrease to maintain fairness. Post-Beta users won't have this cap.
-              </p>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li className="flex gap-2">
+                  <span>✓</span>
+                  <span>You start earning Rep immediately</span>
+                </li>
+                <li className="flex gap-2">
+                  <span>✓</span>
+                  <span>After 500 Rep, new points count for less (but still count!)</span>
+                </li>
+                <li className="flex gap-2">
+                  <span>✓</span>
+                  <span>This protects your early advantage as new users join</span>
+                </li>
+                <li className="flex gap-2">
+                  <span>✓</span>
+                  <span><strong>All your points are permanent</strong> - never lost!</span>
+                </li>
+              </ul>
             </div>
           )}
 
           {/* How Rep Works */}
-          <div className="space-y-3">
-            <h3 className="font-semibold text-sm">How Reputation Works:</h3>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li className="flex gap-2">
-                <span className="text-green-600 dark:text-green-400 font-bold">+</span>
-                <span><strong>Gain Rep:</strong> Complete surveys, maintain streaks, earn badges</span>
+          <div className="space-y-4">
+            <h3 className="font-semibold text-base">How Your Rep Works:</h3>
+            <ul className="space-y-3 text-sm">
+              <li className="flex gap-3 items-start">
+                <span className="text-xl">✅</span>
+                <div>
+                  <strong>Earn Points:</strong>
+                  <p className="text-muted-foreground">Complete surveys, keep daily streaks, unlock badges</p>
+                </div>
               </li>
-              <li className="flex gap-2">
-                <span className="text-red-600 dark:text-red-400 font-bold">-</span>
-                <span><strong>Lose Rep:</strong> Rejected surveys, broken streaks, poor quality</span>
+              <li className="flex gap-3 items-start">
+                <span className="text-xl">❌</span>
+                <div>
+                  <strong>Lose Points:</strong>
+                  <p className="text-muted-foreground">Skipped surveys, inconsistent answers</p>
+                </div>
               </li>
-              <li className="flex gap-2">
-                <span className="text-blue-600 dark:text-blue-400 font-bold">📊</span>
-                <span><strong>Quality Metrics:</strong> Track consistency, speed, and accuracy</span>
+              <li className="flex gap-3 items-start">
+                <span className="text-xl">📊</span>
+                <div>
+                  <strong>Track Progress:</strong>
+                  <p className="text-muted-foreground">Watch your quality score improve over time</p>
+                </div>
               </li>
             </ul>
           </div>
 
           {/* Tier Progression */}
-          <div className="space-y-2">
-            <h3 className="font-semibold text-sm">Tier Progression:</h3>
-            <div className="grid grid-cols-2 gap-2 text-xs">
-              <div className="p-2 bg-amber-100 dark:bg-amber-900/30 rounded">Bronze (0-99)</div>
-              <div className="p-2 bg-gray-200 dark:bg-gray-800 rounded">Silver (100-249)</div>
-              <div className="p-2 bg-yellow-200 dark:bg-yellow-900/30 rounded">Gold (250-499)</div>
-              <div className="p-2 bg-purple-200 dark:bg-purple-900/30 rounded">Platinum (500-999)</div>
-              <div className="p-2 bg-cyan-200 dark:bg-cyan-900/30 rounded">Diamond (1000-1999)</div>
-              <div className="p-2 bg-orange-200 dark:bg-orange-900/30 rounded">Elite (2000+)</div>
+          <div className="space-y-3">
+            <h3 className="font-semibold text-base">Your Journey:</h3>
+            <div className="grid grid-cols-2 gap-3 text-sm">
+              <div className="p-3 bg-amber-100 dark:bg-amber-900/30 rounded-lg hover:shadow-sm transition-shadow">
+                <div className="text-2xl mb-1">🥉</div>
+                <div className="font-medium">Bronze</div>
+                <div className="text-xs text-muted-foreground">0-99 Rep</div>
+              </div>
+              <div className="p-3 bg-gray-200 dark:bg-gray-800 rounded-lg hover:shadow-sm transition-shadow">
+                <div className="text-2xl mb-1">🥈</div>
+                <div className="font-medium">Silver</div>
+                <div className="text-xs text-muted-foreground">100-249 Rep</div>
+              </div>
+              <div className="p-3 bg-yellow-200 dark:bg-yellow-900/30 rounded-lg hover:shadow-sm transition-shadow">
+                <div className="text-2xl mb-1">🥇</div>
+                <div className="font-medium">Gold</div>
+                <div className="text-xs text-muted-foreground">250-499 Rep</div>
+              </div>
+              <div className="p-3 bg-purple-200 dark:bg-purple-900/30 rounded-lg hover:shadow-sm transition-shadow">
+                <div className="text-2xl mb-1">⭐</div>
+                <div className="font-medium">Platinum</div>
+                <div className="text-xs text-muted-foreground">500-999 Rep</div>
+              </div>
+              <div className="p-3 bg-cyan-200 dark:bg-cyan-900/30 rounded-lg hover:shadow-sm transition-shadow">
+                <div className="text-2xl mb-1">💎</div>
+                <div className="font-medium">Diamond</div>
+                <div className="text-xs text-muted-foreground">1000-1999 Rep</div>
+              </div>
+              <div className="p-3 bg-orange-200 dark:bg-orange-900/30 rounded-lg hover:shadow-sm transition-shadow">
+                <div className="text-2xl mb-1">👑</div>
+                <div className="font-medium">Elite</div>
+                <div className="text-xs text-muted-foreground">2000+ Rep</div>
+              </div>
             </div>
           </div>
         </div>
 
         <DialogFooter>
-          <Button onClick={onClose} className="w-full">
-            Got it! Let's Build My Reputation
+          <Button onClick={onClose} className="w-full text-base py-6">
+            Got it! Let's Start Earning 🚀
           </Button>
         </DialogFooter>
       </DialogContent>
