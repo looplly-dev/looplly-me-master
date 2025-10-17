@@ -107,27 +107,27 @@ export function StreakProgress({
   const nextMilestone = getNextMilestone();
 
   return (
-    <div className="p-4 bg-slate-900/50 dark:bg-slate-950/60 rounded-xl border border-slate-700/40 dark:border-slate-800/50">
-      <p className="text-xs text-slate-400 mb-3 text-center">
+    <div className="p-2 sm:p-4 bg-slate-900/50 dark:bg-slate-950/60 rounded-xl border border-slate-700/40 dark:border-slate-800/50">
+      <p className="text-xs text-slate-400 mb-2 text-center hidden sm:block">
         Earn bonus Rep and unlock milestone badges
       </p>
       
-      <div className="space-y-3">
+      <div className="space-y-2 sm:space-y-3">
         {/* Hero Stats - Unified Dark Card */}
-        <div className="relative p-4 bg-slate-900/90 dark:bg-slate-950/90 rounded-xl border border-slate-700/50 dark:border-slate-800/50">
-          <div className="flex items-center justify-between">
+        <div className="relative p-3 sm:p-4 bg-slate-900/90 dark:bg-slate-950/90 rounded-xl border border-slate-700/50 dark:border-slate-800/50">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-0">
             {/* Left: Current Streak */}
-            <div className="flex flex-col items-center flex-1">
-              <div className="text-5xl mb-2">🔥</div>
+            <div className="flex flex-col items-center flex-[3] w-full sm:w-auto">
+              <div className="text-5xl mb-1">🔥</div>
               <div className="text-3xl font-bold text-orange-400">{currentStreak}</div>
-              <p className="text-sm font-medium text-slate-300 mb-2">Day Streak</p>
+              <p className="text-xs sm:text-sm font-medium text-slate-300 mb-1.5 sm:mb-2">Day Streak</p>
               <Badge className="bg-orange-500/20 text-orange-300 border border-orange-400/30 text-xs font-semibold">
                 +{getStreakReward(currentStreak)} Rep Today
               </Badge>
             </div>
             
             {/* Right: Longest Streak */}
-          <div className="flex flex-col items-center flex-1 border-l border-slate-700/50 dark:border-slate-800/50 pl-4">
+          <div className="flex flex-col items-center flex-[1] border-t sm:border-t-0 sm:border-l border-slate-700/50 dark:border-slate-800/50 pt-3 sm:pt-0 sm:pl-4 w-full sm:w-auto">
             <div className="text-2xl font-bold text-slate-400 mb-1">{longestStreak}</div>
             <p className="text-xs text-slate-500 dark:text-slate-600">Longest Streak</p>
           </div>
@@ -135,23 +135,23 @@ export function StreakProgress({
         </div>
 
         {/* Next Milestone - Prominent Card */}
-        <div className="relative p-6 bg-gradient-to-br from-blue-900/40 via-blue-800/30 to-purple-900/40 dark:from-blue-950/60 dark:via-blue-900/40 dark:to-purple-950/60 rounded-xl border-2 border-blue-400/30 dark:border-blue-600/40">
+        <div className="relative p-4 sm:p-6 bg-gradient-to-br from-blue-900/40 via-blue-800/30 to-purple-900/40 dark:from-blue-950/60 dark:via-blue-900/40 dark:to-purple-950/60 rounded-xl border-2 border-blue-400/30 dark:border-blue-600/40">
           {/* Title */}
-          <h4 className="font-bold text-2xl text-white text-center mb-2">
+          <h4 className="font-bold text-lg sm:text-2xl text-white text-center mb-1.5 sm:mb-2">
             {nextMilestone.name}
           </h4>
           
           {/* Rep Badge - Centered */}
-          <div className="flex justify-center mb-4">
+          <div className="flex justify-center mb-2 sm:mb-4">
             <Badge className="bg-blue-500/30 text-blue-200 border border-blue-400/40 text-sm font-semibold px-4 py-1">
               +{nextMilestone.reward} Rep
             </Badge>
           </div>
 
           {/* Circular Progress - Larger */}
-          <div className="flex flex-col items-center gap-2">
+          <div className="flex flex-col items-center gap-1 sm:gap-2">
             <div className="relative">
-              <svg className="w-32 h-32 transform -rotate-90">
+              <svg className="w-24 h-24 sm:w-32 sm:h-32 transform -rotate-90">
                 {/* Background circle - darker */}
                 <circle
                   cx="64"
@@ -178,7 +178,7 @@ export function StreakProgress({
               </svg>
               {/* Emoji in center - larger */}
               <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-5xl">{nextMilestone.emoji}</span>
+                <span className="text-4xl sm:text-5xl">{nextMilestone.emoji}</span>
               </div>
             </div>
             
@@ -190,24 +190,24 @@ export function StreakProgress({
 
           {/* Days Remaining */}
           {nextMilestone.remaining > 0 ? (
-            <p className="text-base font-semibold text-center mt-4 text-pink-300 dark:text-pink-400 flex items-center justify-center gap-2">
-              <span className="text-2xl">🎯</span>
+            <p className="text-sm sm:text-base font-semibold text-center mt-2 sm:mt-4 text-pink-300 dark:text-pink-400 flex items-center justify-center gap-2">
+              <span className="text-xl sm:text-2xl">🎯</span>
               {nextMilestone.remaining} day{nextMilestone.remaining !== 1 ? 's' : ''} to go!
             </p>
           ) : (
-            <p className="text-base font-semibold text-center mt-4 text-green-300 flex items-center justify-center gap-2">
-              <span className="text-2xl">✓</span> Completed! <span className="text-2xl">🏆</span>
+            <p className="text-sm sm:text-base font-semibold text-center mt-2 sm:mt-4 text-green-300 flex items-center justify-center gap-2">
+              <span className="text-xl sm:text-2xl">✓</span> Completed! <span className="text-xl sm:text-2xl">🏆</span>
             </p>
           )}
         </div>
 
         {/* Milestone Grid */}
-        <div className="space-y-2">
-          <h4 className="text-sm font-semibold text-white">Streak Milestones</h4>
-          <div className="grid grid-cols-2 gap-3">
+        <div className="space-y-1.5 sm:space-y-2">
+          <h4 className="text-xs sm:text-sm font-semibold text-white">Streak Milestones</h4>
+          <div className="grid grid-cols-2 gap-2 sm:gap-3">
             {/* Week Warrior */}
             <div className={cn(
-              'p-3 rounded-lg border text-left transition-all duration-300',
+              'p-2 sm:p-3 rounded-lg border text-left transition-all duration-300',
               milestones.weekly.achieved 
                 ? 'bg-green-900/40 border-green-500/40 dark:bg-green-950/60 dark:border-green-600/40' 
                 : 'bg-slate-800/40 border-slate-700/40 dark:bg-slate-900/60 dark:border-slate-700/40'
@@ -223,7 +223,7 @@ export function StreakProgress({
             
             {/* Month Master */}
             <div className={cn(
-              'p-3 rounded-lg border text-left transition-all duration-300',
+              'p-2 sm:p-3 rounded-lg border text-left transition-all duration-300',
               milestones.monthly.achieved
                 ? 'bg-green-900/40 border-green-500/40 dark:bg-green-950/60 dark:border-green-600/40' 
                 : 'bg-slate-800/40 border-slate-700/40 dark:bg-slate-900/60 dark:border-slate-700/40'
@@ -239,7 +239,7 @@ export function StreakProgress({
             
             {/* Quarter Champion */}
             <div className={cn(
-              'p-3 rounded-lg border text-left transition-all duration-300',
+              'p-2 sm:p-3 rounded-lg border text-left transition-all duration-300',
               milestones.quarterly.achieved
                 ? 'bg-green-900/40 border-green-500/40 dark:bg-green-950/60 dark:border-green-600/40' 
                 : 'bg-slate-800/40 border-slate-700/40 dark:bg-slate-900/60 dark:border-slate-700/40'
@@ -255,7 +255,7 @@ export function StreakProgress({
             
             {/* Annual Legend */}
             <div className={cn(
-              'p-3 rounded-lg border text-left transition-all duration-300',
+              'p-2 sm:p-3 rounded-lg border text-left transition-all duration-300',
               milestones.yearly.achieved
                 ? 'bg-green-900/40 border-green-500/40 dark:bg-green-950/60 dark:border-green-600/40' 
                 : 'bg-slate-800/40 border-slate-700/40 dark:bg-slate-900/60 dark:border-slate-700/40'
