@@ -119,7 +119,7 @@ export function StreakProgress({
             {/* Left: Current Streak */}
             <div className="flex flex-col items-center flex-1">
               <div className="text-5xl mb-2">🔥</div>
-              <div className="text-4xl font-bold text-orange-400">{currentStreak}</div>
+              <div className="text-3xl font-bold text-orange-400">{currentStreak}</div>
               <p className="text-sm font-medium text-slate-300 mb-2">Day Streak</p>
               <Badge className="bg-orange-500/20 text-orange-300 border border-orange-400/30 text-xs font-semibold">
                 +{getStreakReward(currentStreak)} Rep Today
@@ -127,10 +127,10 @@ export function StreakProgress({
             </div>
             
             {/* Right: Longest Streak */}
-            <div className="flex flex-col items-center flex-1 border-l border-slate-700/50 dark:border-slate-800/50 pl-4">
-              <div className="text-4xl font-bold text-slate-300 mb-1">{longestStreak}</div>
-              <p className="text-sm text-slate-400">Longest Streak</p>
-            </div>
+          <div className="flex flex-col items-center flex-1 border-l border-slate-700/50 dark:border-slate-800/50 pl-4">
+            <div className="text-2xl font-bold text-slate-400 mb-1">{longestStreak}</div>
+            <p className="text-xs text-slate-500 dark:text-slate-600">Longest Streak</p>
+          </div>
           </div>
         </div>
 
