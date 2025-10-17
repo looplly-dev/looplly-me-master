@@ -153,7 +153,7 @@ export function StreakProgress({
           {/* Circular Progress - Larger */}
           <div className="flex flex-col items-center gap-1 sm:gap-2">
             <div className="relative">
-              <svg className="w-24 h-24 sm:w-32 sm:h-32 transform -rotate-90">
+              <svg className="w-24 h-24 sm:w-32 sm:h-32 transform -rotate-90" viewBox="0 0 128 128">
                 {/* Background circle - darker */}
                 <circle
                   cx="64"
