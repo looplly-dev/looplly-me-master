@@ -336,7 +336,7 @@ export default function RepTab() {
         }
       >
         <div className="space-y-4">
-          <div className="grid grid-cols-3 gap-2 text-center">
+          <div className="grid grid-cols-3 gap-2 text-center justify-items-center">
             <div className={`p-4 rounded-2xl transition-all duration-200 ${
               userStats.reputation.score >= 0 && userStats.reputation.score < 100
                 ? 'bg-amber-50 dark:bg-amber-950/30 text-amber-800 dark:text-amber-200 shadow-lg border-2 border-amber-300 dark:border-amber-700 scale-105 ring-2 ring-primary ring-offset-2 dark:ring-offset-background' 
@@ -383,14 +383,14 @@ export default function RepTab() {
             </div>
             <div className={`relative p-4 rounded-2xl transition-all duration-200 ${
               userStats.reputation.score >= 1000 && userStats.reputation.score < 2000
-                ? 'bg-cyan-50 dark:bg-cyan-950/30 text-cyan-800 dark:text-cyan-200 shadow-2xl shadow-cyan-500/50 border-4 border-cyan-400 dark:border-cyan-600 scale-110 ring-2 ring-primary ring-offset-2 dark:ring-offset-background animate-pulse' 
+                ? 'bg-cyan-50 dark:bg-cyan-950/30 text-cyan-800 dark:text-cyan-200 shadow-2xl shadow-cyan-500/50 border-4 border-cyan-400 dark:border-cyan-600 scale-110 ring-2 ring-primary ring-offset-2 dark:ring-offset-background' 
                 : userStats.reputation.score >= 1000
                 ? 'bg-cyan-50 dark:bg-cyan-950/30 text-cyan-800 dark:text-cyan-200 shadow-md border border-cyan-300 dark:border-cyan-700 hover:scale-105 opacity-60'
                 : 'bg-gray-50/50 dark:bg-gray-800/30 text-muted-foreground border border-gray-200 dark:border-gray-700 hover:scale-105 opacity-60'
             }`}>
               {userStats.reputation.score >= 1000 && userStats.reputation.score < 2000 && (
                 <div className="absolute -top-2 -right-2 bg-cyan-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg z-10">
-                  CURRENT
+                  ✓
                 </div>
               )}
               <div className="text-5xl mb-2">💎</div>
