@@ -1,5 +1,7 @@
 // RESTORE POINT: Before implementing oversized icon theme throughout RepTab
+// RESTORE POINT: Before implementing oversized icon theme throughout RepTab
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -25,7 +27,12 @@ import {
   Minimize2,
   Zap,
   History,
-  BookOpen
+  BookOpen,
+  ChevronDown,
+  FileCheck,
+  TrendingDown,
+  Wallet,
+  MessageCircle
 } from 'lucide-react';
 import { userStats } from '@/mock_data';
 import { useAuth } from '@/hooks/useAuth';
@@ -47,6 +54,7 @@ import { useUserReputation } from '@/hooks/useUserReputation';
 import { ContextualRepTour } from '@/components/ui/contextual-rep-tour';
 
 export default function RepTab() {
+  const navigate = useNavigate();
   const { authState } = useAuth();
   const [selectedBadge, setSelectedBadge] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -177,41 +185,84 @@ export default function RepTab() {
     setIsModalOpen(true);
   };
 
+  // Handle action routing
+  const handleActionRoute = (routeTo: string) => {
+    switch (routeTo) {
+      case 'kyc':
+        navigate('/settings'); // Navigate to settings where KYC is located
+        break;
+      case 'surveys':
+        navigate('/earn'); // Navigate to earn tab for survey tips
+        break;
+      case 'token':
+        navigate('/wallet'); // Navigate to wallet for token connection
+        break;
+      case 'profile':
+        navigate('/profile'); // Navigate to profile completion
+        break;
+      case 'notifications':
+        navigate('/settings'); // Navigate to settings for notification preferences
+        break;
+      default:
+        console.log('No route defined for:', routeTo);
+    }
+  };
+
   const tips = [
     { 
       title: 'Complete KYC Verification', 
-      points: '+30 rep', 
-      description: 'Verify identity with Soulbase to unlock withdrawals',
+      subtitle: 'Verify identity with Soulbase',
+      icon: <Shield className="h-5 w-5 text-red-500" />,
+      points: '+30', 
+      description: 'Identity verification unlocks withdrawals and premium earning opportunities. Complete KYC to access higher-paying surveys and faster payment processing.',
       priority: 'high',
-      action: 'Start KYC'
+      actionLabel: 'Start KYC Verification',
+      routeTo: 'kyc',
+      completed: false
     },
     { 
       title: 'Improve Survey Quality', 
-      points: '+20 rep', 
-      description: 'Read questions carefully, give consistent responses',
+      subtitle: 'Boost consistency & accuracy',
+      icon: <FileCheck className="h-5 w-5 text-red-500" />,
+      points: '+20', 
+      description: 'Read questions carefully and provide consistent, thoughtful responses. Quality answers increase your reputation and reduce rejection rates.',
       priority: 'high',
-      action: 'View Guide'
+      actionLabel: 'View Quality Guide',
+      routeTo: 'surveys',
+      completed: false
     },
     { 
       title: 'Connect Soulbase Crypto Token', 
-      points: '+50 rep', 
-      description: 'Premium verification for exclusive opportunities',
+      subtitle: 'Premium verification method',
+      icon: <Wallet className="h-5 w-5 text-amber-500" />,
+      points: '+50', 
+      description: 'Link your Soulbase crypto token for advanced verification. Gain access to exclusive high-value opportunities and premium features.',
       priority: 'medium',
-      action: 'Connect Token'
+      actionLabel: 'Connect Token',
+      routeTo: 'token',
+      completed: false
     },
     { 
       title: 'Slow Down Survey Completion', 
-      points: '+15 rep', 
-      description: 'Take time to read - avoid speeding penalties',
+      subtitle: 'Avoid speeding penalties',
+      icon: <TrendingDown className="h-5 w-5 text-amber-500" />,
+      points: '+15', 
+      description: 'Take time to read each question carefully. Rushing through surveys can trigger quality flags and lower your reputation score.',
       priority: 'medium',
-      action: 'Learn More'
+      actionLabel: 'Learn Best Practices',
+      routeTo: 'surveys',
+      completed: false
     },
     { 
       title: 'Enable WhatsApp Notifications', 
-      points: '+5 rep', 
-      description: 'Get quick surveys via WhatsApp',
+      subtitle: 'Get instant survey alerts',
+      icon: <MessageCircle className="h-5 w-5 text-blue-500" />,
+      points: '+5', 
+      description: 'Receive quick survey notifications via WhatsApp. Respond faster to time-sensitive opportunities and maximize your earnings.',
       priority: 'low',
-      action: 'Enable'
+      actionLabel: 'Enable Notifications',
+      routeTo: 'notifications',
+      completed: false
     }
   ];
 
@@ -719,7 +770,7 @@ export default function RepTab() {
         </div>
       </CollapsibleSection>
 
-      {/* Improvement Action Plan */}
+      {/* Improvement Action Plan - FAQ Style */}
       <CollapsibleSection
         data-tour-step="action-plan"
         title="Action Plan to Improve"
@@ -729,42 +780,89 @@ export default function RepTab() {
         compactContent={
           <div className="text-center">
             <p className="text-sm text-muted-foreground">
-              {tips.filter(t => t.priority === 'high').length} high priority actions
+              {tips.filter(t => !t.completed).length} pending actions • {tips.reduce((sum, t) => sum + parseInt(t.points), 0)} rep available
             </p>
           </div>
         }
       >
-        <div className="space-y-3">
+        <div className="space-y-2">
           {tips.map((tip, index) => (
-            <div key={index} className={`p-4 rounded-xl border transition-all hover:shadow-md bg-white shadow-sm ${
-              tip.priority === 'high' ? 'border-red-200' :
-              tip.priority === 'medium' ? 'border-amber-200' :
-              'border-blue-200'
+            <Card key={index} className={`overflow-hidden transition-all hover:shadow-md ${
+              tip.priority === 'high' ? 'border-destructive/20' :
+              tip.priority === 'medium' ? 'border-amber-500/20' :
+              'border-blue-500/20'
             }`}>
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    {tip.priority === 'high' && <div className="text-3xl animate-pulse">🚨</div>}
-                    {tip.priority === 'medium' && <div className="text-2xl">⚠️</div>}
-                    {tip.priority === 'low' && <div className="text-2xl">💡</div>}
-                    <h4 className="font-semibold text-sm">{tip.title}</h4>
-                    <Badge variant="outline" className="text-xs font-medium">
-                      {tip.points}
-                    </Badge>
-                  </div>
-                  <p className="text-sm text-muted-foreground">{tip.description}</p>
-                </div>
-                <Button size="sm" variant="default" className="shrink-0">
-                  {tip.action}
-                </Button>
-              </div>
-            </div>
+              <Collapsible>
+                <CollapsibleTrigger className="w-full">
+                  <CardHeader className="hover:bg-muted/50 transition-colors cursor-pointer p-4">
+                    <div className="flex items-center justify-between gap-4">
+                      {/* Left: Icon + Title */}
+                      <div className="flex items-center gap-3 flex-1 text-left">
+                        <div className="shrink-0">
+                          {tip.icon}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-semibold text-sm mb-0.5">{tip.title}</h4>
+                          <p className="text-xs text-muted-foreground truncate">{tip.subtitle}</p>
+                        </div>
+                      </div>
+                      
+                      {/* Right: Points + Priority Badge + Expand Icon */}
+                      <div className="flex items-center gap-2 shrink-0">
+                        {/* Points circle */}
+                        <div className="w-10 h-10 rounded-full border-2 border-primary/20 bg-primary/5 flex items-center justify-center">
+                          <span className="text-xs font-bold text-primary">{tip.points}</span>
+                        </div>
+                        
+                        {/* Priority badge */}
+                        <Badge 
+                          variant="outline" 
+                          className={`text-xs hidden sm:flex ${
+                            tip.priority === 'high' ? 'border-destructive/30 text-destructive' :
+                            tip.priority === 'medium' ? 'border-amber-500/30 text-amber-600' :
+                            'border-blue-500/30 text-blue-600'
+                          }`}
+                        >
+                          {tip.priority}
+                        </Badge>
+                        
+                        {/* Expand icon */}
+                        <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
+                      </div>
+                    </div>
+                  </CardHeader>
+                </CollapsibleTrigger>
+                
+                <CollapsibleContent>
+                  <CardContent className="pt-0 pb-4 px-4 border-t">
+                    <div className="space-y-3 pt-3">
+                      {/* Description */}
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        {tip.description}
+                      </p>
+                      
+                      {/* Action button */}
+                      <Button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleActionRoute(tip.routeTo);
+                        }}
+                        className="w-full"
+                        size="sm"
+                      >
+                        {tip.actionLabel}
+                      </Button>
+                    </div>
+                  </CardContent>
+                </CollapsibleContent>
+              </Collapsible>
+            </Card>
           ))}
         </div>
         
-        <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg shadow-sm">
+        <div className="mt-4 p-3 bg-muted/50 border rounded-lg">
           <p className="text-xs text-muted-foreground">
-            💡 <strong>Reputation Tips:</strong> Higher reputation unlocks better opportunities, faster payments, and premium features. Complete actions above to boost your score efficiently.
+            💡 <strong>Tip:</strong> Higher reputation unlocks better opportunities, faster payments, and premium features. Complete actions above to boost your score efficiently.
           </p>
         </div>
       </CollapsibleSection>
