@@ -118,8 +118,10 @@ export function StreakProgress({
           <div className="flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-0">
             {/* Left: Current Streak */}
             <div className="flex flex-col items-center flex-[3] w-full sm:w-auto">
-              <div className="text-5xl mb-1">🔥</div>
-              <div className="text-3xl font-bold text-orange-400">{currentStreak}</div>
+              <div className="flex items-center justify-center gap-2 mb-1">
+                <div className="text-5xl">🔥</div>
+                <div className="text-3xl font-bold text-orange-400">{currentStreak}</div>
+              </div>
               <p className="text-xs sm:text-sm font-medium text-slate-300 mb-1.5 sm:mb-2">Day Streak</p>
               <Badge className="bg-orange-500/20 text-orange-300 border border-orange-400/30 text-xs font-semibold">
                 +{getStreakReward(currentStreak)} Rep Today
