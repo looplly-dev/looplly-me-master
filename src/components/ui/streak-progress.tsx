@@ -2,11 +2,18 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { 
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import { 
   Flame, 
   Calendar, 
   Target, 
   Clock,
-  TrendingUp 
+  TrendingUp,
+  Info
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -210,7 +217,31 @@ export function StreakProgress({
 
         {/* Milestone Grid */}
         <div className="space-y-1.5 sm:space-y-2">
-          <h4 className="text-xs sm:text-sm font-semibold text-white">Streak Milestones</h4>
+          <div className="flex items-center gap-2 justify-between">
+            <div className="flex items-center gap-2">
+              <h4 className="text-xs sm:text-sm font-semibold text-white">Streak Milestones</h4>
+              <Badge className="bg-blue-500/20 text-blue-300 border border-blue-400/30 text-[10px] sm:text-xs font-semibold px-1.5 py-0.5">
+                Year 1
+              </Badge>
+            </div>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button 
+                    className="flex items-center justify-center w-5 h-5 rounded-full bg-slate-700/50 hover:bg-slate-600/50 transition-colors"
+                    aria-label="Milestone information"
+                  >
+                    <Info className="w-3.5 h-3.5 text-slate-300" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent className="max-w-[280px] p-3 bg-slate-800 border-slate-700">
+                  <p className="text-xs text-slate-200 leading-relaxed">
+                    <strong className="text-white">One-time achievements:</strong> Each milestone badge can only be earned once based on your longest streak ever. Once earned, they stay with you forever—even if your streak resets. New milestone badges will be released in Year 2!
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
           <div className="grid grid-cols-2 gap-2 sm:gap-3">
             {/* Week Warrior */}
             <div className={cn(
