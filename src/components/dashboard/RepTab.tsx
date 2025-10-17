@@ -311,34 +311,68 @@ export default function RepTab() {
       >
         <div className="space-y-4">
           <div className="grid grid-cols-3 gap-2 text-center">
-            <div className={`p-3 rounded-xl transition-all ${userStats.reputation.score >= 0 ? 'bg-amber-50 text-amber-800 shadow-sm border border-amber-200' : 'bg-gray-50 text-muted-foreground border'}`}>
-              <div className="text-lg mb-1">🥉</div>
-              <div className="text-xs font-medium">Bronze</div>
+            <div className={`p-4 rounded-2xl transition-all duration-200 ${
+              userStats.reputation.score >= 0 && userStats.reputation.score < 100
+                ? 'bg-amber-50 dark:bg-amber-950/30 text-amber-800 dark:text-amber-200 shadow-lg border-2 border-amber-300 dark:border-amber-700 scale-105 ring-2 ring-primary ring-offset-2 dark:ring-offset-background' 
+                : userStats.reputation.score >= 0
+                ? 'bg-amber-50 dark:bg-amber-950/30 text-amber-800 dark:text-amber-200 shadow-md border border-amber-300 dark:border-amber-700 hover:scale-105'
+                : 'bg-gray-50/50 dark:bg-gray-800/30 text-muted-foreground border border-gray-200 dark:border-gray-700 hover:scale-105'
+            }`}>
+              <div className="text-5xl mb-2">🥉</div>
+              <div className="text-sm font-semibold">Bronze</div>
               <div className="text-xs opacity-75">0-99</div>
             </div>
-            <div className={`p-3 rounded-xl transition-all ${userStats.reputation.score >= 100 ? 'bg-gray-50 text-gray-700 shadow-sm border border-gray-200' : 'bg-gray-50 text-muted-foreground border'}`}>
-              <div className="text-lg mb-1">🥈</div>
-              <div className="text-xs font-medium">Silver</div>
+            <div className={`p-4 rounded-2xl transition-all duration-200 ${
+              userStats.reputation.score >= 100 && userStats.reputation.score < 250
+                ? 'bg-gray-50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-200 shadow-lg border-2 border-gray-300 dark:border-gray-600 scale-105 ring-2 ring-primary ring-offset-2 dark:ring-offset-background' 
+                : userStats.reputation.score >= 100
+                ? 'bg-gray-50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-200 shadow-md border border-gray-300 dark:border-gray-600 hover:scale-105'
+                : 'bg-gray-50/50 dark:bg-gray-800/30 text-muted-foreground border border-gray-200 dark:border-gray-700 hover:scale-105'
+            }`}>
+              <div className="text-5xl mb-2">🥈</div>
+              <div className="text-sm font-semibold">Silver</div>
               <div className="text-xs opacity-75">100-249</div>
             </div>
-            <div className={`p-3 rounded-xl transition-all ${userStats.reputation.score >= 250 ? 'bg-yellow-50 text-yellow-800 shadow-sm border border-yellow-200' : 'bg-gray-50 text-muted-foreground border'}`}>
-              <div className="text-lg mb-1">🥇</div>
-              <div className="text-xs font-medium">Gold</div>
+            <div className={`p-4 rounded-2xl transition-all duration-200 ${
+              userStats.reputation.score >= 250 && userStats.reputation.score < 500
+                ? 'bg-yellow-50 dark:bg-yellow-950/30 text-yellow-800 dark:text-yellow-200 shadow-lg border-2 border-yellow-300 dark:border-yellow-700 scale-105 ring-2 ring-primary ring-offset-2 dark:ring-offset-background' 
+                : userStats.reputation.score >= 250
+                ? 'bg-yellow-50 dark:bg-yellow-950/30 text-yellow-800 dark:text-yellow-200 shadow-md border border-yellow-300 dark:border-yellow-700 hover:scale-105'
+                : 'bg-gray-50/50 dark:bg-gray-800/30 text-muted-foreground border border-gray-200 dark:border-gray-700 hover:scale-105'
+            }`}>
+              <div className="text-5xl mb-2">🥇</div>
+              <div className="text-sm font-semibold">Gold</div>
               <div className="text-xs opacity-75">250-499</div>
             </div>
-            <div className={`p-3 rounded-xl transition-all ${userStats.reputation.score >= 500 ? 'bg-purple-50 text-purple-800 shadow-sm border border-purple-200' : 'bg-gray-50 text-muted-foreground border'}`}>
-              <div className="text-lg mb-1">⭐</div>
-              <div className="text-xs font-medium">Platinum</div>
+            <div className={`p-4 rounded-2xl transition-all duration-200 ${
+              userStats.reputation.score >= 500 && userStats.reputation.score < 1000
+                ? 'bg-purple-50 dark:bg-purple-950/30 text-purple-800 dark:text-purple-200 shadow-lg border-2 border-purple-300 dark:border-purple-700 scale-105 ring-2 ring-primary ring-offset-2 dark:ring-offset-background' 
+                : userStats.reputation.score >= 500
+                ? 'bg-purple-50 dark:bg-purple-950/30 text-purple-800 dark:text-purple-200 shadow-md border border-purple-300 dark:border-purple-700 hover:scale-105'
+                : 'bg-gray-50/50 dark:bg-gray-800/30 text-muted-foreground border border-gray-200 dark:border-gray-700 hover:scale-105'
+            }`}>
+              <div className="text-5xl mb-2">⭐</div>
+              <div className="text-sm font-semibold">Platinum</div>
               <div className="text-xs opacity-75">500-999</div>
             </div>
-            <div className={`p-3 rounded-xl transition-all ${userStats.reputation.score >= 1000 ? 'bg-cyan-50 text-cyan-800 shadow-sm border border-cyan-200' : 'bg-gray-50 text-muted-foreground border'}`}>
-              <div className="text-lg mb-1">💎</div>
-              <div className="text-xs font-medium">Diamond</div>
+            <div className={`p-4 rounded-2xl transition-all duration-200 ${
+              userStats.reputation.score >= 1000 && userStats.reputation.score < 2000
+                ? 'bg-cyan-50 dark:bg-cyan-950/30 text-cyan-800 dark:text-cyan-200 shadow-lg border-2 border-cyan-300 dark:border-cyan-700 scale-105 ring-2 ring-primary ring-offset-2 dark:ring-offset-background' 
+                : userStats.reputation.score >= 1000
+                ? 'bg-cyan-50 dark:bg-cyan-950/30 text-cyan-800 dark:text-cyan-200 shadow-md border border-cyan-300 dark:border-cyan-700 hover:scale-105'
+                : 'bg-gray-50/50 dark:bg-gray-800/30 text-muted-foreground border border-gray-200 dark:border-gray-700 hover:scale-105'
+            }`}>
+              <div className="text-5xl mb-2">💎</div>
+              <div className="text-sm font-semibold">Diamond</div>
               <div className="text-xs opacity-75">1000-1999</div>
             </div>
-            <div className={`p-3 rounded-xl transition-all ${userStats.reputation.score >= 2000 ? 'bg-orange-50 text-orange-800 shadow-sm border border-orange-200' : 'bg-gray-50 text-muted-foreground border'}`}>
-              <div className="text-lg mb-1">👑</div>
-              <div className="text-xs font-medium">Elite</div>
+            <div className={`p-4 rounded-2xl transition-all duration-200 ${
+              userStats.reputation.score >= 2000
+                ? 'bg-orange-50 dark:bg-orange-950/30 text-orange-800 dark:text-orange-200 shadow-lg border-2 border-orange-300 dark:border-orange-700 scale-105 ring-2 ring-primary ring-offset-2 dark:ring-offset-background' 
+                : 'bg-gray-50/50 dark:bg-gray-800/30 text-muted-foreground border border-gray-200 dark:border-gray-700 hover:scale-105'
+            }`}>
+              <div className="text-5xl mb-2">👑</div>
+              <div className="text-sm font-semibold">Elite</div>
               <div className="text-xs opacity-75">2000+</div>
             </div>
           </div>
