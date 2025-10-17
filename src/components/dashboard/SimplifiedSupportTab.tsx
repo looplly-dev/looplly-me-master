@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { 
+import {
   MessageCircle, 
   HelpCircle, 
   Send,
@@ -12,48 +12,68 @@ import {
   Lightbulb,
   BookOpen,
   Phone,
-  Flame
+  Flame,
+  DollarSign
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
-const quickHelp = [
+const faqCategories = [
   {
-    question: "How do I earn money?",
-    answer: "Complete surveys, watch videos, and do micro-tasks. Tap the daily check-in for instant $0.50!"
+    id: 'earning',
+    title: 'Earning & Payments',
+    icon: DollarSign,
+    iconColor: 'text-green-500',
+    description: 'Learn about earning money and getting paid',
+    faqs: [
+      {
+        question: "How do I earn money?",
+        answer: "Complete surveys, watch videos, and do micro-tasks. Tap the daily check-in for instant $0.50!"
+      },
+      {
+        question: "When can I cash out?", 
+        answer: "M-Pesa: $2.50 minimum, Airtime: $5.00, PayPal/Crypto: $10.00. Complete your profile first!"
+      },
+      {
+        question: "How long until I get paid?",
+        answer: "Payments are processed within 24-48 hours after approval."
+      },
+      {
+        question: "Why complete my profile?",
+        answer: "Profile completion unlocks all earning opportunities and enables withdrawals for security."
+      }
+    ]
   },
   {
-    question: "When can I cash out?", 
-    answer: "M-Pesa: $2.50 minimum, Airtime: $5.00, PayPal/Crypto: $10.00. Complete your profile first!"
-  },
-  {
-    question: "How long until I get paid?",
-    answer: "Payments are processed within 24-48 hours after approval."
-  },
-  {
-    question: "Why complete my profile?",
-    answer: "Profile completion unlocks all earning opportunities and enables withdrawals for security."
-  },
-  {
-    question: "How does the Streak System work?",
-    answer: "Build your streak by checking in daily! Each consecutive day increases your streak count. You have a 7-day grace period if you miss a day - your streak continues but enters grace mode. Miss 8+ days and your streak resets to Day 1."
-  },
-  {
-    question: "What happens if I miss days?",
-    answer: "Miss 1-7 days: Your streak continues with grace period active. You'll see a notification to come back. Miss 8+ consecutive days: Your streak resets to Day 1, but your milestone badges stay with you forever!"
-  },
-  {
-    question: "What are Streak Milestone Badges?",
-    answer: "One-time achievements earned based on your longest streak ever: Week Warrior (7 days), Month Master (30 days), Quarter Champion (90 days), and Annual Legend (365 days). Once earned, they're yours forever - even if your streak resets!"
-  },
-  {
-    question: "Do I lose my badges if my streak resets?",
-    answer: "No! Milestone badges are permanent achievements. They're based on your longest streak ever, not your current streak. Once earned, they stay with you forever. New badges will be released in Year 2!"
+    id: 'streaks',
+    title: 'Streak System',
+    icon: Flame,
+    iconColor: 'text-orange-500',
+    description: 'Everything about daily streaks and badges',
+    faqs: [
+      {
+        question: "How does the Streak System work?",
+        answer: "Build your streak by checking in daily! Each consecutive day increases your streak count. You have a 7-day grace period if you miss a day - your streak continues but enters grace mode. Miss 8+ days and your streak resets to Day 1."
+      },
+      {
+        question: "What happens if I miss days?",
+        answer: "Miss 1-7 days: Your streak continues with grace period active. You'll see a notification to come back. Miss 8+ consecutive days: Your streak resets to Day 1, but your milestone badges stay with you forever!"
+      },
+      {
+        question: "What are Streak Milestone Badges?",
+        answer: "One-time achievements earned based on your longest streak ever: Week Warrior (7 days), Month Master (30 days), Quarter Champion (90 days), and Annual Legend (365 days). Once earned, they're yours forever - even if your streak resets!"
+      },
+      {
+        question: "Do I lose my badges if my streak resets?",
+        answer: "No! Milestone badges are permanent achievements. They're based on your longest streak ever, not your current streak. Once earned, they stay with you forever. New badges will be released in Year 2!"
+      }
+    ]
   }
 ];
 
 export default function SimplifiedSupportTab() {
   const [showContactForm, setShowContactForm] = useState(false);
-  const [expandedHelp, setExpandedHelp] = useState<number | null>(null);
+  const [expandedHelp, setExpandedHelp] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -160,35 +180,54 @@ export default function SimplifiedSupportTab() {
             Frequently Asked Questions
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
-          {quickHelp.map((item, index) => (
-            <Card key={index} className="bg-background/50">
-              <CardContent className="p-3">
-                <Button
-                  variant="ghost"
-                  className="w-full justify-between text-left h-auto p-0"
-                  onClick={() => setExpandedHelp(expandedHelp === index ? null : index)}
-                >
-                  <div className="flex items-center gap-2">
-                    {/* Show flame icon for streak-related questions (indices 4-7) */}
-                    {index >= 4 && index <= 7 && (
-                      <Flame className="h-4 w-4 text-orange-500 flex-shrink-0" />
-                    )}
-                    <span className="font-medium text-sm">{item.question}</span>
-                  </div>
-                  <HelpCircle className="h-4 w-4 flex-shrink-0" />
-                </Button>
-                
-                {expandedHelp === index && (
-                  <div className="mt-3 pt-3 border-t border-border">
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      {item.answer}
-                    </p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          ))}
+        <CardContent className="space-y-4">
+          <Accordion type="single" collapsible defaultValue="earning" className="space-y-3">
+            {faqCategories.map((category) => {
+              const IconComponent = category.icon;
+              return (
+                <AccordionItem key={category.id} value={category.id} className="border rounded-lg bg-background/50">
+                  <AccordionTrigger className="px-4 hover:no-underline">
+                    <div className="flex items-center gap-3">
+                      <IconComponent className={`h-5 w-5 ${category.iconColor}`} />
+                      <div className="text-left">
+                        <div className="font-semibold">{category.title}</div>
+                        <div className="text-xs text-muted-foreground">{category.description}</div>
+                      </div>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-4 pb-4">
+                    <div className="space-y-2 pt-2">
+                      {category.faqs.map((item, index) => {
+                        const faqKey = `${category.id}-${index}`;
+                        return (
+                          <Card key={faqKey} className="bg-background/30">
+                            <CardContent className="p-3">
+                              <Button
+                                variant="ghost"
+                                className="w-full justify-between text-left h-auto p-0"
+                                onClick={() => setExpandedHelp(expandedHelp === faqKey ? null : faqKey)}
+                              >
+                                <span className="font-medium text-sm">{item.question}</span>
+                                <HelpCircle className="h-4 w-4 flex-shrink-0" />
+                              </Button>
+                              
+                              {expandedHelp === faqKey && (
+                                <div className="mt-3 pt-3 border-t border-border">
+                                  <p className="text-sm text-muted-foreground leading-relaxed">
+                                    {item.answer}
+                                  </p>
+                                </div>
+                              )}
+                            </CardContent>
+                          </Card>
+                        );
+                      })}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              );
+            })}
+          </Accordion>
         </CardContent>
       </Card>
 
