@@ -377,25 +377,6 @@ export default function RepTab() {
               <div className="text-xs opacity-75">2000+</div>
             </div>
           </div>
-          
-          <div className="space-y-3">
-            <div className="flex justify-between text-sm">
-              <span>Progress to {level.max === Infinity ? 'Next Milestone' : 'Next Tier'}</span>
-              <span className="font-medium">{Math.round(progressToNext)}%</span>
-            </div>
-            <Progress value={progressToNext} className="h-3" />
-            <p className="text-sm text-muted-foreground">
-              {level.max === Infinity 
-                ? 'You\'ve reached Elite status! Keep earning for prestige levels.' 
-                : `${nextLevelThreshold - userStats.reputation.score} Rep to unlock ${
-                    userStats.reputation.score >= 1000 ? 'Elite' :
-                    userStats.reputation.score >= 500 ? 'Diamond' : 
-                    userStats.reputation.score >= 250 ? 'Platinum' :
-                    userStats.reputation.score >= 100 ? 'Gold' : 'Silver'
-                  } tier`
-              }
-            </p>
-          </div>
         </div>
       </CollapsibleSection>
 
