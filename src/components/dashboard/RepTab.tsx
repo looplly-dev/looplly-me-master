@@ -319,32 +319,6 @@ export default function RepTab() {
           </TooltipProvider>
         </div>
       </div>
-      {/* Enhanced Reputation Score - Always Visible */}
-      <Card data-tour-step="rep-score" className="bg-card shadow-sm border border-primary/20">
-        <CardContent className="p-4 md:p-6">
-          <div className="text-center">
-            <div className="text-5xl mb-2">{level.icon}</div>
-            <h2 className="text-2xl font-bold mb-1">
-              {level.name} {prestigeName}
-            </h2>
-            <p className="text-muted-foreground text-sm mb-4">
-              {userStats.reputation.score} Rep • {level.tier} Tier
-            </p>
-            
-            <div className="flex justify-center items-center gap-4">
-              <div className="text-center">
-                <p className="text-2xl font-bold">{userStats.reputation.score}</p>
-                <p className="text-xs text-muted-foreground">Current</p>
-              </div>
-              <Progress value={progressToNext} className="w-20 h-2" />
-              <div className="text-center">
-                <p className="text-lg font-semibold">{level.max === Infinity ? '∞' : nextLevelThreshold}</p>
-                <p className="text-xs text-muted-foreground">Next</p>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
 
       {/* Tier Progression */}
       <CollapsibleSection
@@ -426,6 +400,21 @@ export default function RepTab() {
               <div className="text-5xl mb-2">👑</div>
               <div className="text-sm font-semibold">Elite</div>
               <div className="text-xs opacity-75">2000+</div>
+            </div>
+          </div>
+          
+          {/* Progress Bar */}
+          <div className="mt-6 p-4 bg-muted/30 rounded-lg">
+            <div className="flex justify-center items-center gap-4">
+              <div className="text-center">
+                <p className="text-2xl font-bold">{userStats.reputation.score}</p>
+                <p className="text-xs text-muted-foreground">Current</p>
+              </div>
+              <Progress value={progressToNext} className="w-32 h-2" />
+              <div className="text-center">
+                <p className="text-lg font-semibold">{level.max === Infinity ? '∞' : nextLevelThreshold}</p>
+                <p className="text-xs text-muted-foreground">Next</p>
+              </div>
             </div>
           </div>
         </div>
