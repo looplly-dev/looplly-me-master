@@ -216,7 +216,7 @@ export function StreakProgress({
         </div>
 
         {/* Milestone Grid */}
-          <div className="space-y-1.5 sm:space-y-2">
+          <div className="space-y-3 sm:space-y-4">
           <div className="flex items-center gap-2 justify-between">
             <div className="flex items-center gap-2">
               <h4 className="text-xs sm:text-sm font-semibold text-foreground">Streak Milestones</h4>
