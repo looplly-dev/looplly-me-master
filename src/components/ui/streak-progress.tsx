@@ -108,33 +108,36 @@ export function StreakProgress({
 
   return (
     <Card className="border-primary/30 bg-gradient-to-br from-primary/5 to-accent/5">
-      <CardHeader className="pb-2">
-        <p className="text-sm text-muted-foreground">
-          Maintain your streak to earn bonus Rep and unlock exclusive milestone badges
+      <CardHeader className="pb-1 pt-3">
+        <p className="text-xs text-muted-foreground">
+          Earn bonus Rep and unlock milestone badges
         </p>
       </CardHeader>
       
-      <CardContent className="space-y-3">
-        {/* Current Streak Display */}
-        <div className="text-center p-3 bg-background/50 dark:bg-background/70 rounded-lg border border-border/50">
-          <div className="text-3xl font-bold bg-gradient-to-r from-primary via-orange-500 to-primary bg-clip-text text-transparent mb-1">
-            🔥 {currentStreak}
+      <CardContent className="space-y-2">
+        {/* Combined Streak Stats - Compact Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          {/* Left: Day Streak */}
+          <div className="text-center p-3 bg-background/50 dark:bg-background/70 rounded-lg border border-border/50">
+            <div className="text-3xl font-bold bg-gradient-to-r from-primary via-orange-500 to-primary bg-clip-text text-transparent mb-1">
+              🔥 {currentStreak}
+            </div>
+            <p className="text-sm font-medium text-foreground mb-1">Day Streak</p>
+            <Badge className="bg-primary/20 text-primary border border-primary/30 text-xs">
+              +{getStreakReward(currentStreak)} Rep Today
+            </Badge>
           </div>
-          <p className="text-sm font-medium text-foreground mb-1">Day Streak</p>
-          <Badge className="bg-primary/20 text-primary border border-primary/30">
-            +{getStreakReward(currentStreak)} Rep Today
-          </Badge>
-        </div>
 
-        {/* Streak Stats */}
-        <div className="text-center p-2 bg-secondary/30 dark:bg-secondary/40 rounded-lg border border-secondary/20 dark:border-secondary/30">
-          <p className="text-lg font-bold text-foreground">{longestStreak}</p>
-          <p className="text-xs text-muted-foreground">Longest Streak</p>
+          {/* Right: Longest Streak */}
+          <div className="flex flex-col items-center justify-center p-3 bg-secondary/30 dark:bg-secondary/40 rounded-lg border border-secondary/20 dark:border-secondary/30">
+            <p className="text-3xl font-bold text-foreground">{longestStreak}</p>
+            <p className="text-sm text-muted-foreground">Longest Streak</p>
+          </div>
         </div>
 
         {/* Next Milestone Progress - Circular Design */}
-        <div className={cn("p-4 rounded-lg border", nextMilestone.colorClass)}>
-          <div className="flex flex-col items-center gap-3">
+        <div className={cn("p-3 rounded-lg border", nextMilestone.colorClass)}>
+          <div className="flex flex-col items-center gap-2">
             {/* Title - Centered Header */}
             <h4 className="font-bold text-xl text-foreground text-center">
               {nextMilestone.name}
