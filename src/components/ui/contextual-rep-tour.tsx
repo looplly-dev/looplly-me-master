@@ -66,31 +66,61 @@ export function ContextualRepTour({ isActive, onStart, onComplete }: ContextualR
     currentStep,
     currentStepData,
     totalSteps,
-    skipTour,
+    completeTour,
     nextStep,
     previousStep,
+    resetTour,
   } = useContextualTour(tourSteps, 'rep_contextual_tour_completed');
 
   const [highlightRect, setHighlightRect] = useState<DOMRect | null>(null);
 
+  // Dynamic position tracking with scroll and resize support
   useEffect(() => {
     if (!isActive || !currentStepData) return;
 
+    const updatePosition = () => {
+      const element = document.querySelector(currentStepData.targetSelector);
+      if (element) {
+        const rect = element.getBoundingClientRect();
+        setHighlightRect(rect);
+      }
+    };
+
+    // Initial position
+    updatePosition();
+
+    // Auto-scroll to element
     const element = document.querySelector(currentStepData.targetSelector);
     if (element) {
-      const rect = element.getBoundingClientRect();
-      setHighlightRect(rect);
+      setTimeout(() => {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
     }
+
+    // Update on scroll (with capture to catch all scroll events)
+    window.addEventListener('scroll', updatePosition, true);
+    
+    // Update on resize
+    window.addEventListener('resize', updatePosition);
+    
+    // Continuous updates for smooth tracking during animations
+    let rafId: number;
+    const continuousUpdate = () => {
+      updatePosition();
+      rafId = requestAnimationFrame(continuousUpdate);
+    };
+    rafId = requestAnimationFrame(continuousUpdate);
+    
+    return () => {
+      window.removeEventListener('scroll', updatePosition, true);
+      window.removeEventListener('resize', updatePosition);
+      cancelAnimationFrame(rafId);
+    };
   }, [currentStep, isActive, currentStepData]);
 
-  useEffect(() => {
-    if (!isActive) {
-      onStart();
-    }
-  }, [isActive, onStart]);
-
   const handleComplete = () => {
-    skipTour();
+    completeTour();
+    resetTour();
     onComplete();
   };
 
