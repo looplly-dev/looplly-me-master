@@ -11,7 +11,8 @@ import {
   CheckCircle,
   Lightbulb,
   BookOpen,
-  Phone
+  Phone,
+  Flame
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -31,6 +32,22 @@ const quickHelp = [
   {
     question: "Why complete my profile?",
     answer: "Profile completion unlocks all earning opportunities and enables withdrawals for security."
+  },
+  {
+    question: "How does the Streak System work?",
+    answer: "Build your streak by checking in daily! Each consecutive day increases your streak count. You have a 7-day grace period if you miss a day - your streak continues but enters grace mode. Miss 8+ days and your streak resets to Day 1."
+  },
+  {
+    question: "What happens if I miss days?",
+    answer: "Miss 1-7 days: Your streak continues with grace period active. You'll see a notification to come back. Miss 8+ consecutive days: Your streak resets to Day 1, but your milestone badges stay with you forever!"
+  },
+  {
+    question: "What are Streak Milestone Badges?",
+    answer: "One-time achievements earned based on your longest streak ever: Week Warrior (7 days), Month Master (30 days), Quarter Champion (90 days), and Annual Legend (365 days). Once earned, they're yours forever - even if your streak resets!"
+  },
+  {
+    question: "Do I lose my badges if my streak resets?",
+    answer: "No! Milestone badges are permanent achievements. They're based on your longest streak ever, not your current streak. Once earned, they stay with you forever. New badges will be released in Year 2!"
   }
 ];
 
@@ -140,7 +157,7 @@ export default function SimplifiedSupportTab() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Lightbulb className="h-5 w-5 text-primary" />
-            Quick Help
+            Frequently Asked Questions
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -152,7 +169,13 @@ export default function SimplifiedSupportTab() {
                   className="w-full justify-between text-left h-auto p-0"
                   onClick={() => setExpandedHelp(expandedHelp === index ? null : index)}
                 >
-                  <span className="font-medium text-sm">{item.question}</span>
+                  <div className="flex items-center gap-2">
+                    {/* Show flame icon for streak-related questions (indices 4-7) */}
+                    {index >= 4 && index <= 7 && (
+                      <Flame className="h-4 w-4 text-orange-500 flex-shrink-0" />
+                    )}
+                    <span className="font-medium text-sm">{item.question}</span>
+                  </div>
                   <HelpCircle className="h-4 w-4 flex-shrink-0" />
                 </Button>
                 
