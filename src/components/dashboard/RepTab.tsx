@@ -226,18 +226,29 @@ export default function RepTab() {
 
   return (
     <div data-tour-step="page" className="py-4 md:p-6 lg:p-8 pb-24 md:pb-20 lg:pb-8 space-y-4 md:space-y-6">
-      {/* Header with Tour Button */}
-      <div className="flex justify-between items-center">
+      {/* Header with Two Tour Buttons */}
+      <div className="flex justify-between items-center flex-wrap gap-2">
         <h1 className="text-2xl font-bold text-foreground">Reputation</h1>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setShowContextualTour(true)}
-          className="flex items-center gap-2"
-        >
-          <MapPin className="h-4 w-4" />
-          Take a Tour
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowOnboarding(true)}
+            className="flex items-center gap-2"
+          >
+            <span className="text-base">📖</span>
+            Welcome Guide
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowContextualTour(true)}
+            className="flex items-center gap-2"
+          >
+            <MapPin className="h-4 w-4" />
+            Feature Tour
+          </Button>
+        </div>
       </div>
       {/* Enhanced Reputation Score - Always Visible */}
       <Card data-tour-step="rep-score" className="bg-card shadow-sm border border-primary/20">
