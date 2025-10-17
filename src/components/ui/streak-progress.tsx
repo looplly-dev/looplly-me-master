@@ -16,10 +16,10 @@ interface StreakProgressProps {
   daysUntilMonthlyMilestone: number;
   monthsUntilYearly: number;
   milestones: {
-    weekly: { achieved: boolean; count: number };
-    monthly: { achieved: boolean; count: number };
-    quarterly: { achieved: boolean; count: number };
-    yearly: { achieved: boolean; count: number };
+    weekly: { achieved: boolean };
+    monthly: { achieved: boolean };
+    quarterly: { achieved: boolean };
+    yearly: { achieved: boolean };
   };
 }
 
@@ -224,7 +224,7 @@ export function StreakProgress({
                 <p className="text-sm font-semibold text-white">Week Warrior</p>
               </div>
               <p className="text-xs text-slate-400">
-                {milestones.weekly.achieved ? `✓ Earned ${milestones.weekly.count}x` : '7 days to unlock'}
+                {milestones.weekly.achieved ? '✓ Earned' : '7 days to unlock'}
               </p>
             </div>
             
@@ -240,7 +240,7 @@ export function StreakProgress({
                 <p className="text-sm font-semibold text-white">Month Master</p>
               </div>
               <p className="text-xs text-slate-400">
-                {milestones.monthly.achieved ? `✓ Earned ${milestones.monthly.count}x` : '30 days to unlock'}
+                {milestones.monthly.achieved ? '✓ Earned' : '30 days to unlock'}
               </p>
             </div>
             
@@ -256,7 +256,7 @@ export function StreakProgress({
                 <p className="text-sm font-semibold text-white">Quarter Champion</p>
               </div>
               <p className="text-xs text-slate-400">
-                {milestones.quarterly.achieved ? `✓ Earned ${milestones.quarterly.count}x` : '90 days to unlock'}
+                {milestones.quarterly.achieved ? '✓ Earned' : '90 days to unlock'}
               </p>
             </div>
             
@@ -272,7 +272,7 @@ export function StreakProgress({
                 <p className="text-sm font-semibold text-white">Annual Legend</p>
               </div>
               <p className="text-xs text-slate-400">
-                {milestones.yearly.achieved ? `✓ Earned ${milestones.yearly.count}x` : '365 days to unlock'}
+                {milestones.yearly.achieved ? '✓ Earned' : '365 days to unlock'}
               </p>
             </div>
           </div>

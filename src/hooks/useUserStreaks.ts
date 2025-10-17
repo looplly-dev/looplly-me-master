@@ -11,10 +11,10 @@ export interface UserStreak {
   last_activity_date: string | null;
   streak_started_at: string | null;
   milestones: {
-    weekly: { achieved: boolean; count: number };
-    monthly: { achieved: boolean; count: number };
-    quarterly: { achieved: boolean; count: number };
-    yearly: { achieved: boolean; count: number };
+    weekly: { achieved: boolean };
+    monthly: { achieved: boolean };
+    quarterly: { achieved: boolean };
+    yearly: { achieved: boolean };
   };
   unlocked_stages: {
     stage1: boolean;
@@ -54,10 +54,10 @@ export const useUserStreaks = () => {
             current_streak: 0,
             longest_streak: 0,
             milestones: {
-              weekly: { achieved: false, count: 0 },
-              monthly: { achieved: false, count: 0 },
-              quarterly: { achieved: false, count: 0 },
-              yearly: { achieved: false, count: 0 }
+              weekly: { achieved: false },
+              monthly: { achieved: false },
+              quarterly: { achieved: false },
+              yearly: { achieved: false }
             }
           })
           .select()
@@ -153,6 +153,32 @@ export const useUserStreaks = () => {
       // Update longest streak if needed
       newLongestStreak = Math.max(newLongestStreak, newCurrentStreak);
 
+      // Check and unlock milestone badges (one-time only, based on longest_streak)
+      const updatedMilestones = { ...streak.milestones };
+      let milestoneUnlocked = false;
+
+      if (newLongestStreak >= 365 && !updatedMilestones.yearly.achieved) {
+        updatedMilestones.yearly = { achieved: true };
+        milestoneUnlocked = true;
+        toastTitle = '🏆 Annual Legend!';
+        toastMessage = 'You earned the Annual Legend badge! 365 day milestone achieved!';
+      } else if (newLongestStreak >= 90 && !updatedMilestones.quarterly.achieved) {
+        updatedMilestones.quarterly = { achieved: true };
+        milestoneUnlocked = true;
+        toastTitle = '🌟 Quarter Champion!';
+        toastMessage = 'You earned the Quarter Champion badge! 90 day milestone achieved!';
+      } else if (newLongestStreak >= 30 && !updatedMilestones.monthly.achieved) {
+        updatedMilestones.monthly = { achieved: true };
+        milestoneUnlocked = true;
+        toastTitle = '🌙 Month Master!';
+        toastMessage = 'You earned the Month Master badge! 30 day milestone achieved!';
+      } else if (newLongestStreak >= 7 && !updatedMilestones.weekly.achieved) {
+        updatedMilestones.weekly = { achieved: true };
+        milestoneUnlocked = true;
+        toastTitle = '⚡ Week Warrior!';
+        toastMessage = 'You earned the Week Warrior badge! 7 day milestone achieved!';
+      }
+
       const { error } = await supabase
         .from('user_streaks')
         .update({
@@ -161,7 +187,8 @@ export const useUserStreaks = () => {
           last_activity_date: today,
           consecutive_days_missed: newConsecutiveDaysMissed,
           grace_period_started_at: newGracePeriodStartedAt,
-          streak_started_at: streak.streak_started_at || new Date().toISOString()
+          streak_started_at: streak.streak_started_at || new Date().toISOString(),
+          milestones: updatedMilestones
         })
         .eq('user_id', authState.user.id);
 
