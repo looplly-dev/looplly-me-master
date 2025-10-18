@@ -74,7 +74,7 @@ export function RepOnboardingTour({ isVisible, onComplete, onSkip, isBetaCohort 
           <div className="bg-primary/10 rounded-lg p-4 flex items-center gap-3">
             <span className="text-2xl">🔥</span>
             <div>
-              <p className="font-semibold text-sm">Logging in daily</p>
+              <p className="font-semibold text-sm">Check in daily</p>
               <p className="text-xs text-muted-foreground">Keep your streak alive</p>
             </div>
           </div>
