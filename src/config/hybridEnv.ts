@@ -31,6 +31,8 @@ const extendedConfigSchema = z.object({
   VITE_API_BASE_URL: z.string().url().optional(),
   VITE_API_TIMEOUT: z.string().transform(val => parseInt(val, 10)).pipe(z.number().min(1000).max(120000)).default('30000'),
   VITE_CAPACITOR_PLATFORM: z.enum(['web', 'ios', 'android']).default('web'),
+  VITE_GOOGLE_PLACES_API_KEY: z.string().optional(),
+  VITE_USE_MOCK_PLACES: z.string().transform(val => val === 'true').default('true'),
 });
 
 export type HybridConfig = z.infer<typeof extendedConfigSchema>;

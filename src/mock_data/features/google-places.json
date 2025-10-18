@@ -1,0 +1,171 @@
+{
+  "mockPlaces": [
+    {
+      "place_id": "mock_place_1",
+      "formatted_address": "123 Main Street, Sandton, Johannesburg, Gauteng, 2196, South Africa",
+      "geometry": {
+        "location": {
+          "lat": -26.107169,
+          "lng": 28.056305
+        }
+      },
+      "address_components": [
+        {
+          "long_name": "123",
+          "short_name": "123",
+          "types": ["street_number"]
+        },
+        {
+          "long_name": "Main Street",
+          "short_name": "Main St",
+          "types": ["route"]
+        },
+        {
+          "long_name": "Sandton",
+          "short_name": "Sandton",
+          "types": ["sublocality", "political"]
+        },
+        {
+          "long_name": "Johannesburg",
+          "short_name": "JHB",
+          "types": ["locality", "political"]
+        },
+        {
+          "long_name": "Gauteng",
+          "short_name": "GP",
+          "types": ["administrative_area_level_1", "political"]
+        },
+        {
+          "long_name": "2196",
+          "short_name": "2196",
+          "types": ["postal_code"]
+        },
+        {
+          "long_name": "South Africa",
+          "short_name": "ZA",
+          "types": ["country", "political"]
+        }
+      ]
+    },
+    {
+      "place_id": "mock_place_2",
+      "formatted_address": "456 Oak Avenue, Cape Town, Western Cape, 8001, South Africa",
+      "geometry": {
+        "location": {
+          "lat": -33.924869,
+          "lng": 18.424055
+        }
+      },
+      "address_components": [
+        {
+          "long_name": "456",
+          "short_name": "456",
+          "types": ["street_number"]
+        },
+        {
+          "long_name": "Oak Avenue",
+          "short_name": "Oak Ave",
+          "types": ["route"]
+        },
+        {
+          "long_name": "Cape Town City Centre",
+          "short_name": "Cape Town",
+          "types": ["sublocality", "political"]
+        },
+        {
+          "long_name": "Cape Town",
+          "short_name": "CPT",
+          "types": ["locality", "political"]
+        },
+        {
+          "long_name": "Western Cape",
+          "short_name": "WC",
+          "types": ["administrative_area_level_1", "political"]
+        },
+        {
+          "long_name": "8001",
+          "short_name": "8001",
+          "types": ["postal_code"]
+        },
+        {
+          "long_name": "South Africa",
+          "short_name": "ZA",
+          "types": ["country", "political"]
+        }
+      ]
+    },
+    {
+      "place_id": "mock_place_3",
+      "formatted_address": "789 Beach Road, Durban, KwaZulu-Natal, 4001, South Africa",
+      "geometry": {
+        "location": {
+          "lat": -29.858680,
+          "lng": 31.021840
+        }
+      },
+      "address_components": [
+        {
+          "long_name": "789",
+          "short_name": "789",
+          "types": ["street_number"]
+        },
+        {
+          "long_name": "Beach Road",
+          "short_name": "Beach Rd",
+          "types": ["route"]
+        },
+        {
+          "long_name": "Durban Central",
+          "short_name": "Durban",
+          "types": ["sublocality", "political"]
+        },
+        {
+          "long_name": "Durban",
+          "short_name": "DBN",
+          "types": ["locality", "political"]
+        },
+        {
+          "long_name": "KwaZulu-Natal",
+          "short_name": "KZN",
+          "types": ["administrative_area_level_1", "political"]
+        },
+        {
+          "long_name": "4001",
+          "short_name": "4001",
+          "types": ["postal_code"]
+        },
+        {
+          "long_name": "South Africa",
+          "short_name": "ZA",
+          "types": ["country", "political"]
+        }
+      ]
+    }
+  ],
+  "mockAutocompleteResults": [
+    {
+      "description": "123 Main Street, Sandton, Johannesburg, South Africa",
+      "place_id": "mock_place_1",
+      "structured_formatting": {
+        "main_text": "123 Main Street",
+        "secondary_text": "Sandton, Johannesburg, South Africa"
+      }
+    },
+    {
+      "description": "456 Oak Avenue, Cape Town, South Africa",
+      "place_id": "mock_place_2",
+      "structured_formatting": {
+        "main_text": "456 Oak Avenue",
+        "secondary_text": "Cape Town, South Africa"
+      }
+    },
+    {
+      "description": "789 Beach Road, Durban, South Africa",
+      "place_id": "mock_place_3",
+      "structured_formatting": {
+        "main_text": "789 Beach Road",
+        "secondary_text": "Durban, South Africa"
+      }
+    }
+  ]
+}
