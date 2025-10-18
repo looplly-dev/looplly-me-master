@@ -57,13 +57,7 @@ export const ProfileCategorySection = ({
             </div>
           </div>
           <div className="flex items-center gap-2">
-            {category.staleCount > 0 && (
-              <Badge variant="outline" className="border-warning text-warning gap-1">
-                <AlertCircle className="h-3 w-3" />
-                {category.staleCount} Stale
-              </Badge>
-            )}
-            <Badge 
+            <Badge
               variant={completionPercentage === 100 ? "default" : "secondary"}
               className="gap-1"
             >

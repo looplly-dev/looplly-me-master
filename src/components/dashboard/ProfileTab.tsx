@@ -66,9 +66,9 @@ export default function ProfileTab() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
-            <span>Essential Profile (Required)</span>
+            <span>About You</span>
             <span className="text-sm font-normal text-muted-foreground">
-              Complete to unlock earning
+              Finish to start earning
             </span>
           </CardTitle>
         </CardHeader>
@@ -96,9 +96,9 @@ export default function ProfileTab() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
-              <span>Extended Profile (Optional)</span>
+              <span>Tell Us More</span>
               <span className="text-sm font-normal text-muted-foreground">
-                Complete for better survey matches
+                Help us find better opportunities for you
               </span>
             </CardTitle>
           </CardHeader>

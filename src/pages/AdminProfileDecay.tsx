@@ -98,6 +98,35 @@ export default function AdminProfileDecay() {
     }
   });
 
+  // Platform health metrics
+  const { data: staleStats } = useQuery({
+    queryKey: ['stale-profile-stats'],
+    queryFn: async () => {
+      const { data: answers } = await supabase
+        .from('profile_answers')
+        .select(`
+          question_id, 
+          last_updated,
+          profile_questions!inner(decay_interval_days, is_immutable)
+        `)
+        .not('profile_questions.decay_interval_days', 'is', null)
+        .eq('profile_questions.is_immutable', false);
+      
+      if (!answers) return { totalAnswers: 0, staleAnswers: 0, stalenessRate: 0 };
+      
+      const staleCount = answers.filter(a => {
+        const daysSinceUpdate = (Date.now() - new Date(a.last_updated).getTime()) / (1000 * 60 * 60 * 24);
+        return daysSinceUpdate > (a.profile_questions as any).decay_interval_days;
+      }).length;
+      
+      return {
+        totalAnswers: answers.length,
+        staleAnswers: staleCount,
+        stalenessRate: answers.length > 0 ? (staleCount / answers.length) * 100 : 0
+      };
+    }
+  });
+
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredQuestions = questions?.filter(q => 
@@ -115,6 +144,34 @@ export default function AdminProfileDecay() {
         <h1 className="text-3xl font-bold">Profile Decay Configuration</h1>
         <p className="text-muted-foreground">Manage how often profile questions expire and need re-confirmation</p>
       </div>
+
+      {/* Platform Health Dashboard */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Platform Health Metrics</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="space-y-2">
+              <p className="text-sm text-muted-foreground">Total Data Points</p>
+              <p className="text-4xl font-bold">{staleStats?.totalAnswers || 0}</p>
+              <p className="text-xs text-muted-foreground">Answered profile questions</p>
+            </div>
+            <div className="space-y-2">
+              <p className="text-sm text-muted-foreground">Stale Data Points</p>
+              <p className="text-4xl font-bold text-warning">{staleStats?.staleAnswers || 0}</p>
+              <p className="text-xs text-muted-foreground">Need re-collection</p>
+            </div>
+            <div className="space-y-2">
+              <p className="text-sm text-muted-foreground">Staleness Rate</p>
+              <p className="text-4xl font-bold text-warning">
+                {staleStats?.stalenessRate?.toFixed(1) || 0}%
+              </p>
+              <p className="text-xs text-muted-foreground">Of answered questions</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Section 1: Global Intervals */}
       <Card>

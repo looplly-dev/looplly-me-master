@@ -48,12 +48,16 @@ import { addMissingDemoActivities } from '@/utils/addMissingDemoActivities';
 import { addMockEarningActivities } from '@/utils/mockEarningActivities';
 import { userStats } from '@/mock_data';
 import { useProfileQuestions } from '@/hooks/useProfileQuestions';
+import { useStaleProfileCheck } from '@/hooks/useStaleProfileCheck';
+import { ProfileUpdateModal } from '@/components/dashboard/ProfileUpdateModal';
 import { useNavigate } from 'react-router-dom';
 
 export default function SimplifiedEarnTab() {
   const navigate = useNavigate();
   const { level2Complete } = useProfileQuestions();
+  const { hasStaleData, staleQuestions, staleCount } = useStaleProfileCheck();
   const [checkInDone, setCheckInDone] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(true);
   const [dataOptIns, setDataOptIns] = useState({
     shopping: false,
     appUsage: false,
@@ -74,6 +78,21 @@ export default function SimplifiedEarnTab() {
   const { authState } = useAuth();
   const { surveys: cintSurveys, isLoading: cintLoading, startSurvey } = useCintSurveys();
   const isMobile = useIsMobile();
+
+  // Skip tracking for stale profile updates
+  const SKIP_TIMESTAMP_KEY = 'profile_update_skip_timestamp';
+  const SKIP_DURATION_HOURS = 24;
+
+  const hasSkippedUpdate = () => {
+    const skipTimestamp = localStorage.getItem(SKIP_TIMESTAMP_KEY);
+    if (!skipTimestamp) return false;
+    const hoursSinceSkip = (Date.now() - parseInt(skipTimestamp)) / (1000 * 60 * 60);
+    return hoursSinceSkip < SKIP_DURATION_HOURS;
+  };
+
+  const recordSkip = () => {
+    localStorage.setItem(SKIP_TIMESTAMP_KEY, Date.now().toString());
+  };
 
   // Using static mock data - no database calls needed
 
@@ -265,23 +284,39 @@ export default function SimplifiedEarnTab() {
   if (!level2Complete) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] p-8 space-y-6">
-        <div className="text-center space-y-4">
-          <AlertCircle className="h-16 w-16 text-warning mx-auto" />
-          <h2 className="text-2xl font-bold">Complete Your Profile First</h2>
-          <p className="text-muted-foreground text-center max-w-md">
-            You need to complete your Level 2 profile questions to access earning opportunities.
-            This helps us match you with the best surveys and tasks.
-          </p>
-          <Button onClick={() => navigate('/profile')} size="lg">
-            Complete Profile Now
-          </Button>
-        </div>
+        <AlertCircle className="h-16 w-16 text-warning mx-auto" />
+        <h2 className="text-2xl font-bold">Finish Your Profile</h2>
+        <p className="text-muted-foreground text-center max-w-md">
+          Complete your basic info to start earning. It takes less than 2 minutes!
+        </p>
+        <Button onClick={() => navigate('/profile')} size="lg">
+          Complete Now
+        </Button>
       </div>
     );
   }
 
+  // Direct pop-up if stale data exists (no prompt screen)
+  const showUpdateModal = hasStaleData && !hasSkippedUpdate() && showProfileModal;
+
   return (
     <TooltipProvider>
+      {/* Profile Update Modal - Shows directly as popup */}
+      {showUpdateModal && (
+        <ProfileUpdateModal
+          staleQuestions={staleQuestions}
+          onComplete={() => {
+            localStorage.removeItem(SKIP_TIMESTAMP_KEY);
+            setShowProfileModal(false);
+          }}
+          onSkip={() => {
+            recordSkip();
+            setShowProfileModal(false);
+          }}
+        />
+      )}
+      
+      {/* Normal Earn content renders underneath */}
       <div className="pt-0 pb-24 md:pb-20 lg:pb-8 px-0 md:px-6 lg:px-8 space-y-3">
         {/* Enhanced Balance Card with Progress */}
         <Card className="bg-card border-0 shadow-lg">

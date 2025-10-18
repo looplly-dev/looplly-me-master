@@ -167,33 +167,10 @@ export function QuestionRenderer({ question, onAnswerChange, onAddressChange, di
           {question.is_required && <span className="text-destructive">*</span>}
         </Label>
         <div className="flex items-center gap-2">
-          {question.user_answer?.is_stale && (
-            <Badge variant="outline" className="border-warning text-warning gap-1 flex-shrink-0">
-              <AlertCircle className="h-3 w-3" />
-              Needs Update
-            </Badge>
-          )}
           {isLocked && (
             <Badge variant="secondary" className="gap-1 flex-shrink-0">
               <Lock className="h-3 w-3" />
               Locked
-            </Badge>
-          )}
-          {!isLocked && daysUntilExpiry !== null && question.decay_interval_type && (
-            <Badge 
-              variant="outline" 
-              className={cn(
-                "gap-1 flex-shrink-0",
-                daysUntilExpiry < 0 ? "border-destructive text-destructive" :
-                daysUntilExpiry <= 7 ? "border-warning text-warning" :
-                "border-success text-success"
-              )}
-            >
-              <Clock className="h-3 w-3" />
-              {daysUntilExpiry < 0 
-                ? "Expired" 
-                : `${daysUntilExpiry}d (${question.decay_interval_type})`
-              }
             </Badge>
           )}
         </div>
