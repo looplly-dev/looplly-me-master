@@ -5,6 +5,7 @@
 This document outlines the complete architecture for Looplly's multi-level profile system. The system is designed to progressively collect user information across three levels of priority, with built-in data decay tracking and contextual triggers.
 
 ### Key Features
+
 - **3-Level Profile System**: Mandatory Level 1 (signup), Compulsory Level 2 (pre-earning), Progressive Level 3 (contextual)
 - **Data Decay Tracking**: Automatic staleness detection based on configurable intervals
 - **Google Places Integration**: Structured address collection with international support
@@ -43,6 +44,7 @@ CREATE POLICY "Admins can manage categories"
 ```
 
 **Initial Seed Data:**
+
 ```sql
 INSERT INTO public.profile_categories (name, icon_name, display_order, priority_level) VALUES
   ('Identity & Security', 'ShieldCheck', 1, 1),
@@ -95,6 +97,7 @@ CREATE INDEX idx_profile_questions_priority ON public.profile_questions(priority
 ```
 
 **Sample Level 1 Questions:**
+
 ```sql
 -- Identity & Security Category
 INSERT INTO public.profile_questions (category_id, question_key, question_text, question_type, priority_level, decay_days, is_required) VALUES
@@ -106,20 +109,21 @@ INSERT INTO public.profile_questions (category_id, question_key, question_text, 
 ```
 
 **Sample Level 2 Questions:**
+
 ```sql
 -- Demographics Category
 INSERT INTO public.profile_questions (category_id, question_key, question_text, question_type, options, priority_level, decay_days, is_required) VALUES
-  ((SELECT id FROM profile_categories WHERE name = 'Demographics'), 'gender', 'Gender', 'select', 
+  ((SELECT id FROM profile_categories WHERE name = 'Demographics'), 'gender', 'Gender', 'select',
    '["Male", "Female", "Other", "Prefer not to say"]'::jsonb, 2, 365, true),
   ((SELECT id FROM profile_categories WHERE name = 'Demographics'), 'date_of_birth', 'Date of Birth', 'date', 2, 365, true),
-  ((SELECT id FROM profile_categories WHERE name = 'Demographics'), 'ethnicity', 'Ethnicity', 'select', 
+  ((SELECT id FROM profile_categories WHERE name = 'Demographics'), 'ethnicity', 'Ethnicity', 'select',
    '["White", "Black/African", "Coloured", "Indian/Asian", "Other"]'::jsonb, 2, 365, false);
 
 -- Financial Profile Category
 INSERT INTO public.profile_questions (category_id, question_key, question_text, question_type, priority_level, decay_days, is_required, country_specific) VALUES
   ((SELECT id FROM profile_categories WHERE name = 'Financial Profile'), 'household_income', 'Household Income', 'select', 2, 90, true, true),
   ((SELECT id FROM profile_categories WHERE name = 'Financial Profile'), 'personal_income', 'Personal Income', 'select', 2, 90, true, true),
-  ((SELECT id FROM profile_categories WHERE name = 'Financial Profile'), 'sec', 'Socio-Economic Classification (SEC)', 'select', 
+  ((SELECT id FROM profile_categories WHERE name = 'Financial Profile'), 'sec', 'Socio-Economic Classification (SEC)', 'select',
    '["A", "B", "C1", "C2", "D", "E"]'::jsonb, 2, 180, true),
   ((SELECT id FROM profile_categories WHERE name = 'Financial Profile'), 'sem', 'Socio-Economic Measure (SEM)', 'select', 2, 180, true),
   ((SELECT id FROM profile_categories WHERE name = 'Financial Profile'), 'nccs', 'National Consumer Classification System (NCCS)', 'select', 2, 180, true);
@@ -141,12 +145,12 @@ CREATE TABLE public.profile_answers (
   expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
   updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
-  
+
   UNIQUE(user_id, question_id)
 );
 
 -- Computed column for staleness check
-ALTER TABLE public.profile_answers 
+ALTER TABLE public.profile_answers
   ADD COLUMN is_stale BOOLEAN GENERATED ALWAYS AS (expires_at < now()) STORED;
 
 -- RLS Policies
@@ -178,8 +182,8 @@ CREATE OR REPLACE FUNCTION set_profile_answer_expiry()
 RETURNS TRIGGER AS $$
 BEGIN
   NEW.expires_at := NEW.answered_at + (
-    SELECT (decay_days || ' days')::interval 
-    FROM profile_questions 
+    SELECT (decay_days || ' days')::interval
+    FROM profile_questions
     WHERE id = NEW.question_id
   );
   RETURN NEW;
@@ -288,9 +292,9 @@ BEGIN
   UPDATE profiles SET
     level_1_complete = (v_level_1_answered >= v_level_1_count),
     level_2_complete = (v_level_2_answered >= v_level_2_count),
-    level_3_completion_percentage = CASE 
-      WHEN v_level_3_count = 0 THEN 100 
-      ELSE (v_level_3_answered * 100 / v_level_3_count) 
+    level_3_completion_percentage = CASE
+      WHEN v_level_3_count = 0 THEN 100
+      ELSE (v_level_3_answered * 100 / v_level_3_count)
     END,
     profile_last_reviewed = now()
   WHERE user_id = NEW.user_id;
@@ -314,6 +318,7 @@ CREATE TRIGGER update_profile_completion_trigger
 **Purpose**: Essential identity and contact information required before account creation.
 
 **Required Fields:**
+
 - First Name
 - Last Name
 - Mobile Number (with country code detection)
@@ -321,6 +326,7 @@ CREATE TRIGGER update_profile_completion_trigger
 - Email (optional but recommended)
 
 **Validation TypeScript Interface:**
+
 ```typescript
 interface Level1Requirements {
   firstName: string;
@@ -361,6 +367,7 @@ const validateLevel1 = (profile: Profile, address: AddressComponents): boolean =
 **Purpose**: Demographic and socio-economic data required for survey matching and earning eligibility.
 
 **Required Fields:**
+
 - Gender
 - Date of Birth
 - Household Income (country-specific ranges)
@@ -371,6 +378,7 @@ const validateLevel1 = (profile: Profile, address: AddressComponents): boolean =
 - Ethnicity (recommended)
 
 **Validation TypeScript Interface:**
+
 ```typescript
 interface Level2Requirements {
   gender: 'male' | 'female' | 'other' | 'prefer_not_to_say';
@@ -393,18 +401,19 @@ const validateLevel2 = (answers: ProfileAnswer[]): boolean => {
     'sem',
     'nccs'
   ];
-  
+
   const answeredKeys = answers.map(a => a.question_key);
   const allAnswered = requiredLevel2Keys.every(key => answeredKeys.includes(key));
   const noStaleRequired = answers
     .filter(a => requiredLevel2Keys.includes(a.question_key))
     .every(a => !a.is_stale);
-  
+
   return allAnswered && noStaleRequired;
 };
 ```
 
-**Enforcement Point**: 
+**Enforcement Point**:
+
 - Block access to "Earn" tab until Level 2 complete
 - Show completion prompt on dashboard
 - Allow profile setup but prevent earning activities
@@ -416,6 +425,7 @@ const validateLevel2 = (answers: ProfileAnswer[]): boolean => {
 **Purpose**: Additional profiling data collected over time based on survey type, feature access, or time-based triggers.
 
 **Categories:**
+
 - Employment & Career (job title, industry, company size)
 - Lifestyle & Housing (home ownership, household size, pets)
 - Automotive & Transportation (car ownership, vehicle make/model, driving frequency)
@@ -424,6 +434,7 @@ const validateLevel2 = (answers: ProfileAnswer[]): boolean => {
 - Financial Details (banking products, insurance, investment preferences)
 
 **Contextual Trigger Logic:**
+
 ```typescript
 interface Level3Trigger {
   questionKey: string;
@@ -439,31 +450,32 @@ const checkLevel3Triggers = (
   triggers: Level3Trigger[]
 ): string[] => {
   const triggeredQuestions: string[] = [];
-  
+
   // Survey-based triggers
   if (surveyCategory === 'automotive') {
     triggeredQuestions.push('car_ownership', 'vehicle_make', 'vehicle_model', 'driving_frequency');
   }
-  
+
   // Time-based triggers (e.g., 30 days since signup)
   const daysSinceSignup = Math.floor(
     (Date.now() - new Date(user.created_at).getTime()) / (1000 * 60 * 60 * 24)
   );
-  
+
   if (daysSinceSignup >= 30 && !user.level_3_completion_percentage) {
     triggeredQuestions.push('employment_status', 'home_ownership');
   }
-  
+
   // Milestone triggers (e.g., completed 10 surveys)
   if (user.surveys_completed >= 10) {
     triggeredQuestions.push('banking_products', 'insurance_types');
   }
-  
+
   return triggeredQuestions;
 };
 ```
 
-**Enforcement**: 
+**Enforcement**:
+
 - Optional prompts before accessing specific surveys
 - Progressive disclosure in Profile tab
 - Gamified completion tracking (badges, rewards)
@@ -478,16 +490,16 @@ Profile data becomes "stale" after a configurable period. Users must refresh sta
 
 ### Default Decay Intervals
 
-| Category | Decay Period | Rationale |
-|----------|--------------|-----------|
-| Identity & Security | 365 days | Names/contact info rarely change |
-| Demographics | 365 days | Age/gender stable |
-| Financial Profile | 90 days | Income/economic status fluctuates |
-| Employment & Career | 90 days | Job changes common |
-| Lifestyle & Housing | 180 days | Moderate change frequency |
-| Automotive & Transportation | 180 days | Vehicle ownership updates |
-| Technology & Communication | 120 days | Device/tech changes frequent |
-| Health & Wellness | 180 days | Moderate health status changes |
+| Category                    | Decay Period | Rationale                         |
+| --------------------------- | ------------ | --------------------------------- |
+| Identity & Security         | 365 days     | Names/contact info rarely change  |
+| Demographics                | 365 days     | Age/gender stable                 |
+| Financial Profile           | 90 days      | Income/economic status fluctuates |
+| Employment & Career         | 90 days      | Job changes common                |
+| Lifestyle & Housing         | 180 days     | Moderate change frequency         |
+| Automotive & Transportation | 180 days     | Vehicle ownership updates         |
+| Technology & Communication  | 120 days     | Device/tech changes frequent      |
+| Health & Wellness           | 180 days     | Moderate health status changes    |
 
 ### Decay Calculation
 
@@ -505,11 +517,11 @@ const calculateDecayStatus = (
 ): DecayStatus => {
   const expiresAt = new Date(answeredAt);
   expiresAt.setDate(expiresAt.getDate() + decayDays);
-  
+
   const now = new Date();
   const diffMs = expiresAt.getTime() - now.getTime();
   const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-  
+
   return {
     isStale: diffDays <= 0,
     daysRemaining: Math.max(0, diffDays),
@@ -522,11 +534,13 @@ const calculateDecayStatus = (
 ### Decay Enforcement
 
 **Soft Enforcement:**
+
 - Visual indicators (amber warning icons)
 - Profile completion percentage affected
 - Prompt on dashboard: "3 profile answers need updating"
 
 **Hard Enforcement (for Level 2 questions):**
+
 - Block earning activities if critical Level 2 answers are stale
 - "Your profile needs updating before you can access new surveys"
 
@@ -683,12 +697,12 @@ const AddressAutocomplete: React.FC<{
 
 Different countries have different address hierarchies. Map Google's address components accordingly:
 
-| Country | street | suburb | city | province | postal_code |
-|---------|--------|--------|------|----------|-------------|
-| South Africa | street_number + route | sublocality_level_1 | locality | administrative_area_level_1 | postal_code |
-| United States | street_number + route | neighborhood | locality | administrative_area_level_1 | postal_code |
-| United Kingdom | street_number + route | postal_town | locality | administrative_area_level_1 | postal_code |
-| India | street_number + route | sublocality_level_2 | locality | administrative_area_level_1 | postal_code |
+| Country        | street                | suburb              | city     | province                    | postal_code |
+| -------------- | --------------------- | ------------------- | -------- | --------------------------- | ----------- |
+| South Africa   | street_number + route | sublocality_level_1 | locality | administrative_area_level_1 | postal_code |
+| United States  | street_number + route | neighborhood        | locality | administrative_area_level_1 | postal_code |
+| United Kingdom | street_number + route | postal_town         | locality | administrative_area_level_1 | postal_code |
+| India          | street_number + route | sublocality_level_2 | locality | administrative_area_level_1 | postal_code |
 
 ---
 
@@ -891,6 +905,7 @@ const ProfileCompletionCard: React.FC<{ profile: Profile }> = ({ profile }) => {
 ### A. Profile Question Management
 
 **Features:**
+
 - ✅ CRUD operations for categories and questions
 - ✅ Drag-and-drop reordering of categories and questions
 - ✅ Set priority levels (1, 2, 3) per question
@@ -901,6 +916,7 @@ const ProfileCompletionCard: React.FC<{ profile: Profile }> = ({ profile }) => {
 - ✅ Bulk import/export questions (CSV/JSON)
 
 **UI Components:**
+
 ```
 AdminQuestionsPage
 ├── CategoryList (sortable)
@@ -944,6 +960,7 @@ AdminQuestionsPage
    - Completion rate by earning tier
 
 **Dashboard UI:**
+
 ```tsx
 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
   <MetricCard
@@ -1047,6 +1064,7 @@ AdminQuestionsPage
 ### Phase 1: Database Setup (Week 1)
 
 **Tasks:**
+
 1. ✅ Create `profile_categories` table with RLS policies
 2. ✅ Create `profile_questions` table with RLS policies
 3. ✅ Create `profile_answers` table with RLS policies and triggers
@@ -1058,6 +1076,7 @@ AdminQuestionsPage
 9. ✅ Seed Level 2 questions (8 questions)
 
 **Success Criteria:**
+
 - All tables created with proper indexes
 - RLS policies tested and validated
 - Seed data inserted successfully
@@ -1068,6 +1087,7 @@ AdminQuestionsPage
 ### Phase 2: Data Migration (Week 1)
 
 **Tasks:**
+
 1. ✅ Migrate existing `profiles` table data to `profile_answers`:
    - Map `first_name` → question_key='first_name'
    - Map `last_name` → question_key='last_name'
@@ -1081,10 +1101,11 @@ AdminQuestionsPage
 4. ✅ Update `level_1_complete`, `level_2_complete` flags
 
 **Migration SQL Example:**
+
 ```sql
 -- Migrate first_name
 INSERT INTO profile_answers (user_id, question_id, answer_value, answered_at, expires_at)
-SELECT 
+SELECT
   p.user_id,
   (SELECT id FROM profile_questions WHERE question_key = 'first_name'),
   jsonb_build_object('value', p.first_name),
@@ -1097,6 +1118,7 @@ WHERE p.first_name IS NOT NULL;
 ```
 
 **Success Criteria:**
+
 - 100% of existing profile data migrated
 - No data loss during migration
 - Completion flags accurately reflect migrated data
@@ -1106,6 +1128,7 @@ WHERE p.first_name IS NOT NULL;
 ### Phase 3: Frontend Implementation (Week 2-3)
 
 **Week 2: Core Components**
+
 1. ✅ Install Google Places API dependencies
 2. ✅ Create `AddressAutocomplete` component
 3. ✅ Build `ProfileCategory` collapsible component
@@ -1114,6 +1137,7 @@ WHERE p.first_name IS NOT NULL;
 6. ✅ Create `useProfileAnswers` hook for submitting answers
 
 **Week 3: Integration & Polish**
+
 1. ✅ Refactor `ProfileTab` to use new category structure
 2. ✅ Implement Level 1 validation in `ProfileSetup`
 3. ✅ Add Level 2 blocker in `EarnTab`
@@ -1122,6 +1146,7 @@ WHERE p.first_name IS NOT NULL;
 6. ✅ Test mobile responsiveness
 
 **Success Criteria:**
+
 - Profile tab displays all categories correctly
 - Address autocomplete works across multiple countries
 - Stale data indicators appear correctly
@@ -1132,18 +1157,21 @@ WHERE p.first_name IS NOT NULL;
 ### Phase 4: Admin Portal (Week 4-6) - FUTURE
 
 **Week 4: Question Management**
+
 1. Build admin question management page
 2. Implement category CRUD operations
 3. Implement question CRUD operations
 4. Add drag-and-drop reordering
 
 **Week 5: Analytics**
+
 1. Build profile analytics dashboard
 2. Implement completion rate tracking
 3. Add stale data metrics
 4. Create question performance reports
 
 **Week 6: Configuration & Polish**
+
 1. Build configuration settings page
 2. Implement decay notification system
 3. Add user profile review interface
@@ -1156,6 +1184,7 @@ WHERE p.first_name IS NOT NULL;
 ### Row-Level Security (RLS)
 
 **User Access:**
+
 ```sql
 -- Users can only access their own profile data
 CREATE POLICY "Users can view own answers"
@@ -1172,6 +1201,7 @@ CREATE POLICY "Users can update own answers"
 ```
 
 **Admin Access:**
+
 ```sql
 -- Admins can view all profiles and manage questions
 CREATE POLICY "Admins can view all answers"
@@ -1188,10 +1218,12 @@ CREATE POLICY "Admins can manage questions"
 ### Data Encryption
 
 **At-Rest Encryption:**
+
 - Supabase provides automatic encryption for all stored data
 - Consider additional encryption for highly sensitive fields (SSN, financial data) if added in future
 
 **In-Transit Encryption:**
+
 - All API calls use HTTPS/TLS
 - Supabase client enforces encrypted connections
 
@@ -1200,6 +1232,7 @@ CREATE POLICY "Admins can manage questions"
 ### Audit Trail
 
 **Profile Change Logging:**
+
 ```sql
 CREATE TABLE profile_answer_audit (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -1236,6 +1269,7 @@ CREATE TRIGGER audit_profile_answer_changes
 ### GDPR Compliance
 
 **Right to Access:**
+
 ```typescript
 // Edge Function: export-user-profile
 export const exportUserProfile = async (userId: string) => {
@@ -1259,13 +1293,14 @@ export const exportUserProfile = async (userId: string) => {
 ```
 
 **Right to Deletion:**
+
 ```typescript
 // Edge Function: delete-user-profile-data
 export const deleteUserProfileData = async (userId: string) => {
   // Delete cascades handled by foreign key constraints
   await supabase.from('profile_answers').delete().eq('user_id', userId);
   await supabase.from('address_components').delete().eq('user_id', userId);
-  
+
   // Anonymize profile record instead of deleting (retain analytics)
   await supabase
     .from('profiles')
@@ -1281,6 +1316,7 @@ export const deleteUserProfileData = async (userId: string) => {
 ```
 
 **Right to Portability:**
+
 - Provide JSON/CSV export of all profile data
 - Include timestamps and answer history
 
@@ -1289,6 +1325,7 @@ export const deleteUserProfileData = async (userId: string) => {
 ### Consent Management
 
 **Question-Level Consent:**
+
 ```typescript
 interface ProfileQuestionConsent {
   questionId: string;
@@ -1317,6 +1354,7 @@ const recordConsent = async (userId: string, questionId: string) => {
 **Purpose**: Fetch profile questions by level and category
 
 **Request:**
+
 ```typescript
 {
   priorityLevel?: 1 | 2 | 3;
@@ -1326,6 +1364,7 @@ const recordConsent = async (userId: string, questionId: string) => {
 ```
 
 **Response:**
+
 ```typescript
 {
   categories: Array<{
@@ -1359,6 +1398,7 @@ const recordConsent = async (userId: string, questionId: string) => {
 **Purpose**: Batch update user profile answers
 
 **Request:**
+
 ```typescript
 {
   answers: Array<{
@@ -1369,6 +1409,7 @@ const recordConsent = async (userId: string, questionId: string) => {
 ```
 
 **Response:**
+
 ```typescript
 {
   success: boolean;
@@ -1386,6 +1427,7 @@ const recordConsent = async (userId: string, questionId: string) => {
 ```
 
 **Implementation:**
+
 ```typescript
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
@@ -1449,6 +1491,7 @@ serve(async (req) => {
 **Purpose**: Validate profile level completion before allowing actions
 
 **Request:**
+
 ```typescript
 {
   requiredLevel: 1 | 2;
@@ -1456,6 +1499,7 @@ serve(async (req) => {
 ```
 
 **Response:**
+
 ```typescript
 {
   isComplete: boolean;
@@ -1479,6 +1523,7 @@ serve(async (req) => {
 **Purpose**: Fetch all stale profile answers for a user
 
 **Response:**
+
 ```typescript
 {
   staleCount: number;
@@ -1500,6 +1545,7 @@ serve(async (req) => {
 **Purpose**: Admin CRUD operations for questions and categories
 
 **Endpoints:**
+
 - `POST /admin/categories` - Create category
 - `PUT /admin/categories/:id` - Update category
 - `DELETE /admin/categories/:id` - Delete category
@@ -1515,6 +1561,7 @@ serve(async (req) => {
 ### Phase 1: Database Foundation ✅
 
 **Deliverables:**
+
 1. All 4 new tables created (`profile_categories`, `profile_questions`, `profile_answers`, `address_components`)
 2. RLS policies configured
 3. Database triggers for expiry and completion tracking
@@ -1528,6 +1575,7 @@ serve(async (req) => {
 ### Phase 2: Address Integration 🔄
 
 **Deliverables:**
+
 1. Google Places API key added to secrets
 2. `@react-google-maps/api` package installed
 3. `AddressAutocomplete` component built
@@ -1542,6 +1590,7 @@ serve(async (req) => {
 ### Phase 3: ProfileTab Refactor 🔄
 
 **Deliverables:**
+
 1. `ProfileCategory` collapsible component
 2. `ProfileQuestionInput` component (handles all input types)
 3. `useProfileData` hook for fetching questions/categories/answers
@@ -1557,6 +1606,7 @@ serve(async (req) => {
 ### Phase 4: Level Validation Logic 🔄
 
 **Deliverables:**
+
 1. Level 1 validation in `ProfileSetup` during registration
 2. Level 2 blocker in `EarnTab` (block surveys until complete)
 3. Profile completion prompts on dashboard
@@ -1570,6 +1620,7 @@ serve(async (req) => {
 ### Phase 5: Polish & Testing ⏳
 
 **Deliverables:**
+
 1. Mobile responsiveness testing
 2. Cross-browser testing
 3. Performance optimization (lazy loading, caching)
@@ -1584,6 +1635,7 @@ serve(async (req) => {
 ## 11. Success Metrics
 
 ### User Metrics
+
 - **Level 1 Completion Rate**: Target 98%+ (must complete to register)
 - **Level 2 Completion Rate**: Target 80%+ (required for earning)
 - **Level 3 Completion Rate**: Target 40%+ (optional, progressive)
@@ -1592,11 +1644,13 @@ serve(async (req) => {
 - **Profile Update Rate**: Target 70%+ of stale profiles updated within 7 days
 
 ### System Metrics
+
 - **Address Parsing Accuracy**: Target 95%+ correct component extraction
 - **API Response Time**: Target <500ms for profile data fetch
 - **Data Integrity**: 0% data loss during migrations
 
 ### Business Metrics
+
 - **Survey Match Rate Improvement**: Target 15%+ increase with better profile data
 - **User Engagement**: Target 25%+ increase in survey completions (due to better matching)
 - **Data Freshness**: Target <10% of active users with stale Level 2 data
@@ -1606,6 +1660,7 @@ serve(async (req) => {
 ## 12. Future Enhancements
 
 ### Advanced Features (Post-MVP)
+
 1. **AI-Powered Profiling**: Suggest answers based on user behavior
 2. **Social Profile Import**: Import data from LinkedIn, Facebook (with consent)
 3. **Progressive Disclosure**: Smart question ordering based on user preferences
@@ -1616,6 +1671,7 @@ serve(async (req) => {
 8. **Profile Insights**: "Your profile is 85% similar to top earners"
 
 ### Admin Features (Post-MVP)
+
 1. **A/B Testing**: Test different question phrasings
 2. **Question Recommendation Engine**: Suggest new questions based on survey needs
 3. **Profile Data Export**: Bulk export for analytics/reporting
@@ -1629,6 +1685,7 @@ serve(async (req) => {
 This architecture provides a robust, scalable foundation for Looplly's multi-level profile system. The phased approach allows for incremental delivery while maintaining data integrity and user experience quality.
 
 **Key Takeaways:**
+
 - ✅ Clear separation of profile levels (mandatory, compulsory, progressive)
 - ✅ Automated data decay tracking to ensure profile freshness
 - ✅ User-friendly collapsible UI matching existing design patterns
@@ -1637,6 +1694,7 @@ This architecture provides a robust, scalable foundation for Looplly's multi-lev
 - ✅ Structured address collection with international support
 
 **Next Steps:**
+
 1. Review and approve this architecture document
 2. Begin Phase 1 database implementation
 3. Schedule weekly check-ins to track progress
@@ -1646,5 +1704,5 @@ This architecture provides a robust, scalable foundation for Looplly's multi-lev
 
 **Document Version**: 1.0  
 **Last Updated**: 2025-10-18  
-**Author**: Looplly Development Team  
+**Author**: Looplly Development Team - Nadia Gaspari
 **Status**: Ready for Implementation

@@ -1,6 +1,7 @@
 # Streak & Reputation System Documentation
 
 ## Table of Contents
+
 1. [Overview & Purpose](#overview--purpose)
 2. [Database Schema](#database-schema)
 3. [Streak Tracking Mechanics](#streak-tracking-mechanics)
@@ -27,6 +28,7 @@
 The **Streak & Reputation System** is a gamification layer designed to encourage daily user engagement and reward consistent participation in the Looplly platform. The system tracks consecutive days of activity and awards reputation points that contribute to a user's overall standing and unlock access to higher-tier earning opportunities.
 
 ### Key Features:
+
 - **Daily Streak Tracking**: Automatically records consecutive days of user activity
 - **Milestone Achievements**: Special badges and bonuses for reaching 7, 30, 90, and 365-day streaks
 - **Reputation Point Rewards**: Scaling daily bonuses based on current streak length
@@ -34,6 +36,7 @@ The **Streak & Reputation System** is a gamification layer designed to encourage
 - **Quality Metrics**: Survey completion rates and consistency scores that influence reputation
 
 ### Business Goals:
+
 1. **Increase Daily Active Users (DAU)**: Streaks incentivize daily logins
 2. **Improve User Retention**: Longer streaks = higher emotional investment
 3. **Fair Job Distribution**: Reputation gates access to premium opportunities
@@ -74,6 +77,7 @@ CREATE INDEX idx_user_streaks_user_id ON public.user_streaks(user_id);
 ```
 
 #### Column Descriptions:
+
 - **`current_streak`**: Number of consecutive days with activity (0 = no activity yet, 1+ = active streak)
 - **`longest_streak`**: Personal record for consecutive days (never decreases)
 - **`last_activity_date`**: ISO date string (YYYY-MM-DD) of last recorded activity
@@ -115,6 +119,7 @@ CREATE INDEX idx_user_reputation_tier ON public.user_reputation(tier);
 ```
 
 #### Column Descriptions:
+
 - **`score`**: Total reputation points earned (determines tier)
 - **`level`**: Human-readable level name (e.g., "Silver Elite")
 - **`tier`**: Category for job access (Bronze, Silver, Gold, Platinum, Diamond)
@@ -132,6 +137,7 @@ CREATE INDEX idx_user_reputation_tier ON public.user_reputation(tier);
 The system uses **ISO date strings** (YYYY-MM-DD) to determine consecutive days, avoiding timezone complexity.
 
 #### When `updateStreak()` is Called:
+
 1. **Get today's date**: `const today = new Date().toISOString().split('T')[0];`
 2. **Check last activity date**:
    - **If `last_activity_date === today`**: No change (already recorded today)
@@ -160,14 +166,14 @@ The system includes a **7-day grace period** to prevent streaks from breaking du
 
 ### Example Scenarios
 
-| Scenario | Last Activity | Consecutive Days Missed | Current Streak (Before) | Current Streak (After) |
-|----------|---------------|------------------------|------------------------|----------------------|
-| First visit | `null` | 0 | 0 | 1 |
-| Daily consecutive | Yesterday | 0 | 5 | 6 |
-| Same day (duplicate) | Today | 0 | 5 | 5 (no change) |
-| Missed 1 day (grace) | 2 days ago | 1 | 10 | 10 (maintained) |
-| Missed 6 days (grace) | 7 days ago | 6 | 30 | 30 (maintained) |
-| Missed 7+ days | 8 days ago | 7 | 30 | 1 (broken) |
+| Scenario              | Last Activity | Consecutive Days Missed | Current Streak (Before) | Current Streak (After) |
+| --------------------- | ------------- | ----------------------- | ----------------------- | ---------------------- |
+| First visit           | `null`        | 0                       | 0                       | 1                      |
+| Daily consecutive     | Yesterday     | 0                       | 5                       | 6                      |
+| Same day (duplicate)  | Today         | 0                       | 5                       | 5 (no change)          |
+| Missed 1 day (grace)  | 2 days ago    | 1                       | 10                      | 10 (maintained)        |
+| Missed 6 days (grace) | 7 days ago    | 6                       | 30                      | 30 (maintained)        |
+| Missed 7+ days        | 8 days ago    | 7                       | 30                      | 1 (broken)             |
 
 ---
 
@@ -190,12 +196,12 @@ The streak system is divided into **stages** that control when and how streaks c
 ### **Stage 2: Badge-Gated Phase (Day 29 Freeze)**
 
 - **Trigger**: When user reaches 29 consecutive days
-- **Behavior**: 
+- **Behavior**:
   - Streak **stops incrementing** at 29 days (frozen)
   - User cannot progress to day 30+ until unlock requirements are met
   - Grace period **still applies** (streak won't break for 7 consecutive missed days)
   - Daily login still counts as activity (prevents breaking, but doesn't increment)
-- **Unlock Requirements**: 
+- **Unlock Requirements**:
   - Must earn **4 out of 5** badges from the "Identity & Security" category:
     1. Government ID Verification
     2. Phone Number Verification
@@ -215,13 +221,13 @@ The streak system is divided into **stages** that control when and how streaks c
 
 Stages are managed via the `streak_unlock_config` table, allowing dynamic configuration:
 
-| Stage | Config Key | Config Value | Description |
-|-------|-----------|--------------|-------------|
-| 1 | `max_streak_days` | `29` | Maximum days before Stage 2 freeze |
-| 2 | `required_badge_count` | `4` | Number of badges needed to unlock Stage 2 |
-| 2 | `required_badge_category` | `"Identity & Security"` | Badge category required for unlock |
-| 2 | `total_badges_in_category` | `5` | Total badges available in category |
-| 2 | `cap_message` | `"..."` | User-facing message displayed at cap |
+| Stage | Config Key                 | Config Value            | Description                               |
+| ----- | -------------------------- | ----------------------- | ----------------------------------------- |
+| 1     | `max_streak_days`          | `29`                    | Maximum days before Stage 2 freeze        |
+| 2     | `required_badge_count`     | `4`                     | Number of badges needed to unlock Stage 2 |
+| 2     | `required_badge_category`  | `"Identity & Security"` | Badge category required for unlock        |
+| 2     | `total_badges_in_category` | `5`                     | Total badges available in category        |
+| 2     | `cap_message`              | `"..."`                 | User-facing message displayed at cap      |
 
 ### Database Schema: `streak_unlock_config`
 
@@ -251,12 +257,12 @@ Milestones are special achievements awarded at specific streak thresholds. Each 
 
 ### Milestone Definitions
 
-| Milestone | Streak Threshold | Emoji | Badge Name | Rep Award | Repeatable |
-|-----------|-----------------|-------|------------|----------|------------|
-| **Weekly** | 7 days | ⚡ | Week Warrior | +25 Rep | Yes (every 7 days) |
-| **Monthly** | 30 days | 🌙 | Monthly Master | +50 Rep | Yes (every 30 days) |
-| **Quarterly** | 90 days | 🌟 | Quarter Champion | +150 Rep | Yes (every 90 days) |
-| **Yearly** | 365 days | 👑 | Annual Legend | +500 Rep | Yes (every 365 days) |
+| Milestone     | Streak Threshold | Emoji | Badge Name       | Rep Award | Repeatable           |
+| ------------- | ---------------- | ----- | ---------------- | --------- | -------------------- |
+| **Weekly**    | 7 days           | ⚡    | Week Warrior     | +25 Rep   | Yes (every 7 days)   |
+| **Monthly**   | 30 days          | 🌙    | Monthly Master   | +50 Rep   | Yes (every 30 days)  |
+| **Quarterly** | 90 days          | 🌟    | Quarter Champion | +150 Rep  | Yes (every 90 days)  |
+| **Yearly**    | 365 days         | 👑    | Annual Legend    | +500 Rep  | Yes (every 365 days) |
 
 ### Milestone JSONB Structure
 
@@ -284,6 +290,7 @@ Milestones are special achievements awarded at specific streak thresholds. Each 
 ### Milestone Detection Logic
 
 When `current_streak` reaches a milestone threshold:
+
 1. Check if milestone is already `achieved` for this streak cycle
 2. If not achieved:
    - Set `achieved: true`
@@ -303,13 +310,14 @@ Reputation points are the primary currency of the system, determining a user's t
 Users earn reputation points **automatically** when their daily streak is updated. The bonus scales with streak length:
 
 | Streak Range | Daily Rep Bonus | Badge Color | Icon |
-|--------------|----------------|-------------|------|
-| 1-6 days | +5 Rep | Gray | 🔥 |
-| 7-13 days | +10 Rep | Orange | ⚡ |
-| 14-29 days | +15 Rep | Yellow | 🌙 |
-| 30+ days | +25 Rep | Purple | 👑 |
+| ------------ | --------------- | ----------- | ---- |
+| 1-6 days     | +5 Rep          | Gray        | 🔥   |
+| 7-13 days    | +10 Rep         | Orange      | ⚡   |
+| 14-29 days   | +15 Rep         | Yellow      | 🌙   |
+| 30+ days     | +25 Rep         | Purple      | 👑   |
 
 #### Example Calculation:
+
 - User with 3-day streak visits today → Earns **+5 Rep**
 - User with 15-day streak visits today → Earns **+15 Rep**
 - User with 100-day streak visits today → Earns **+25 Rep**
@@ -329,25 +337,25 @@ const milestoneRewards = {
 
 ### Other Reputation Sources
 
-| Action | Rep Award | Trigger |
-|--------|----------|---------|
-| Survey Completion | +50 Rep | `earning_activities` status = 'completed' |
-| Profile Completion | +100 Rep | `kyc_verifications` verified = true |
-| Successful Referral | +50 Rep | `user_referrals` status = 'qualified' |
-| Daily Streak | +5 to +25 Rep | `updateStreak()` called |
-| Milestone Achievement | +25 to +500 Rep | Milestone threshold reached |
+| Action                | Rep Award       | Trigger                                   |
+| --------------------- | --------------- | ----------------------------------------- |
+| Survey Completion     | +50 Rep         | `earning_activities` status = 'completed' |
+| Profile Completion    | +100 Rep        | `kyc_verifications` verified = true       |
+| Successful Referral   | +50 Rep         | `user_referrals` status = 'qualified'     |
+| Daily Streak          | +5 to +25 Rep   | `updateStreak()` called                   |
+| Milestone Achievement | +25 to +500 Rep | Milestone threshold reached               |
 
 ### Reputation Tier Thresholds
 
 See `docs/REP_CLASSIFICATION_SYSTEM.md` for full tier system details.
 
-| Tier | Score Range | Icon | Access Level |
-|------|-------------|------|--------------|
-| Bronze | 0-499 | 🥉 | Basic jobs |
-| Silver | 500-1999 | 🥈 | Intermediate jobs |
-| Gold | 2000-4999 | 🥇 | Advanced jobs |
-| Platinum | 5000-9999 | 💎 | Premium jobs |
-| Diamond | 10000+ | 👑 | Exclusive jobs |
+| Tier     | Score Range | Icon | Access Level      |
+| -------- | ----------- | ---- | ----------------- |
+| Bronze   | 0-499       | 🥉   | Basic jobs        |
+| Silver   | 500-1999    | 🥈   | Intermediate jobs |
+| Gold     | 2000-4999   | 🥇   | Advanced jobs     |
+| Platinum | 5000-9999   | 💎   | Premium jobs      |
+| Diamond  | 10000+      | 👑   | Exclusive jobs    |
 
 ---
 
@@ -358,9 +366,11 @@ See `docs/REP_CLASSIFICATION_SYSTEM.md` for full tier system details.
 **Location**: `src/hooks/useUserStreaks.ts`
 
 #### Purpose
+
 Fetches and manages user streak data from the `user_streaks` table. Automatically initializes a new streak record if none exists.
 
 #### Usage
+
 ```typescript
 import { useUserStreaks } from '@/hooks/useUserStreaks';
 
@@ -368,12 +378,14 @@ const { streak, isLoading, updateStreak, updateMilestones } = useUserStreaks();
 ```
 
 #### Returns
+
 - **`streak`**: `UserStreak | null` - Current streak data or null if loading
 - **`isLoading`**: `boolean` - Loading state for initial fetch
 - **`updateStreak`**: `() => void` - Function to increment daily streak
 - **`updateMilestones`**: `(milestones: Milestones) => void` - Function to update milestone achievements
 
 #### Type Definitions
+
 ```typescript
 export interface UserStreak {
   id: string;
@@ -405,7 +417,9 @@ export interface UserStreak {
 ```
 
 #### Auto-Initialization Logic
+
 If no streak record exists for the user, the hook automatically creates one:
+
 ```typescript
 if (!data) {
   const { data: newStreak, error: insertError } = await supabase
@@ -428,6 +442,7 @@ if (!data) {
 ```
 
 #### Query Key
+
 - **Key**: `['user-streak', userId]`
 - **Enabled**: Only when `authState.user?.id` exists
 - **Stale Time**: Default (0ms, refetch on window focus)
@@ -435,9 +450,11 @@ if (!data) {
 #### Mutations
 
 ##### `updateStreak()`
+
 Updates the user's daily streak based on last activity date.
 
 **Logic**:
+
 1. Compares `last_activity_date` with today's date
 2. If last activity was yesterday → increment streak
 3. If last activity was earlier → reset to 1
@@ -448,9 +465,11 @@ Updates the user's daily streak based on last activity date.
 **Error Handling**: Displays error toast on failure
 
 ##### `updateMilestones(milestones)`
+
 Persists milestone achievement data to the database.
 
 **Parameters**:
+
 - `milestones`: Updated milestone object with `achieved` and `count` fields
 
 **Side Effects**: Invalidates `['user-streak', userId]` query
@@ -462,9 +481,11 @@ Persists milestone achievement data to the database.
 **Location**: `src/hooks/useStageUnlockLogic.ts`
 
 #### Purpose
+
 Manages the logic for checking stage unlock eligibility and unlocking stages based on badge requirements. Used primarily for Stage 2 badge-gated progression.
 
 #### Usage
+
 ```typescript
 import { useStageUnlockLogic } from '@/hooks/useStageUnlockLogic';
 
@@ -472,6 +493,7 @@ const { checkStage2Unlock, unlockStage, isUnlocking } = useStageUnlockLogic();
 ```
 
 #### Returns
+
 - **`checkStage2Unlock`**: `object` - Stage 2 unlock status check
   - `canUnlock`: `boolean` - Whether user meets Stage 2 unlock requirements
   - `progress`: `number` - Number of required badges earned
@@ -491,6 +513,7 @@ The hook checks if the user has earned 4 out of 5 "Identity & Security" badges:
 4. Returns `canUnlock: true` if `earnedCount >= 4`
 
 #### Example: Checking Stage 2 Unlock Status
+
 ```typescript
 const { checkStage2Unlock } = useStageUnlockLogic();
 
@@ -501,6 +524,7 @@ if (checkStage2Unlock.canUnlock) {
 ```
 
 #### Example: Unlocking Stage 2
+
 ```typescript
 const { unlockStage, isUnlocking } = useStageUnlockLogic();
 
@@ -513,12 +537,14 @@ const handleUnlock = () => {
 ```
 
 #### Query Key
+
 - **Key**: `['stage2-unlock-check', userId]`
 - **Enabled**: Only when `user?.id` exists
 - **Stale Time**: 30 seconds (prevents excessive badge checks)
 
 #### Mutation Behavior
-- **On Success**: 
+
+- **On Success**:
   - Updates `unlocked_stages.stage2 = true` in `user_streaks` table
   - Adds unlock event to `stage_unlock_history`
   - Invalidates `['user-streak', userId]` query
@@ -532,9 +558,11 @@ const handleUnlock = () => {
 **Location**: `src/hooks/useStreakUnlockConfig.ts`
 
 #### Purpose
+
 Fetches stage unlock configuration from the `streak_unlock_config` table. Used by admin tools and stage logic to determine unlock requirements.
 
 #### Usage
+
 ```typescript
 import { useStreakUnlockConfig } from '@/hooks/useStreakUnlockConfig';
 
@@ -546,14 +574,17 @@ const { data: stage2Configs } = useStreakUnlockConfig(2);
 ```
 
 #### Parameters
+
 - **`stage`**: `number | undefined` - Optional stage number to filter configs
 
 #### Returns
+
 - **`data`**: `StreakUnlockConfig[]` - Array of configuration objects
 - **`isLoading`**: `boolean` - Loading state
 - **`error`**: `Error | null` - Error state
 
 #### Type: `StreakUnlockConfig`
+
 ```typescript
 export interface StreakUnlockConfig {
   id: string;
@@ -569,6 +600,7 @@ export interface StreakUnlockConfig {
 ```
 
 #### Example Config Values
+
 ```json
 {
   "stage": 2,
@@ -589,27 +621,31 @@ export interface StreakUnlockConfig {
 **Location**: `src/hooks/useUserReputation.ts`
 
 #### Purpose
+
 Fetches and manages user reputation data from the `user_reputation` table. Handles reputation point awards, tier calculations, and quality metrics.
 
 #### Usage
+
 ```typescript
 import { useUserReputation } from '@/hooks/useUserReputation';
 
-const { 
-  reputation, 
-  isLoading, 
-  addReputationPoints, 
-  updateQualityMetrics 
+const {
+  reputation,
+  isLoading,
+  addReputationPoints,
+  updateQualityMetrics
 } = useUserReputation();
 ```
 
 #### Returns
+
 - **`reputation`**: `UserReputation | null` - Current reputation data or null if loading
 - **`isLoading`**: `boolean` - Loading state for initial fetch
 - **`addReputationPoints`**: `({ points, action }) => void` - Function to award Rep
 - **`updateQualityMetrics`**: `(metrics: QualityMetrics) => void` - Function to update quality data
 
 #### Type Definitions
+
 ```typescript
 export interface UserReputation {
   id: string;
@@ -641,7 +677,9 @@ export interface QualityMetrics {
 ```
 
 #### Auto-Initialization Logic
+
 Creates a default reputation record if none exists:
+
 ```typescript
 if (!data) {
   const { data: newReputation } = await supabase
@@ -670,13 +708,16 @@ if (!data) {
 #### Mutations
 
 ##### `addReputationPoints({ points, action })`
+
 Awards reputation points and updates tier/level accordingly.
 
 **Parameters**:
+
 - `points`: `number` - Amount of Rep to award
 - `action`: `string` - Description of the action (e.g., "Survey completion")
 
 **Logic**:
+
 1. Calculates new score: `newScore = currentScore + points`
 2. Determines new tier based on score thresholds
 3. Calculates `next_level_threshold` for progress bar
@@ -685,20 +726,24 @@ Awards reputation points and updates tier/level accordingly.
 6. Shows toast notification with level info
 
 **Example**:
+
 ```typescript
-addReputationPoints({ 
-  points: 50, 
-  action: 'Survey completion' 
+addReputationPoints({
+  points: 50,
+  action: 'Survey completion'
 });
 ```
 
 ##### `updateQualityMetrics(metrics)`
+
 Updates survey performance metrics without changing score.
 
 **Parameters**:
+
 - `metrics`: `QualityMetrics` - Updated quality metrics object
 
 **Usage**:
+
 ```typescript
 updateQualityMetrics({
   surveysCompleted: 127,
@@ -718,9 +763,11 @@ updateQualityMetrics({
 **Location**: `src/components/ui/stage-2-cap-alert.tsx`
 
 #### Purpose
+
 Displays an alert banner when a user's streak is frozen at 29 days due to insufficient "Identity & Security" badges. Provides clear feedback on unlock requirements and progress.
 
 #### Props
+
 ```typescript
 interface Stage2CapAlertProps {
   earnedBadgesCount: number;      // Number of required badges user has earned
@@ -730,6 +777,7 @@ interface Stage2CapAlertProps {
 ```
 
 #### Visual Features
+
 - **Alert Banner**: Amber-themed info alert with lock icon
 - **Title**: "🔒 Streak Capped at 29 Days"
 - **Description**: Clear explanation of unlock requirements
@@ -738,6 +786,7 @@ interface Stage2CapAlertProps {
 - **Responsive**: Light/dark mode support via CSS variables
 
 #### Example Usage
+
 ```typescript
 import { Stage2CapAlert } from '@/components/ui/stage-2-cap-alert';
 
@@ -752,12 +801,14 @@ import { Stage2CapAlert } from '@/components/ui/stage-2-cap-alert';
 ```
 
 #### When Displayed
+
 - User has reached 29-day streak
 - `unlocked_stages.stage2 === false`
 - User has earned fewer than 4 "Identity & Security" badges
 - Shown prominently in Rep Tab above streak display
 
 #### Design Notes
+
 - Uses semantic color tokens (`amber-500`, `amber-900`, etc.)
 - Progress bar fills proportionally: `(earnedBadgesCount / requiredBadgesCount) * 100`
 - Lock icon changes to unlock icon when progress reaches 100%
@@ -769,9 +820,11 @@ import { Stage2CapAlert } from '@/components/ui/stage-2-cap-alert';
 **Location**: `src/components/ui/streak-progress.tsx`
 
 #### Purpose
+
 Displays the user's current and longest streaks, progress toward the next milestone, and milestone achievement badges.
 
 #### Props
+
 ```typescript
 interface StreakProgressProps {
   currentStreak: number;          // Current consecutive days
@@ -790,17 +843,20 @@ interface StreakProgressProps {
 #### Visual Features
 
 ##### Current Streak Display
+
 - Large flame emoji (🔥)
 - Bold number showing current streak
 - Daily Rep reward based on streak length
 - Example: **"14 🔥 DAYS"** → **"+15 Rep Daily"**
 
 ##### Longest Streak Display
+
 - Trophy emoji (🏆)
 - Personal record number
 - Subtle text styling
 
 ##### Next Milestone Progress
+
 - Circular progress indicator
 - Color-coded by milestone tier
 - Shows remaining days
@@ -808,16 +864,18 @@ interface StreakProgressProps {
 - Example: **"23 days until Monthly Master +50 Rep"**
 
 ##### Milestone Badges
+
 Grid layout showing all four milestone tiers:
 
-| Badge | Threshold | Icon | Achieved Color | Locked Color |
-|-------|-----------|------|----------------|--------------|
-| Week Warrior | 7 days | ⚡ | Green (success) | Gray (muted) |
-| Monthly Master | 30 days | 🌙 | Yellow | Gray |
-| Quarter Champion | 90 days | 🌟 | Purple | Gray |
-| Annual Legend | 365 days | 👑 | Gold | Gray |
+| Badge            | Threshold | Icon | Achieved Color  | Locked Color |
+| ---------------- | --------- | ---- | --------------- | ------------ |
+| Week Warrior     | 7 days    | ⚡   | Green (success) | Gray (muted) |
+| Monthly Master   | 30 days   | 🌙   | Yellow          | Gray         |
+| Quarter Champion | 90 days   | 🌟   | Purple          | Gray         |
+| Annual Legend    | 365 days  | 👑   | Gold            | Gray         |
 
 #### Responsive Design
+
 - **Mobile**: Single column, stacked layout
 - **Tablet**: 2-column grid for milestone badges
 - **Desktop**: Full grid with sidebar-friendly sizing
@@ -825,7 +883,9 @@ Grid layout showing all four milestone tiers:
 #### Helper Functions
 
 ##### `getStreakReward(streak: number): number`
+
 Returns the daily Rep bonus based on current streak length:
+
 ```typescript
 if (streak >= 30) return 25;
 if (streak >= 14) return 15;
@@ -834,7 +894,9 @@ return 5;
 ```
 
 ##### `getNextMilestone()`
+
 Calculates and returns details about the next upcoming milestone:
+
 ```typescript
 return {
   name: "Monthly Master",
@@ -854,7 +916,9 @@ return {
 **Location**: `src/components/dashboard/RepTab.tsx`
 
 #### Current State (Using Mock Data)
+
 Currently displays data from `src/mock_data/pages/rep.json`:
+
 ```typescript
 const userStats = {
   reputation: {
@@ -871,7 +935,9 @@ const userStats = {
 ```
 
 #### Planned Integration (Real Database)
+
 Will be refactored to use hooks:
+
 ```typescript
 const { streak, isLoading: streakLoading, updateStreak } = useUserStreaks();
 const { reputation, isLoading: repLoading, addReputationPoints } = useUserReputation();
@@ -885,11 +951,13 @@ useEffect(() => {
 ```
 
 #### Loading States
+
 - Show `<Skeleton />` components while data fetches
 - Combine loading states: `const isLoading = streakLoading || repLoading;`
 - Display partial UI if one hook loads faster than the other
 
 #### Error Handling
+
 - Toast notifications for mutation errors
 - Fallback UI if data fetch fails
 - Retry logic via React Query's built-in refetch
@@ -901,6 +969,7 @@ useEffect(() => {
 ### Automatic Streak Updates
 
 #### Flow:
+
 1. **User logs in** → `authState.user` is set
 2. **User navigates to `/rep` route** → `RepTab` component mounts
 3. **`useEffect` fires** → Calls `updateStreak()`
@@ -914,6 +983,7 @@ useEffect(() => {
 7. **Toast notification** → "Streak Updated!"
 
 #### Code Example:
+
 ```typescript
 useEffect(() => {
   if (streak && authState.user) {
@@ -930,6 +1000,7 @@ useEffect(() => {
 ### Milestone Achievement Flow
 
 #### Detection Logic:
+
 ```typescript
 const checkMilestones = () => {
   if (currentStreak >= 7 && !milestones.weekly.achieved) {
@@ -951,7 +1022,9 @@ const checkMilestones = () => {
 ```
 
 #### Reset Logic for Repeatable Milestones:
+
 When a user breaks their streak and starts over:
+
 1. `current_streak` resets to 1
 2. `milestones.weekly.achieved` resets to `false` (ready to earn again)
 3. `milestones.weekly.count` remains unchanged (historical record)
@@ -961,6 +1034,7 @@ When a user breaks their streak and starts over:
 ### Quality Metrics Integration
 
 #### Survey Completion Trigger:
+
 ```typescript
 // In EarnTab or survey completion handler
 const handleSurveyComplete = async (surveyId: string) => {
@@ -984,6 +1058,7 @@ const handleSurveyComplete = async (surveyId: string) => {
 ```
 
 #### Metrics Calculation:
+
 ```typescript
 const calculateConsistency = (metrics: QualityMetrics) => {
   const total = metrics.surveysCompleted + metrics.surveysRejected;
@@ -999,6 +1074,7 @@ const calculateConsistency = (metrics: QualityMetrics) => {
 ### Table: `user_streaks`
 
 #### RLS Policies:
+
 ```sql
 -- Users can view their own streaks
 CREATE POLICY "Users can view own streaks"
@@ -1028,6 +1104,7 @@ USING (has_role(auth.uid(), 'admin'));
 #### Common Queries:
 
 ##### Fetch User Streak:
+
 ```typescript
 const { data, error } = await supabase
   .from('user_streaks')
@@ -1037,6 +1114,7 @@ const { data, error } = await supabase
 ```
 
 ##### Update Streak:
+
 ```typescript
 const { error } = await supabase
   .from('user_streaks')
@@ -1050,6 +1128,7 @@ const { error } = await supabase
 ```
 
 ##### Update Milestones:
+
 ```typescript
 const { error } = await supabase
   .from('user_streaks')
@@ -1062,6 +1141,7 @@ const { error } = await supabase
 ### Table: `user_reputation`
 
 #### RLS Policies:
+
 ```sql
 -- Users can view their own reputation
 CREATE POLICY "Users can view own reputation"
@@ -1097,6 +1177,7 @@ USING (has_role(auth.uid(), 'admin'));
 #### Common Queries:
 
 ##### Fetch User Reputation:
+
 ```typescript
 const { data, error } = await supabase
   .from('user_reputation')
@@ -1106,6 +1187,7 @@ const { data, error } = await supabase
 ```
 
 ##### Add Reputation Points:
+
 ```typescript
 const newScore = currentScore + points;
 const newTier = calculateTier(newScore);
@@ -1127,6 +1209,7 @@ const { error } = await supabase
 ```
 
 ##### Update Quality Metrics:
+
 ```typescript
 const { error } = await supabase
   .from('user_reputation')
@@ -1148,16 +1231,16 @@ const handleSurveyComplete = async (activityId: string) => {
   // 1. Mark activity as complete
   await supabase
     .from('earning_activities')
-    .update({ 
+    .update({
       status: 'completed',
       completed_at: new Date().toISOString()
     })
     .eq('id', activityId);
 
   // 2. Award reputation points
-  addReputationPoints({ 
-    points: 50, 
-    action: 'Survey completion' 
+  addReputationPoints({
+    points: 50,
+    action: 'Survey completion'
   });
 
   // 3. Update quality metrics
@@ -1179,9 +1262,9 @@ const handleSurveyComplete = async (activityId: string) => {
 // In KYC verification handler
 const handleKycVerified = async () => {
   // Award one-time bonus for profile completion
-  addReputationPoints({ 
-    points: 100, 
-    action: 'Profile completion' 
+  addReputationPoints({
+    points: 100,
+    action: 'Profile completion'
   });
 
   // Update profile flag
@@ -1210,9 +1293,9 @@ const handleReferralQualified = async (referralId: string) => {
 
   // Award referrer reputation points
   if (referral?.referrer_user_id) {
-    addReputationPoints({ 
-      points: 50, 
-      action: 'Successful referral' 
+    addReputationPoints({
+      points: 50,
+      action: 'Successful referral'
     });
   }
 };
@@ -1223,6 +1306,7 @@ const handleReferralQualified = async (referralId: string) => {
 ## Toast Notifications
 
 ### Streak Update Success
+
 ```typescript
 toast({
   title: 'Streak Updated',
@@ -1231,6 +1315,7 @@ toast({
 ```
 
 ### Milestone Achievement
+
 ```typescript
 toast({
   title: '🎉 Milestone Unlocked!',
@@ -1240,6 +1325,7 @@ toast({
 ```
 
 ### Reputation Level Up
+
 ```typescript
 toast({
   title: 'Reputation Updated',
@@ -1248,6 +1334,7 @@ toast({
 ```
 
 ### Error Handling
+
 ```typescript
 toast({
   title: 'Error',
@@ -1321,6 +1408,7 @@ Provides default reputation data for development and testing:
 ### Development (Lovable Cloud)
 
 **File**: `.env`
+
 ```env
 VITE_SUPABASE_URL=https://chlqpvzreztzxmjjdjpk.supabase.co
 VITE_SUPABASE_PUBLISHABLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
@@ -1328,6 +1416,7 @@ VITE_SUPABASE_PROJECT_ID=chlqpvzreztzxmjjdjpk
 ```
 
 **Behavior**:
+
 - Hooks connect to Lovable Cloud Supabase project
 - Data persists between sessions
 - RLS policies enforced
@@ -1338,6 +1427,7 @@ VITE_SUPABASE_PROJECT_ID=chlqpvzreztzxmjjdjpk
 ### Production (External Supabase)
 
 **File**: `.env.production`
+
 ```env
 VITE_SUPABASE_URL=https://chlqpvzreztzxmjjdjpk.supabase.co
 VITE_SUPABASE_PUBLISHABLE_KEY=[your-production-key]
@@ -1345,6 +1435,7 @@ VITE_SUPABASE_PROJECT_ID=chlqpvzreztzxmjjdjpk
 ```
 
 **Migration Steps**:
+
 1. Export data from Lovable Cloud project
 2. Run migrations on production project
 3. Import data to production
@@ -1357,6 +1448,7 @@ VITE_SUPABASE_PROJECT_ID=chlqpvzreztzxmjjdjpk
 ## Testing Checklist
 
 ### Streak Logic Tests
+
 - [ ] New user gets `current_streak: 0` on first visit
 - [ ] Visiting on consecutive days increments streak correctly
 - [ ] Missing a day resets streak to 1 (not 0)
@@ -1365,6 +1457,7 @@ VITE_SUPABASE_PROJECT_ID=chlqpvzreztzxmjjdjpk
 - [ ] Multiple visits in same day don't increment streak
 
 ### Milestone Tests
+
 - [ ] 7-day streak awards Week Warrior milestone
 - [ ] 30-day streak awards Monthly Master milestone
 - [ ] 90-day streak awards Quarter Champion milestone
@@ -1373,6 +1466,7 @@ VITE_SUPABASE_PROJECT_ID=chlqpvzreztzxmjjdjpk
 - [ ] Milestone Rep bonuses are awarded correctly
 
 ### Reputation Tests
+
 - [ ] New user starts with 0 rep, Bronze Novice tier
 - [ ] `addReputationPoints()` increases score correctly
 - [ ] Tier auto-updates when thresholds are crossed
@@ -1381,6 +1475,7 @@ VITE_SUPABASE_PROJECT_ID=chlqpvzreztzxmjjdjpk
 - [ ] Toast notifications appear for rep changes
 
 ### UI Component Tests
+
 - [ ] `StreakProgress` displays current and longest streaks
 - [ ] Circular progress indicator shows correct percentage
 - [ ] Milestone badges show achieved/locked states
@@ -1389,6 +1484,7 @@ VITE_SUPABASE_PROJECT_ID=chlqpvzreztzxmjjdjpk
 - [ ] Color coding matches tier/milestone status
 
 ### Integration Tests
+
 - [ ] Survey completion triggers rep point award
 - [ ] KYC verification triggers bonus rep
 - [ ] Referral qualification triggers rep for referrer
@@ -1397,6 +1493,7 @@ VITE_SUPABASE_PROJECT_ID=chlqpvzreztzxmjjdjpk
 - [ ] RLS policies prevent unauthorized access
 
 ### Performance Tests
+
 - [ ] Initial load time < 500ms
 - [ ] Query cache reduces redundant fetches
 - [ ] Mutations update UI optimistically (future)
@@ -1408,11 +1505,13 @@ VITE_SUPABASE_PROJECT_ID=chlqpvzreztzxmjjdjpk
 ## Performance Considerations
 
 ### Query Optimization
+
 - **Indexed Fields**: `user_id` columns have indexes for fast lookups
 - **Single-Row Queries**: Use `.maybeSingle()` for user-specific data
 - **Avoid N+1 Queries**: Fetch related data with joins when possible
 
 ### Caching Strategy
+
 - **React Query Cache Keys**:
   - `['user-streak', userId]`
   - `['user-reputation', userId]`
@@ -1420,6 +1519,7 @@ VITE_SUPABASE_PROJECT_ID=chlqpvzreztzxmjjdjpk
 - **Cache Invalidation**: Manual invalidation after mutations
 
 ### Optimistic Updates (Future)
+
 ```typescript
 // Not yet implemented, but planned for V2
 const { mutate } = useMutation({
@@ -1427,16 +1527,16 @@ const { mutate } = useMutation({
   onMutate: async () => {
     // Cancel outgoing refetches
     await queryClient.cancelQueries(['user-streak', userId]);
-    
+
     // Snapshot previous value
     const previous = queryClient.getQueryData(['user-streak', userId]);
-    
+
     // Optimistically update UI
     queryClient.setQueryData(['user-streak', userId], (old) => ({
       ...old,
       current_streak: old.current_streak + 1
     }));
-    
+
     return { previous };
   },
   onError: (err, variables, context) => {
@@ -1447,6 +1547,7 @@ const { mutate } = useMutation({
 ```
 
 ### Lazy Loading
+
 - Hooks only fetch when `authState.user?.id` exists
 - Components show loading states during fetch
 - No data fetching on unauthenticated routes
@@ -1458,27 +1559,32 @@ const { mutate } = useMutation({
 ### V2 Features (Next 3-6 Months)
 
 #### Streak Grace Period
+
 - Allow 1 missed day without breaking streak (with penalty)
 - Deduct 3 days from current streak instead of full reset
 - Show warning toast: "Streak saved! -3 day penalty applied"
 
 #### Streak Freeze Items
+
 - Let users "save" a streak for 1 day (purchasable with Rep)
 - Cost: 50 Rep per freeze (max 3 per month)
 - Useful for planned absences
 
 #### Leaderboards
+
 - Global leaderboard for longest current streaks
 - Tier-based leaderboards (top Bronze, Silver, etc.)
 - Weekly/Monthly/All-Time tabs
 - Social features (follow friends, challenge others)
 
 #### Seasonal Events
+
 - Double Rep weekends
 - Holiday bonus milestones (e.g., "25 days in December")
 - Limited-time badges
 
 #### Streak Challenges
+
 - "Complete 3 surveys during a 7-day streak for +100 Rep"
 - "Reach 30-day streak without missing quality threshold"
 - Challenge progress tracking
@@ -1488,25 +1594,30 @@ const { mutate } = useMutation({
 ### V3 Features (6-12 Months)
 
 #### Social Streaks
+
 - Team/group streaks with friends
 - Shared milestone goals
 - Team leaderboards
 
 #### Streak Recovery
+
 - Pay 100 Rep to restore a recently broken streak (within 48 hours)
 - One-time use per month
 
 #### Dynamic Milestones
+
 - Personalized milestones based on user behavior
 - Adaptive difficulty scaling
 - Machine learning-based predictions
 
 #### Streak Predictions
+
 - AI-powered notifications: "You're at risk of breaking your streak!"
 - Remind users 2 hours before day ends
 - Suggest quick actions to maintain streak
 
 #### Historical Analytics
+
 - Charts showing streak patterns over time
 - Heatmap of activity days (like GitHub contributions)
 - Insights: "You're most active on Tuesdays"
@@ -1520,17 +1631,19 @@ const { mutate } = useMutation({
 **Symptoms**: User visits daily but `current_streak` stays the same
 
 **Possible Causes**:
+
 1. `last_activity_date` already set to today (duplicate call)
 2. RLS policy blocking update (user not authenticated)
 3. Timezone mismatch (ISO date string comparison failing)
 
 **Solutions**:
+
 - Check browser console for Supabase errors
 - Verify `authState.user?.id` is not null
 - Inspect `last_activity_date` value in database:
   ```sql
-  SELECT user_id, current_streak, last_activity_date 
-  FROM user_streaks 
+  SELECT user_id, current_streak, last_activity_date
+  FROM user_streaks
   WHERE user_id = '[user-id]';
   ```
 - Test date comparison logic:
@@ -1547,11 +1660,13 @@ const { mutate } = useMutation({
 **Symptoms**: User reaches 7-day streak but doesn't receive Week Warrior badge
 
 **Possible Causes**:
+
 1. Milestone detection logic not running
 2. `updateMilestones()` not called after detection
 3. Rep point award function failing silently
 
 **Solutions**:
+
 - Add console logs to milestone detection:
   ```typescript
   console.log('Current streak:', currentStreak);
@@ -1577,11 +1692,13 @@ const { mutate } = useMutation({
 **Symptoms**: Survey completed but Rep score doesn't increase
 
 **Possible Causes**:
+
 1. `addReputationPoints()` mutation not triggered
 2. RLS policy blocking update
 3. History array constraint error (exceeds size limit)
 
 **Solutions**:
+
 - Check mutation status:
   ```typescript
   console.log('Mutation loading:', isLoading);
@@ -1611,11 +1728,13 @@ const { mutate } = useMutation({
 **Symptoms**: Changes to database don't reflect in UI
 
 **Possible Causes**:
+
 1. Component still using mock data instead of hooks
 2. `.env` file points to wrong Supabase project
 3. Query cache not invalidating
 
 **Solutions**:
+
 - Verify hooks are imported and used:
   ```typescript
   const { streak } = useUserStreaks(); // ✅ Real data
@@ -1646,32 +1765,32 @@ const { mutate } = useMutation({
 
 ### Quick Reference: Rep Point Values
 
-| Action | Rep Award |
-|--------|----------|
-| Daily visit (1-6 days) | +5 |
-| Daily visit (7-13 days) | +10 |
-| Daily visit (14-29 days) | +15 |
-| Daily visit (30+ days) | +25 |
-| Week Warrior milestone | +25 |
-| Monthly Master milestone | +50 |
-| Quarter Champion milestone | +150 |
-| Annual Legend milestone | +500 |
-| Survey completion | +50 |
-| Profile completion (KYC) | +100 |
-| Successful referral | +50 |
+| Action                     | Rep Award |
+| -------------------------- | --------- |
+| Daily visit (1-6 days)     | +5        |
+| Daily visit (7-13 days)    | +10       |
+| Daily visit (14-29 days)   | +15       |
+| Daily visit (30+ days)     | +25       |
+| Week Warrior milestone     | +25       |
+| Monthly Master milestone   | +50       |
+| Quarter Champion milestone | +150      |
+| Annual Legend milestone    | +500      |
+| Survey completion          | +50       |
+| Profile completion (KYC)   | +100      |
+| Successful referral        | +50       |
 
 ### Quick Reference: Tier Thresholds
 
-| Tier | Min Score | Max Score |
-|------|-----------|-----------|
-| Bronze | 0 | 499 |
-| Silver | 500 | 1999 |
-| Gold | 2000 | 4999 |
-| Platinum | 5000 | 9999 |
-| Diamond | 10000+ | ∞ |
+| Tier     | Min Score | Max Score |
+| -------- | --------- | --------- |
+| Bronze   | 0         | 499       |
+| Silver   | 500       | 1999      |
+| Gold     | 2000      | 4999      |
+| Platinum | 5000      | 9999      |
+| Diamond  | 10000+    | ∞         |
 
 ---
 
 **Last Updated**: 2025-01-18  
 **Version**: 1.0.0  
-**Maintainer**: Looplly Development Team
+**Maintainer**: Looplly Development Team - Nadia Gaspari

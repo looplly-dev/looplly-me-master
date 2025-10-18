@@ -7,6 +7,7 @@ This document outlines the implementation plan for a reputation-based job classi
 ## Current State Analysis
 
 ### What Exists
+
 - Mock reputation data in `src/data/mockData.ts`
 - `earning_activities` table in database (lacks classification fields)
 - `cint_survey_sessions` table for tracking survey participation
@@ -14,6 +15,7 @@ This document outlines the implementation plan for a reputation-based job classi
 - Mock Cint surveys in `src/hooks/useCintSurveys.ts`
 
 ### Problems to Solve
+
 1. **No systematic classification**: Jobs are artificially split into "premium" vs "regular" in UI only
 2. **No rep requirements**: All users see all jobs regardless of reputation
 3. **No progression system**: Users can't unlock better opportunities by building reputation
@@ -127,17 +129,18 @@ CREATE TRIGGER on_profile_created_reputation
 
 ### Tier Thresholds
 
-| Tier | Rep Range | Icon | Description | Access Level |
-|------|-----------|------|-------------|--------------|
-| **Bronze** | 0-499 | 🥉 | New users, basic opportunities | Entry-level surveys, simple tasks |
-| **Silver** | 500-999 | 🥈 | Established users | Moderate complexity surveys, video tasks |
-| **Gold** | 1000-1999 | 🥇 | Experienced users | Premium surveys, focus groups |
-| **Platinum** | 2000-4999 | 💎 | High performers | Exclusive opportunities, high-paying jobs |
-| **Diamond** | 5000+ | 💠 | Elite users | Highest-tier jobs, VIP opportunities |
+| Tier         | Rep Range | Icon | Description                    | Access Level                              |
+| ------------ | --------- | ---- | ------------------------------ | ----------------------------------------- |
+| **Bronze**   | 0-499     | 🥉   | New users, basic opportunities | Entry-level surveys, simple tasks         |
+| **Silver**   | 500-999   | 🥈   | Established users              | Moderate complexity surveys, video tasks  |
+| **Gold**     | 1000-1999 | 🥇   | Experienced users              | Premium surveys, focus groups             |
+| **Platinum** | 2000-4999 | 💎   | High performers                | Exclusive opportunities, high-paying jobs |
+| **Diamond**  | 5000+     | 💠   | Elite users                    | Highest-tier jobs, VIP opportunities      |
 
 ### Tier Benefits
 
 Each tier unlocks:
+
 - **Higher-paying jobs**: Better rewards for higher tiers
 - **Exclusive opportunities**: Some jobs only available to certain tiers
 - **Priority matching**: Higher-tier users get preference in survey matching
@@ -176,13 +179,13 @@ if (metadata.difficulty_level === 'hard') {
 
 **For Other Job Types**:
 
-| Activity Type | Default Tier | Min Rep | Reasoning |
-|---------------|--------------|---------|-----------|
-| Video watching | Bronze | 0 | Low barrier, passive |
-| App downloads | Bronze-Silver | 0-200 | Simple completion |
-| Micro tasks | Silver-Gold | 200-500 | Varies by complexity |
-| Data sharing | All tiers | 0 | Passive income |
-| Focus groups | Gold-Diamond | 1000-2000 | Exclusive, high-paying |
+| Activity Type   | Default Tier  | Min Rep   | Reasoning                 |
+| --------------- | ------------- | --------- | ------------------------- |
+| Video watching  | Bronze        | 0         | Low barrier, passive      |
+| App downloads   | Bronze-Silver | 0-200     | Simple completion         |
+| Micro tasks     | Silver-Gold   | 200-500   | Varies by complexity      |
+| Data sharing    | All tiers     | 0         | Passive income            |
+| Focus groups    | Gold-Diamond  | 1000-2000 | Exclusive, high-paying    |
 | Product testing | Gold-Platinum | 1000-1500 | Requires quality feedback |
 
 ### Matching Algorithm
@@ -200,7 +203,7 @@ function getVisibleJobs(userRep: number, allJobs: Job[]): Job[] {
       // Primary: Match/qualification score
       const scoreSort = b.qualification_score - a.qualification_score;
       if (scoreSort !== 0) return scoreSort;
-      
+
       // Secondary: Tier proximity (jobs at user's tier first)
       const aTierDiff = Math.abs(getTierValue(a.tier) - getTierValue(userTier));
       const bTierDiff = Math.abs(getTierValue(b.tier) - getTierValue(userTier));
@@ -212,11 +215,11 @@ function getVisibleJobs(userRep: number, allJobs: Job[]): Job[] {
 function getLockedJobs(userRep: number, userTier: string, allJobs: Job[]): Job[] {
   const nextTierValue = getTierValue(userTier) + 1;
   const nextNextTierValue = getTierValue(userTier) + 2;
-  
+
   return allJobs
-    .filter(job => 
+    .filter(job =>
       userRep < job.min_rep_required &&
-      (getTierValue(job.tier) === nextTierValue || 
+      (getTierValue(job.tier) === nextTierValue ||
        getTierValue(job.tier) === nextNextTierValue)
     )
     .slice(0, 3); // Show max 3 locked jobs as preview
@@ -241,12 +244,12 @@ export interface CintSurvey {
   qualification_score: number;
   completion_rate: number;
   status: 'available' | 'qualification_required' | 'full';
-  
+
   // ADD THESE FIELDS:
   tier: 'bronze' | 'silver' | 'gold' | 'platinum' | 'diamond';
   min_rep_required: number;
   max_rep_suggested?: number;
-  
+
   metadata: {
     target_audience?: string;
     difficulty_level?: 'easy' | 'medium' | 'hard';
@@ -273,7 +276,7 @@ export interface EarningActivity {
   expires_at?: string;
   created_at: string;
   updated_at: string;
-  
+
   // ADD THESE FIELDS:
   tier?: 'bronze' | 'silver' | 'gold' | 'platinum' | 'diamond';
   min_rep_required?: number;
@@ -357,6 +360,7 @@ export const useReputation = () => {
 **File: `src/components/dashboard/SimplifiedEarnTab.tsx`**
 
 Major changes needed:
+
 1. Remove separate "Cint Premium Surveys" section (lines 410-459)
 2. Merge all jobs into unified display
 3. Add tier badges and rep requirement displays
@@ -364,6 +368,7 @@ Major changes needed:
 5. Add tier filter dropdown
 
 Key UI elements:
+
 ```tsx
 // Tier badge component
 <Badge variant={getTierVariant(job.tier)}>
@@ -391,6 +396,7 @@ Key UI elements:
 ### Tier Badges
 
 **Visual Design**:
+
 - Bronze: Copper/brown color scheme
 - Silver: Gray/silver metallic
 - Gold: Yellow/gold shine
@@ -398,6 +404,7 @@ Key UI elements:
 - Diamond: Cyan/blue crystal appearance
 
 **Component Structure**:
+
 ```tsx
 <Badge className={cn(
   "font-semibold",
@@ -436,24 +443,28 @@ Key UI elements:
 ## Migration Strategy
 
 ### Phase 1: Database Setup (Week 1)
+
 - [ ] Run migration to add classification columns to `earning_activities`
 - [ ] Create `user_reputation` table
 - [ ] Create trigger functions for auto-tier assignment
 - [ ] Backfill existing users with default reputation (0 rep, bronze tier)
 
 ### Phase 2: Data Classification (Week 1-2)
+
 - [ ] Create admin function to bulk-classify existing jobs
 - [ ] Manually review and adjust tier assignments for all existing jobs
 - [ ] Set appropriate `min_rep_required` values based on job complexity
 - [ ] Update mock data with classification fields
 
 ### Phase 3: Backend Logic (Week 2)
+
 - [ ] Create `useReputation()` hook
 - [ ] Update `useEarningActivities()` to include classification filtering
 - [ ] Add reputation calculation logic (earned from completed jobs)
 - [ ] Create API for fetching filtered jobs based on user rep
 
 ### Phase 4: UI Implementation (Week 3)
+
 - [ ] Remove fake "premium" vs "regular" split
 - [ ] Add tier badges to all job cards
 - [ ] Implement locked job preview section
@@ -461,12 +472,14 @@ Key UI elements:
 - [ ] Update job card styling with rep requirements
 
 ### Phase 5: Testing & Refinement (Week 3-4)
+
 - [ ] Test job visibility for users at different rep levels
 - [ ] Verify tier progression works correctly
 - [ ] User acceptance testing
 - [ ] Adjust tier thresholds based on feedback
 
 ### Phase 6: Cint API Integration (Future)
+
 - [ ] Connect to actual Cint API
 - [ ] Implement automatic classification for incoming surveys
 - [ ] Set up webhook for real-time survey updates
@@ -479,6 +492,7 @@ Key UI elements:
 **Location**: Create new section in `src/pages/AdminEarningClassification.tsx`
 
 **Features**:
+
 1. **Job Classification Manager**
    - View all jobs with current tier/rep requirements
    - Bulk edit classifications
@@ -508,18 +522,21 @@ Key UI elements:
 ## Testing Checklist
 
 ### Unit Tests
+
 - [ ] Test tier assignment based on rep score
 - [ ] Test job filtering logic
 - [ ] Test reputation calculation
 - [ ] Test tier progression trigger
 
 ### Integration Tests
+
 - [ ] Test new user reputation creation
 - [ ] Test job visibility for different rep levels
 - [ ] Test reputation updates after job completion
 - [ ] Test locked job preview generation
 
 ### E2E Tests
+
 - [ ] Bronze user sees only bronze/silver jobs
 - [ ] Completing jobs increases reputation
 - [ ] Tier-up unlocks new jobs
@@ -553,12 +570,14 @@ Key UI elements:
 ## Future Enhancements
 
 ### V2 Features
+
 - **Dynamic tier thresholds**: Adjust based on user base size
 - **Specialty tiers**: Medical surveys tier, B2B tier, etc.
 - **Seasonal tiers**: Holiday bonus tiers
 - **Team/group tiers**: Shared reputation for teams
 
 ### V3 Features
+
 - **Machine learning classification**: Auto-assign tiers based on completion patterns
 - **Personalized matching**: Beyond tier, match based on user interests
 - **Reputation decay**: Inactive users gradually lose rep
@@ -572,7 +591,6 @@ If issues arise during rollout:
    - Revert UI changes to show all jobs to all users
    - Keep database changes (they're additive, not breaking)
    - Fix bug in development environment
-   
 2. **Partial Rollback** (if tier distribution is wrong):
    - Temporarily set all `min_rep_required` to 0
    - Recalculate tier assignments
@@ -605,5 +623,5 @@ If issues arise during rollout:
 **Document Version**: 1.0  
 **Created**: 2025-01-XX  
 **Last Updated**: 2025-01-XX  
-**Owner**: Looplly Product Team  
+**Owner**: Looplly Product Team - Nadia Gaspari
 **Status**: Planning Phase
