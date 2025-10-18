@@ -34,7 +34,8 @@ import {
   CreditCard,
   Share2,
   Info,
-  Copy
+  Copy,
+  AlertCircle
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useBalance } from '@/hooks/useBalance';
@@ -46,8 +47,12 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { addMissingDemoActivities } from '@/utils/addMissingDemoActivities';
 import { addMockEarningActivities } from '@/utils/mockEarningActivities';
 import { userStats } from '@/mock_data';
+import { useProfileQuestions } from '@/hooks/useProfileQuestions';
+import { useNavigate } from 'react-router-dom';
 
 export default function SimplifiedEarnTab() {
+  const navigate = useNavigate();
+  const { level2Complete } = useProfileQuestions();
   const [checkInDone, setCheckInDone] = useState(false);
   const [dataOptIns, setDataOptIns] = useState({
     shopping: false,
@@ -255,6 +260,25 @@ export default function SimplifiedEarnTab() {
   // Total available tasks across all categories
   const totalAvailable = surveyCount + videoCount + taskCount + dataCount;
 
+
+  // Check if Level 2 is complete
+  if (!level2Complete) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] p-8 space-y-6">
+        <div className="text-center space-y-4">
+          <AlertCircle className="h-16 w-16 text-warning mx-auto" />
+          <h2 className="text-2xl font-bold">Complete Your Profile First</h2>
+          <p className="text-muted-foreground text-center max-w-md">
+            You need to complete your Level 2 profile questions to access earning opportunities.
+            This helps us match you with the best surveys and tasks.
+          </p>
+          <Button onClick={() => navigate('/profile')} size="lg">
+            Complete Profile Now
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <TooltipProvider>
