@@ -16,6 +16,10 @@ export interface ProfileQuestion {
   is_required: boolean;
   display_order: number;
   staleness_days: number | null;
+  is_immutable?: boolean;
+  decay_config_key?: string | null;
+  decay_interval_days?: number | null;
+  decay_interval_type?: string | null;
   user_answer?: {
     id: string;
     answer_value: string | null;
@@ -48,19 +52,33 @@ export const useProfileQuestions = () => {
     queryFn: async () => {
       if (!userId) throw new Error('User not authenticated');
 
-      // Fetch categories with questions
+      // Fetch categories with questions and decay config
       const { data: categories, error: categoriesError } = await supabase
         .from('profile_categories')
-        .select('*')
+        .select(`
+          *,
+          default_decay_config:profile_decay_config!profile_categories_default_decay_config_key_fkey(
+            config_key,
+            interval_type,
+            interval_days
+          )
+        `)
         .eq('is_active', true)
         .order('display_order');
 
       if (categoriesError) throw categoriesError;
 
-      // Fetch questions
+      // Fetch questions with decay config
       const { data: questions, error: questionsError } = await supabase
         .from('profile_questions')
-        .select('*')
+        .select(`
+          *,
+          question_decay_config:profile_decay_config!profile_questions_decay_config_key_fkey(
+            config_key,
+            interval_type,
+            interval_days
+          )
+        `)
         .eq('is_active', true)
         .order('display_order');
 
@@ -86,19 +104,25 @@ export const useProfileQuestions = () => {
           .map(q => {
             const userAnswer = answerMap.get(q.id);
             
-            // Calculate staleness
+            // Resolve decay config: question override → category default
+            const decayConfig = q.question_decay_config || cat.default_decay_config;
+            const intervalDays = decayConfig?.interval_days;
+            
+            // Calculate staleness using resolved decay config
             let isStale = false;
-            if (userAnswer && q.staleness_days && userAnswer.last_updated) {
+            if (userAnswer && intervalDays && userAnswer.last_updated) {
               const lastUpdated = new Date(userAnswer.last_updated);
               const daysSinceUpdate = Math.floor(
                 (Date.now() - lastUpdated.getTime()) / (1000 * 60 * 60 * 24)
               );
-              isStale = daysSinceUpdate > q.staleness_days;
+              isStale = daysSinceUpdate > intervalDays;
             }
 
             return {
               ...q,
               question_type: q.question_type as ProfileQuestion['question_type'],
+              decay_interval_days: intervalDays,
+              decay_interval_type: decayConfig?.interval_type,
               user_answer: userAnswer ? {
                 ...userAnswer,
                 is_stale: isStale

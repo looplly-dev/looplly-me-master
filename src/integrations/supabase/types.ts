@@ -759,6 +759,7 @@ export type Database = {
       profile_categories: {
         Row: {
           created_at: string | null
+          default_decay_config_key: string | null
           description: string | null
           display_name: string
           display_order: number
@@ -771,6 +772,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
+          default_decay_config_key?: string | null
           description?: string | null
           display_name: string
           display_order?: number
@@ -783,6 +785,7 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
+          default_decay_config_key?: string | null
           description?: string | null
           display_name?: string
           display_order?: number
@@ -793,16 +796,59 @@ export type Database = {
           name?: string
           updated_at?: string | null
         }
+        Relationships: [
+          {
+            foreignKeyName: "profile_categories_default_decay_config_key_fkey"
+            columns: ["default_decay_config_key"]
+            isOneToOne: false
+            referencedRelation: "profile_decay_config"
+            referencedColumns: ["config_key"]
+          },
+        ]
+      }
+      profile_decay_config: {
+        Row: {
+          config_key: string
+          created_at: string | null
+          description: string | null
+          id: string
+          interval_days: number | null
+          interval_type: string
+          is_active: boolean
+          updated_at: string | null
+        }
+        Insert: {
+          config_key: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          interval_days?: number | null
+          interval_type: string
+          is_active?: boolean
+          updated_at?: string | null
+        }
+        Update: {
+          config_key?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          interval_days?: number | null
+          interval_type?: string
+          is_active?: boolean
+          updated_at?: string | null
+        }
         Relationships: []
       }
       profile_questions: {
         Row: {
           category_id: string
           created_at: string | null
+          decay_config_key: string | null
           display_order: number
           help_text: string | null
           id: string
           is_active: boolean | null
+          is_immutable: boolean
           is_required: boolean | null
           level: number
           options: Json | null
@@ -817,10 +863,12 @@ export type Database = {
         Insert: {
           category_id: string
           created_at?: string | null
+          decay_config_key?: string | null
           display_order?: number
           help_text?: string | null
           id?: string
           is_active?: boolean | null
+          is_immutable?: boolean
           is_required?: boolean | null
           level: number
           options?: Json | null
@@ -835,10 +883,12 @@ export type Database = {
         Update: {
           category_id?: string
           created_at?: string | null
+          decay_config_key?: string | null
           display_order?: number
           help_text?: string | null
           id?: string
           is_active?: boolean | null
+          is_immutable?: boolean
           is_required?: boolean | null
           level?: number
           options?: Json | null
@@ -857,6 +907,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profile_categories"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profile_questions_decay_config_key_fkey"
+            columns: ["decay_config_key"]
+            isOneToOne: false
+            referencedRelation: "profile_decay_config"
+            referencedColumns: ["config_key"]
           },
         ]
       }

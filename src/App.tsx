@@ -15,6 +15,7 @@ import AdminAnalytics from "./pages/AdminAnalytics";
 import AdminAgents from "./pages/AdminAgents";
 import AdminMigration from "./pages/AdminMigration";
 import AdminStreakConfig from "./pages/AdminStreakConfig";
+import AdminProfileDecay from "./pages/AdminProfileDecay";
 import ResetPassword from "./components/auth/ResetPassword";
 
 const queryClient = new QueryClient();
@@ -37,6 +38,7 @@ const App = () => (
               <Route path="/admin/agents" element={<AdminAgents />} />
               <Route path="/admin/migration" element={<AdminMigration />} />
               <Route path="/admin/streak-config" element={<AdminStreakConfig />} />
+              <Route path="/admin/profile-decay" element={<AdminProfileDecay />} />
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/*" element={<LoopllyApp />} />
             </Routes>

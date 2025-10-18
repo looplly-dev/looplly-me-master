@@ -33,7 +33,9 @@ export const useProfileAnswers = () => {
             last_updated: new Date().toISOString(),
             is_stale: false
           }
-        ]);
+        ], {
+          onConflict: 'user_id,question_id'
+        });
 
       if (error) throw error;
     },
@@ -74,6 +76,8 @@ export const useProfileAnswers = () => {
           latitude: addressData.latitude,
           longitude: addressData.longitude,
           is_primary: true
+        }, {
+          onConflict: 'user_id,place_id'
         });
 
       if (addressError) throw addressError;
@@ -97,7 +101,9 @@ export const useProfileAnswers = () => {
               last_updated: new Date().toISOString(),
               is_stale: false
             }
-          ]);
+          ], {
+            onConflict: 'user_id,question_id'
+          });
 
         if (answerError) throw answerError;
       }
