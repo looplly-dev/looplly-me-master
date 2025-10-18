@@ -13,6 +13,7 @@ import {
   ArrowRightLeft,
   Flame,
   Clock,
+  MessageSquare,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -45,6 +46,7 @@ const adminNavItems = [
   { title: 'Badges', url: '/admin/badges', icon: Award },
   { title: 'Streak Config', url: '/admin/streak-config', icon: Flame },
   { title: 'Profile Decay', url: '/admin/profile-decay', icon: Clock },
+  { title: 'Profile Questions', url: '/admin/profile-questions', icon: MessageSquare },
   { title: 'Redemptions', url: '/admin/redemptions', icon: DollarSign },
   { title: 'Analytics', url: '/admin/analytics', icon: BarChart3 },
   { title: 'AI Agents', url: '/admin/agents', icon: Brain },
@@ -123,6 +125,7 @@ function AdminBreadcrumb() {
       badges: 'Badge Generator',
       'streak-config': 'Streak Configuration',
       'profile-decay': 'Profile Decay',
+      'profile-questions': 'Profile Questions',
       redemptions: 'Redemptions',
       analytics: 'Analytics',
       agents: 'AI Agents',

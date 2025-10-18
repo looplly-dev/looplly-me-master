@@ -22,6 +22,11 @@ export const useProfileAnswers = () => {
     }) => {
       if (!userId) throw new Error('User not authenticated');
 
+      // Normalize value for targeting
+      const normalizedValue = typeof value === 'string' 
+        ? value 
+        : (value?.value || JSON.stringify(value));
+
       const { error } = await supabase
         .from('profile_answers')
         .upsert([
@@ -30,7 +35,8 @@ export const useProfileAnswers = () => {
             question_id: questionId,
             answer_value: typeof value === 'string' ? value : null,
             answer_json: typeof value === 'object' ? value : null,
-            last_updated: new Date().toISOString(),
+            answer_normalized: normalizedValue, // For fast targeting
+            last_updated: new Date().toISOString(), // Decay uses this
             is_stale: false
           }
         ], {
@@ -98,6 +104,7 @@ export const useProfileAnswers = () => {
               question_id: addressQuestion.id,
               answer_value: addressData.formatted_address,
               answer_json: addressData as any,
+              answer_normalized: addressData.formatted_address, // For targeting
               last_updated: new Date().toISOString(),
               is_stale: false
             }

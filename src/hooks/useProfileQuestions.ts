@@ -52,6 +52,17 @@ export const useProfileQuestions = () => {
     queryFn: async () => {
       if (!userId) throw new Error('User not authenticated');
 
+      // Get user's country code
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('country_code')
+        .eq('user_id', userId)
+        .single();
+
+      if (profileError) throw profileError;
+
+      const userCountry = profile?.country_code || 'ZA'; // Default to South Africa
+
       // Fetch categories with questions and decay config
       const { data: categories, error: categoriesError } = await supabase
         .from('profile_categories')
@@ -68,7 +79,7 @@ export const useProfileQuestions = () => {
 
       if (categoriesError) throw categoriesError;
 
-      // Fetch questions with decay config
+      // Fetch questions filtered by country
       const { data: questions, error: questionsError } = await supabase
         .from('profile_questions')
         .select(`
@@ -80,9 +91,33 @@ export const useProfileQuestions = () => {
           )
         `)
         .eq('is_active', true)
+        .or(`applicability.eq.global,country_codes.cs.{${userCountry}}`)
         .order('display_order');
 
       if (questionsError) throw questionsError;
+
+      // Get IDs of country-specific questions
+      const countrySpecificIds = questions
+        ?.filter((q: any) => q.applicability === 'country_specific')
+        .map((q: any) => q.id) || [];
+
+      // Fetch country-specific options
+      let countryOptions: any[] = [];
+      if (countrySpecificIds.length > 0) {
+        const { data: optionsData, error: optionsError } = await supabase
+          .from('country_question_options')
+          .select('*')
+          .in('question_id', countrySpecificIds)
+          .eq('country_code', userCountry);
+        
+        if (optionsError) throw optionsError;
+        countryOptions = optionsData || [];
+      }
+
+      // Create options map
+      const optionsMap = new Map(
+        countryOptions.map(opt => [opt.question_id, { options: opt.options, metadata: opt.metadata }])
+      );
 
       // Fetch user's answers
       const { data: answers, error: answersError } = await supabase
@@ -100,17 +135,23 @@ export const useProfileQuestions = () => {
       // Group questions by category and attach user answers
       const categoriesWithQuestions: ProfileCategory[] = categories.map(cat => {
         const categoryQuestions = questions
-          .filter(q => q.category_id === cat.id)
-          .map(q => {
+          .filter((q: any) => q.category_id === cat.id)
+          .map((q: any) => {
             const userAnswer = answerMap.get(q.id);
+            
+            // Merge country-specific options if applicable
+            const countryData = optionsMap.get(q.id);
+            const finalOptions = q.applicability === 'country_specific' && countryData
+              ? countryData.options
+              : q.options;
             
             // Resolve decay config: question override → category default
             const decayConfig = q.question_decay_config || cat.default_decay_config;
             const intervalDays = decayConfig?.interval_days;
             
-            // Calculate staleness using resolved decay config
+            // Calculate staleness using resolved decay config (not expiry date)
             let isStale = false;
-            if (userAnswer && intervalDays && userAnswer.last_updated) {
+            if (userAnswer && intervalDays && userAnswer.last_updated && !q.is_immutable) {
               const lastUpdated = new Date(userAnswer.last_updated);
               const daysSinceUpdate = Math.floor(
                 (Date.now() - lastUpdated.getTime()) / (1000 * 60 * 60 * 24)
@@ -120,12 +161,13 @@ export const useProfileQuestions = () => {
 
             return {
               ...q,
+              options: finalOptions,
               question_type: q.question_type as ProfileQuestion['question_type'],
               decay_interval_days: intervalDays,
               decay_interval_type: decayConfig?.interval_type,
               user_answer: userAnswer ? {
                 ...userAnswer,
-                is_stale: isStale
+                is_stale: isStale // Computed on-the-fly, not stored
               } : null
             } as ProfileQuestion;
           });

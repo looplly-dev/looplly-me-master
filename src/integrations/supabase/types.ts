@@ -615,6 +615,44 @@ export type Database = {
           },
         ]
       }
+      country_question_options: {
+        Row: {
+          country_code: string
+          created_at: string | null
+          id: string
+          metadata: Json | null
+          options: Json
+          question_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          country_code: string
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          options: Json
+          question_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          country_code?: string
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          options?: Json
+          question_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "country_question_options_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "profile_questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       earning_activities: {
         Row: {
           activity_type: string
@@ -709,6 +747,7 @@ export type Database = {
       profile_answers: {
         Row: {
           answer_json: Json | null
+          answer_normalized: string | null
           answer_value: string | null
           created_at: string | null
           id: string
@@ -716,12 +755,14 @@ export type Database = {
           is_verified: boolean | null
           last_updated: string | null
           question_id: string
+          targeting_metadata: Json | null
           user_id: string
           verified_at: string | null
           verified_by: string | null
         }
         Insert: {
           answer_json?: Json | null
+          answer_normalized?: string | null
           answer_value?: string | null
           created_at?: string | null
           id?: string
@@ -729,12 +770,14 @@ export type Database = {
           is_verified?: boolean | null
           last_updated?: string | null
           question_id: string
+          targeting_metadata?: Json | null
           user_id: string
           verified_at?: string | null
           verified_by?: string | null
         }
         Update: {
           answer_json?: Json | null
+          answer_normalized?: string | null
           answer_value?: string | null
           created_at?: string | null
           id?: string
@@ -742,6 +785,7 @@ export type Database = {
           is_verified?: boolean | null
           last_updated?: string | null
           question_id?: string
+          targeting_metadata?: Json | null
           user_id?: string
           verified_at?: string | null
           verified_by?: string | null
@@ -841,7 +885,9 @@ export type Database = {
       }
       profile_questions: {
         Row: {
+          applicability: string | null
           category_id: string
+          country_codes: string[] | null
           created_at: string | null
           decay_config_key: string | null
           display_order: number
@@ -853,15 +899,19 @@ export type Database = {
           level: number
           options: Json | null
           placeholder: string | null
+          question_group: string | null
           question_key: string
           question_text: string
           question_type: string
           staleness_days: number | null
+          targeting_tags: string[] | null
           updated_at: string | null
           validation_rules: Json | null
         }
         Insert: {
+          applicability?: string | null
           category_id: string
+          country_codes?: string[] | null
           created_at?: string | null
           decay_config_key?: string | null
           display_order?: number
@@ -873,15 +923,19 @@ export type Database = {
           level: number
           options?: Json | null
           placeholder?: string | null
+          question_group?: string | null
           question_key: string
           question_text: string
           question_type: string
           staleness_days?: number | null
+          targeting_tags?: string[] | null
           updated_at?: string | null
           validation_rules?: Json | null
         }
         Update: {
+          applicability?: string | null
           category_id?: string
+          country_codes?: string[] | null
           created_at?: string | null
           decay_config_key?: string | null
           display_order?: number
@@ -893,10 +947,12 @@ export type Database = {
           level?: number
           options?: Json | null
           placeholder?: string | null
+          question_group?: string | null
           question_key?: string
           question_text?: string
           question_type?: string
           staleness_days?: number | null
+          targeting_tags?: string[] | null
           updated_at?: string | null
           validation_rules?: Json | null
         }
@@ -1454,12 +1510,26 @@ export type Database = {
         }
         Returns: undefined
       }
+      find_users_by_criteria: {
+        Args: { p_country_code: string; p_criteria: Json }
+        Returns: {
+          match_score: number
+          user_id: string
+        }[]
+      }
       get_auth_users_with_phones: {
         Args: Record<PropertyKey, never>
         Returns: {
           email: string
           phone: string
           user_id: string
+        }[]
+      }
+      get_targeting_values_by_question: {
+        Args: { p_country_code: string; p_question_key: string }
+        Returns: {
+          user_count: number
+          value: string
         }[]
       }
       get_user_tenant_id: {
