@@ -14,6 +14,66 @@ export type Database = {
   }
   public: {
     Tables: {
+      address_components: {
+        Row: {
+          administrative_area_level_1: string | null
+          administrative_area_level_2: string | null
+          country: string | null
+          created_at: string | null
+          formatted_address: string
+          id: string
+          is_primary: boolean | null
+          latitude: number | null
+          locality: string | null
+          longitude: number | null
+          place_id: string | null
+          postal_code: string | null
+          route: string | null
+          street_number: string | null
+          updated_at: string | null
+          user_id: string
+          verified_at: string | null
+        }
+        Insert: {
+          administrative_area_level_1?: string | null
+          administrative_area_level_2?: string | null
+          country?: string | null
+          created_at?: string | null
+          formatted_address: string
+          id?: string
+          is_primary?: boolean | null
+          latitude?: number | null
+          locality?: string | null
+          longitude?: number | null
+          place_id?: string | null
+          postal_code?: string | null
+          route?: string | null
+          street_number?: string | null
+          updated_at?: string | null
+          user_id: string
+          verified_at?: string | null
+        }
+        Update: {
+          administrative_area_level_1?: string | null
+          administrative_area_level_2?: string | null
+          country?: string | null
+          created_at?: string | null
+          formatted_address?: string
+          id?: string
+          is_primary?: boolean | null
+          latitude?: number | null
+          locality?: string | null
+          longitude?: number | null
+          place_id?: string | null
+          postal_code?: string | null
+          route?: string | null
+          street_number?: string | null
+          updated_at?: string | null
+          user_id?: string
+          verified_at?: string | null
+        }
+        Relationships: []
+      }
       agent_configs: {
         Row: {
           agent_id: string
@@ -646,6 +706,160 @@ export type Database = {
           },
         ]
       }
+      profile_answers: {
+        Row: {
+          answer_json: Json | null
+          answer_value: string | null
+          created_at: string | null
+          id: string
+          is_stale: boolean | null
+          is_verified: boolean | null
+          last_updated: string | null
+          question_id: string
+          user_id: string
+          verified_at: string | null
+          verified_by: string | null
+        }
+        Insert: {
+          answer_json?: Json | null
+          answer_value?: string | null
+          created_at?: string | null
+          id?: string
+          is_stale?: boolean | null
+          is_verified?: boolean | null
+          last_updated?: string | null
+          question_id: string
+          user_id: string
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Update: {
+          answer_json?: Json | null
+          answer_value?: string | null
+          created_at?: string | null
+          id?: string
+          is_stale?: boolean | null
+          is_verified?: boolean | null
+          last_updated?: string | null
+          question_id?: string
+          user_id?: string
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profile_answers_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "profile_questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profile_categories: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          display_name: string
+          display_order: number
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          level: number
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          display_name: string
+          display_order?: number
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          level: number
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          display_name?: string
+          display_order?: number
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          level?: number
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      profile_questions: {
+        Row: {
+          category_id: string
+          created_at: string | null
+          display_order: number
+          help_text: string | null
+          id: string
+          is_active: boolean | null
+          is_required: boolean | null
+          level: number
+          options: Json | null
+          placeholder: string | null
+          question_key: string
+          question_text: string
+          question_type: string
+          staleness_days: number | null
+          updated_at: string | null
+          validation_rules: Json | null
+        }
+        Insert: {
+          category_id: string
+          created_at?: string | null
+          display_order?: number
+          help_text?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_required?: boolean | null
+          level: number
+          options?: Json | null
+          placeholder?: string | null
+          question_key: string
+          question_text: string
+          question_type: string
+          staleness_days?: number | null
+          updated_at?: string | null
+          validation_rules?: Json | null
+        }
+        Update: {
+          category_id?: string
+          created_at?: string | null
+          display_order?: number
+          help_text?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_required?: boolean | null
+          level?: number
+          options?: Json | null
+          placeholder?: string | null
+          question_key?: string
+          question_text?: string
+          question_type?: string
+          staleness_days?: number | null
+          updated_at?: string | null
+          validation_rules?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profile_questions_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "profile_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           address: string | null
@@ -662,8 +876,11 @@ export type Database = {
           is_suspended: boolean | null
           is_verified: boolean | null
           last_name: string | null
+          last_profile_update: string | null
           mobile: string | null
           profile_complete: boolean | null
+          profile_completeness_score: number | null
+          profile_level: number | null
           sec: string | null
           tenant_id: string | null
           updated_at: string | null
@@ -684,8 +901,11 @@ export type Database = {
           is_suspended?: boolean | null
           is_verified?: boolean | null
           last_name?: string | null
+          last_profile_update?: string | null
           mobile?: string | null
           profile_complete?: boolean | null
+          profile_completeness_score?: number | null
+          profile_level?: number | null
           sec?: string | null
           tenant_id?: string | null
           updated_at?: string | null
@@ -706,8 +926,11 @@ export type Database = {
           is_suspended?: boolean | null
           is_verified?: boolean | null
           last_name?: string | null
+          last_profile_update?: string | null
           mobile?: string | null
           profile_complete?: boolean | null
+          profile_completeness_score?: number | null
+          profile_level?: number | null
           sec?: string | null
           tenant_id?: string | null
           updated_at?: string | null
