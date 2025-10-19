@@ -484,88 +484,19 @@ const checkLevel3Triggers = (
 
 ## 3. Profile Decay System
 
-### Decay Concept
+**For comprehensive decay system documentation, see [PROFILING/DECAY_SYSTEM.md](PROFILING/DECAY_SYSTEM.md)**
 
-Profile data becomes "stale" after a configurable period. Users must refresh stale answers before accessing certain features or surveys.
+### Quick Overview
 
-### Default Decay Intervals
+Profile data becomes "stale" after configurable periods:
+- **Immutable**: Never expires (DOB, gender, address)
+- **Rare (365d)**: Lifestyle, hobbies
+- **Occasional (180d)**: Income, job title
+- **Frequent (90d)**: Brands, devices
 
-| Category                    | Decay Period | Rationale                         |
-| --------------------------- | ------------ | --------------------------------- |
-| Identity & Security         | 365 days     | Names/contact info rarely change  |
-| Demographics                | 365 days     | Age/gender stable                 |
-| Financial Profile           | 90 days      | Income/economic status fluctuates |
-| Employment & Career         | 90 days      | Job changes common                |
-| Lifestyle & Housing         | 180 days     | Moderate change frequency         |
-| Automotive & Transportation | 180 days     | Vehicle ownership updates         |
-| Technology & Communication  | 120 days     | Device/tech changes frequent      |
-| Health & Wellness           | 180 days     | Moderate health status changes    |
+Stale data triggers visual indicators and may block earning access for Level 2 questions.
 
-### Decay Calculation
-
-```typescript
-interface DecayStatus {
-  isStale: boolean;
-  daysRemaining: number;
-  daysOverdue: number;
-  expiresAt: Date;
-}
-
-const calculateDecayStatus = (
-  answeredAt: Date,
-  decayDays: number
-): DecayStatus => {
-  const expiresAt = new Date(answeredAt);
-  expiresAt.setDate(expiresAt.getDate() + decayDays);
-
-  const now = new Date();
-  const diffMs = expiresAt.getTime() - now.getTime();
-  const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-
-  return {
-    isStale: diffDays <= 0,
-    daysRemaining: Math.max(0, diffDays),
-    daysOverdue: Math.abs(Math.min(0, diffDays)),
-    expiresAt
-  };
-};
-```
-
-### Decay Enforcement
-
-**Soft Enforcement:**
-
-- Visual indicators (amber warning icons)
-- Profile completion percentage affected
-- Prompt on dashboard: "3 profile answers need updating"
-
-**Hard Enforcement (for Level 2 questions):**
-
-- Block earning activities if critical Level 2 answers are stale
-- "Your profile needs updating before you can access new surveys"
-
-### Admin Decay Configuration
-
-```typescript
-interface DecayConfig {
-  categoryId: string;
-  defaultDecayDays: number;
-  minDecayDays: number;
-  maxDecayDays: number;
-  notificationThreshold: number; // Days before expiry to notify user
-}
-
-// Admin can override per category
-const updateDecaySettings = async (
-  categoryId: string,
-  newDecayDays: number
-) => {
-  await supabase
-    .from('profile_questions')
-    .update({ decay_days: newDecayDays })
-    .eq('category_id', categoryId);
-};
-```
+See the [full decay system documentation](PROFILING/DECAY_SYSTEM.md) for implementation details, SQL patterns, and UI components.
 
 ---
 
