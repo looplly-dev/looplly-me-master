@@ -16,6 +16,9 @@ import CommunityTab from './CommunityTab';
 import SimplifiedSupportTab from './SimplifiedSupportTab';
 import { OnboardingTour } from '@/components/ui/onboarding-tour';
 import { useOnboarding } from '@/hooks/useOnboarding';
+import { useProfileQuestions } from '@/hooks/useProfileQuestions';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { AlertCircle } from 'lucide-react';
 
 interface DashboardProps {
   triggerOnboarding?: boolean;
@@ -29,6 +32,15 @@ export default function Dashboard({ triggerOnboarding = false }: DashboardProps)
   const { isAdmin } = useRole();
   const { isDarkMode, toggleDarkMode } = useDarkMode();
   const { showOnboarding, completeOnboarding, skipOnboarding } = useOnboarding(triggerOnboarding);
+  const { level2Complete, level2Categories } = useProfileQuestions();
+  
+  // Calculate Level 2 percentage
+  const level2Questions = level2Categories.flatMap(c => c.questions);
+  const level2Required = level2Questions.filter(q => q.is_required);
+  const level2Answered = level2Required.filter(q => q.user_answer?.answer_value || q.user_answer?.answer_json);
+  const level2Percentage = level2Required.length > 0 
+    ? Math.round((level2Answered.length / level2Required.length) * 100)
+    : 0;
 
   const handleLogout = () => {
     logout();
@@ -173,6 +185,25 @@ export default function Dashboard({ triggerOnboarding = false }: DashboardProps)
 
       {/* Main Content */}
       <div className="max-w-md md:max-w-2xl lg:max-w-5xl mx-auto">
+        {/* Level 2 Incomplete Alert */}
+        {!level2Complete && (
+          <Alert className="mx-4 mt-4 border-warning bg-warning/10">
+            <AlertCircle className="h-5 w-5 text-warning" />
+            <AlertTitle className="text-warning font-bold">Complete Your Profile to Start Earning</AlertTitle>
+            <AlertDescription className="text-sm text-muted-foreground">
+              You're {Math.round(level2Percentage)}% done! Finish your basic info to unlock surveys and earning opportunities.
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="mt-2 border-warning text-warning hover:bg-warning hover:text-warning-foreground"
+                onClick={() => setActiveTab('profile')}
+              >
+                Complete Now →
+              </Button>
+            </AlertDescription>
+          </Alert>
+        )}
+        
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsContent value="earn" className="mt-0">
             <SimplifiedEarnTab />
@@ -216,10 +247,13 @@ export default function Dashboard({ triggerOnboarding = false }: DashboardProps)
                 </TabsTrigger>
                 <TabsTrigger 
                   value="profile" 
-                  className="flex-col gap-1 h-full data-[state=active]:bg-primary/10 data-[state=active]:text-primary active:scale-95 transition-transform"
+                  className="flex-col gap-1 h-full data-[state=active]:bg-primary/10 data-[state=active]:text-primary active:scale-95 transition-transform relative"
                 >
                   <User className="h-4 w-4 md:h-5 md:w-5" />
                   <span className="text-xs md:text-sm">Profile</span>
+                  {!level2Complete && (
+                    <span className="absolute -top-1 -right-1 h-3 w-3 bg-warning rounded-full animate-pulse" />
+                  )}
                 </TabsTrigger>
                 <TabsTrigger 
                   value="refer" 

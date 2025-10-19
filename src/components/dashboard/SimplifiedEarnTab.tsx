@@ -54,7 +54,16 @@ import { useNavigate } from 'react-router-dom';
 
 export default function SimplifiedEarnTab() {
   const navigate = useNavigate();
-  const { level2Complete } = useProfileQuestions();
+  const { level2Complete, level2Categories } = useProfileQuestions();
+  
+  // Calculate Level 2 percentage
+  const level2Questions = level2Categories.flatMap(c => c.questions);
+  const level2Required = level2Questions.filter(q => q.is_required);
+  const level2Answered = level2Required.filter(q => q.user_answer?.answer_value || q.user_answer?.answer_json);
+  const level2Percentage = level2Required.length > 0 
+    ? Math.round((level2Answered.length / level2Required.length) * 100)
+    : 0;
+    
   const { hasStaleData, staleQuestions, staleCount } = useStaleProfileCheck();
   const [checkInDone, setCheckInDone] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(true);
@@ -283,14 +292,46 @@ export default function SimplifiedEarnTab() {
   // Check if Level 2 is complete
   if (!level2Complete) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] p-8 space-y-6">
-        <AlertCircle className="h-16 w-16 text-warning mx-auto" />
-        <h2 className="text-2xl font-bold">Finish Your Profile</h2>
-        <p className="text-muted-foreground text-center max-w-md">
-          Complete your basic info to start earning. It takes less than 2 minutes!
-        </p>
-        <Button onClick={() => navigate('/profile')} size="lg">
-          Complete Now
+      <div className="flex flex-col items-center justify-center min-h-[500px] p-8 space-y-6 bg-gradient-to-b from-warning/5 to-transparent">
+        <div className="relative">
+          <AlertCircle className="h-20 w-20 text-warning mx-auto animate-pulse" />
+          <div className="absolute inset-0 h-20 w-20 mx-auto rounded-full bg-warning/20 animate-ping" />
+        </div>
+        <div className="text-center space-y-3">
+          <h2 className="text-3xl font-bold text-foreground">Complete Your Profile to Start Earning</h2>
+          <p className="text-lg text-muted-foreground max-w-md">
+            <span className="font-semibold text-warning">Level 2:</span> Demographics, Income, SEC/SEM
+          </p>
+          <p className="text-sm text-muted-foreground">
+            → Blocks Earn tab access (no surveys until complete)
+          </p>
+        </div>
+        <Card className="max-w-md border-warning/30 bg-card">
+          <CardContent className="p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium">Profile Progress</span>
+              <span className="text-sm font-bold text-warning">{Math.round(level2Percentage)}%</span>
+            </div>
+            <Progress value={level2Percentage} className="h-3" />
+            <ul className="space-y-2 text-sm text-muted-foreground">
+              <li className="flex items-start gap-2">
+                <CheckCircle className="h-4 w-4 text-success mt-0.5 flex-shrink-0" />
+                <span>Takes less than 2 minutes</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <CheckCircle className="h-4 w-4 text-success mt-0.5 flex-shrink-0" />
+                <span>Unlocks all earning opportunities</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <CheckCircle className="h-4 w-4 text-success mt-0.5 flex-shrink-0" />
+                <span>Better survey matches = higher rewards</span>
+              </li>
+            </ul>
+          </CardContent>
+        </Card>
+        <Button onClick={() => navigate('/profile')} size="lg" className="text-lg px-8 py-6">
+          <ArrowRight className="h-5 w-5 mr-2" />
+          Complete Profile Now
         </Button>
       </div>
     );
