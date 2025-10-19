@@ -222,6 +222,11 @@ After Phase 1 is complete and tested:
 - **Audit Logs**: Critical actions are logged immediately, others are batched
 - **Rate Limiting**: Consider implementing rate limiting per tenant in Phase 2
 
+## Related Documentation
+
+- [Profile System Admin Guide](docs/PROFILING/ADMIN_GUIDE.md) - Managing profile questions and badges
+- [Profiling System Docs](docs/PROFILING/README.md) - Complete profiling documentation
+
 ## Support
 
 For issues or questions:

@@ -79,6 +79,11 @@ After running the migration, you need to grant the admin role. Follow these step
 ✅ **Secure role checking** - Uses security definer function to prevent RLS issues
 ✅ **Audit-ready** - All admin actions can be logged (Phase 3)
 
+## Related Documentation
+
+- [Profile System Admin Guide](docs/PROFILING/ADMIN_GUIDE.md) - Managing profile questions and decay
+- [Profiling System Docs](docs/PROFILING/README.md) - Complete profiling documentation
+
 ## Next Steps (Phase 3 & 4)
 
 These features are planned but not yet implemented:
