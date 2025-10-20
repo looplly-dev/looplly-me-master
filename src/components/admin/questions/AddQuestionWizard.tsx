@@ -8,7 +8,6 @@ import { toast } from 'sonner';
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -20,18 +19,28 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
-import { ChevronLeft, ChevronRight, Check, Sparkles } from 'lucide-react';
+import { Plus, Trash2, Save } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { 
+  Form, 
+  FormControl, 
+  FormDescription, 
+  FormField, 
+  FormItem, 
+  FormLabel, 
+  FormMessage 
+} from '@/components/ui/form';
 
 const QUESTION_TYPES = [
-  { value: 'text', label: 'Text Input', description: 'Short text response' },
-  { value: 'textarea', label: 'Long Text', description: 'Multi-line text response' },
-  { value: 'number', label: 'Number', description: 'Numeric input' },
-  { value: 'select', label: 'Single Select', description: 'Choose one option' },
-  { value: 'multi-select', label: 'Multi Select', description: 'Choose multiple options' },
-  { value: 'date', label: 'Date', description: 'Date picker' },
-  { value: 'address', label: 'Address', description: 'Full address with autocomplete' },
-  { value: 'boolean', label: 'Yes/No', description: 'Boolean toggle' },
+  { value: 'text', label: 'Single Textbox', icon: '📝' },
+  { value: 'textarea', label: 'Comment Box', icon: '💬' },
+  { value: 'number', label: 'Number', icon: '🔢' },
+  { value: 'select', label: 'Multiple Choice (single answer)', icon: '🔘' },
+  { value: 'multi-select', label: 'Checkboxes (multiple answers)', icon: '☑️' },
+  { value: 'date', label: 'Date Picker', icon: '📅' },
+  { value: 'address', label: 'Address', icon: '📍' },
+  { value: 'boolean', label: 'Yes/No', icon: '✓' },
 ];
 
 const questionSchema = z.object({
@@ -63,7 +72,7 @@ interface AddQuestionWizardProps {
 }
 
 export function AddQuestionWizard({ open, onClose, defaultLevel }: AddQuestionWizardProps) {
-  const [step, setStep] = useState(1);
+  const [activeTab, setActiveTab] = useState('edit');
   const [options, setOptions] = useState<Array<{ label: string; value: string }>>([]);
   const [newOptionLabel, setNewOptionLabel] = useState('');
   const queryClient = useQueryClient();
@@ -134,6 +143,7 @@ export function AddQuestionWizard({ open, onClose, defaultLevel }: AddQuestionWi
     onSuccess: () => {
       toast.success('Question created successfully');
       queryClient.invalidateQueries({ queryKey: ['profile_questions'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-questions-unified'] });
       handleClose();
     },
     onError: (error: any) => {
@@ -143,35 +153,20 @@ export function AddQuestionWizard({ open, onClose, defaultLevel }: AddQuestionWi
 
   const handleClose = () => {
     form.reset();
-    setStep(1);
+    setActiveTab('edit');
     setOptions([]);
     setNewOptionLabel('');
     onClose();
   };
 
-  const handleNext = async () => {
-    const fieldsToValidate = getFieldsForStep(step);
-    const isValid = await form.trigger(fieldsToValidate as any);
-    if (isValid) setStep(step + 1);
-  };
-
-  const handleBack = () => setStep(step - 1);
-
-  const handleSubmit = form.handleSubmit((data) => {
+  const handleSubmit = form.handleSubmit(async (data) => {
+    // Validate based on question type
+    if (isSelectType && options.length === 0) {
+      toast.error('Please add at least one option for select/multi-select questions');
+      return;
+    }
     createQuestionMutation.mutate(data);
   });
-
-  const getFieldsForStep = (currentStep: number): string[] => {
-    switch (currentStep) {
-      case 1: return ['question_type'];
-      case 2: return ['question_text', 'question_key', 'help_text', 'placeholder'];
-      case 3: return ['is_required'];
-      case 4: return ['decay_config_key'];
-      case 5: return ['applicability', 'country_codes'];
-      case 6: return ['category_id', 'level'];
-      default: return [];
-    }
-  };
 
   const addOption = () => {
     if (newOptionLabel.trim()) {
@@ -191,135 +186,190 @@ export function AddQuestionWizard({ open, onClose, defaultLevel }: AddQuestionWi
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-primary" />
+          <DialogTitle>
             {defaultLevel ? `Add Level ${defaultLevel} Question` : 'Add New Question'}
           </DialogTitle>
-          <DialogDescription>
-            Step {step} of 6 - {getStepTitle(step)}
-          </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6 py-4">
-          {/* Step 1: Question Type */}
-          {step === 1 && (
-            <div className="space-y-4">
-              <Label>Select Question Type</Label>
-              <div className="grid grid-cols-2 gap-3">
-                {QUESTION_TYPES.map((type) => (
-                  <button
-                    key={type.value}
-                    type="button"
-                    onClick={() => form.setValue('question_type', type.value)}
-                    className={`p-4 rounded-lg border-2 text-left transition-all ${
-                      selectedType === type.value
-                        ? 'border-primary bg-primary/5'
-                        : 'border-border hover:border-primary/50'
-                    }`}
-                  >
-                    <div className="font-medium">{type.label}</div>
-                    <div className="text-sm text-muted-foreground">{type.description}</div>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
+        <Form {...form}>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="edit">Edit</TabsTrigger>
+              <TabsTrigger value="options">Options</TabsTrigger>
+              <TabsTrigger value="assignment">Assignment</TabsTrigger>
+            </TabsList>
 
-          {/* Step 2: Basic Configuration */}
-          {step === 2 && (
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="question_text">Question Text *</Label>
-                <Input
-                  id="question_text"
-                  {...form.register('question_text')}
-                  placeholder="What is your employment status?"
-                />
-                {form.formState.errors.question_text && (
-                  <p className="text-sm text-destructive mt-1">{form.formState.errors.question_text.message}</p>
+            {/* Edit Tab */}
+            <TabsContent value="edit" className="space-y-6 py-4">
+              <FormField
+                control={form.control}
+                name="question_text"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Question Text</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        {...field}
+                        placeholder="What is your employment status?"
+                        rows={3}
+                        className="resize-none"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
                 )}
-              </div>
+              />
 
-              <div>
-                <Label htmlFor="question_key">Question Key *</Label>
-                <Input
-                  id="question_key"
-                  {...form.register('question_key')}
-                  placeholder="employment_status"
-                />
-                <p className="text-xs text-muted-foreground mt-1">
-                  Unique identifier (lowercase, underscores only)
-                </p>
-                {form.formState.errors.question_key && (
-                  <p className="text-sm text-destructive mt-1">{form.formState.errors.question_key.message}</p>
+              <FormField
+                control={form.control}
+                name="question_type"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Question Type</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a question type" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {QUESTION_TYPES.map((type) => (
+                          <SelectItem key={type.value} value={type.value}>
+                            <div className="flex items-center gap-2">
+                              <span>{type.icon}</span>
+                              <span>{type.label}</span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
                 )}
-              </div>
+              />
 
-              <div>
-                <Label htmlFor="help_text">Help Text</Label>
-                <Textarea
-                  id="help_text"
-                  {...form.register('help_text')}
-                  placeholder="Optional guidance for users"
-                  rows={2}
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="placeholder">Placeholder</Label>
-                <Input
-                  id="placeholder"
-                  {...form.register('placeholder')}
-                  placeholder="e.g., Select an option..."
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Step 3: Type-Specific Configuration */}
-          {step === 3 && (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label htmlFor="is_required">Required Field</Label>
-                  <p className="text-sm text-muted-foreground">Users must answer this question</p>
-                </div>
-                <Switch
-                  id="is_required"
-                  checked={form.watch('is_required')}
-                  onCheckedChange={(checked) => form.setValue('is_required', checked)}
-                />
-              </div>
-
-              <Separator />
+              <FormField
+                control={form.control}
+                name="question_key"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Question Key</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="employment_status"
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Unique identifier (lowercase, underscores only)
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
               {isSelectType && (
                 <div className="space-y-3">
-                  <Label>Options</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      value={newOptionLabel}
-                      onChange={(e) => setNewOptionLabel(e.target.value)}
-                      placeholder="Add option..."
-                      onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addOption())}
-                    />
-                    <Button type="button" onClick={addOption} variant="outline">Add</Button>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
+                  <Label>Answer Choices</Label>
+                  <div className="space-y-2">
                     {options.map((opt, idx) => (
-                      <Badge key={idx} variant="secondary" className="gap-2">
-                        {opt.label}
-                        <button onClick={() => removeOption(idx)} className="hover:text-destructive">×</button>
-                      </Badge>
+                      <div key={idx} className="flex items-center gap-2">
+                        <span className="text-sm text-muted-foreground w-8">{idx + 1}.</span>
+                        <Input value={opt.label} disabled className="flex-1" />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeOption(idx)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                     ))}
+                    <div className="flex gap-2">
+                      <Input
+                        value={newOptionLabel}
+                        onChange={(e) => setNewOptionLabel(e.target.value)}
+                        placeholder="Add option..."
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            addOption();
+                          }
+                        }}
+                      />
+                      <Button type="button" onClick={addOption} variant="outline" size="sm">
+                        <Plus className="h-4 w-4 mr-1" />
+                        Add
+                      </Button>
+                    </div>
                   </div>
                   {isSelectType && options.length === 0 && (
-                    <p className="text-sm text-destructive">At least one option is required for select types</p>
+                    <p className="text-sm text-destructive">At least one option is required</p>
                   )}
                 </div>
               )}
+
+              <FormField
+                control={form.control}
+                name="help_text"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Help Text (Optional)</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        {...field}
+                        placeholder="Additional guidance for users..."
+                        rows={2}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="placeholder"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Placeholder (Optional)</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="e.g., Select an option..."
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </TabsContent>
+
+            {/* Options Tab */}
+            <TabsContent value="options" className="space-y-6 py-4">
+              <FormField
+                control={form.control}
+                name="is_required"
+                render={({ field }) => (
+                  <FormItem className="flex items-center justify-between rounded-lg border p-4">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-base">Require an answer to this question</FormLabel>
+                      <FormDescription>
+                        Users must provide an answer before proceeding
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
 
               {selectedType === 'number' && (
                 <div className="grid grid-cols-2 gap-4">
@@ -329,6 +379,7 @@ export function AddQuestionWizard({ open, onClose, defaultLevel }: AddQuestionWi
                       id="min"
                       type="number"
                       onChange={(e) => form.setValue('validation_rules.min', parseInt(e.target.value))}
+                      placeholder="Min"
                     />
                   </div>
                   <div>
@@ -337,115 +388,141 @@ export function AddQuestionWizard({ open, onClose, defaultLevel }: AddQuestionWi
                       id="max"
                       type="number"
                       onChange={(e) => form.setValue('validation_rules.max', parseInt(e.target.value))}
+                      placeholder="Max"
                     />
                   </div>
                 </div>
               )}
-            </div>
-          )}
 
-          {/* Step 4: Decay Configuration */}
-          {step === 4 && (
-            <div className="space-y-4">
-              <Label>How often should this answer be refreshed?</Label>
-              <div className="grid gap-3">
-                {decayConfigs?.map((config) => (
-                  <button
-                    key={config.config_key}
-                    type="button"
-                    onClick={() => form.setValue('decay_config_key', config.config_key)}
-                    className={`p-4 rounded-lg border-2 text-left transition-all ${
-                      form.watch('decay_config_key') === config.config_key
-                        ? 'border-primary bg-primary/5'
-                        : 'border-border hover:border-primary/50'
-                    }`}
-                  >
-                    <div className="font-medium">{config.config_key}</div>
-                    <div className="text-sm text-muted-foreground">{config.description}</div>
-                  </button>
-                ))}
-              </div>
-              {form.formState.errors.decay_config_key && (
-                <p className="text-sm text-destructive">{form.formState.errors.decay_config_key.message}</p>
-              )}
-            </div>
-          )}
+              <Separator />
 
-          {/* Step 5: Applicability */}
-          {step === 5 && (
-            <div className="space-y-4">
-              <Label>Question Applicability</Label>
-              <div className="grid gap-3">
-                <button
-                  type="button"
-                  onClick={() => form.setValue('applicability', 'global')}
-                  className={`p-4 rounded-lg border-2 text-left transition-all ${
-                    selectedApplicability === 'global'
-                      ? 'border-primary bg-primary/5'
-                      : 'border-border hover:border-primary/50'
-                  }`}
-                >
-                  <div className="font-medium">Global</div>
-                  <div className="text-sm text-muted-foreground">Available to all users worldwide</div>
-                </button>
+              <FormField
+                control={form.control}
+                name="decay_config_key"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Data Refresh Frequency</FormLabel>
+                    <FormDescription>
+                      How often should this answer be refreshed?
+                    </FormDescription>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select refresh frequency" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {decayConfigs?.map((config) => (
+                          <SelectItem key={config.config_key} value={config.config_key}>
+                            {config.config_key} - {config.description}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-                <button
-                  type="button"
-                  onClick={() => form.setValue('applicability', 'country-specific')}
-                  className={`p-4 rounded-lg border-2 text-left transition-all ${
-                    selectedApplicability === 'country-specific'
-                      ? 'border-primary bg-primary/5'
-                      : 'border-border hover:border-primary/50'
-                  }`}
-                >
-                  <div className="font-medium">Country-Specific</div>
-                  <div className="text-sm text-muted-foreground">Only for selected countries</div>
-                </button>
-              </div>
+              <Separator />
+
+              <FormField
+                control={form.control}
+                name="applicability"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Question Availability</FormLabel>
+                    <FormControl>
+                      <div className="grid gap-3">
+                        <div
+                          onClick={() => field.onChange('global')}
+                          className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                            field.value === 'global'
+                              ? 'border-primary bg-primary/5'
+                              : 'border-border hover:border-primary/50'
+                          }`}
+                        >
+                          <div className="font-medium">Global</div>
+                          <div className="text-sm text-muted-foreground">Available to all users worldwide</div>
+                        </div>
+                        <div
+                          onClick={() => field.onChange('country-specific')}
+                          className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                            field.value === 'country-specific'
+                              ? 'border-primary bg-primary/5'
+                              : 'border-border hover:border-primary/50'
+                          }`}
+                        >
+                          <div className="font-medium">Country-Specific</div>
+                          <div className="text-sm text-muted-foreground">Only for selected countries</div>
+                        </div>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
               {selectedApplicability === 'country-specific' && (
-                <div className="mt-4">
-                  <Label htmlFor="country_codes">Country Codes (comma-separated)</Label>
-                  <Input
-                    id="country_codes"
-                    placeholder="US,UK,IN"
-                    onChange={(e) => form.setValue('country_codes', e.target.value.split(',').map(c => c.trim()))}
-                  />
-                  <p className="text-xs text-muted-foreground mt-1">Enter 2-letter country codes</p>
-                </div>
+                <FormField
+                  control={form.control}
+                  name="country_codes"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Country Codes</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="US,UK,IN"
+                          onChange={(e) => field.onChange(e.target.value.split(',').map(c => c.trim()))}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Enter 2-letter country codes, separated by commas
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               )}
-            </div>
-          )}
+            </TabsContent>
 
-          {/* Step 6: Assignment */}
-          {step === 6 && (
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="category_id">Category *</Label>
-                <Select onValueChange={(value) => form.setValue('category_id', value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories?.map((cat) => (
-                      <SelectItem key={cat.id} value={cat.id}>
-                        {cat.display_name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {form.formState.errors.category_id && (
-                  <p className="text-sm text-destructive mt-1">{form.formState.errors.category_id.message}</p>
+            {/* Assignment Tab */}
+            <TabsContent value="assignment" className="space-y-6 py-4">
+              <FormField
+                control={form.control}
+                name="category_id"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Category</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a category" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {categories?.map((cat) => (
+                          <SelectItem key={cat.id} value={cat.id}>
+                            {cat.display_name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormDescription>
+                      Group this question under a specific category
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
                 )}
-              </div>
+              />
 
               {defaultLevel ? (
                 <div className="space-y-2">
                   <Label>Profile Level</Label>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 p-4 border rounded-lg bg-muted/50">
                     <Badge variant="secondary">Level {defaultLevel}</Badge>
                     <span className="text-sm text-muted-foreground">
-                      (pre-selected)
+                      (pre-selected from tab context)
                     </span>
                   </div>
                   <p className="text-sm text-muted-foreground">
@@ -453,81 +530,83 @@ export function AddQuestionWizard({ open, onClose, defaultLevel }: AddQuestionWi
                   </p>
                 </div>
               ) : (
-                <div>
-                  <Label htmlFor="level">Profile Level *</Label>
-                  <Select onValueChange={(value) => form.setValue('level', parseInt(value))} defaultValue="2">
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select level" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="1">Level 1 (Basic)</SelectItem>
-                      <SelectItem value="2">Level 2 (Intermediate)</SelectItem>
-                      <SelectItem value="3">Level 3 (Advanced)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                <FormField
+                  control={form.control}
+                  name="level"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Profile Level</FormLabel>
+                      <Select onValueChange={(val) => field.onChange(parseInt(val))} value={field.value?.toString()}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select level" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="1">Level 1 - Identity & Security</SelectItem>
+                          <SelectItem value="2">Level 2 - Demographics & Earning</SelectItem>
+                          <SelectItem value="3">Level 3 - Progressive Profiling</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormDescription>
+                        Assign this question to a specific profile level
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               )}
 
-              <div className="bg-muted/50 p-4 rounded-lg space-y-2">
-                <h4 className="font-medium">Review Summary</h4>
-                <div className="text-sm space-y-1">
-                  <p><span className="text-muted-foreground">Type:</span> {selectedType}</p>
-                  <p><span className="text-muted-foreground">Question:</span> {form.watch('question_text')}</p>
-                  <p><span className="text-muted-foreground">Required:</span> {form.watch('is_required') ? 'Yes' : 'No'}</p>
-                  <p><span className="text-muted-foreground">Applicability:</span> {selectedApplicability}</p>
+              <Separator />
+
+              <div className="bg-muted/50 p-4 rounded-lg space-y-3">
+                <h4 className="font-medium flex items-center gap-2">
+                  Summary
+                </h4>
+                <div className="text-sm space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Question:</span>
+                    <span className="font-medium">{form.watch('question_text') || 'Not set'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Type:</span>
+                    <span className="font-medium">{selectedType || 'Not selected'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Required:</span>
+                    <span className="font-medium">{form.watch('is_required') ? 'Yes' : 'No'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Availability:</span>
+                    <span className="font-medium capitalize">{selectedApplicability}</span>
+                  </div>
+                  {isSelectType && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Options:</span>
+                      <span className="font-medium">{options.length} choices</span>
+                    </div>
+                  )}
                 </div>
               </div>
-            </div>
-          )}
-        </div>
+            </TabsContent>
+          </Tabs>
+        </Form>
 
-        <DialogFooter className="flex justify-between">
-          <div>
-            {step > 1 && (
-              <Button type="button" variant="outline" onClick={handleBack}>
-                <ChevronLeft className="h-4 w-4 mr-1" />
-                Back
-              </Button>
-            )}
-          </div>
-          <div className="flex gap-2">
-            <Button type="button" variant="ghost" onClick={handleClose}>
-              Cancel
-            </Button>
-            {step < 6 ? (
-              <Button
-                type="button"
-                onClick={handleNext}
-                disabled={isSelectType && step === 3 && options.length === 0}
-              >
-                Next
-                <ChevronRight className="h-4 w-4 ml-1" />
-              </Button>
-            ) : (
-              <Button
-                type="button"
-                onClick={handleSubmit}
-                disabled={createQuestionMutation.isPending}
-              >
-                <Check className="h-4 w-4 mr-1" />
-                {createQuestionMutation.isPending ? 'Creating...' : 'Create Question'}
-              </Button>
-            )}
-          </div>
+        <DialogFooter className="flex justify-between items-center">
+          <Button type="button" variant="ghost" onClick={handleClose}>
+            Cancel
+          </Button>
+          
+          <Button 
+            type="button" 
+            onClick={handleSubmit}
+            disabled={createQuestionMutation.isPending}
+          >
+            <Save className="mr-2 h-4 w-4" />
+            {createQuestionMutation.isPending ? 'Saving...' : 'Save Question'}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
   );
-}
-
-function getStepTitle(step: number): string {
-  switch (step) {
-    case 1: return 'Choose Question Type';
-    case 2: return 'Basic Configuration';
-    case 3: return 'Type-Specific Settings';
-    case 4: return 'Decay Configuration';
-    case 5: return 'Applicability';
-    case 6: return 'Assignment & Review';
-    default: return '';
-  }
 }
