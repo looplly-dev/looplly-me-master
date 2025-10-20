@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, ArrowRight, RotateCcw, ExternalLink } from 'lucide-react';
 import AdminLayout from '@/components/admin/AdminLayout';
@@ -11,6 +12,8 @@ import { Link } from 'react-router-dom';
 
 function JourneyPreviewContent() {
   const { currentStepId, setCurrentStepId, resetMockUserState } = useJourneyPreview();
+  const [leftSidebarCollapsed, setLeftSidebarCollapsed] = useState(false);
+  const [rightSidebarCollapsed, setRightSidebarCollapsed] = useState(false);
   
   const currentIndex = journeySteps.findIndex(s => s.id === currentStepId);
   const canGoPrevious = currentIndex > 0;
@@ -30,56 +33,55 @@ function JourneyPreviewContent() {
 
   return (
     <AdminLayout>
-      <div className="h-[calc(100vh-8rem)] flex flex-col space-y-4">
-        {/* Header Controls */}
-        <div className="flex items-center justify-between gap-4 bg-background p-4 rounded-lg border">
-          <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold">Visual Journey Preview</h1>
+      <div className="h-[calc(100vh-8rem)] flex flex-col space-y-3">
+        {/* Compact Header Controls */}
+        <div className="flex items-center justify-between gap-3 bg-background px-3 py-2 rounded-lg border">
+          <div className="flex items-center gap-2">
             <Button 
               size="sm" 
-              variant="outline"
+              variant="ghost"
               onClick={resetMockUserState}
             >
-              <RotateCcw className="h-4 w-4 mr-2" />
-              Reset Journey
+              <RotateCcw className="h-4 w-4 mr-1.5" />
+              Reset
+            </Button>
+            
+            <div className="h-4 w-px bg-border" />
+            
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={handlePrevious}
+              disabled={!canGoPrevious}
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+            <span className="text-xs text-muted-foreground px-1 min-w-[3rem] text-center">
+              {currentIndex + 1} / {journeySteps.length}
+            </span>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={handleNext}
+              disabled={!canGoNext}
+            >
+              <ArrowRight className="h-4 w-4" />
             </Button>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <CountrySelector />
             
-            <div className="flex items-center gap-2 border-l pl-3">
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={handlePrevious}
-                disabled={!canGoPrevious}
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Previous
-              </Button>
-              <span className="text-sm text-muted-foreground px-2">
-                {currentIndex + 1} / {journeySteps.length}
-              </span>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={handleNext}
-                disabled={!canGoNext}
-              >
-                Next
-                <ArrowRight className="h-4 w-4 ml-2" />
-              </Button>
-            </div>
-
+            <div className="h-4 w-px bg-border" />
+            
             <Button
               size="sm"
               variant="ghost"
               asChild
             >
               <Link to="/admin/question-builder">
-                <ExternalLink className="h-4 w-4 mr-2" />
-                Question Builder
+                <ExternalLink className="h-4 w-4 mr-1.5" />
+                Builder
               </Link>
             </Button>
           </div>
@@ -87,9 +89,15 @@ function JourneyPreviewContent() {
 
         {/* Main Preview Layout */}
         <div className="flex-1 flex border rounded-lg overflow-hidden bg-background">
-          <JourneyStepSidebar />
+          <JourneyStepSidebar 
+            collapsed={leftSidebarCollapsed}
+            onToggleCollapse={() => setLeftSidebarCollapsed(!leftSidebarCollapsed)}
+          />
           <JourneyPreviewFrame />
-          <UserStatePanel />
+          <UserStatePanel 
+            collapsed={rightSidebarCollapsed}
+            onToggleCollapse={() => setRightSidebarCollapsed(!rightSidebarCollapsed)}
+          />
         </div>
       </div>
     </AdminLayout>

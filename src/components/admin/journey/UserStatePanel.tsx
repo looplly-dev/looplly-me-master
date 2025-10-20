@@ -4,48 +4,134 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useJourneyPreview } from '@/contexts/JourneyPreviewContext';
-import { User, Award, Flame, Shield, AlertTriangle } from 'lucide-react';
+import { User, Award, Flame, Shield, AlertTriangle, ChevronLeft, ChevronRight, RotateCcw } from 'lucide-react';
 
-export function UserStatePanel() {
+interface UserStatePanelProps {
+  collapsed: boolean;
+  onToggleCollapse: () => void;
+}
+
+export function UserStatePanel({ collapsed, onToggleCollapse }: UserStatePanelProps) {
   const { mockUserState, updateMockUserState, resetMockUserState } = useJourneyPreview();
 
+  if (collapsed) {
+    return (
+      <div className="w-14 border-l bg-muted/30 flex flex-col">
+        <div className="p-2 border-b bg-background flex items-center justify-center sticky top-0 z-10">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-7 w-7"
+            onClick={onToggleCollapse}
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+        </div>
+        
+        <TooltipProvider>
+          <div className="flex-1 p-1 space-y-2">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="flex flex-col items-center justify-center p-2 bg-background rounded border">
+                  <Shield className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-xs font-medium mt-1">{mockUserState.profileLevel}</span>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent side="left">
+                <div className="text-xs">Profile Level: {mockUserState.profileLevel}</div>
+              </TooltipContent>
+            </Tooltip>
+            
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="flex flex-col items-center justify-center p-2 bg-background rounded border">
+                  <Award className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-xs font-medium mt-1">{mockUserState.reputationScore}</span>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent side="left">
+                <div className="text-xs">
+                  <div>Reputation: {mockUserState.reputationScore}</div>
+                  <div>Tier: {mockUserState.reputationTier}</div>
+                </div>
+              </TooltipContent>
+            </Tooltip>
+            
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="flex flex-col items-center justify-center p-2 bg-background rounded border">
+                  <Flame className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-xs font-medium mt-1">{mockUserState.currentStreak}</span>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent side="left">
+                <div className="text-xs">Current Streak: {mockUserState.currentStreak} days</div>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+        </TooltipProvider>
+      </div>
+    );
+  }
+
   return (
-    <div className="w-80 border-l bg-background flex flex-col">
+    <div className="w-72 border-l bg-background flex flex-col transition-all duration-200">
       <Card className="rounded-none border-0 border-b flex-1 overflow-auto">
-        <CardHeader className="sticky top-0 bg-background z-10">
-          <CardTitle className="text-base flex items-center gap-2">
-            <User className="h-4 w-4" />
-            Virtual User State
-          </CardTitle>
+        <CardHeader className="sticky top-0 bg-background z-10 py-2 px-3">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-sm flex items-center gap-2">
+              <User className="h-4 w-4" />
+              User State
+            </CardTitle>
+            <div className="flex items-center gap-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={resetMockUserState}
+                className="h-7 w-7"
+              >
+                <RotateCcw className="h-3.5 w-3.5" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={onToggleCollapse}
+                className="h-7 w-7"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-4 px-3 pb-3">
           {/* User Info */}
-          <div className="space-y-3">
+          <div className="space-y-2 pb-2 border-b">
             <div className="text-sm space-y-1">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">User ID:</span>
-                <span className="font-mono text-xs">{mockUserState.userId}</span>
+                <span className="text-muted-foreground text-xs">User ID:</span>
+                <span className="font-mono text-xs">{mockUserState.userId.slice(0, 8)}...</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Email:</span>
-                <span className="text-sm">{mockUserState.email}</span>
+                <span className="text-muted-foreground text-xs">Email:</span>
+                <span className="text-xs">{mockUserState.email}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Country:</span>
-                <Badge variant="outline">{mockUserState.countryCode}</Badge>
+                <span className="text-muted-foreground text-xs">Country:</span>
+                <Badge variant="outline" className="text-xs">{mockUserState.countryCode}</Badge>
               </div>
             </div>
           </div>
 
           {/* Profile Progress */}
-          <div className="space-y-3">
+          <div className="space-y-2 pb-2 border-b">
             <div className="flex items-center justify-between">
-              <Label className="text-sm flex items-center gap-2">
-                <Shield className="h-4 w-4" />
+              <Label className="text-xs flex items-center gap-2">
+                <Shield className="h-3.5 w-3.5" />
                 Profile Level
               </Label>
-              <Badge>{mockUserState.profileLevel}</Badge>
+              <Badge className="text-xs">{mockUserState.profileLevel}</Badge>
             </div>
             
             <div className="space-y-2">
@@ -79,17 +165,17 @@ export function UserStatePanel() {
           </div>
 
           {/* Reputation */}
-          <div className="space-y-3">
+          <div className="space-y-2 pb-2 border-b">
             <div className="flex items-center justify-between">
-              <Label className="text-sm flex items-center gap-2">
-                <Award className="h-4 w-4" />
+              <Label className="text-xs flex items-center gap-2">
+                <Award className="h-3.5 w-3.5" />
                 Reputation
               </Label>
-              <Badge variant="secondary">{mockUserState.reputationTier}</Badge>
+              <Badge variant="secondary" className="text-xs">{mockUserState.reputationTier}</Badge>
             </div>
             
             <div className="space-y-1">
-              <div className="flex justify-between text-sm">
+              <div className="flex justify-between text-xs">
                 <span className="text-muted-foreground">Score:</span>
                 <span className="font-semibold">{mockUserState.reputationScore}</span>
               </div>
@@ -125,10 +211,10 @@ export function UserStatePanel() {
           </div>
 
           {/* Streaks */}
-          <div className="space-y-3">
+          <div className="space-y-2 pb-2 border-b">
             <div className="flex items-center justify-between">
-              <Label className="text-sm flex items-center gap-2">
-                <Flame className="h-4 w-4" />
+              <Label className="text-xs flex items-center gap-2">
+                <Flame className="h-3.5 w-3.5" />
                 Streaks
               </Label>
             </div>
@@ -161,7 +247,7 @@ export function UserStatePanel() {
           </div>
 
           {/* Additional States */}
-          <div className="space-y-3">
+          <div className="space-y-2">
             <div className="flex items-center justify-between">
               <Label className="text-xs">Badges Earned</Label>
               <div className="flex items-center gap-2">
@@ -175,7 +261,7 @@ export function UserStatePanel() {
                 >
                   -
                 </Button>
-                <span className="text-sm font-medium w-6 text-center">
+                <span className="text-xs font-medium w-6 text-center">
                   {mockUserState.badgesEarned}
                 </span>
                 <Button
@@ -235,15 +321,6 @@ export function UserStatePanel() {
               />
             </div>
           </div>
-
-          {/* Reset Button */}
-          <Button 
-            variant="outline" 
-            className="w-full" 
-            onClick={resetMockUserState}
-          >
-            Reset to Defaults
-          </Button>
         </CardContent>
       </Card>
     </div>
