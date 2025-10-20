@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ArrowRight, RotateCcw, ExternalLink } from 'lucide-react';
+import { ArrowLeft, ArrowRight, RotateCcw, ExternalLink, Home } from 'lucide-react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import { JourneyPreviewProvider, journeySteps, useJourneyPreview } from '@/contexts/JourneyPreviewContext';
@@ -34,6 +34,19 @@ function JourneyPreviewContent() {
   return (
     <AdminLayout>
       <div className="h-[calc(100vh-8rem)] flex flex-col space-y-3">
+        {/* Back to Dashboard Button */}
+        <Button
+          variant="outline"
+          size="sm"
+          asChild
+          className="w-fit border-orange-500 text-orange-500 hover:bg-orange-50"
+        >
+          <Link to="/admin">
+            <Home className="h-4 w-4 mr-2" />
+            Back to Dashboard
+          </Link>
+        </Button>
+
         {/* Compact Header Controls */}
         <div className="flex items-center justify-between gap-3 bg-background px-3 py-2 rounded-lg border">
           <div className="flex items-center gap-2">
