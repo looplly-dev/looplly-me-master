@@ -329,11 +329,7 @@ function CountryOptionsDialog({ question, onClose }: { question: any; onClose: (
 }
 
 export default function AdminProfileQuestions() {
-  return (
-    <ProtectedRoute requiredRole="admin">
-      <AdminLayout>
-        <AdminProfileQuestionsContent />
-      </AdminLayout>
-    </ProtectedRoute>
-  );
+  // Redirect to unified questions page
+  window.location.href = '/admin/questions';
+  return null;
 }

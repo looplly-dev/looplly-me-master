@@ -324,11 +324,7 @@ function AdminProfileDecayContent() {
 }
 
 export default function AdminProfileDecay() {
-  return (
-    <ProtectedRoute requiredRole="admin">
-      <AdminLayout>
-        <AdminProfileDecayContent />
-      </AdminLayout>
-    </ProtectedRoute>
-  );
+  // Redirect to unified questions page
+  window.location.href = '/admin/questions';
+  return null;
 }

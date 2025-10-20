@@ -521,11 +521,7 @@ function AdminQuestionBuilderContent() {
 }
 
 export default function AdminQuestionBuilder() {
-  return (
-    <ProtectedRoute requiredRole="admin">
-      <AdminLayout>
-        <AdminQuestionBuilderContent />
-      </AdminLayout>
-    </ProtectedRoute>
-  );
+  // Redirect to unified questions page
+  window.location.href = '/admin/questions';
+  return null;
 }
