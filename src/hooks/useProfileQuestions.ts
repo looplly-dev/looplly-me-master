@@ -79,7 +79,7 @@ export const useProfileQuestions = () => {
 
       if (categoriesError) throw categoriesError;
 
-      // Fetch questions filtered by country
+      // Fetch questions filtered by country (exclude drafts for non-admin users)
       const { data: questions, error: questionsError } = await supabase
         .from('profile_questions')
         .select(`
@@ -91,6 +91,7 @@ export const useProfileQuestions = () => {
           )
         `)
         .eq('is_active', true)
+        .eq('is_draft', false)
         .or(`applicability.eq.global,country_codes.cs.{${userCountry}}`)
         .order('display_order');
 

@@ -1,11 +1,27 @@
+import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Edit, Settings, Globe, MapPin } from 'lucide-react';
+import { Edit, Settings, Globe, MapPin, Eye, EyeOff } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface QuestionInlineCardProps {
   question: any;
   decayLabel: string;
   onManageCountries: () => void;
+  isEditable?: boolean;
 }
 
 const getQuestionTypeIcon = (type: string) => {
@@ -37,8 +53,37 @@ const getQuestionTypeIcon = (type: string) => {
 export function QuestionInlineCard({ 
   question, 
   decayLabel,
-  onManageCountries 
+  onManageCountries,
+  isEditable = true
 }: QuestionInlineCardProps) {
+  const [showPublishDialog, setShowPublishDialog] = useState(false);
+  const queryClient = useQueryClient();
+
+  const toggleDraftMutation = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase
+        .from('profile_questions')
+        .update({ is_draft: !question.is_draft })
+        .eq('id', question.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success(question.is_draft ? 'Question published successfully' : 'Question unpublished');
+      queryClient.invalidateQueries({ queryKey: ['admin-questions-unified'] });
+      setShowPublishDialog(false);
+    },
+    onError: (error: any) => {
+      toast.error(`Failed to update question: ${error.message}`);
+    },
+  });
+
+  const handlePublishClick = () => {
+    if (question.is_draft) {
+      setShowPublishDialog(true);
+    } else {
+      toggleDraftMutation.mutate();
+    }
+  };
   return (
     <div className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors">
       <div className="flex-1 space-y-2">
@@ -56,6 +101,13 @@ export function QuestionInlineCard({
           
           {question.is_required && (
             <Badge variant="destructive">Required</Badge>
+          )}
+
+          {question.is_draft && (
+            <Badge variant="secondary" className="bg-gray-200 text-gray-700 dark:bg-gray-800 dark:text-gray-300">
+              <EyeOff className="mr-1 h-3 w-3" />
+              Draft
+            </Badge>
           )}
           
           <Badge variant="outline">{decayLabel}</Badge>
@@ -80,21 +132,90 @@ export function QuestionInlineCard({
             Manage Countries
           </Button>
         )}
-        <Button
-          variant="ghost"
-          size="sm"
-          title="Quick Settings"
-        >
-          <Settings className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          title="Edit Question"
-        >
-          <Edit className="h-4 w-4" />
-        </Button>
+        
+        {question.level === 2 && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handlePublishClick}
+            disabled={toggleDraftMutation.isPending}
+          >
+            {question.is_draft ? (
+              <>
+                <Eye className="mr-2 h-4 w-4" />
+                Publish
+              </>
+            ) : (
+              <>
+                <EyeOff className="mr-2 h-4 w-4" />
+                Unpublish
+              </>
+            )}
+          </Button>
+        )}
+
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                title="Quick Settings"
+                disabled={!isEditable}
+              >
+                <Settings className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            {!isEditable && (
+              <TooltipContent>
+                <p>Level 1 questions are locked</p>
+              </TooltipContent>
+            )}
+          </Tooltip>
+        </TooltipProvider>
+
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                title="Edit Question"
+                disabled={!isEditable}
+              >
+                <Edit className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            {!isEditable && (
+              <TooltipContent>
+                <p>Level 1 questions are locked</p>
+              </TooltipContent>
+            )}
+          </Tooltip>
+        </TooltipProvider>
       </div>
+
+      <AlertDialog open={showPublishDialog} onOpenChange={setShowPublishDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Publish Level 2 Question?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will make the question visible to all users. 
+              Users will be prompted to answer it before accessing surveys.
+              <br /><br />
+              <strong>Question:</strong> "{question.question_text}"
+              <br />
+              <strong>Level:</strong> 2 (Pre-Earning Requirement)
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => toggleDraftMutation.mutate()}>
+              Publish Now
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

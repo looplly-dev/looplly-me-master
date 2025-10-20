@@ -894,6 +894,7 @@ export type Database = {
           help_text: string | null
           id: string
           is_active: boolean | null
+          is_draft: boolean
           is_immutable: boolean
           is_required: boolean | null
           level: number
@@ -918,6 +919,7 @@ export type Database = {
           help_text?: string | null
           id?: string
           is_active?: boolean | null
+          is_draft?: boolean
           is_immutable?: boolean
           is_required?: boolean | null
           level: number
@@ -942,6 +944,7 @@ export type Database = {
           help_text?: string | null
           id?: string
           is_active?: boolean | null
+          is_draft?: boolean
           is_immutable?: boolean
           is_required?: boolean | null
           level?: number

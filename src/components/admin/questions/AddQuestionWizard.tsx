@@ -19,7 +19,8 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Trash2, Save } from 'lucide-react';
+import { Plus, Trash2, Save, AlertTriangle } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
@@ -61,6 +62,7 @@ const questionSchema = z.object({
     max: z.number().optional(),
     pattern: z.string().optional(),
   }).optional(),
+  is_draft: z.boolean().default(false),
 });
 
 type QuestionFormData = z.infer<typeof questionSchema>;
@@ -91,6 +93,7 @@ export function AddQuestionWizard({ open, onClose, defaultLevel }: AddQuestionWi
       country_codes: [],
       options: [],
       validation_rules: {},
+      is_draft: (defaultLevel === 2),
     },
   });
 
@@ -136,6 +139,7 @@ export function AddQuestionWizard({ open, onClose, defaultLevel }: AddQuestionWi
         options: options.length > 0 ? options : null,
         validation_rules: data.validation_rules || {},
         is_active: true,
+        is_draft: data.is_draft,
         display_order: 999,
       });
       if (error) throw error;
@@ -182,7 +186,12 @@ export function AddQuestionWizard({ open, onClose, defaultLevel }: AddQuestionWi
 
   const selectedType = form.watch('question_type');
   const selectedApplicability = form.watch('applicability');
+  const selectedLevel = form.watch('level');
+  const isDraft = form.watch('is_draft');
   const isSelectType = ['select', 'multi-select'].includes(selectedType);
+  
+  // Filter categories by selected level
+  const filteredCategories = categories?.filter(cat => cat.level === Number(selectedLevel)) || [];
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
@@ -371,6 +380,30 @@ export function AddQuestionWizard({ open, onClose, defaultLevel }: AddQuestionWi
                 )}
               />
 
+              {Number(selectedLevel) === 2 && (
+                <FormField
+                  control={form.control}
+                  name="is_draft"
+                  render={({ field }) => (
+                    <FormItem className="flex items-center justify-between rounded-lg border p-4">
+                      <div className="space-y-0.5">
+                        <FormLabel className="text-base">Draft Mode</FormLabel>
+                        <FormDescription>
+                          Draft questions are invisible to users. Use this to test changes safely 
+                          before publishing to production.
+                        </FormDescription>
+                      </div>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              )}
+
               {selectedType === 'number' && (
                 <div className="grid grid-cols-2 gap-4">
                   <div>
@@ -501,15 +534,21 @@ export function AddQuestionWizard({ open, onClose, defaultLevel }: AddQuestionWi
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {categories?.map((cat) => (
-                          <SelectItem key={cat.id} value={cat.id}>
-                            {cat.display_name}
-                          </SelectItem>
-                        ))}
+                        {filteredCategories.length > 0 ? (
+                          filteredCategories.map((cat) => (
+                            <SelectItem key={cat.id} value={cat.id}>
+                              {cat.display_name}
+                            </SelectItem>
+                          ))
+                        ) : (
+                          <div className="p-2 text-sm text-muted-foreground">
+                            No categories for Level {selectedLevel}
+                          </div>
+                        )}
                       </SelectContent>
                     </Select>
                     <FormDescription>
-                      Group this question under a specific category
+                      Showing categories for Level {selectedLevel} only
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -588,6 +627,19 @@ export function AddQuestionWizard({ open, onClose, defaultLevel }: AddQuestionWi
                   )}
                 </div>
               </div>
+
+              {Number(selectedLevel) === 2 && (
+                <Alert variant={isDraft ? "default" : "destructive"} className="mt-4">
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertTitle>Level 2 Impact Warning</AlertTitle>
+                  <AlertDescription>
+                    This question affects earning eligibility. 
+                    {isDraft 
+                      ? " It's in draft mode and won't be visible to users yet."
+                      : " ⚠️ IT WILL BE IMMEDIATELY VISIBLE TO ALL USERS."}
+                  </AlertDescription>
+                </Alert>
+              )}
             </TabsContent>
           </Tabs>
         </Form>

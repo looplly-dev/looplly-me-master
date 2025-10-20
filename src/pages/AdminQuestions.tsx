@@ -17,6 +17,7 @@ function AdminQuestionsContent() {
   const [countryOptionsQuestion, setCountryOptionsQuestion] = useState<any>(null);
   const [showAddWizard, setShowAddWizard] = useState(false);
   const [selectedLevel, setSelectedLevel] = useState<number | null>(null);
+  const [showDrafts, setShowDrafts] = useState(false);
 
   // Fetch all data in one query
   const { data: questionsData, isLoading } = useQuery({
@@ -48,10 +49,12 @@ function AdminQuestionsContent() {
     }
   });
 
-  const groupQuestionsByCategory = (level: number) => {
+  const groupQuestionsByCategory = (level: number, includeDrafts: boolean = false) => {
     if (!questionsData) return [];
     
-    const levelQuestions = questionsData.questions.filter(q => q.level === level);
+    const levelQuestions = questionsData.questions.filter(q => 
+      q.level === level && (includeDrafts || !q.is_draft)
+    );
     const categoriesWithQuestions = questionsData.categories
       .filter(cat => cat.level === level)
       .map(cat => ({
@@ -94,32 +97,17 @@ function AdminQuestionsContent() {
         </TabsList>
 
         <TabsContent value="1" className="space-y-4 mt-6">
-          <Alert>
-            <Info className="h-4 w-4" />
-            <AlertTitle>Level 1 Questions</AlertTitle>
-            <AlertDescription>
-              Level 1 questions are identity/security fields (name, mobile, address). These are immutable and rarely need changes.
+          <Alert className="border-blue-500 bg-blue-50 dark:bg-blue-950">
+            <Info className="h-4 w-4 text-blue-600" />
+            <AlertTitle className="text-blue-900 dark:text-blue-100">
+              Level 1 Questions Are Locked
+            </AlertTitle>
+            <AlertDescription className="text-blue-800 dark:text-blue-200">
+              Level 1 contains identity and security fields (name, mobile, address). 
+              These are immutable and tied to fraud prevention logic. 
+              Contact the development team if changes are required.
             </AlertDescription>
           </Alert>
-          
-          <div className="flex justify-end">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button 
-                    variant="outline" 
-                    disabled
-                  >
-                    <Plus className="mr-2 h-4 w-4" />
-                    Add Level 1 Question
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Level 1 questions are locked. Contact support to modify.</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
 
           {groupQuestionsByCategory(1).map(category => (
             <Card key={category.id}>
@@ -139,6 +127,7 @@ function AdminQuestionsContent() {
                     question={question}
                     decayLabel={getDecayLabel(question)}
                     onManageCountries={() => setCountryOptionsQuestion(question)}
+                    isEditable={false}
                   />
                 ))}
               </CardContent>
@@ -154,38 +143,46 @@ function AdminQuestionsContent() {
         </TabsContent>
 
         <TabsContent value="2" className="space-y-4 mt-6">
-          <Alert>
-            <AlertTriangle className="h-4 w-4" />
-            <AlertTitle>Level 2 Questions</AlertTitle>
-            <AlertDescription>
-              Level 2 questions are demographic/socio-economic data required for earning. These change only when SEC models update or strategic needs arise. Note: SEC questions with logic scoring are managed separately (contact dev team).
+          <Alert className="border-yellow-500 bg-yellow-50 dark:bg-yellow-950">
+            <AlertTriangle className="h-4 w-4 text-yellow-600" />
+            <AlertTitle className="text-yellow-900 dark:text-yellow-100">
+              Level 2: Pre-Earning Requirements
+            </AlertTitle>
+            <AlertDescription className="text-yellow-800 dark:text-yellow-200">
+              Level 2 questions are demographic/socio-economic data required for earning opportunities.
+              <br /><br />
+              <strong>⚠️ Important:</strong>
+              <ul className="list-disc list-inside mt-2 space-y-1">
+                <li>Changes affect all users' ability to access surveys</li>
+                <li>SEC questions with scoring logic require dev team involvement</li>
+                <li>Use <strong>Draft Mode</strong> to test changes before publishing</li>
+              </ul>
             </AlertDescription>
           </Alert>
           
-          <div className="flex justify-end">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button 
-                    variant="outline"
-                    className="border-yellow-500 text-yellow-600 hover:bg-yellow-50 dark:hover:bg-yellow-950"
-                    onClick={() => {
-                      setSelectedLevel(2);
-                      setShowAddWizard(true);
-                    }}
-                  >
-                    <AlertTriangle className="mr-2 h-4 w-4" />
-                    Add Level 2 Question
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Level 2 questions affect earning eligibility. Proceed with caution.</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+          <div className="flex items-center justify-between">
+            <Button 
+              variant={showDrafts ? "default" : "outline"}
+              size="sm"
+              onClick={() => setShowDrafts(prev => !prev)}
+            >
+              {showDrafts ? "Showing Drafts" : "Showing Published"}
+            </Button>
+            
+            <Button 
+              variant="outline"
+              className="border-yellow-500 text-yellow-600 hover:bg-yellow-50 dark:hover:bg-yellow-950"
+              onClick={() => {
+                setSelectedLevel(2);
+                setShowAddWizard(true);
+              }}
+            >
+              <AlertTriangle className="mr-2 h-4 w-4" />
+              Add Level 2 Question
+            </Button>
           </div>
 
-          {groupQuestionsByCategory(2).map(category => (
+          {groupQuestionsByCategory(2, showDrafts).map(category => (
             <Card key={category.id}>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -203,12 +200,13 @@ function AdminQuestionsContent() {
                     question={question}
                     decayLabel={getDecayLabel(question)}
                     onManageCountries={() => setCountryOptionsQuestion(question)}
+                    isEditable={true}
                   />
                 ))}
               </CardContent>
             </Card>
           ))}
-          {groupQuestionsByCategory(2).length === 0 && (
+          {groupQuestionsByCategory(2, showDrafts).length === 0 && (
             <Card>
               <CardContent className="py-12 text-center text-muted-foreground">
                 No questions at this level yet
@@ -256,6 +254,7 @@ function AdminQuestionsContent() {
                     question={question}
                     decayLabel={getDecayLabel(question)}
                     onManageCountries={() => setCountryOptionsQuestion(question)}
+                    isEditable={true}
                   />
                 ))}
               </CardContent>
