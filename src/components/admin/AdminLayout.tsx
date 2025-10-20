@@ -178,7 +178,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             <SidebarTrigger />
             <AdminBreadcrumb />
           </header>
-          <main className="flex-1 p-6 bg-muted/30 overflow-auto">
+          <main className="flex-1 px-4 py-6 md:px-6 lg:px-8 bg-muted/30 overflow-auto">
             {children}
           </main>
         </div>
