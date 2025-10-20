@@ -14,8 +14,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Plus, Edit, Globe, MapPin } from 'lucide-react';
+import ProtectedRoute from '@/components/auth/ProtectedRoute';
 
-export default function AdminProfileQuestions() {
+function AdminProfileQuestionsContent() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState('');
@@ -324,5 +325,15 @@ function CountryOptionsDialog({ question, onClose }: { question: any; onClose: (
         </DialogFooter>
       </DialogContent>
     </Dialog>
+  );
+}
+
+export default function AdminProfileQuestions() {
+  return (
+    <ProtectedRoute requiredRole="admin">
+      <AdminLayout>
+        <AdminProfileQuestionsContent />
+      </AdminLayout>
+    </ProtectedRoute>
   );
 }

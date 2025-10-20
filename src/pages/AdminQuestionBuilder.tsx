@@ -20,8 +20,9 @@ import {
   Calendar,
 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import ProtectedRoute from '@/components/auth/ProtectedRoute';
 
-export default function AdminQuestionBuilder() {
+function AdminQuestionBuilderContent() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterLevel, setFilterLevel] = useState<string>('all');
   const [filterCategory, setFilterCategory] = useState<string>('all');
@@ -314,5 +315,15 @@ export default function AdminQuestionBuilder() {
         </Tabs>
       </div>
     </AdminLayout>
+  );
+}
+
+export default function AdminQuestionBuilder() {
+  return (
+    <ProtectedRoute requiredRole="admin">
+      <AdminLayout>
+        <AdminQuestionBuilderContent />
+      </AdminLayout>
+    </ProtectedRoute>
   );
 }
