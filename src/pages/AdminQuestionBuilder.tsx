@@ -8,6 +8,8 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { 
   AlertCircle, 
   Search, 
@@ -18,15 +20,24 @@ import {
   CheckCircle,
   Clock,
   Calendar,
+  SlidersHorizontal,
+  Eye,
 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
+import { QuestionDetailModal } from '@/components/admin/questions/QuestionDetailModal';
 
 function AdminQuestionBuilderContent() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterLevel, setFilterLevel] = useState<string>('all');
   const [filterCategory, setFilterCategory] = useState<string>('all');
+  const [filterType, setFilterType] = useState<string>('all');
+  const [filterApplicability, setFilterApplicability] = useState<string>('all');
+  const [filterRequired, setFilterRequired] = useState<string>('all');
+  const [filterDecay, setFilterDecay] = useState<string>('all');
   const [activeTab, setActiveTab] = useState('overview');
+  const [selectedQuestion, setSelectedQuestion] = useState<any>(null);
+  const [detailModalOpen, setDetailModalOpen] = useState(false);
 
   // Fetch categories
   const { data: categories } = useQuery({
@@ -59,8 +70,30 @@ function AdminQuestionBuilderContent() {
                           q.question_key.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesLevel = filterLevel === 'all' || q.level === parseInt(filterLevel);
     const matchesCategory = filterCategory === 'all' || q.category_id === filterCategory;
-    return matchesSearch && matchesLevel && matchesCategory;
+    const matchesType = filterType === 'all' || q.question_type === filterType;
+    const matchesApplicability = filterApplicability === 'all' || q.applicability === filterApplicability;
+    const matchesRequired = filterRequired === 'all' || 
+      (filterRequired === 'required' && q.is_required) ||
+      (filterRequired === 'optional' && !q.is_required);
+    const matchesDecay = filterDecay === 'all' || q.decay_config_key === filterDecay;
+    
+    return matchesSearch && matchesLevel && matchesCategory && matchesType && 
+           matchesApplicability && matchesRequired && matchesDecay;
   });
+
+  const handleQuestionClick = (question: any) => {
+    setSelectedQuestion(question);
+    setDetailModalOpen(true);
+  };
+
+  const activeFilterCount = [
+    filterLevel !== 'all',
+    filterCategory !== 'all',
+    filterType !== 'all',
+    filterApplicability !== 'all',
+    filterRequired !== 'all',
+    filterDecay !== 'all',
+  ].filter(Boolean).length;
 
   const getQuestionTypeIcon = (type: string) => {
     const iconMap: Record<string, JSX.Element> = {
@@ -98,64 +131,209 @@ function AdminQuestionBuilderContent() {
         {/* Phase Notice */}
         <Alert>
           <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Phase 1: Read-Only Viewer</AlertTitle>
+          <AlertTitle>Phase 2: Enhanced Viewing</AlertTitle>
           <AlertDescription>
-            This is the foundation view. Edit and create functionality will be added in future phases.
-            See <code className="text-xs bg-muted px-1 py-0.5 rounded">docs/PROFILING/QUESTION_BUILDER_GUIDE.md</code> for roadmap.
+            Click any question to see detailed statistics and metadata. Advanced filtering now available.
           </AlertDescription>
         </Alert>
 
         {/* Filters */}
         <Card>
           <CardContent className="pt-6">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div className="md:col-span-2">
-                <Label className="flex items-center gap-2">
-                  <Search className="h-4 w-4" />
-                  Search Questions
-                </Label>
-                <Input
-                  placeholder="Search by text or key..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="mt-1"
-                />
+            <div className="flex flex-col gap-4">
+              {/* Primary Filters Row */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="md:col-span-2">
+                  <Label className="flex items-center gap-2">
+                    <Search className="h-4 w-4" />
+                    Search Questions
+                  </Label>
+                  <Input
+                    placeholder="Search by text or key..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label className="flex items-center gap-2">
+                    <Filter className="h-4 w-4" />
+                    Level
+                  </Label>
+                  <Select value={filterLevel} onValueChange={setFilterLevel}>
+                    <SelectTrigger className="mt-1">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Levels</SelectItem>
+                      <SelectItem value="1">Level 1</SelectItem>
+                      <SelectItem value="2">Level 2</SelectItem>
+                      <SelectItem value="3">Level 3</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label className="flex items-center gap-2">
+                    <Layers className="h-4 w-4" />
+                    Category
+                  </Label>
+                  <Select value={filterCategory} onValueChange={setFilterCategory}>
+                    <SelectTrigger className="mt-1">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Categories</SelectItem>
+                      {categories?.map(cat => (
+                        <SelectItem key={cat.id} value={cat.id}>
+                          {cat.display_name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
-              <div>
-                <Label className="flex items-center gap-2">
-                  <Filter className="h-4 w-4" />
-                  Level
-                </Label>
-                <Select value={filterLevel} onValueChange={setFilterLevel}>
-                  <SelectTrigger className="mt-1">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Levels</SelectItem>
-                    <SelectItem value="1">Level 1 (Registration)</SelectItem>
-                    <SelectItem value="2">Level 2 (Required)</SelectItem>
-                    <SelectItem value="3">Level 3 (Progressive)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label className="flex items-center gap-2">
-                  <Layers className="h-4 w-4" />
-                  Category
-                </Label>
-                <Select value={filterCategory} onValueChange={setFilterCategory}>
-                  <SelectTrigger className="mt-1">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Categories</SelectItem>
-                    {categories?.map(cat => (
-                      <SelectItem key={cat.id} value={cat.id}>
-                        {cat.display_name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+
+              {/* Advanced Filters - Mobile Sheet, Desktop Inline */}
+              <div className="flex items-center gap-2">
+                <Sheet>
+                  <SheetTrigger asChild>
+                    <Button variant="outline" size="sm" className="md:hidden">
+                      <SlidersHorizontal className="h-4 w-4 mr-2" />
+                      Advanced Filters
+                      {activeFilterCount > 0 && (
+                        <Badge variant="secondary" className="ml-2">{activeFilterCount}</Badge>
+                      )}
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side="bottom" className="h-[80vh]">
+                    <SheetHeader>
+                      <SheetTitle>Advanced Filters</SheetTitle>
+                    </SheetHeader>
+                    <div className="grid gap-4 mt-4">
+                      <div>
+                        <Label>Question Type</Label>
+                        <Select value={filterType} onValueChange={setFilterType}>
+                          <SelectTrigger className="mt-1">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">All Types</SelectItem>
+                            <SelectItem value="text">Text</SelectItem>
+                            <SelectItem value="select">Select</SelectItem>
+                            <SelectItem value="multiselect">Multi-Select</SelectItem>
+                            <SelectItem value="date">Date</SelectItem>
+                            <SelectItem value="address">Address</SelectItem>
+                            <SelectItem value="number">Number</SelectItem>
+                            <SelectItem value="email">Email</SelectItem>
+                            <SelectItem value="phone">Phone</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label>Applicability</Label>
+                        <Select value={filterApplicability} onValueChange={setFilterApplicability}>
+                          <SelectTrigger className="mt-1">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">All</SelectItem>
+                            <SelectItem value="global">Global</SelectItem>
+                            <SelectItem value="country_specific">Country-Specific</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label>Required Status</Label>
+                        <Select value={filterRequired} onValueChange={setFilterRequired}>
+                          <SelectTrigger className="mt-1">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">All</SelectItem>
+                            <SelectItem value="required">Required Only</SelectItem>
+                            <SelectItem value="optional">Optional Only</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label>Decay Interval</Label>
+                        <Select value={filterDecay} onValueChange={setFilterDecay}>
+                          <SelectTrigger className="mt-1">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">All</SelectItem>
+                            <SelectItem value="immutable">Never</SelectItem>
+                            <SelectItem value="rare_change">Rare</SelectItem>
+                            <SelectItem value="occasional_change">Occasional</SelectItem>
+                            <SelectItem value="frequent_change">Frequent</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  </SheetContent>
+                </Sheet>
+
+                {/* Desktop Advanced Filters */}
+                <div className="hidden md:grid md:grid-cols-4 gap-4 flex-1">
+                  <div>
+                    <Label>Type</Label>
+                    <Select value={filterType} onValueChange={setFilterType}>
+                      <SelectTrigger className="mt-1">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Types</SelectItem>
+                        <SelectItem value="text">Text</SelectItem>
+                        <SelectItem value="select">Select</SelectItem>
+                        <SelectItem value="multiselect">Multi-Select</SelectItem>
+                        <SelectItem value="date">Date</SelectItem>
+                        <SelectItem value="address">Address</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label>Applicability</Label>
+                    <Select value={filterApplicability} onValueChange={setFilterApplicability}>
+                      <SelectTrigger className="mt-1">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All</SelectItem>
+                        <SelectItem value="global">Global</SelectItem>
+                        <SelectItem value="country_specific">Country-Specific</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label>Status</Label>
+                    <Select value={filterRequired} onValueChange={setFilterRequired}>
+                      <SelectTrigger className="mt-1">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All</SelectItem>
+                        <SelectItem value="required">Required</SelectItem>
+                        <SelectItem value="optional">Optional</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label>Decay</Label>
+                    <Select value={filterDecay} onValueChange={setFilterDecay}>
+                      <SelectTrigger className="mt-1">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All</SelectItem>
+                        <SelectItem value="immutable">Never</SelectItem>
+                        <SelectItem value="rare_change">Rare</SelectItem>
+                        <SelectItem value="occasional_change">Occasional</SelectItem>
+                        <SelectItem value="frequent_change">Frequent</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
               </div>
             </div>
           </CardContent>
@@ -181,7 +359,11 @@ function AdminQuestionBuilderContent() {
                 ) : (
                   <div className="space-y-3">
                     {filteredQuestions?.map((question) => (
-                      <Card key={question.id} className="border-l-4 border-l-primary/30">
+                      <Card 
+                        key={question.id} 
+                        className="border-l-4 border-l-primary/30 cursor-pointer hover:shadow-md transition-shadow"
+                        onClick={() => handleQuestionClick(question)}
+                      >
                         <CardContent className="pt-4">
                           <div className="flex items-start justify-between gap-4">
                             <div className="flex-1 space-y-2">
@@ -230,14 +412,27 @@ function AdminQuestionBuilderContent() {
 
                               {/* Help Text */}
                               {question.help_text && (
-                                <p className="text-sm text-muted-foreground italic">{question.help_text}</p>
-                              )}
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
+                                 <p className="text-sm text-muted-foreground italic">{question.help_text}</p>
+                               )}
+                             </div>
+                             
+                             {/* View Details Button */}
+                             <Button 
+                               variant="ghost" 
+                               size="sm"
+                               onClick={(e) => {
+                                 e.stopPropagation();
+                                 handleQuestionClick(question);
+                               }}
+                             >
+                               <Eye className="h-4 w-4 mr-1" />
+                               Details
+                             </Button>
+                           </div>
+                         </CardContent>
+                       </Card>
+                     ))}
+                   </div>
                 )}
               </CardContent>
             </Card>
@@ -313,6 +508,15 @@ function AdminQuestionBuilderContent() {
             })}
           </TabsContent>
         </Tabs>
+
+        {/* Question Detail Modal */}
+        {selectedQuestion && (
+          <QuestionDetailModal
+            question={selectedQuestion}
+            open={detailModalOpen}
+            onOpenChange={setDetailModalOpen}
+          />
+        )}
       </div>
     </AdminLayout>
   );
