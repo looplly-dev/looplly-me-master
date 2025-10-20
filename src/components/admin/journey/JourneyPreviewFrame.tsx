@@ -3,13 +3,89 @@ import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Eye, FileCode } from 'lucide-react';
 import { journeySteps, useJourneyPreview } from '@/contexts/JourneyPreviewContext';
+import { JourneyPreviewProviders } from '@/contexts/JourneyPreviewProviders';
+import { Suspense, lazy } from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
+
+// Lazy load components
+const Register = lazy(() => import('@/components/auth/Register'));
+const MultiStepProfileSetup = lazy(() => import('@/components/auth/MultiStepProfileSetup'));
+const CommunicationPreferences = lazy(() => import('@/components/auth/CommunicationPreferences'));
+const Dashboard = lazy(() => import('@/components/dashboard/Dashboard'));
+const ProfileTab = lazy(() => import('@/components/dashboard/ProfileTab'));
+const SimplifiedEarnTab = lazy(() => import('@/components/dashboard/SimplifiedEarnTab'));
+const RepTab = lazy(() => import('@/components/dashboard/RepTab'));
 
 export function JourneyPreviewFrame() {
-  const { currentStepId, mockUserState } = useJourneyPreview();
+  const { currentStepId, mockUserState, setCurrentStepId } = useJourneyPreview();
   
   const currentStep = journeySteps.find(s => s.id === currentStepId);
 
   if (!currentStep) return null;
+
+  const renderComponent = () => {
+    const handleNavigation = (nextStepId: string) => {
+      console.log('[Preview] Navigation to:', nextStepId);
+      setCurrentStepId(nextStepId);
+    };
+
+    switch (currentStepId) {
+      case 'signup':
+        return (
+          <Register
+            onBack={() => handleNavigation('signup')}
+            onSuccess={() => handleNavigation('otp')}
+            onOTPRequired={() => handleNavigation('otp')}
+          />
+        );
+      
+      case 'level1':
+        return (
+          <MultiStepProfileSetup
+            onBack={() => handleNavigation('signup')}
+            onComplete={() => handleNavigation('communication')}
+          />
+        );
+      
+      case 'communication':
+        return (
+          <CommunicationPreferences
+            onBack={() => handleNavigation('level1')}
+            onComplete={() => handleNavigation('dashboard-first')}
+          />
+        );
+      
+      case 'dashboard-first':
+      case 'dashboard-active':
+        return <Dashboard />;
+      
+      case 'level2-questions':
+        return <ProfileTab />;
+      
+      case 'earn-tab':
+        return <SimplifiedEarnTab />;
+      
+      case 'rep-tab':
+        return <RepTab />;
+      
+      default:
+        return (
+          <div className="text-center space-y-4 p-8">
+            <div className="text-6xl opacity-20">🎭</div>
+            <h3 className="text-xl font-semibold">Component Preview</h3>
+            <p className="text-muted-foreground max-w-md">
+              Visual rendering of <strong>{currentStep.component}</strong> would appear here.
+              This step has not been implemented yet in the preview system.
+            </p>
+            <div className="pt-4 space-y-2 text-sm text-muted-foreground">
+              <p>📍 Step Category: <Badge variant="outline">{currentStep.category}</Badge></p>
+              <p>👤 Preview User: {mockUserState.firstName} {mockUserState.lastName}</p>
+              <p>🌍 Country Context: {mockUserState.countryCode}</p>
+            </div>
+          </div>
+        );
+    }
+  };
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
@@ -42,20 +118,19 @@ export function JourneyPreviewFrame() {
       {/* Preview Content Area */}
       <div className="flex-1 overflow-auto bg-muted/30 p-6">
         <Card className="max-w-4xl mx-auto border-2 border-dashed border-primary/50">
-          <div className="aspect-[16/10] flex items-center justify-center bg-background">
-            <div className="text-center space-y-4 p-8">
-              <div className="text-6xl opacity-20">🎭</div>
-              <h3 className="text-xl font-semibold">Component Preview</h3>
-              <p className="text-muted-foreground max-w-md">
-                Visual rendering of <strong>{currentStep.component}</strong> would appear here.
-                This preview frame will display the actual component in the next phase.
-              </p>
-              <div className="pt-4 space-y-2 text-sm text-muted-foreground">
-                <p>📍 Step Category: <Badge variant="outline">{currentStep.category}</Badge></p>
-                <p>👤 Preview User: {mockUserState.firstName} {mockUserState.lastName}</p>
-                <p>🌍 Country Context: {mockUserState.countryCode}</p>
-              </div>
-            </div>
+          <div className="min-h-[600px] bg-background">
+            <JourneyPreviewProviders>
+              <Suspense fallback={
+                <div className="p-8 space-y-4">
+                  <Skeleton className="h-8 w-3/4" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-32 w-full" />
+                </div>
+              }>
+                {renderComponent()}
+              </Suspense>
+            </JourneyPreviewProviders>
           </div>
         </Card>
       </div>
