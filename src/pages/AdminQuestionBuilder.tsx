@@ -118,8 +118,7 @@ function AdminQuestionBuilderContent() {
   };
 
   return (
-    <AdminLayout>
-      <div className="w-full space-y-6">
+    <div className="space-y-6">
         {/* Header */}
         <div>
           <h1 className="text-3xl font-bold">Question Builder</h1>
@@ -517,8 +516,7 @@ function AdminQuestionBuilderContent() {
             onOpenChange={setDetailModalOpen}
           />
         )}
-      </div>
-    </AdminLayout>
+    </div>
   );
 }
 
