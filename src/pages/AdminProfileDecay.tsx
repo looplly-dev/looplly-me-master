@@ -9,8 +9,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast';
 import { Calendar, Clock, AlertCircle, Save } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import ProtectedRoute from '@/components/auth/ProtectedRoute';
+import AdminLayout from '@/components/admin/AdminLayout';
 
-export default function AdminProfileDecay() {
+function AdminProfileDecayContent() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -318,5 +320,15 @@ export default function AdminProfileDecay() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function AdminProfileDecay() {
+  return (
+    <ProtectedRoute requiredRole="admin">
+      <AdminLayout>
+        <AdminProfileDecayContent />
+      </AdminLayout>
+    </ProtectedRoute>
   );
 }

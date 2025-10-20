@@ -7,8 +7,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Save, Shield } from 'lucide-react';
+import ProtectedRoute from '@/components/auth/ProtectedRoute';
+import AdminLayout from '@/components/admin/AdminLayout';
 
-export default function AdminStreakConfig() {
+function AdminStreakConfigContent() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -157,5 +159,15 @@ export default function AdminStreakConfig() {
 
       </div>
     </div>
+  );
+}
+
+export default function AdminStreakConfig() {
+  return (
+    <ProtectedRoute requiredRole="admin">
+      <AdminLayout>
+        <AdminStreakConfigContent />
+      </AdminLayout>
+    </ProtectedRoute>
   );
 }
