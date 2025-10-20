@@ -18,8 +18,8 @@ export function UserStatePanel({ collapsed, onToggleCollapse }: UserStatePanelPr
 
   if (collapsed) {
     return (
-      <div className="w-14 border-l bg-muted/30 flex flex-col">
-        <div className="p-2 border-b bg-background flex items-center justify-center sticky top-0 z-10">
+      <div className="w-14 border-l bg-muted/30 h-full flex flex-col">
+        <div className="p-2 border-b bg-background flex items-center justify-center shrink-0">
           <Button
             variant="ghost"
             size="icon"
@@ -77,9 +77,9 @@ export function UserStatePanel({ collapsed, onToggleCollapse }: UserStatePanelPr
   }
 
   return (
-    <div className="w-72 border-l bg-background flex flex-col transition-all duration-200">
-      <Card className="rounded-none border-0 border-b flex-1 overflow-auto">
-        <CardHeader className="sticky top-0 bg-background z-10 py-2 px-3">
+    <div className="w-72 border-l bg-background h-full flex flex-col overflow-hidden transition-all duration-200">
+      <Card className="rounded-none border-0 shadow-none flex-1 overflow-hidden flex flex-col">
+        <CardHeader className="border-b bg-background py-2 px-3 shrink-0">
           <div className="flex items-center justify-between">
             <CardTitle className="text-sm flex items-center gap-2">
               <User className="h-4 w-4" />
@@ -105,7 +105,7 @@ export function UserStatePanel({ collapsed, onToggleCollapse }: UserStatePanelPr
             </div>
           </div>
         </CardHeader>
-        <CardContent className="space-y-4 px-3 pb-3">
+        <CardContent className="space-y-4 px-3 pb-3 overflow-auto flex-1">
           {/* User Info */}
           <div className="space-y-2 pb-2 border-b">
             <div className="text-sm space-y-1">

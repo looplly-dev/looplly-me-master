@@ -34,8 +34,8 @@ export function JourneyStepSidebar({ collapsed, onToggleCollapse }: JourneyStepS
   };
 
   return (
-    <div className={`${collapsed ? 'w-14' : 'w-64'} border-r bg-muted/30 flex flex-col transition-all duration-200`}>
-      <div className="p-2 border-b bg-background flex items-center justify-between sticky top-0 z-10">
+    <div className={`${collapsed ? 'w-14' : 'w-64'} border-r bg-muted/30 h-full flex flex-col transition-all duration-200`}>
+      <div className="p-2 border-b bg-background flex items-center justify-between shrink-0">
         {!collapsed && (
           <h3 className="font-semibold text-xs">
             Steps {currentIndex + 1}/{journeySteps.length}
