@@ -59,9 +59,10 @@ type QuestionFormData = z.infer<typeof questionSchema>;
 interface AddQuestionWizardProps {
   open: boolean;
   onClose: () => void;
+  defaultLevel?: number;
 }
 
-export function AddQuestionWizard({ open, onClose }: AddQuestionWizardProps) {
+export function AddQuestionWizard({ open, onClose, defaultLevel }: AddQuestionWizardProps) {
   const [step, setStep] = useState(1);
   const [options, setOptions] = useState<Array<{ label: string; value: string }>>([]);
   const [newOptionLabel, setNewOptionLabel] = useState('');
@@ -76,7 +77,7 @@ export function AddQuestionWizard({ open, onClose }: AddQuestionWizardProps) {
       help_text: '',
       placeholder: '',
       is_required: false,
-      level: 2,
+      level: defaultLevel || 2,
       applicability: 'global',
       country_codes: [],
       options: [],
@@ -194,7 +195,7 @@ export function AddQuestionWizard({ open, onClose }: AddQuestionWizardProps) {
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-primary" />
-            Add New Question
+            {defaultLevel ? `Add Level ${defaultLevel} Question` : 'Add New Question'}
           </DialogTitle>
           <DialogDescription>
             Step {step} of 6 - {getStepTitle(step)}
@@ -438,19 +439,34 @@ export function AddQuestionWizard({ open, onClose }: AddQuestionWizardProps) {
                 )}
               </div>
 
-              <div>
-                <Label htmlFor="level">Profile Level *</Label>
-                <Select onValueChange={(value) => form.setValue('level', parseInt(value))}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select level" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="1">Level 1 (Basic)</SelectItem>
-                    <SelectItem value="2">Level 2 (Intermediate)</SelectItem>
-                    <SelectItem value="3">Level 3 (Advanced)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              {defaultLevel ? (
+                <div className="space-y-2">
+                  <Label>Profile Level</Label>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="secondary">Level {defaultLevel}</Badge>
+                    <span className="text-sm text-muted-foreground">
+                      (pre-selected)
+                    </span>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    This question will be added to Level {defaultLevel}
+                  </p>
+                </div>
+              ) : (
+                <div>
+                  <Label htmlFor="level">Profile Level *</Label>
+                  <Select onValueChange={(value) => form.setValue('level', parseInt(value))} defaultValue="2">
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select level" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">Level 1 (Basic)</SelectItem>
+                      <SelectItem value="2">Level 2 (Intermediate)</SelectItem>
+                      <SelectItem value="3">Level 3 (Advanced)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
 
               <div className="bg-muted/50 p-4 rounded-lg space-y-2">
                 <h4 className="font-medium">Review Summary</h4>

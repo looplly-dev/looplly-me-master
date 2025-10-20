@@ -6,7 +6,9 @@ import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Plus, Info, AlertTriangle, Lightbulb } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { QuestionInlineCard } from '@/components/admin/questions/QuestionInlineCard';
 import { CountryOptionsDialog } from '@/components/admin/questions/CountryOptionsDialog';
 import { AddQuestionWizard } from '@/components/admin/questions/AddQuestionWizard';
@@ -14,6 +16,7 @@ import { AddQuestionWizard } from '@/components/admin/questions/AddQuestionWizar
 function AdminQuestionsContent() {
   const [countryOptionsQuestion, setCountryOptionsQuestion] = useState<any>(null);
   const [showAddWizard, setShowAddWizard] = useState(false);
+  const [selectedLevel, setSelectedLevel] = useState<number | null>(null);
 
   // Fetch all data in one query
   const { data: questionsData, isLoading } = useQuery({
@@ -78,15 +81,9 @@ function AdminQuestionsContent() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold">Profile Questions & Configuration</h1>
-          <p className="text-muted-foreground">Manage questions organized by profile level</p>
-        </div>
-        <Button onClick={() => setShowAddWizard(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          Add Question
-        </Button>
+      <div>
+        <h1 className="text-3xl font-bold">Profile Questions & Configuration</h1>
+        <p className="text-muted-foreground">Manage questions organized by profile level</p>
       </div>
 
       <Tabs defaultValue="1" className="w-full">
@@ -97,6 +94,33 @@ function AdminQuestionsContent() {
         </TabsList>
 
         <TabsContent value="1" className="space-y-4 mt-6">
+          <Alert>
+            <Info className="h-4 w-4" />
+            <AlertTitle>Level 1 Questions</AlertTitle>
+            <AlertDescription>
+              Level 1 questions are identity/security fields (name, mobile, address). These are immutable and rarely need changes.
+            </AlertDescription>
+          </Alert>
+          
+          <div className="flex justify-end">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button 
+                    variant="outline" 
+                    disabled
+                  >
+                    <Plus className="mr-2 h-4 w-4" />
+                    Add Level 1 Question
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Level 1 questions are locked. Contact support to modify.</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+
           {groupQuestionsByCategory(1).map(category => (
             <Card key={category.id}>
               <CardHeader>
@@ -130,6 +154,37 @@ function AdminQuestionsContent() {
         </TabsContent>
 
         <TabsContent value="2" className="space-y-4 mt-6">
+          <Alert>
+            <AlertTriangle className="h-4 w-4" />
+            <AlertTitle>Level 2 Questions</AlertTitle>
+            <AlertDescription>
+              Level 2 questions are demographic/socio-economic data required for earning. These change only when SEC models update or strategic needs arise. Note: SEC questions with logic scoring are managed separately (contact dev team).
+            </AlertDescription>
+          </Alert>
+          
+          <div className="flex justify-end">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button 
+                    variant="outline"
+                    className="border-yellow-500 text-yellow-600 hover:bg-yellow-50 dark:hover:bg-yellow-950"
+                    onClick={() => {
+                      setSelectedLevel(2);
+                      setShowAddWizard(true);
+                    }}
+                  >
+                    <AlertTriangle className="mr-2 h-4 w-4" />
+                    Add Level 2 Question
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Level 2 questions affect earning eligibility. Proceed with caution.</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+
           {groupQuestionsByCategory(2).map(category => (
             <Card key={category.id}>
               <CardHeader>
@@ -163,6 +218,26 @@ function AdminQuestionsContent() {
         </TabsContent>
 
         <TabsContent value="3" className="space-y-4 mt-6">
+          <Alert>
+            <Lightbulb className="h-4 w-4" />
+            <AlertTitle>Level 3 Questions</AlertTitle>
+            <AlertDescription>
+              Level 3 questions are progressive profiling fields (employment, automotive, lifestyle). Use this builder to add contextual questions triggered by surveys, milestones, or time.
+            </AlertDescription>
+          </Alert>
+          
+          <div className="flex justify-end">
+            <Button 
+              onClick={() => {
+                setSelectedLevel(3);
+                setShowAddWizard(true);
+              }}
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Add Level 3 Question
+            </Button>
+          </div>
+
           {groupQuestionsByCategory(3).map(category => (
             <Card key={category.id}>
               <CardHeader>
@@ -203,9 +278,13 @@ function AdminQuestionsContent() {
         />
       )}
 
-      <AddQuestionWizard
-        open={showAddWizard}
-        onClose={() => setShowAddWizard(false)}
+      <AddQuestionWizard 
+        open={showAddWizard} 
+        onClose={() => {
+          setShowAddWizard(false);
+          setSelectedLevel(null);
+        }}
+        defaultLevel={selectedLevel}
       />
     </div>
   );
