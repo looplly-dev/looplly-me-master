@@ -173,25 +173,15 @@ interface AdminLayoutProps {
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
   return (
-    <SidebarProvider>
+    <SidebarProvider defaultOpen={true}>
       <div className="min-h-screen flex w-full">
         <AdminSidebar />
         <div className="flex-1 flex flex-col">
           <header className="h-14 border-b flex items-center px-4 gap-4 bg-background sticky top-0 z-10">
-            <Button
-              variant="outline"
-              size="icon"
-              className="lg:hidden h-10 w-10 shrink-0"
-              asChild
-            >
-              <SidebarTrigger />
-            </Button>
-            <div className="hidden lg:block">
-              <SidebarTrigger />
-            </div>
+            <SidebarTrigger />
             <AdminBreadcrumb />
           </header>
-          <main className="flex-1 p-6 bg-muted/30">
+          <main className="flex-1 p-6 bg-muted/30 overflow-auto">
             {children}
           </main>
         </div>
