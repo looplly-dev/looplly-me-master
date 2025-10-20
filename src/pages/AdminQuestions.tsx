@@ -9,9 +9,11 @@ import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { QuestionInlineCard } from '@/components/admin/questions/QuestionInlineCard';
 import { CountryOptionsDialog } from '@/components/admin/questions/CountryOptionsDialog';
+import { AddQuestionWizard } from '@/components/admin/questions/AddQuestionWizard';
 
 function AdminQuestionsContent() {
   const [countryOptionsQuestion, setCountryOptionsQuestion] = useState<any>(null);
+  const [showAddWizard, setShowAddWizard] = useState(false);
 
   // Fetch all data in one query
   const { data: questionsData, isLoading } = useQuery({
@@ -81,7 +83,7 @@ function AdminQuestionsContent() {
           <h1 className="text-3xl font-bold">Profile Questions & Configuration</h1>
           <p className="text-muted-foreground">Manage questions organized by profile level</p>
         </div>
-        <Button>
+        <Button onClick={() => setShowAddWizard(true)}>
           <Plus className="mr-2 h-4 w-4" />
           Add Question
         </Button>
@@ -200,6 +202,11 @@ function AdminQuestionsContent() {
           onClose={() => setCountryOptionsQuestion(null)}
         />
       )}
+
+      <AddQuestionWizard
+        open={showAddWizard}
+        onClose={() => setShowAddWizard(false)}
+      />
     </div>
   );
 }
