@@ -8,7 +8,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
-import { AddressAutocomplete } from '@/components/ui/address-autocomplete';
+import { AddressFieldsInput } from '@/components/ui/address-fields-input';
 import type { AddressComponents } from '@/services/googlePlacesService';
 import { Switch } from '@/components/ui/switch';
 import { Calendar as CalendarIcon, AlertCircle, Lock, Clock } from 'lucide-react';
@@ -132,15 +132,15 @@ export function QuestionRenderer({ question, onAnswerChange, onAddressChange, di
 
       case 'address':
         return (
-          <AddressAutocomplete
-            value={value}
+          <AddressFieldsInput
+            value={question.user_answer?.answer_json}
             onChange={(address) => {
-              setValue(address.formatted_address);
+              setValue(address);
               if (onAddressChange) {
                 onAddressChange(address);
               }
             }}
-            placeholder={question.placeholder || 'Enter your address'}
+            disabled={disabled || isLocked}
           />
         );
 
