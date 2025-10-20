@@ -10,11 +10,12 @@ import {
 } from '@/utils/journeyPreviewMocks';
 
 interface MockAuthContextType {
-  isPreviewMode: boolean;
-  user: any;
-  isAuthenticated: boolean;
-  isLoading: boolean;
-  currentStep: string;
+  authState: {
+    user: any;
+    isAuthenticated: boolean;
+    isLoading: boolean;
+    step: "communication-preferences" | "dashboard" | "login" | "otp-verification" | "profile-setup";
+  };
   register: (data: any) => Promise<boolean>;
   login: (email: string, password: string) => Promise<boolean>;
   verifyOTP: (code: string) => Promise<boolean>;
@@ -31,18 +32,19 @@ export const MockAuthProvider = ({ children }: { children: ReactNode }) => {
   const { mockUserState, setCurrentStepId } = useJourneyPreview();
 
   const mockAuthValue: MockAuthContextType = {
-    isPreviewMode: true,
-    user: {
-      id: mockUserState.userId,
-      email: mockUserState.email,
-      user_metadata: {
-        first_name: mockUserState.firstName,
-        last_name: mockUserState.lastName
-      }
+    authState: {
+      user: {
+        id: mockUserState.userId,
+        email: mockUserState.email,
+        user_metadata: {
+          first_name: mockUserState.firstName,
+          last_name: mockUserState.lastName
+        }
+      },
+      isAuthenticated: true,
+      isLoading: false,
+      step: mockUserState.profileLevel === 1 ? 'profile-setup' : 'dashboard'
     },
-    isAuthenticated: true,
-    isLoading: false,
-    currentStep: mockUserState.profileLevel === 1 ? 'profile' : 'complete',
     register: async (data: any) => {
       console.log('[Preview] Mock register called with:', data);
       await new Promise(resolve => setTimeout(resolve, 500));
