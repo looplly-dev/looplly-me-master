@@ -175,7 +175,17 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         <AdminSidebar />
         <div className="flex-1 flex flex-col">
           <header className="h-14 border-b flex items-center px-4 gap-4 bg-background sticky top-0 z-10">
-            <SidebarTrigger />
+            <Button
+              variant="outline"
+              size="icon"
+              className="lg:hidden h-10 w-10 shrink-0"
+              asChild
+            >
+              <SidebarTrigger />
+            </Button>
+            <div className="hidden lg:block">
+              <SidebarTrigger />
+            </div>
             <AdminBreadcrumb />
           </header>
           <main className="flex-1 p-6 bg-muted/30">
