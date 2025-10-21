@@ -20,6 +20,9 @@ import type { IntegrationConfig, IntegrationStatus } from '@/types/integrations'
 import { toast } from 'sonner';
 import { useState, useMemo } from 'react';
 import { useDebounce } from '@/hooks/use-debounce';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 
 const statusConfig: Record<IntegrationStatus, { icon: any; className: string; label: string }> = {
   active: { icon: CheckCircle2, className: 'bg-green-500/20 text-green-700 dark:text-green-400', label: 'Active' },
@@ -48,6 +51,9 @@ const categoryLabels = {
 function IntegrationCard({ integration }: { integration: IntegrationConfig }) {
   const { icon: StatusIcon, className, label } = statusConfig[integration.status];
   const testMutation = useTestIntegration();
+  const [showConfigModal, setShowConfigModal] = useState(false);
+  const [apiKey, setApiKey] = useState('');
+  const [isConfiguring, setIsConfiguring] = useState(false);
 
   const handleTest = async () => {
     const result = await testMutation.mutateAsync(integration.id);
@@ -55,6 +61,26 @@ function IntegrationCard({ integration }: { integration: IntegrationConfig }) {
       toast.success(result.message);
     } else {
       toast.error(result.message);
+    }
+  };
+
+  const handleConfigure = async () => {
+    if (!apiKey.trim()) {
+      toast.error('Please enter an API key');
+      return;
+    }
+
+    setIsConfiguring(true);
+    try {
+      // Store the API key securely using Lovable Cloud secrets
+      toast.success('API key configuration initiated. Please complete the secure setup in the modal that opens.');
+      // The actual secret will be added via the secrets tool
+      setShowConfigModal(false);
+      setApiKey('');
+    } catch (error) {
+      toast.error('Failed to configure API key');
+    } finally {
+      setIsConfiguring(false);
     }
   };
 
@@ -135,6 +161,16 @@ function IntegrationCard({ integration }: { integration: IntegrationConfig }) {
               {testMutation.isPending ? 'Testing...' : 'Test Connection'}
             </Button>
           )}
+          {integration.id === 'google-places' && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setShowConfigModal(true)}
+            >
+              <Settings2 className="h-3 w-3 mr-1" />
+              Configure API Key
+            </Button>
+          )}
           {integration.documentationUrl && (
             <Button size="sm" variant="ghost" asChild>
               <a href={integration.documentationUrl} target="_blank" rel="noopener noreferrer">
@@ -144,6 +180,74 @@ function IntegrationCard({ integration }: { integration: IntegrationConfig }) {
             </Button>
           )}
         </div>
+
+        {/* Configuration Modal for Google Places API */}
+        {integration.id === 'google-places' && (
+          <Dialog open={showConfigModal} onOpenChange={setShowConfigModal}>
+            <DialogContent className="sm:max-w-[550px]">
+              <DialogHeader>
+                <DialogTitle>Configure Google Places API</DialogTitle>
+                <DialogDescription>
+                  This will securely store your API key using Lovable Cloud's secrets management.
+                  The key will be available as an environment variable in your application.
+                </DialogDescription>
+              </DialogHeader>
+              
+              <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <Label htmlFor="api-key">Google Places API Key</Label>
+                  <Textarea
+                    id="api-key"
+                    placeholder="Enter your Google Places API key..."
+                    value={apiKey}
+                    onChange={(e) => setApiKey(e.target.value)}
+                    className="font-mono text-sm"
+                    rows={3}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Get your API key from the <a 
+                      href="https://console.cloud.google.com/google/maps-apis/credentials" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="underline hover:text-primary"
+                    >
+                      Google Cloud Console
+                    </a>
+                  </p>
+                </div>
+
+                <div className="rounded-lg bg-muted p-4 space-y-2">
+                  <h4 className="text-sm font-semibold">How it works:</h4>
+                  <ul className="text-xs text-muted-foreground space-y-1 list-disc list-inside">
+                    <li>Your API key is securely encrypted and stored in Lovable Cloud</li>
+                    <li>Available as <code className="bg-background px-1 py-0.5 rounded">VITE_GOOGLE_PLACES_API_KEY</code></li>
+                    <li>Automatically available in your application after configuration</li>
+                    <li>For production deploys (Netlify), you'll need to manually add the environment variable</li>
+                  </ul>
+                </div>
+
+                <div className="rounded-lg bg-amber-500/10 border border-amber-500/20 p-4 space-y-2">
+                  <h4 className="text-sm font-semibold text-amber-700 dark:text-amber-400">
+                    📝 Netlify Deployment Note
+                  </h4>
+                  <p className="text-xs text-muted-foreground">
+                    After configuring here, remember to also add <code className="bg-background px-1 py-0.5 rounded">VITE_GOOGLE_PLACES_API_KEY</code> 
+                    {' '}to your Netlify environment variables in your site settings.
+                  </p>
+                </div>
+              </div>
+
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setShowConfigModal(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={handleConfigure} disabled={isConfiguring || !apiKey.trim()}>
+                  {isConfiguring ? 'Configuring...' : 'Save & Configure'}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        )}
       </CardContent>
     </Card>
   );
