@@ -18,7 +18,7 @@ export async function initializeApp(): Promise<void> {
     console.log('🚀 Initializing application...');
     
     // Bootstrap core configuration (synchronous)
-    const coreConfig = hybridEnv.getCore();
+    const coreConfig = hybridEnv.bootstrapCore();
     console.log('✅ Core Supabase configuration loaded');
     
     // Initialize full configuration (asynchronous, loads from remote)

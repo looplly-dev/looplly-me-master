@@ -41,7 +41,8 @@ const categoryIcons = {
   backend: '☁️',
   payments: '💳',
   communications: '📧',
-  ai: '🤖'
+  ai: '🤖',
+  rulesets: '⚙️'
 };
 
 const categoryLabels = {
@@ -50,7 +51,8 @@ const categoryLabels = {
   backend: 'Backend Infrastructure',
   payments: 'Payment Processing',
   communications: 'Communications',
-  ai: 'AI & Machine Learning'
+  ai: 'AI & Machine Learning',
+  rulesets: 'Business Rules & Configuration'
 };
 
 function IntegrationCard({ integration }: { integration: IntegrationConfig }) {
@@ -315,6 +317,14 @@ function IntegrationCard({ integration }: { integration: IntegrationConfig }) {
             >
               <Settings2 className="h-3 w-3 mr-1" />
               Configure AI Provider
+            </Button>
+          )}
+          {integration.category === 'rulesets' && integration.setupGuideUrl && (
+            <Button size="sm" variant="default" asChild>
+              <a href={integration.setupGuideUrl}>
+                <Settings2 className="h-3 w-3 mr-1" />
+                Manage Rules
+              </a>
             </Button>
           )}
           {integration.documentationUrl && (

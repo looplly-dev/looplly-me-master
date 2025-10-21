@@ -183,6 +183,169 @@ class IntegrationStatusService {
     };
   }
 
+  private async checkEarningRules(): Promise<IntegrationConfig> {
+    try {
+      const { data, error } = await supabase
+        .from('earning_rules')
+        .select('id, rule_key, rule_name, is_active, updated_at')
+        .eq('is_active', true);
+
+      if (error) throw error;
+
+      const activeCount = data?.length || 0;
+      const lastUpdated = data?.[0]?.updated_at 
+        ? new Date(data[0].updated_at).toLocaleDateString()
+        : 'Never';
+
+      return {
+        id: 'earning-rules',
+        name: 'Earning Rules',
+        description: 'Business rules controlling how users earn points and unlock features',
+        category: 'rulesets',
+        status: activeCount > 0 ? 'active' : 'not_configured',
+        isRequired: true,
+        configKeys: [],
+        configuredKeys: [],
+        features: ['Mobile Verification Gates', 'Stage Unlock Thresholds', 'Profile Completion Bonuses', 'Activity Limits'],
+        metadata: {
+          activeRules: activeCount,
+          lastUpdated,
+          manageUrl: '/admin/earning-rules'
+        },
+        setupGuideUrl: '/admin/earning-rules',
+        healthCheck: true,
+        lastChecked: new Date()
+      };
+    } catch (error) {
+      console.error('Failed to check earning rules:', error);
+      return {
+        id: 'earning-rules',
+        name: 'Earning Rules',
+        description: 'Business rules controlling how users earn points and unlock features',
+        category: 'rulesets',
+        status: 'error',
+        isRequired: true,
+        configKeys: [],
+        configuredKeys: [],
+        metadata: {
+          error: 'Failed to load earning rules'
+        },
+        healthCheck: false,
+        lastChecked: new Date()
+      };
+    }
+  }
+
+  private async checkStreakConfig(): Promise<IntegrationConfig> {
+    try {
+      const { data, error } = await supabase
+        .from('streak_unlock_config')
+        .select('id, stage, config_key, is_active, updated_at')
+        .eq('is_active', true);
+
+      if (error) throw error;
+
+      const activeCount = data?.length || 0;
+      const stages = [...new Set(data?.map(d => d.stage) || [])];
+      const lastUpdated = data?.[0]?.updated_at 
+        ? new Date(data[0].updated_at).toLocaleDateString()
+        : 'Never';
+
+      return {
+        id: 'streak-config',
+        name: 'Streak Configuration',
+        description: 'Configure streak-based unlocks and stage progression rules',
+        category: 'rulesets',
+        status: activeCount > 0 ? 'active' : 'not_configured',
+        isRequired: true,
+        configKeys: [],
+        configuredKeys: [],
+        features: ['Stage Unlock Rules', 'Streak Milestones', 'Grace Periods', 'Progression Thresholds'],
+        metadata: {
+          activeConfigs: activeCount,
+          stages: stages.join(', '),
+          lastUpdated,
+          manageUrl: '/admin/streak-config'
+        },
+        setupGuideUrl: '/admin/streak-config',
+        healthCheck: true,
+        lastChecked: new Date()
+      };
+    } catch (error) {
+      console.error('Failed to check streak config:', error);
+      return {
+        id: 'streak-config',
+        name: 'Streak Configuration',
+        description: 'Configure streak-based unlocks and stage progression rules',
+        category: 'rulesets',
+        status: 'error',
+        isRequired: true,
+        configKeys: [],
+        configuredKeys: [],
+        metadata: {
+          error: 'Failed to load streak configuration'
+        },
+        healthCheck: false,
+        lastChecked: new Date()
+      };
+    }
+  }
+
+  private async checkProfileDecay(): Promise<IntegrationConfig> {
+    try {
+      const { data, error } = await supabase
+        .from('profile_decay_config')
+        .select('id, config_key, interval_type, interval_days, is_active, updated_at')
+        .eq('is_active', true);
+
+      if (error) throw error;
+
+      const activeCount = data?.length || 0;
+      const intervalTypes = [...new Set(data?.map(d => d.interval_type) || [])];
+      const lastUpdated = data?.[0]?.updated_at 
+        ? new Date(data[0].updated_at).toLocaleDateString()
+        : 'Never';
+
+      return {
+        id: 'profile-decay',
+        name: 'Profile Decay Configuration',
+        description: 'Manage data freshness rules and automatic profile data expiration',
+        category: 'rulesets',
+        status: activeCount > 0 ? 'active' : 'not_configured',
+        isRequired: false,
+        configKeys: [],
+        configuredKeys: [],
+        features: ['Data Freshness Rules', 'Automatic Staleness Detection', 'Decay Intervals', 'Profile Refresh Prompts'],
+        metadata: {
+          activeConfigs: activeCount,
+          intervalTypes: intervalTypes.join(', '),
+          lastUpdated,
+          manageUrl: '/admin/profile-decay'
+        },
+        setupGuideUrl: '/admin/profile-decay',
+        healthCheck: true,
+        lastChecked: new Date()
+      };
+    } catch (error) {
+      console.error('Failed to check profile decay config:', error);
+      return {
+        id: 'profile-decay',
+        name: 'Profile Decay Configuration',
+        description: 'Manage data freshness rules and automatic profile data expiration',
+        category: 'rulesets',
+        status: 'error',
+        isRequired: false,
+        configKeys: [],
+        configuredKeys: [],
+        metadata: {
+          error: 'Failed to load profile decay configuration'
+        },
+        healthCheck: false,
+        lastChecked: new Date()
+      };
+    }
+  }
+
   async getIntegrationStatus(): Promise<IntegrationStatusResponse> {
     const integrations: IntegrationConfig[] = [
       this.checkGoogleAnalytics(),
@@ -191,7 +354,10 @@ class IntegrationStatusService {
       this.checkAIProvider(),
       this.checkEmailService(),
       this.checkPaymentGateway(),
-      this.checkSMSService()
+      this.checkSMSService(),
+      await this.checkEarningRules(),
+      await this.checkStreakConfig(),
+      await this.checkProfileDecay()
     ];
 
     const summary = {

@@ -1,48 +1,64 @@
 import { z } from 'zod';
-import { remoteConfig } from '../services/remoteConfig';
 
 /**
- * Hybrid Environment Configuration
+ * Hybrid Environment Configuration System
  * 
- * This configuration system tries to load environment variables from:
- * 1. Local environment variables (import.meta.env)
- * 2. Remote configuration stored in Supabase
- * 3. Sensible defaults
+ * Simplified two-tier configuration:
+ * 1. Public config: Netlify environment variables (VITE_* and NODE_ENV)
+ * 2. Private secrets: Supabase Vault (accessed server-side in edge functions only)
  * 
- * This ensures the app works in all deployment scenarios.
+ * This system removes the complexity of app_secrets table and remote config,
+ * standardizing on Supabase Vault for all sensitive API keys.
  */
 
-// Core Supabase config that must be available locally for bootstrap
+// Core Supabase configuration (required for bootstrap)
 const coreSupabaseSchema = z.object({
   VITE_SUPABASE_URL: z.string().url(),
-  VITE_SUPABASE_PUBLISHABLE_KEY: z.string().regex(/^eyJ[A-Za-z0-9-_]*\.[A-Za-z0-9-_]*\.[A-Za-z0-9-_]*$/),
-  VITE_SUPABASE_PROJECT_ID: z.string().regex(/^[a-z0-9]{20}$/),
+  VITE_SUPABASE_PUBLISHABLE_KEY: z.string().min(1),
+  VITE_SUPABASE_PROJECT_ID: z.string().min(1),
 });
 
-// Extended configuration schema including optional values
+// Extended configuration schema with defaults and transformations
 const extendedConfigSchema = z.object({
+  // Core Supabase (required)
   VITE_SUPABASE_URL: z.string().url(),
-  VITE_SUPABASE_PUBLISHABLE_KEY: z.string(),
-  VITE_SUPABASE_PROJECT_ID: z.string(),
+  VITE_SUPABASE_PUBLISHABLE_KEY: z.string().min(1),
+  VITE_SUPABASE_PROJECT_ID: z.string().min(1),
+  
+  // Environment
   NODE_ENV: z.enum(['development', 'production', 'test']).default('production'),
-  VITE_SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),
+  
+  // Feature flags
   VITE_ENABLE_ANALYTICS: z.string().transform(val => val === 'true').default('false'),
   VITE_ENABLE_DEBUG: z.string().transform(val => val === 'true').default('false'),
+  
+  // API configuration
   VITE_API_BASE_URL: z.string().url().optional(),
-  VITE_API_TIMEOUT: z.string().transform(val => parseInt(val, 10)).pipe(z.number().min(1000).max(120000)).default('30000'),
+  VITE_API_TIMEOUT: z.string().transform(Number).default('30000'),
+  
+  // Capacitor
   VITE_CAPACITOR_PLATFORM: z.enum(['web', 'ios', 'android']).default('web'),
+  
+  // Google Places (optional, can use mock mode)
   VITE_GOOGLE_PLACES_API_KEY: z.string().optional(),
-  VITE_USE_MOCK_PLACES: z.string().transform(val => val === 'true').default('true'),
+  VITE_USE_MOCK_PLACES: z.string().transform(val => val === 'true').default('false'),
+  
+  // AI Provider (optional, can use mock mode)
+  VITE_AI_PROVIDER: z.enum(['openai', 'anthropic', 'google']).optional(),
+  VITE_AI_PROVIDER_API_KEY: z.string().optional(),
+  VITE_USE_MOCK_AI: z.string().transform(val => val === 'true').default('false'),
 });
 
 export type HybridConfig = z.infer<typeof extendedConfigSchema>;
 
-export class HybridEnvironmentConfig {
+/**
+ * Hybrid Environment Configuration Manager
+ * Simplified to use only local environment variables and Supabase Vault
+ */
+class HybridEnvironmentConfig {
   private static instance: HybridEnvironmentConfig;
+  private config: HybridConfig | null = null;
   private coreConfig: z.infer<typeof coreSupabaseSchema> | null = null;
-  private fullConfig: HybridConfig | null = null;
-  private isInitialized = false;
-  private initializationPromise: Promise<void> | null = null;
 
   private constructor() {}
 
@@ -54,176 +70,156 @@ export class HybridEnvironmentConfig {
   }
 
   /**
-   * Initialize with minimal config needed to bootstrap Supabase connection
+   * Bootstrap core Supabase configuration (synchronous)
+   * This is called immediately on module load
    */
   public bootstrapCore(): z.infer<typeof coreSupabaseSchema> {
-    if (this.coreConfig) {
-      return this.coreConfig;
+    if (this.coreConfig) return this.coreConfig;
+
+    const rawEnv = {
+      VITE_SUPABASE_URL: import.meta.env.VITE_SUPABASE_URL,
+      VITE_SUPABASE_PUBLISHABLE_KEY: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+      VITE_SUPABASE_PROJECT_ID: import.meta.env.VITE_SUPABASE_PROJECT_ID,
+    };
+
+    const result = coreSupabaseSchema.safeParse(rawEnv);
+    
+    if (!result.success) {
+      console.error('Core Supabase configuration validation failed:', result.error.format());
+      throw new Error(
+        'Missing required Supabase configuration. Please ensure VITE_SUPABASE_URL, ' +
+        'VITE_SUPABASE_PUBLISHABLE_KEY, and VITE_SUPABASE_PROJECT_ID are set.'
+      );
     }
 
-    try {
-      const env = {
-        VITE_SUPABASE_URL: import.meta.env.VITE_SUPABASE_URL,
-        VITE_SUPABASE_PUBLISHABLE_KEY: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-        VITE_SUPABASE_PROJECT_ID: import.meta.env.VITE_SUPABASE_PROJECT_ID,
-      };
-
-      this.coreConfig = coreSupabaseSchema.parse(env);
-      
-      // Initialize remote config service with core credentials
-      remoteConfig.initialize(this.coreConfig.VITE_SUPABASE_URL, this.coreConfig.VITE_SUPABASE_PUBLISHABLE_KEY);
-      
-      return this.coreConfig;
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        const errorMessages = error.errors.map(err => `${err.path.join('.')}: ${err.message}`);
-        throw new Error(
-          `Core Supabase configuration missing or invalid. Please ensure these environment variables are set in your deployment:\n${errorMessages.join('\n')}\n\nFor Netlify, add these in Site Settings > Environment Variables.`
-        );
-      }
-      throw error;
-    }
-  }
-
-  /**
-   * Initialize full configuration (async, loads from remote if needed)
-   */
-  public async initialize(): Promise<HybridConfig> {
-    if (this.fullConfig && this.isInitialized) {
-      return this.fullConfig;
-    }
-
-    if (this.initializationPromise) {
-      await this.initializationPromise;
-      return this.fullConfig!;
-    }
-
-    this.initializationPromise = this._initializeAsync();
-    await this.initializationPromise;
-    return this.fullConfig!;
-  }
-
-  private async _initializeAsync(): Promise<void> {
-    try {
-      // Ensure core config is bootstrapped
-      const coreConfig = this.bootstrapCore();
-
-      // Get all configuration values (local + remote)
-      const allConfig = await remoteConfig.getAllConfig();
-      
-      // Merge with defaults and validate
-      const configToValidate = {
-        ...allConfig,
-        VITE_SUPABASE_URL: coreConfig.VITE_SUPABASE_URL,
-        VITE_SUPABASE_PUBLISHABLE_KEY: coreConfig.VITE_SUPABASE_PUBLISHABLE_KEY,
-        VITE_SUPABASE_PROJECT_ID: coreConfig.VITE_SUPABASE_PROJECT_ID,
-      };
-
-      this.fullConfig = extendedConfigSchema.parse(configToValidate);
-      this.isInitialized = true;
-      
-      console.log('✅ Hybrid environment configuration initialized successfully');
-      
-    } catch (error) {
-      console.error('❌ Failed to initialize hybrid environment configuration:', error);
-      
-      // Fallback to core config with defaults
-      const coreConfig = this.bootstrapCore();
-      this.fullConfig = {
-        ...coreConfig,
-        NODE_ENV: (import.meta.env.NODE_ENV as any) || 'production',
-        VITE_ENABLE_ANALYTICS: false,
-        VITE_ENABLE_DEBUG: import.meta.env.NODE_ENV === 'development',
-        VITE_API_TIMEOUT: 30000,
-        VITE_CAPACITOR_PLATFORM: 'web' as const,
-      };
-      
-      console.warn('⚠️ Using fallback configuration due to initialization failure');
-    }
-  }
-
-  /**
-   * Get the current configuration (may be incomplete if not fully initialized)
-   */
-  public getCurrent(): HybridConfig | null {
-    return this.fullConfig;
-  }
-
-  /**
-   * Get core Supabase configuration (always available after bootstrap)
-   */
-  public getCore(): z.infer<typeof coreSupabaseSchema> {
-    if (!this.coreConfig) {
-      return this.bootstrapCore();
-    }
+    this.coreConfig = result.data;
     return this.coreConfig;
   }
 
   /**
-   * Get configuration, initializing if necessary
+   * Initialize full configuration (async)
+   * Loads from local environment variables only
    */
-  public async get(): Promise<HybridConfig> {
-    if (!this.fullConfig || !this.isInitialized) {
-      return await this.initialize();
+  public async initialize(): Promise<HybridConfig> {
+    if (this.config) return this.config;
+
+    try {
+      // Gather all environment variables
+      const localEnv = this.getAllLocalEnvVars();
+
+      // Validate and transform
+      const result = extendedConfigSchema.safeParse(localEnv);
+      
+      if (!result.success) {
+        console.error('Configuration validation failed:', result.error.format());
+        throw new Error('Invalid configuration. Check console for details.');
+      }
+
+      this.config = result.data;
+      console.log('✅ Configuration loaded successfully');
+      return this.config;
+
+    } catch (error) {
+      console.error('Failed to initialize configuration:', error);
+      
+      // Fallback: Use core config + defaults
+      const coreConfig = this.bootstrapCore();
+      const fallbackConfig = extendedConfigSchema.parse({
+        ...coreConfig,
+        NODE_ENV: 'production',
+      });
+      
+      this.config = fallbackConfig;
+      console.warn('⚠️ Using fallback configuration');
+      return this.config;
     }
-    return this.fullConfig;
   }
 
   /**
-   * Force refresh configuration from remote
+   * Get current configuration (initializes if needed)
+   */
+  public async get(): Promise<HybridConfig> {
+    if (!this.config) {
+      return await this.initialize();
+    }
+    return this.config;
+  }
+
+  /**
+   * Force refresh configuration
    */
   public async refresh(): Promise<HybridConfig> {
-    this.isInitialized = false;
-    this.initializationPromise = null;
-    remoteConfig.clearCache();
+    this.config = null;
     return await this.initialize();
   }
 
-  // Convenience methods
-  public async isDevelopment(): Promise<boolean> {
-    const config = await this.get();
-    return config.NODE_ENV === 'development';
+  /**
+   * Helper: Check if development mode
+   */
+  public isDevelopment(): boolean {
+    return this.config?.NODE_ENV === 'development';
   }
 
-  public async isProduction(): Promise<boolean> {
-    const config = await this.get();
-    return config.NODE_ENV === 'production';
+  /**
+   * Helper: Check if production mode
+   */
+  public isProduction(): boolean {
+    return this.config?.NODE_ENV === 'production';
   }
 
-  public async isTest(): Promise<boolean> {
-    const config = await this.get();
-    return config.NODE_ENV === 'test';
-  }
-
-  public async getSupabaseConfig() {
-    const config = await this.get();
+  /**
+   * Helper: Get Supabase configuration
+   */
+  public getSupabaseConfig() {
+    const config = this.coreConfig || this.bootstrapCore();
     return {
       url: config.VITE_SUPABASE_URL,
       publishableKey: config.VITE_SUPABASE_PUBLISHABLE_KEY,
       projectId: config.VITE_SUPABASE_PROJECT_ID,
-      serviceRoleKey: config.VITE_SUPABASE_SERVICE_ROLE_KEY,
     };
   }
 
+  /**
+   * Helper: Get feature flags
+   */
   public async getFeatureFlags() {
     const config = await this.get();
     return {
-      enableAnalytics: config.VITE_ENABLE_ANALYTICS,
-      enableDebug: config.VITE_ENABLE_DEBUG,
+      analyticsEnabled: config.VITE_ENABLE_ANALYTICS,
+      debugEnabled: config.VITE_ENABLE_DEBUG,
+      useMockPlaces: config.VITE_USE_MOCK_PLACES,
+      useMockAI: config.VITE_USE_MOCK_AI,
     };
   }
 
+  /**
+   * Helper: Get API configuration
+   */
   public async getApiConfig() {
     const config = await this.get();
     return {
-      baseUrl: config.VITE_API_BASE_URL ?? config.VITE_SUPABASE_URL,
+      baseUrl: config.VITE_API_BASE_URL,
       timeout: config.VITE_API_TIMEOUT,
     };
+  }
+
+  private getAllLocalEnvVars(): Record<string, any> {
+    const env = import.meta.env;
+    const result: Record<string, any> = {};
+    
+    // Include all VITE_ prefixed variables and NODE_ENV
+    for (const [key, value] of Object.entries(env)) {
+      if (key.startsWith('VITE_') || key === 'NODE_ENV') {
+        result[key] = value;
+      }
+    }
+    
+    return result;
   }
 }
 
 // Export singleton instance
 export const hybridEnv = HybridEnvironmentConfig.getInstance();
 
-// Bootstrap core configuration immediately (synchronous)
-export const coreSupabaseConfig = hybridEnv.getCore();
+// Bootstrap core config immediately (synchronous, required for Supabase client)
+export const coreSupabaseConfig = hybridEnv.bootstrapCore();

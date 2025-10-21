@@ -1,6 +1,6 @@
 export type IntegrationStatus = 'active' | 'mock' | 'configured' | 'not_configured' | 'error';
 
-export type IntegrationCategory = 'analytics' | 'maps' | 'backend' | 'payments' | 'communications' | 'ai';
+export type IntegrationCategory = 'analytics' | 'maps' | 'backend' | 'payments' | 'communications' | 'ai' | 'rulesets';
 
 export interface IntegrationConfig {
   id: string;
