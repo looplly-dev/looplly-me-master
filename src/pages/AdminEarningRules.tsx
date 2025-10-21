@@ -82,7 +82,7 @@ interface JobDistribution {
 function AdminEarningRulesContent() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
-  const [userLookupEmail, setUserLookupEmail] = useState('');
+  const [userLookupInput, setUserLookupInput] = useState('');
   const [lookupResult, setLookupResult] = useState<any>(null);
 
   // Fetch rule statistics
@@ -179,19 +179,46 @@ function AdminEarningRulesContent() {
     setIsRefreshing(false);
   };
 
+  // Helper to detect input type
+  const detectInputType = (input: string): 'uuid' | 'email' | 'mobile' => {
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (uuidRegex.test(input)) return 'uuid';
+    if (input.includes('@')) return 'email';
+    return 'mobile';
+  };
+
   // User lookup handler
   const handleUserLookup = async () => {
-    if (!userLookupEmail.trim()) return;
+    const trimmedInput = userLookupInput.trim();
+    if (!trimmedInput) return;
 
     try {
-      const { data: profile } = await supabase
+      const inputType = detectInputType(trimmedInput);
+      
+      // Build query based on input type
+      let query = supabase
         .from('profiles')
-        .select('*, user_streaks(*)')
-        .eq('email', userLookupEmail.trim())
-        .single();
+        .select('*, user_streaks(*)');
+
+      switch (inputType) {
+        case 'uuid':
+          query = query.eq('user_id', trimmedInput);
+          break;
+        case 'email':
+          query = query.eq('email', trimmedInput);
+          break;
+        case 'mobile':
+          query = query.eq('mobile', trimmedInput);
+          break;
+      }
+
+      const { data: profile, error: profileError } = await query.maybeSingle();
+
+      if (profileError) throw profileError;
 
       if (!profile) {
-        setLookupResult({ error: 'User not found' });
+        const fieldName = inputType === 'uuid' ? 'user ID' : inputType;
+        setLookupResult({ error: `User not found with ${fieldName}: ${trimmedInput}` });
         return;
       }
 
@@ -449,10 +476,11 @@ function AdminEarningRulesContent() {
         <CardContent>
           <div className="flex gap-2 mb-4">
             <Input
-              placeholder="Enter user email..."
-              value={userLookupEmail}
-              onChange={(e) => setUserLookupEmail(e.target.value)}
+              placeholder="Enter email, mobile number, or user ID..."
+              value={userLookupInput}
+              onChange={(e) => setUserLookupInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleUserLookup()}
+              className="font-mono"
             />
             <Button onClick={handleUserLookup}>
               <Search className="h-4 w-4 mr-2" />
@@ -473,8 +501,8 @@ function AdminEarningRulesContent() {
                     <p className="font-semibold mb-1">
                       {lookupResult.profile.first_name} {lookupResult.profile.last_name}
                     </p>
-                    <p className="text-sm text-muted-foreground">
-                      {lookupResult.profile.email} • Country: {lookupResult.profile.country_iso} • Level: {lookupResult.profile.profile_level}
+                    <p className="text-sm text-muted-foreground font-mono">
+                      {lookupResult.profile.email} • Mobile: {lookupResult.profile.mobile || 'N/A'} • Country: {lookupResult.profile.country_iso} • Level: {lookupResult.profile.profile_level}
                     </p>
                   </div>
 
