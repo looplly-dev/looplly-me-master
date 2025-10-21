@@ -352,6 +352,47 @@ export type Database = {
           },
         ]
       }
+      auto_approval_config: {
+        Row: {
+          auto_approve_enabled: boolean | null
+          confidence_threshold: number | null
+          created_at: string | null
+          id: string
+          question_key: string
+          require_manual_review: boolean | null
+          tenant_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          auto_approve_enabled?: boolean | null
+          confidence_threshold?: number | null
+          created_at?: string | null
+          id?: string
+          question_key: string
+          require_manual_review?: boolean | null
+          tenant_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          auto_approve_enabled?: boolean | null
+          confidence_threshold?: number | null
+          created_at?: string | null
+          id?: string
+          question_key?: string
+          require_manual_review?: boolean | null
+          tenant_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "auto_approval_config_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       badge_catalog: {
         Row: {
           category: string | null
@@ -615,11 +656,93 @@ export type Database = {
           },
         ]
       }
+      country_profiling_gaps: {
+        Row: {
+          admin_feedback: string | null
+          ai_metadata: Json | null
+          confidence_score: number | null
+          country_code: string
+          country_iso: string
+          country_name: string
+          created_at: string | null
+          detected_at: string | null
+          draft_options: Json | null
+          generated_at: string | null
+          id: string
+          question_id: string
+          question_key: string
+          question_text: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string | null
+          tenant_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          admin_feedback?: string | null
+          ai_metadata?: Json | null
+          confidence_score?: number | null
+          country_code: string
+          country_iso: string
+          country_name: string
+          created_at?: string | null
+          detected_at?: string | null
+          draft_options?: Json | null
+          generated_at?: string | null
+          id?: string
+          question_id: string
+          question_key: string
+          question_text: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+          tenant_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          admin_feedback?: string | null
+          ai_metadata?: Json | null
+          confidence_score?: number | null
+          country_code?: string
+          country_iso?: string
+          country_name?: string
+          created_at?: string | null
+          detected_at?: string | null
+          draft_options?: Json | null
+          generated_at?: string | null
+          id?: string
+          question_id?: string
+          question_key?: string
+          question_text?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+          tenant_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "country_profiling_gaps_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "profile_questions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "country_profiling_gaps_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       country_question_options: {
         Row: {
           country_code: string
           created_at: string | null
           id: string
+          is_fallback: boolean | null
           metadata: Json | null
           options: Json
           question_id: string
@@ -629,6 +752,7 @@ export type Database = {
           country_code: string
           created_at?: string | null
           id?: string
+          is_fallback?: boolean | null
           metadata?: Json | null
           options: Json
           question_id: string
@@ -638,6 +762,7 @@ export type Database = {
           country_code?: string
           created_at?: string | null
           id?: string
+          is_fallback?: boolean | null
           metadata?: Json | null
           options?: Json
           question_id?: string

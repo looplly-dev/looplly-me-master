@@ -2,7 +2,7 @@
 
 ## 🎯 Vision
 
-Eliminate manual work for adding new countries to the Looplly platform. When a verified user signs up from Ethiopia, the system automatically researches Ethiopian household income ranges, local beverage brands, and automotive preferences—then presents Warren with draft options to approve in minutes, not days.
+Eliminate manual work for adding new countries to the Looplly platform. When a verified user signs up from Ethiopia, the system automatically researches Ethiopian household income ranges, local beverage brands, and automotive preferences—then presents admins with draft options to approve in minutes, not days.
 
 **Problem Solved**: Currently, adding a new country requires manual research, data entry, and testing. This creates a bottleneck that limits geographic expansion and delays time-to-market.
 
@@ -26,7 +26,7 @@ graph TD
     H --> I[Validate JSON Output]
     I --> J[Store Draft in DB]
     J --> K[Notify Admin Dashboard]
-    K --> L{Warren Reviews}
+    K --> L{Admin Reviews}
     L -->|Approve| M[Insert into country_question_options]
     L -->|Edit & Approve| N[Manual Adjustment]
     L -->|Reject| O[Flag for Regeneration]
@@ -275,7 +275,7 @@ async function generateCountryOptions(req: GenerateOptionsRequest) {
    - 80-89%: Recommend manual review
    - 90-100%: Eligible for auto-approval (if enabled)
 
-3. **Human Review**: Warren reviews all options before activation
+3. **Human Review**: Admin reviews all options before activation
 4. **A/B Testing**: Compare AI-generated vs. manually created options for known countries
 
 **Quality Metrics** (tracked in `/admin/analytics`):
@@ -313,9 +313,9 @@ async function generateCountryOptions(req: GenerateOptionsRequest) {
      "confidence": 85
    }
 8. Draft stored in country_profiling_gaps (status: pending)
-9. Warren sees notification in /admin/country-gaps
-10. Warren reviews: ✓ Looks good, currency correct, ranges realistic
-11. Warren clicks "Approve"
+9. Admin sees notification in /admin/country-gaps
+10. Admin reviews: ✓ Looks good, currency correct, ranges realistic
+11. Admin clicks "Approve"
 12. Options inserted into country_question_options for ET
 13. Future Ethiopian users see localized income dropdown
 ```
@@ -331,7 +331,7 @@ async function generateCountryOptions(req: GenerateOptionsRequest) {
    c. Fallback query: WHERE country_code = "GLOBAL" AND is_fallback = true
    d. Return generic income ranges with note: "These are generic ranges. Country-specific options pending."
 4. Trigger also fires to generate AU-specific options
-5. Warren approves AU options next day
+5. Admin approves AU options next day
 6. User's next session: sees AU-specific options
 ```
 
@@ -481,7 +481,7 @@ WHERE tenant_id = 'specific-tenant-id';
 
 ## 📚 Related Documentation
 
-- [Admin Auto-Generation Guide](./ADMIN_AUTO_GENERATION_GUIDE.md) - Warren's operational guide
+- [Admin Auto-Generation Guide](./ADMIN_AUTO_GENERATION_GUIDE.md) - Admin operational guide
 - [AI Generation Prompts](./AI_GENERATION_PROMPTS.md) - Prompt engineering library
 - [Country Question Management](./COUNTRY_QUESTION_MANAGEMENT.md) - Managing country-specific questions
 - [Question Builder Guide](./QUESTION_BUILDER_GUIDE.md) - Creating new profile questions
@@ -507,5 +507,5 @@ WHERE tenant_id = 'specific-tenant-id';
 ### Contact
 
 - **Dev Team**: For technical issues with edge function or database
-- **Warren**: For questions about approval workflow or quality standards
+- **Admin Team**: For questions about approval workflow or quality standards
 - **AI Prompt Issues**: See [AI_GENERATION_PROMPTS.md](./AI_GENERATION_PROMPTS.md) for refinement guidelines
