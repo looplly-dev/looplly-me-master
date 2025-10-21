@@ -11,6 +11,7 @@ import {
   Brain,
   Shield,
   Home,
+  CheckCircle2,
   ArrowRightLeft,
   Flame,
   Clock,
@@ -54,6 +55,7 @@ const adminNavItems = [
   { title: 'Analytics', url: '/admin/analytics', icon: BarChart3 },
   { title: 'Integrations', url: '/admin/integrations', icon: Plug },
   { title: 'AI Agents', url: '/admin/agents', icon: Brain },
+  { title: 'Earning Rules', url: '/admin/earning-rules', icon: CheckCircle2 },
   { title: 'Migration', url: '/admin/migration', icon: ArrowRightLeft },
 ];
 
@@ -137,6 +139,7 @@ function AdminBreadcrumb() {
       analytics: 'Analytics',
       integrations: 'Integrations',
       agents: 'AI Agents',
+      'earning-rules': 'Earning Rules',
       migration: 'Migration Helper',
     };
     return labels[segment] || segment.charAt(0).toUpperCase() + segment.slice(1);
