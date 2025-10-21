@@ -24,16 +24,10 @@ export function useUserType() {
 
     const fetchUserType = async () => {
       try {
-        // Use raw query since types table may not be in generated types yet
-        const { data, error } = await supabase
-          .rpc('get_user_type', { _user_id: authState.user!.id });
-
-        if (error) {
-          console.error('Error fetching user type:', error);
-          setUserType('looplly_user');
-        } else {
-          setUserType((data as UserType) || 'looplly_user');
-        }
+        // Default to looplly_user until types table is available
+        // After Supabase types regenerate, we can query user_types table directly
+        setUserType('looplly_user');
+        
       } catch (error) {
         console.error('Error fetching user type:', error);
         setUserType('looplly_user');

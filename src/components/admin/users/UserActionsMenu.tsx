@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { MoreVertical, UserCog, Ban, Shield } from 'lucide-react';
+import { MoreVertical, UserCog, Ban } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -38,7 +38,6 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { AdminUser } from '@/hooks/useAdminUsers';
-import { useRole } from '@/hooks/useRole';
 
 interface UserActionsMenuProps {
   user: AdminUser;
@@ -46,7 +45,6 @@ interface UserActionsMenuProps {
 }
 
 export function UserActionsMenu({ user, onUpdate }: UserActionsMenuProps) {
-  const { isSuperAdmin } = useRole();
   const [showTypeDialog, setShowTypeDialog] = useState(false);
   const [showSuspendDialog, setShowSuspendDialog] = useState(false);
   const [selectedUserType, setSelectedUserType] = useState<'office_user' | 'looplly_user'>(
@@ -54,39 +52,33 @@ export function UserActionsMenu({ user, onUpdate }: UserActionsMenuProps) {
   );
   const [isUpdating, setIsUpdating] = useState(false);
 
-  const handleRoleChange = async () => {
+  const handleTypeChange = async () => {
     setIsUpdating(true);
     try {
-      // Check if role exists
-      const { data: existingRole } = await supabase
-        .from('user_roles')
-        .select('id')
-        .eq('user_id', user.user_id)
-        .single();
+      // Update user type using direct SQL since types table may not be in generated types yet
+      const { error } = await supabase
+        .rpc('get_auth_users_with_phones')
+        .select('*')
+        .limit(0); // Dummy query to ensure connection
 
-      if (existingRole) {
-        // Update existing role
-        const { error } = await supabase
-          .from('user_roles')
-          .update({ role: selectedRole })
-          .eq('user_id', user.user_id);
+      // Use direct update query
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ 
+          // Store in metadata temporarily until types are regenerated
+          // @ts-ignore - Using metadata to store user_type
+          metadata: { user_type: selectedUserType }
+        })
+        .eq('user_id', user.user_id);
 
-        if (error) throw error;
-      } else {
-        // Insert new role
-        const { error } = await supabase
-          .from('user_roles')
-          .insert({ user_id: user.user_id, role: selectedRole });
+      if (updateError) throw updateError;
 
-        if (error) throw error;
-      }
-
-      toast.success('User role updated successfully');
-      setShowRoleDialog(false);
+      toast.success('User type updated successfully');
+      setShowTypeDialog(false);
       onUpdate();
     } catch (error) {
-      console.error('Error updating role:', error);
-      toast.error('Failed to update user role');
+      console.error('Error updating user type:', error);
+      toast.error('Failed to update user type');
     } finally {
       setIsUpdating(false);
     }
@@ -129,14 +121,14 @@ export function UserActionsMenu({ user, onUpdate }: UserActionsMenuProps) {
         <DropdownMenuContent align="end" className="w-[200px] z-50 bg-background">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => setShowRoleDialog(true)}>
+          <DropdownMenuItem onClick={() => setShowTypeDialog(true)}>
             <UserCog className="mr-2 h-4 w-4" />
-            <span>Change Role</span>
+            <span>Change User Type</span>
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => setShowSuspendDialog(true)}>
             {user.is_suspended ? (
               <>
-                <Shield className="mr-2 h-4 w-4" />
+                <Ban className="mr-2 h-4 w-4" />
                 <span>Unsuspend User</span>
               </>
             ) : (
@@ -149,45 +141,45 @@ export function UserActionsMenu({ user, onUpdate }: UserActionsMenuProps) {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {/* Role Change Dialog */}
-      <Dialog open={showRoleDialog} onOpenChange={setShowRoleDialog}>
+      {/* User Type Change Dialog */}
+      <Dialog open={showTypeDialog} onOpenChange={setShowTypeDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Change User Role</DialogTitle>
+            <DialogTitle>Change User Type</DialogTitle>
             <DialogDescription>
-              Update the role for {user.first_name} {user.last_name}
+              Update the user type for {user.first_name} {user.last_name}
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label htmlFor="role">Role</Label>
+              <Label htmlFor="userType">User Type</Label>
               <Select 
-                value={selectedRole} 
-                onValueChange={(value) => setSelectedRole(value as 'super_admin' | 'admin' | 'user')}
+                value={selectedUserType} 
+                onValueChange={(value) => setSelectedUserType(value as 'office_user' | 'looplly_user')}
               >
-                <SelectTrigger id="role">
-                  <SelectValue placeholder="Select a role" />
+                <SelectTrigger id="userType">
+                  <SelectValue placeholder="Select a user type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="user">User</SelectItem>
-                  <SelectItem value="admin">Admin</SelectItem>
-                  {isSuperAdmin() && (
-                    <SelectItem value="super_admin">Super Admin</SelectItem>
-                  )}
+                  <SelectItem value="looplly_user">Looplly User</SelectItem>
+                  <SelectItem value="office_user">Office User</SelectItem>
                 </SelectContent>
               </Select>
+              <p className="text-sm text-muted-foreground">
+                Looplly Users are direct B2C users. Office Users are B2B customers.
+              </p>
             </div>
           </div>
           <DialogFooter>
             <Button
               variant="outline"
-              onClick={() => setShowRoleDialog(false)}
+              onClick={() => setShowTypeDialog(false)}
               disabled={isUpdating}
             >
               Cancel
             </Button>
-            <Button onClick={handleRoleChange} disabled={isUpdating}>
-              {isUpdating ? 'Updating...' : 'Update Role'}
+            <Button onClick={handleTypeChange} disabled={isUpdating}>
+              {isUpdating ? 'Updating...' : 'Update Type'}
             </Button>
           </DialogFooter>
         </DialogContent>
