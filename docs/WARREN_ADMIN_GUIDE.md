@@ -79,60 +79,133 @@ Level 1 questions are identity and security fields tied to:
 
 ## User Visibility and Management
 
+### Two Management Pages: Team vs Users
+
+The admin system has **two separate pages** for managing different groups:
+
+#### 1. **Team Page** (`/admin/team`)
+- Shows **staff members only**: super_admins and admins
+- Used for internal team management
+- Admins can see regular admin colleagues, but NOT super admins
+- Super admins can see everyone on the team
+
+#### 2. **Users Page** (`/admin/users`)
+- Shows **platform users only**: office_user and looplly_user types
+- Used for managing the user base
+- This is where you manage customer accounts
+- All staff can see all platform users
+
 ### Role-Based Visibility Rules
 
 The system enforces **database-level security** to ensure proper separation of concerns:
 
 #### What Super Admins Can See:
-- ✅ **All users** (super admins, admins, and regular users)
+- ✅ **Team Page**: All staff (super admins + admins)
+- ✅ **Users Page**: All platform users (office_user + looplly_user)
 - ✅ Can view, edit, suspend, and manage anyone
 - ✅ Can assign any role including super_admin
 
 #### What Admins Can See:
-- ✅ **Regular users only** (users with 'user' role)
-- ❌ **Cannot see other admins**
-- ❌ **Cannot see super admins**
-- ✅ Can manage regular users (suspend, assign user/admin roles)
+- ✅ **Team Page**: Other regular admins only (NOT super admins)
+- ✅ **Users Page**: All platform users (office_user + looplly_user)
+- ✅ Can manage platform users (suspend, change user types)
+- ❌ Cannot see super admins on Team page
 - ❌ Cannot assign super_admin role (option hidden in UI)
 
 #### Security Implementation:
-- 🔒 **Database-level enforcement**: RLS policies prevent admins from querying admin/super_admin profiles
+- 🔒 **Database-level enforcement**: RLS policies prevent admins from querying super_admin profiles
 - 🔒 **Not just UI hiding**: Security is enforced at the database, not just frontend
 - 🔒 **Prevents privilege escalation**: Admins cannot attempt to contact or target super admins
+- 🔒 **Dual-table architecture**: Staff roles (`user_roles`) separate from user types (`user_types`)
 
 ### Why This Matters:
 - **Super admins remain invisible** to lower-tier admins for security
-- **Clear separation of concerns**: Admins focus on managing regular users
+- **Clear separation**: Staff management (Team) vs customer management (Users)
 - **Prevents social engineering**: Admins cannot identify who the super admins are
-- **Audit trail protection**: Super admin actions cannot be monitored by regular admins
+- **Scalable architecture**: Easy to add new roles or user types without conflicts
 
 ---
 
-## Assigning Roles
+## Assigning Roles and User Types
 
-### How to Change a User's Role:
+### Two Types of Changes: Staff Roles vs User Types
 
-1. Go to **Admin → Users**
-2. Find the user in the table
+The system separates **staff roles** (who can access admin panel) from **user types** (what kind of platform account they have).
+
+---
+
+### A. Changing Staff Roles (Team Page)
+
+**When to use**: Promoting/demoting staff members (super_admin, admin, user)
+
+**Steps**:
+1. Go to **Admin → Team**
+2. Find the staff member in the table
 3. Click the **⋮** (three dots) menu
 4. Select **"Change Role"**
 5. Choose from available roles:
-   - **User** (default)
-   - **Admin** (for regular administrators)
+   - **User** (revoke admin access)
+   - **Admin** (regular administrator)
    - **Super Admin** (⚠️ only visible if you're a super admin!)
 6. Confirm the change
 
-### Role Assignment Rules:
+**Role Assignment Rules**:
 - ✅ Super Admins can assign any role to anyone
 - ✅ Admins can assign `admin` or `user` roles only
 - ❌ Admins cannot see or assign `super_admin` role
-- ❌ Admins cannot modify other admin or super admin accounts
-- ❌ Users cannot change roles
+- ❌ Admins cannot modify super admin accounts
+- ❌ Regular users cannot change roles
+
+---
+
+### B. Changing User Types (Users Page)
+
+**When to use**: Changing what type of platform account a user has (office_user vs looplly_user)
+
+**Steps**:
+1. Go to **Admin → Users**
+2. Find the platform user in the table
+3. Click the **⋮** (three dots) menu
+4. Select **"Change User Type"**
+5. Choose from:
+   - **Office User** (for white-label office users)
+   - **Looplly User** (standard Looplly platform users)
+6. Confirm the change
+
+**User Type Rules**:
+- ✅ All staff (admins and super admins) can change user types
+- ✅ User types only apply to platform users, not staff
+- ✅ Changing user type affects what features they see in the app
+
+---
+
+### Understanding User Types
+
+**Office User** (`office_user`):
+- White-label users from office partnerships
+- May have different branding
+- May have restricted features based on office agreements
+- Example: Users from "Acme Corp Office" partnership
+
+**Looplly User** (`looplly_user`):
+- Standard Looplly platform users
+- Full access to all Looplly features
+- Standard branding and experience
+- Example: Users who signed up directly on looplly.me
+
+**Why This Matters**:
+- Some surveys/features are only available to Looplly users
+- Office users may have custom earning structures
+- Helps with analytics and reporting (segmentation)
+- Allows for partner-specific configurations
+
+---
 
 ### Important Notes:
 - If you're an admin and don't see the "Super Admin" option, **this is intentional** for security
 - If you need to promote someone to super admin, ask an existing super admin
 - Only super admins can demote other super admins
+- User types only appear on the Users page, not the Team page
 
 ---
 

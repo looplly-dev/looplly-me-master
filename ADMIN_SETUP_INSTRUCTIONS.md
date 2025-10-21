@@ -10,14 +10,14 @@
 4. Run the migration
 
 This will:
-- Create the `app_role` enum with values: 'admin', 'moderator', 'user'
+- Create the `app_role` enum with values: 'super_admin', 'admin', 'user'
 - Create the `user_roles` table with proper RLS policies
-- Add the `has_role()` security definer function to prevent RLS recursion
-- Set up secure role-based access control
+- Add the `has_role()` and `has_role_or_higher()` security definer functions to prevent RLS recursion
+- Set up secure role-based access control with hierarchy
 
-### Step 2: Grant Admin Role to nadia@looplly.me
+### Step 2: Grant Super Admin Role to nadia@looplly.me
 
-After running the migration, you need to grant the admin role. Follow these steps:
+After running the migration, you need to grant the super admin role. Follow these steps:
 
 1. **First, find the user_id for nadia@looplly.me:**
    ```sql
@@ -25,16 +25,21 @@ After running the migration, you need to grant the admin role. Follow these step
    ```
    Copy the `id` value (it will be a UUID like: `a1b2c3d4-e5f6-7890-abcd-ef1234567890`)
 
-2. **Then, insert the admin role:**
+2. **Then, insert the super_admin role:**
    ```sql
    INSERT INTO public.user_roles (user_id, role) 
-   VALUES ('PASTE_USER_ID_HERE', 'admin');
+   VALUES ('PASTE_USER_ID_HERE', 'super_admin');
    ```
    Replace `PASTE_USER_ID_HERE` with the actual user_id from step 1.
 
+**Note**: Super admins have the highest level of access, including the ability to:
+- Edit Level 1 (immutable) profile questions
+- Assign any role including other super_admins
+- View and manage all users regardless of their role
+
 3. **Verify the role was granted:**
    ```sql
-   SELECT * FROM public.user_roles WHERE role = 'admin';
+   SELECT * FROM public.user_roles WHERE role = 'super_admin';
    ```
 
 ### Step 3: Test Admin Access
@@ -44,9 +49,11 @@ After running the migration, you need to grant the admin role. Follow these step
 3. Navigate to `/admin` - you should see the new admin dashboard with sidebar
 4. Try accessing different admin pages:
    - `/admin` - Dashboard
-   - `/admin/users` - User Management
+   - `/admin/team` - Team Management (staff only: super_admins and admins)
+   - `/admin/users` - User Management (platform users only)
    - `/admin/content` - Content Creation
-   - `/admin/badges` - Badge Generator (previously accessible)
+   - `/admin/badges` - Badge Generator
+   - `/admin/questions` - Profile Questions Management
    - `/admin/redemptions` - Redemption Management
    - `/admin/analytics` - Analytics
 
@@ -55,13 +62,16 @@ After running the migration, you need to grant the admin role. Follow these step
 ### What's New
 
 1. **Unified Admin Layout** with collapsible sidebar navigation
-2. **Protected Routes** - All admin pages now require 'admin' role
+2. **Protected Routes** - All admin pages now require 'admin' or 'super_admin' role
 3. **Breadcrumb Navigation** - Shows current location in admin panel
-4. **Six Admin Sections:**
+4. **Dual-Table Role System** - Separate tables for staff roles and user types
+5. **Seven Admin Sections:**
    - **Dashboard** - Overview stats and quick actions
-   - **Users** - Search and manage user accounts
+   - **Team** - Manage staff members (super_admins and admins)
+   - **Users** - Search and manage platform users (office_user, looplly_user)
    - **Content** - Create surveys, videos, and tasks
-   - **Badges** - AI-powered badge generator (existing feature)
+   - **Badges** - AI-powered badge generator
+   - **Questions** - Profile questions and decay configuration
    - **Redemptions** - Approve/reject user redemption requests
    - **Analytics** - Platform metrics and insights
 
@@ -74,13 +84,18 @@ After running the migration, you need to grant the admin role. Follow these step
 
 ## Security Features
 
-✅ **Role-based access control** - Only users with 'admin' role can access admin pages
+✅ **Role-based access control** - Only users with 'admin' or 'super_admin' role can access admin pages
+✅ **Role hierarchy** - super_admin > admin > user with proper privilege escalation protection
 ✅ **Protected routes** - Unauthorized users see "Access Denied" message
-✅ **Secure role checking** - Uses security definer function to prevent RLS issues
+✅ **Secure role checking** - Uses security definer functions to prevent RLS issues
+✅ **Dual-table architecture** - Separate tables for staff roles and user types
 ✅ **Audit-ready** - All admin actions can be logged (Phase 3)
 
 ## Related Documentation
 
+- [Role Architecture](docs/ROLE_ARCHITECTURE.md) - Understanding the dual-table role system
+- [User Type Management](docs/USER_TYPE_MANAGEMENT.md) - Managing office vs Looplly users
+- [Warren's Admin Guide](docs/WARREN_ADMIN_GUIDE.md) - Plain-English admin guide
 - [Profile System Admin Guide](docs/PROFILING/ADMIN_GUIDE.md) - Managing profile questions and decay
 - [Profiling System Docs](docs/PROFILING/README.md) - Complete profiling documentation
 

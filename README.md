@@ -104,6 +104,27 @@ For detailed setup instructions, see:
 - [Environment Setup Guide](docs/ENVIRONMENT_SETUP.md) - Traditional .env management
 - [Supabase Configuration Management](docs/SUPABASE_CONFIG_MANAGEMENT.md) - Dynamic configuration system
 
+### Admin & Security Documentation
+- [Admin Setup Instructions](ADMIN_SETUP_INSTRUCTIONS.md) - Setting up admin access
+- [Role Architecture](docs/ROLE_ARCHITECTURE.md) - Understanding the dual-table role system
+- [User Type Management](docs/USER_TYPE_MANAGEMENT.md) - Managing office vs Looplly users
+- [Warren's Admin Guide](docs/WARREN_ADMIN_GUIDE.md) - Plain-English admin guide for non-technical users
+
+## 🔐 Admin System
+
+The project uses a **dual-table role management system**:
+- **Staff Roles** (`user_roles` table): super_admin, admin, user
+- **User Types** (`user_types` table): office_user, looplly_user
+
+This separation provides:
+- ✅ Clear conceptual separation between staff and platform users
+- ✅ Enhanced security with separate RLS policies
+- ✅ Role hierarchy enforcement (super_admin > admin > user)
+- ✅ Scalable architecture for adding new roles/types
+- ✅ Protection against privilege escalation attacks
+
+See [Role Architecture](docs/ROLE_ARCHITECTURE.md) for detailed technical documentation.
+
 ## 🚀 Deployment
 
 Simply open [Lovable](https://lovable.dev/projects/b924d040-e3a7-4d1f-94fa-b78b84f2f3ff) and click on Share -> Publish.
