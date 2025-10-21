@@ -148,11 +148,47 @@ class IntegrationStatusService {
     };
   }
 
+  private checkAIProvider(): IntegrationConfig {
+    const apiKey = import.meta.env.VITE_AI_PROVIDER_API_KEY;
+    const useMock = import.meta.env.VITE_USE_MOCK_AI === 'true';
+    const provider = import.meta.env.VITE_AI_PROVIDER || 'not_set';
+    
+    let status: IntegrationStatus;
+    if (apiKey && !useMock) {
+      status = 'active';
+    } else if (useMock || !apiKey) {
+      status = 'mock';
+    } else {
+      status = 'not_configured';
+    }
+    
+    return {
+      id: 'ai-provider',
+      name: 'AI Provider',
+      description: 'AI model for generating country-specific profiling options',
+      category: 'ai',
+      status,
+      isRequired: false,
+      configKeys: ['VITE_AI_PROVIDER_API_KEY', 'VITE_AI_PROVIDER', 'VITE_USE_MOCK_AI'],
+      configuredKeys: apiKey ? ['VITE_AI_PROVIDER_API_KEY', 'VITE_AI_PROVIDER'] : [],
+      features: ['Country Options Generation', 'Income Range Research', 'Brand Research', 'Market Data Localization'],
+      metadata: {
+        mockMode: useMock || !apiKey,
+        provider: provider,
+        note: !apiKey ? 'Currently using mock data for development' : undefined
+      },
+      documentationUrl: '/docs/PROFILING/AI_GENERATION_PROMPTS.md',
+      healthCheck: true,
+      lastChecked: new Date()
+    };
+  }
+
   async getIntegrationStatus(): Promise<IntegrationStatusResponse> {
     const integrations: IntegrationConfig[] = [
       this.checkGoogleAnalytics(),
       this.checkGooglePlaces(),
       this.checkLovableCloud(),
+      this.checkAIProvider(),
       this.checkEmailService(),
       this.checkPaymentGateway(),
       this.checkSMSService()

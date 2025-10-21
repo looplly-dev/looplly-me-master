@@ -84,6 +84,21 @@ const envSchema = z.object({
     .string()
     .transform((val) => val === 'true')
     .default('true'),
+
+  // Optional: AI Provider Configuration
+  VITE_AI_PROVIDER_API_KEY: z
+    .string()
+    .min(1, 'AI Provider API key is required')
+    .optional(),
+  
+  VITE_AI_PROVIDER: z
+    .enum(['openai', 'anthropic', 'google', 'mock'])
+    .default('mock'),
+  
+  VITE_USE_MOCK_AI: z
+    .string()
+    .transform((val) => val === 'true')
+    .default('true'),
 });
 
 /**
@@ -128,6 +143,9 @@ class EnvironmentConfig {
         VITE_CAPACITOR_PLATFORM: import.meta.env.VITE_CAPACITOR_PLATFORM,
         VITE_GOOGLE_PLACES_API_KEY: import.meta.env.VITE_GOOGLE_PLACES_API_KEY,
         VITE_USE_MOCK_PLACES: import.meta.env.VITE_USE_MOCK_PLACES,
+        VITE_AI_PROVIDER_API_KEY: import.meta.env.VITE_AI_PROVIDER_API_KEY,
+        VITE_AI_PROVIDER: import.meta.env.VITE_AI_PROVIDER,
+        VITE_USE_MOCK_AI: import.meta.env.VITE_USE_MOCK_AI,
       };
 
       return envSchema.parse(env);

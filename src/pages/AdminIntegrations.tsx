@@ -14,7 +14,8 @@ import {
   ExternalLink,
   RefreshCw,
   PlayCircle,
-  Search
+  Search,
+  Sparkles
 } from 'lucide-react';
 import type { IntegrationConfig, IntegrationStatus } from '@/types/integrations';
 import { toast } from 'sonner';
@@ -23,6 +24,8 @@ import { useDebounce } from '@/hooks/use-debounce';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { supabase } from '@/integrations/supabase/client';
 
 const statusConfig: Record<IntegrationStatus, { icon: any; className: string; label: string }> = {
   active: { icon: CheckCircle2, className: 'bg-green-500/20 text-green-700 dark:text-green-400', label: 'Active' },
@@ -37,7 +40,8 @@ const categoryIcons = {
   maps: '🗺️',
   backend: '☁️',
   payments: '💳',
-  communications: '📧'
+  communications: '📧',
+  ai: '🤖'
 };
 
 const categoryLabels = {
@@ -45,7 +49,8 @@ const categoryLabels = {
   maps: 'Maps & Location Services',
   backend: 'Backend Infrastructure',
   payments: 'Payment Processing',
-  communications: 'Communications'
+  communications: 'Communications',
+  ai: 'AI & Machine Learning'
 };
 
 function IntegrationCard({ integration }: { integration: IntegrationConfig }) {
@@ -58,6 +63,13 @@ function IntegrationCard({ integration }: { integration: IntegrationConfig }) {
   const [testResults, setTestResults] = useState<any[]>([]);
   const [isTesting, setIsTesting] = useState(false);
   const [selectedPlace, setSelectedPlace] = useState<any>(null);
+  
+  // AI Provider state
+  const [showAIConfigModal, setShowAIConfigModal] = useState(false);
+  const [aiProvider, setAIProvider] = useState<'openai' | 'anthropic' | 'google'>('openai');
+  const [aiApiKey, setAIApiKey] = useState('');
+  const [testPrompt, setTestPrompt] = useState('Generate 5 household income ranges for South Africa.');
+  const [aiTestResults, setAITestResults] = useState<any>(null);
 
   const handleTest = async () => {
     const result = await testMutation.mutateAsync(integration.id);
@@ -150,6 +162,50 @@ function IntegrationCard({ integration }: { integration: IntegrationConfig }) {
     }
   };
 
+  // AI Provider handlers
+  const handleTestAI = async () => {
+    if (!aiApiKey.trim()) {
+      toast.error('Please enter an API key');
+      return;
+    }
+
+    setIsTesting(true);
+    setAITestResults(null);
+    
+    try {
+      const { data, error } = await supabase.functions.invoke('test-ai-provider', {
+        body: { 
+          provider: aiProvider,
+          apiKey: aiApiKey,
+          prompt: testPrompt 
+        }
+      });
+      
+      if (error) throw error;
+      
+      setAITestResults(data);
+      toast.success('AI provider test successful');
+    } catch (error) {
+      toast.error('AI provider test failed: ' + (error as Error).message);
+      setAITestResults({ error: (error as Error).message });
+    } finally {
+      setIsTesting(false);
+    }
+  };
+
+  const handleConfigureAI = async () => {
+    if (!aiApiKey.trim()) {
+      toast.error('Please enter an API key');
+      return;
+    }
+    
+    toast.success('API key configuration initiated. Add VITE_AI_PROVIDER_API_KEY and VITE_AI_PROVIDER secrets.');
+    setShowAIConfigModal(false);
+    setAIApiKey('');
+    setTestPrompt('Generate 5 household income ranges for South Africa.');
+    setAITestResults(null);
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -237,6 +293,16 @@ function IntegrationCard({ integration }: { integration: IntegrationConfig }) {
               Configure API Key
             </Button>
           )}
+          {integration.id === 'ai-provider' && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setShowAIConfigModal(true)}
+            >
+              <Settings2 className="h-3 w-3 mr-1" />
+              Configure AI Provider
+            </Button>
+          )}
           {integration.documentationUrl && (
             <Button size="sm" variant="ghost" asChild>
               <a href={integration.documentationUrl} target="_blank" rel="noopener noreferrer">
@@ -246,6 +312,80 @@ function IntegrationCard({ integration }: { integration: IntegrationConfig }) {
             </Button>
           )}
         </div>
+
+        {/* Configuration Modal for AI Provider */}
+        {integration.id === 'ai-provider' && (
+          <Dialog open={showAIConfigModal} onOpenChange={setShowAIConfigModal}>
+            <DialogContent className="sm:max-w-[650px] max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Configure AI Provider</DialogTitle>
+                <DialogDescription>
+                  Choose your AI provider and test the integration before saving.
+                </DialogDescription>
+              </DialogHeader>
+              
+              <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <Label>AI Provider</Label>
+                  <Select value={aiProvider} onValueChange={(v: any) => setAIProvider(v)}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="openai">OpenAI (GPT-4)</SelectItem>
+                      <SelectItem value="anthropic">Anthropic (Claude)</SelectItem>
+                      <SelectItem value="google">Google (Gemini Pro)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="ai-api-key">API Key</Label>
+                  <Textarea
+                    id="ai-api-key"
+                    placeholder="Enter your AI provider API key..."
+                    value={aiApiKey}
+                    onChange={(e) => setAIApiKey(e.target.value)}
+                    className="font-mono text-sm"
+                    rows={3}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Test Prompt</Label>
+                  <Textarea
+                    placeholder="Test prompt..."
+                    value={testPrompt}
+                    onChange={(e) => setTestPrompt(e.target.value)}
+                    rows={3}
+                  />
+                  <Button onClick={handleTestAI} disabled={!aiApiKey.trim() || isTesting}>
+                    <Sparkles className="h-4 w-4 mr-2" />
+                    {isTesting ? 'Testing...' : 'Test AI Provider'}
+                  </Button>
+                </div>
+
+                {aiTestResults && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-sm">Test Results</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <pre className="text-xs overflow-x-auto">{JSON.stringify(aiTestResults, null, 2)}</pre>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setShowAIConfigModal(false)}>Cancel</Button>
+                <Button onClick={handleConfigureAI} disabled={!aiApiKey.trim()}>
+                  Save Configuration
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        )}
 
         {/* Configuration Modal for Google Places API */}
         {integration.id === 'google-places' && (
