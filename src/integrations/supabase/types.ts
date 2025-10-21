@@ -1550,6 +1550,13 @@ export type Database = {
         Args: { p_role: string; p_user_id: string }
         Returns: boolean
       }
+      has_role_or_higher: {
+        Args: {
+          _required_role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
       log_audit_event: {
         Args: {
           p_action: string
@@ -1568,7 +1575,7 @@ export type Database = {
     }
     Enums: {
       agent_status: "active" | "inactive" | "testing"
-      app_role: "admin" | "user"
+      app_role: "admin" | "user" | "super_admin"
       config_data_type: "string" | "number" | "boolean" | "json"
       dependency_type: "triggers" | "requires" | "observes"
       execution_status: "success" | "failure" | "timeout" | "cancelled"
@@ -1700,7 +1707,7 @@ export const Constants = {
   public: {
     Enums: {
       agent_status: ["active", "inactive", "testing"],
-      app_role: ["admin", "user"],
+      app_role: ["admin", "user", "super_admin"],
       config_data_type: ["string", "number", "boolean", "json"],
       dependency_type: ["triggers", "requires", "observes"],
       execution_status: ["success", "failure", "timeout", "cancelled"],

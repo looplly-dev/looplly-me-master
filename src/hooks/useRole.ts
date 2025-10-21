@@ -3,7 +3,14 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 
-export type UserRole = 'admin' | 'user' | null;
+export type UserRole = 'super_admin' | 'admin' | 'user' | null;
+
+// Role hierarchy levels
+const ROLE_HIERARCHY: Record<NonNullable<UserRole>, number> = {
+  super_admin: 3,
+  admin: 2,
+  user: 1,
+};
 
 export function useRole() {
   const [role, setRole] = useState<UserRole>(null);
@@ -29,7 +36,7 @@ export function useRole() {
           console.error('Error fetching user role:', error);
           setRole('user'); // Default to user role
         } else {
-          setRole(data?.role || 'user');
+          setRole((data?.role as UserRole) || 'user');
         }
       } catch (error) {
         console.error('Error fetching user role:', error);
@@ -42,18 +49,46 @@ export function useRole() {
     fetchUserRole();
   }, [authState.user]);
 
+  /**
+   * Check if user has the required role or higher in the hierarchy
+   * super_admin > admin > user
+   */
   const hasRole = (requiredRole: UserRole): boolean => {
     if (!role || !requiredRole) return false;
-    if (requiredRole === 'admin') return role === 'admin';
-    return true; // 'user' role can access user-level content
+    
+    const userLevel = ROLE_HIERARCHY[role] || 0;
+    const requiredLevel = ROLE_HIERARCHY[requiredRole] || 0;
+    
+    return userLevel >= requiredLevel;
   };
 
-  const isAdmin = (): boolean => role === 'admin';
+  /**
+   * Check if user is admin or super_admin
+   */
+  const isAdmin = (): boolean => {
+    return role === 'admin' || role === 'super_admin';
+  };
+
+  /**
+   * Check if user is super_admin specifically
+   */
+  const isSuperAdmin = (): boolean => {
+    return role === 'super_admin';
+  };
+
+  /**
+   * Get numeric role level (higher = more permissions)
+   */
+  const getRoleLevel = (): number => {
+    return role ? (ROLE_HIERARCHY[role] || 0) : 0;
+  };
 
   return {
     role,
     isLoading,
     hasRole,
     isAdmin,
+    isSuperAdmin,
+    getRoleLevel,
   };
 }

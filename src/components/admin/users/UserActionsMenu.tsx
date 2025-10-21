@@ -47,8 +47,8 @@ interface UserActionsMenuProps {
 export function UserActionsMenu({ user, onUpdate }: UserActionsMenuProps) {
   const [showRoleDialog, setShowRoleDialog] = useState(false);
   const [showSuspendDialog, setShowSuspendDialog] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<'admin' | 'user'>(
-    (user.role as 'admin' | 'user') || 'user'
+  const [selectedRole, setSelectedRole] = useState<'super_admin' | 'admin' | 'user'>(
+    (user.role as 'super_admin' | 'admin' | 'user') || 'user'
   );
   const [isUpdating, setIsUpdating] = useState(false);
 
@@ -161,7 +161,7 @@ export function UserActionsMenu({ user, onUpdate }: UserActionsMenuProps) {
               <Label htmlFor="role">Role</Label>
               <Select 
                 value={selectedRole} 
-                onValueChange={(value) => setSelectedRole(value as 'admin' | 'user')}
+                onValueChange={(value) => setSelectedRole(value as 'super_admin' | 'admin' | 'user')}
               >
                 <SelectTrigger id="role">
                   <SelectValue placeholder="Select a role" />
@@ -169,6 +169,7 @@ export function UserActionsMenu({ user, onUpdate }: UserActionsMenuProps) {
                 <SelectContent>
                   <SelectItem value="user">User</SelectItem>
                   <SelectItem value="admin">Admin</SelectItem>
+                  <SelectItem value="super_admin">Super Admin</SelectItem>
                 </SelectContent>
               </Select>
             </div>

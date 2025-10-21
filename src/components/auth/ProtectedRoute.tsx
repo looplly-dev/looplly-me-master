@@ -50,7 +50,7 @@ export default function ProtectedRoute({
     );
   }
 
-  // Insufficient permissions
+  // Insufficient permissions (using hierarchical role check)
   if (requiredRole && !hasRole(requiredRole)) {
     return fallback || (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -58,9 +58,11 @@ export default function ProtectedRoute({
           <CardContent className="pt-6 text-center">
             <Shield className="h-12 w-12 text-destructive mx-auto mb-4" />
             <h2 className="text-xl font-semibold mb-2">Access Denied</h2>
-            <p className="text-muted-foreground mb-6">
+            <p className="text-muted-foreground mb-2">
               You don't have permission to access this content.
-              {requiredRole === 'admin' && ' Admin access required.'}
+            </p>
+            <p className="text-sm text-muted-foreground mb-6">
+              Required role: <span className="font-mono">{requiredRole}</span>
             </p>
             <Button variant="secondary" onClick={() => navigate('/dashboard')}>
               Go to Dashboard

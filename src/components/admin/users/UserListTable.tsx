@@ -12,6 +12,22 @@ import { CheckCircle2, XCircle, User, Ban } from 'lucide-react';
 import { format } from 'date-fns';
 import { UserActionsMenu } from './UserActionsMenu';
 
+const getRoleBadgeVariant = (role: string | null) => {
+  switch (role) {
+    case 'super_admin': 
+      return 'destructive'; // Red - highest power
+    case 'admin': 
+      return 'default'; // Blue
+    default: 
+      return 'outline'; // Gray
+  }
+};
+
+const getRoleLabel = (role: string | null) => {
+  if (!role) return 'USER';
+  return role.replace('_', ' ').toUpperCase();
+};
+
 interface UserListTableProps {
   users: AdminUser[];
   onUpdate: () => void;
@@ -64,10 +80,8 @@ export function UserListTable({ users, onUpdate }: UserListTableProps) {
                 )}
               </TableCell>
               <TableCell>
-                <Badge
-                  variant={user.role === 'admin' ? 'default' : 'secondary'}
-                >
-                  {user.role}
+                <Badge variant={getRoleBadgeVariant(user.role)}>
+                  {getRoleLabel(user.role)}
                 </Badge>
               </TableCell>
               <TableCell>

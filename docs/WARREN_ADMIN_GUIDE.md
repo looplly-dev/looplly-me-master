@@ -5,6 +5,126 @@ Welcome, Warren! This guide is written in **plain English** (no jargon) to help 
 
 ---
 
+## Role Hierarchy
+
+The Looplly admin system uses a **3-tier role hierarchy**:
+
+```
+super_admin (Level 3) ─┐
+                       ├─> admin (Level 2) ─┐
+                                             ├─> user (Level 1)
+                                             ─┘
+```
+
+### 1. Super Admin (`super_admin`)
+- **Highest level access**
+- ✅ Can edit Level 1 (immutable) questions
+- ✅ Can assign/change any user's role (including other admins)
+- ✅ Full access to all admin features
+- ⚠️ **Use with extreme caution** - actions affect entire system
+
+### 2. Admin (`admin`)
+- ✅ Can manage Level 2 and 3 questions
+- ✅ Can moderate users and content
+- ✅ Can view analytics and reports
+- ❌ Cannot edit Level 1 questions
+- ❌ Cannot assign super_admin role
+
+### 3. User (`user`)
+- Standard platform access
+- No administrative capabilities
+
+---
+
+## Super Admin Capabilities
+
+### Editing Level 1 Questions
+
+⚠️ **CRITICAL SECURITY WARNING**
+
+Level 1 questions are identity and security fields tied to:
+- User authentication
+- Fraud prevention algorithms
+- KYC verification status
+- Data isolation queries
+
+**Only Super Admins can edit these fields.**
+
+#### How to Edit Level 1 Questions:
+
+1. Navigate to **Admin → Questions → Level 1 tab**
+2. As a Super Admin, you'll see: **"🔓 Super Admin: Level 1 Questions Unlocked"**
+3. Click **Edit** or **Settings** on any Level 1 question
+4. Make changes carefully
+5. **Test thoroughly in staging before deploying to production**
+
+#### Level 1 Question Types:
+- First Name
+- Last Name  
+- Mobile Number
+- Date of Birth
+- Address
+- Country Code / ISO
+
+#### Risks of Editing Level 1:
+- ❌ May break user authentication
+- ❌ May affect fraud detection accuracy
+- ❌ May invalidate KYC verification
+- ❌ May break data isolation queries
+- ❌ Changes affect **all users** immediately
+
+**Best Practice**: Create a test user, apply changes, verify behavior before rolling out system-wide.
+
+---
+
+## Assigning Roles
+
+### How to Change a User's Role:
+
+1. Go to **Admin → Users**
+2. Find the user in the table
+3. Click the **⋮** (three dots) menu
+4. Select **"Change Role"**
+5. Choose from:
+   - User (default)
+   - Admin
+   - Super Admin (⚠️ use sparingly!)
+6. Confirm the change
+
+### Role Assignment Rules:
+- ✅ Super Admins can assign any role to anyone
+- ✅ Admins can assign `admin` or `user` roles
+- ❌ Admins cannot create Super Admins
+- ❌ Users cannot change roles
+
+---
+
+## Security Best Practices
+
+1. **Limit Super Admin Accounts**: Only assign to trusted team members
+2. **Audit Changes**: All Level 1 edits should be logged (future feature)
+3. **Test in Staging**: Never edit Level 1 questions directly in production
+4. **Document Changes**: Keep a record of what was changed and why
+5. **Review Regularly**: Audit who has super_admin access quarterly
+
+---
+
+## Troubleshooting
+
+**Q: I don't see the "Edit" button on Level 1 questions**
+A: Check your role badge in the top-right. Only Super Admins can edit Level 1.
+
+**Q: I want to make another admin a Super Admin**
+A: Go to Admin → Users → Find user → Change Role → Super Admin
+
+**Q: Can I demote myself from Super Admin?**
+A: Yes, but make sure at least one other Super Admin exists first!
+
+**Q: Level 1 questions are showing errors after editing**
+A: Contact engineering immediately. Level 1 changes can break critical systems.
+
+---
+
 ## Table of Contents
 
 1. [Adding a New Country (Step-by-Step)](#section-1-adding-a-new-country)

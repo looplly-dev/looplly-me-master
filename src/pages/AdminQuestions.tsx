@@ -1,12 +1,27 @@
+/**
+ * LEVEL 1 QUESTION EDITING - SUPER ADMIN ONLY
+ * 
+ * Security Warning: Level 1 questions are immutable identity fields.
+ * Editing them can affect:
+ * - User authentication (mobile, email)
+ * - Fraud prevention (name, DOB, address)
+ * - KYC verification status
+ * - Data isolation queries (country codes)
+ * 
+ * Only Super Admins can edit Level 1. Regular admins see these as locked.
+ * Always test changes in staging before production deployment.
+ */
+
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import AdminLayout from '@/components/admin/AdminLayout';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
+import { useRole } from '@/hooks/useRole';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { Plus, Info, AlertTriangle, Lightbulb } from 'lucide-react';
+import { Plus, Info, AlertTriangle, Lightbulb, ShieldCheck } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { QuestionInlineCard } from '@/components/admin/questions/QuestionInlineCard';
@@ -14,6 +29,7 @@ import { CountryOptionsDialog } from '@/components/admin/questions/CountryOption
 import { AddQuestionWizard } from '@/components/admin/questions/AddQuestionWizard';
 
 function AdminQuestionsContent() {
+  const { isSuperAdmin } = useRole();
   const [countryOptionsQuestion, setCountryOptionsQuestion] = useState<any>(null);
   const [showAddWizard, setShowAddWizard] = useState(false);
   const [selectedLevel, setSelectedLevel] = useState<number | null>(null);
@@ -97,15 +113,32 @@ function AdminQuestionsContent() {
         </TabsList>
 
         <TabsContent value="1" className="space-y-4 mt-6">
-          <Alert className="border-blue-500 bg-blue-50 dark:bg-blue-950">
-            <Info className="h-4 w-4 text-blue-600" />
-            <AlertTitle className="text-blue-900 dark:text-blue-100">
-              Level 1 Questions Are Locked
+          <Alert className={isSuperAdmin() 
+            ? "border-green-500 bg-green-50 dark:bg-green-950" 
+            : "border-blue-500 bg-blue-50 dark:bg-blue-950"
+          }>
+            {isSuperAdmin() ? (
+              <ShieldCheck className="h-4 w-4 text-green-600" />
+            ) : (
+              <Info className="h-4 w-4 text-blue-600" />
+            )}
+            <AlertTitle className={isSuperAdmin() 
+              ? "text-green-900 dark:text-green-100" 
+              : "text-blue-900 dark:text-blue-100"
+            }>
+              {isSuperAdmin() 
+                ? "🔓 Super Admin: Level 1 Questions Unlocked" 
+                : "🔒 Level 1 Questions Are Locked"
+              }
             </AlertTitle>
-            <AlertDescription className="text-blue-800 dark:text-blue-200">
-              Level 1 contains identity and security fields (name, mobile, address). 
-              These are immutable and tied to fraud prevention logic. 
-              Contact the development team if changes are required.
+            <AlertDescription className={isSuperAdmin() 
+              ? "text-green-800 dark:text-green-200" 
+              : "text-blue-800 dark:text-blue-200"
+            }>
+              {isSuperAdmin() 
+                ? "You can edit Level 1 identity and security fields. Use caution—these fields are tied to fraud prevention logic and affect all users."
+                : "Level 1 contains identity and security fields (name, mobile, address). These are immutable and tied to fraud prevention logic. Contact a Super Admin if changes are required."
+              }
             </AlertDescription>
           </Alert>
 
@@ -127,7 +160,7 @@ function AdminQuestionsContent() {
                     question={question}
                     decayLabel={getDecayLabel(question)}
                     onManageCountries={() => setCountryOptionsQuestion(question)}
-                    isEditable={false}
+                    isEditable={isSuperAdmin()}
                   />
                 ))}
               </CardContent>

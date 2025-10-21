@@ -3,6 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Edit, Settings, Globe, MapPin, Eye, EyeOff } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { useRole } from '@/hooks/useRole';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -56,6 +57,7 @@ export function QuestionInlineCard({
   onManageCountries,
   isEditable = true
 }: QuestionInlineCardProps) {
+  const { isSuperAdmin } = useRole();
   const [showPublishDialog, setShowPublishDialog] = useState(false);
   const queryClient = useQueryClient();
 
@@ -168,7 +170,12 @@ export function QuestionInlineCard({
             </TooltipTrigger>
             {!isEditable && (
               <TooltipContent>
-                <p>Level 1 questions are locked</p>
+                <p className="text-sm">
+                  {isSuperAdmin() 
+                    ? "Level 1 questions require Super Admin access" 
+                    : "Level 1 questions are locked (Super Admin only)"
+                  }
+                </p>
               </TooltipContent>
             )}
           </Tooltip>
@@ -188,7 +195,12 @@ export function QuestionInlineCard({
             </TooltipTrigger>
             {!isEditable && (
               <TooltipContent>
-                <p>Level 1 questions are locked</p>
+                <p className="text-sm">
+                  {isSuperAdmin() 
+                    ? "Level 1 questions require Super Admin access" 
+                    : "Level 1 questions are locked (Super Admin only)"
+                  }
+                </p>
               </TooltipContent>
             )}
           </Tooltip>
