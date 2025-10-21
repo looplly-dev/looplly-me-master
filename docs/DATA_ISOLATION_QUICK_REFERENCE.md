@@ -2,7 +2,21 @@
 
 ## 🎯 Core Principle
 
-**Every query MUST filter by `country_code` to prevent cross-country data pollution.**
+**Every query MUST filter by country to prevent cross-country data pollution.**
+
+## Country Code Format (IMPORTANT!)
+
+The system uses **dual country columns**:
+- `profiles.country_code` = Dial code (e.g., `+27`) - **Source of Truth**
+- `profiles.country_iso` = ISO code (e.g., `ZA`) - **Auto-derived via DB trigger**
+
+**For queries, use `country_iso` for better readability:**
+```sql
+WHERE p.country_iso = 'NG'     -- ✅ Preferred (readable)
+WHERE p.country_code = '+234'  -- ✅ Also works (source of truth)
+```
+
+📖 **Full documentation**: [COUNTRY_CODE_SPECIFICATION.md](./COUNTRY_CODE_SPECIFICATION.md)
 
 ---
 
@@ -10,16 +24,16 @@
 
 ### Verify User's Country
 ```sql
-SELECT user_id, country_code, first_name, last_name 
+SELECT user_id, country_code, country_iso, first_name, last_name 
 FROM profiles 
 WHERE user_id = 'YOUR_USER_ID';
 ```
 
 ### Count Users Per Country
 ```sql
-SELECT country_code, COUNT(*) as user_count 
+SELECT country_iso, country_code, COUNT(*) as user_count 
 FROM profiles 
-GROUP BY country_code 
+GROUP BY country_iso, country_code 
 ORDER BY user_count DESC;
 ```
 
@@ -47,7 +61,7 @@ SELECT
 FROM profile_answers pa
 JOIN profiles p ON p.user_id = pa.user_id
 JOIN profile_questions pq ON pq.id = pa.question_id
-WHERE p.country_code = 'NG'
+WHERE p.country_iso = 'NG'
   AND pq.question_key = 'household_income'
 GROUP BY pa.answer_normalized
 ORDER BY users DESC;
@@ -72,7 +86,7 @@ COPY (
   FROM profile_answers pa
   JOIN profiles p ON p.user_id = pa.user_id
   JOIN profile_questions pq ON pq.id = pa.question_id
-  WHERE p.country_code = 'NG'
+  WHERE p.country_iso = 'NG'
 ) TO '/tmp/nigeria_data.csv' WITH CSV HEADER;
 ```
 
@@ -97,7 +111,7 @@ SELECT answer_normalized, COUNT(*)
 FROM profile_answers pa
 JOIN profiles p ON p.user_id = pa.user_id
 JOIN profile_questions pq ON pq.id = pa.question_id
-WHERE p.country_code = 'NG'
+WHERE p.country_iso = 'NG'
   AND pq.question_key = 'household_income'
 GROUP BY answer_normalized;
 ```
@@ -108,8 +122,9 @@ GROUP BY answer_normalized;
 
 | Layer | Mechanism | Protection |
 |-------|-----------|------------|
-| **User** | `profiles.country_code` (immutable) | User assigned to one country |
-| **Answer** | `profile_answers.user_id` → `profiles.country_code` | Answers linked to user's country |
+| **User** | `profiles.country_code` (immutable dial code) | User assigned to one country |
+| **ISO Code** | `profiles.country_iso` (auto-derived) | Readable country identifier |
+| **Answer** | `profile_answers.user_id` → `profiles.country_iso` | Answers linked to user's country |
 | **Query** | `find_users_by_criteria(country_code, ...)` | Function enforces country filter |
 
 ---
@@ -118,16 +133,16 @@ GROUP BY answer_normalized;
 
 1. **Always use indexes**:
    ```sql
-   -- Check if index is used
-   EXPLAIN ANALYZE SELECT * FROM profiles WHERE country_code = 'NG';
-   -- Should show: "Index Scan using idx_profiles_country"
+   -- Check if index is used (prefer country_iso)
+   EXPLAIN ANALYZE SELECT * FROM profiles WHERE country_iso = 'NG';
+   -- Should show: "Index Scan using idx_profiles_country_iso"
    ```
 
 2. **Filter early**:
    ```sql
    -- GOOD: Filter by country first
    WITH nigeria_users AS (
-     SELECT user_id FROM profiles WHERE country_code = 'NG'
+     SELECT user_id FROM profiles WHERE country_iso = 'NG'
    )
    SELECT pa.* 
    FROM profile_answers pa
@@ -180,20 +195,21 @@ FROM profile_answers;
 
 | Issue | Solution |
 |-------|----------|
-| Query returns users from wrong country | Add `WHERE p.country_code = 'XX'` to JOIN with profiles |
+| Query returns users from wrong country | Add `WHERE p.country_iso = 'XX'` to JOIN with profiles |
 | Income ranges look wrong | Verify you're using country-specific options (check `country_question_options` table) |
-| Slow queries | Ensure `country_code` filter uses index (`EXPLAIN ANALYZE`) |
+| Slow queries | Ensure `country_iso` filter uses index (`EXPLAIN ANALYZE`) |
 | No results for targeting query | Check that users exist in that country AND have answered the required questions |
 
 ---
 
 ## 💡 Pro Tips
 
-1. **Always JOIN profiles table** when querying `profile_answers` to access `country_code`
-2. **Use `find_users_by_criteria()`** for targeting - it has isolation built-in
-3. **Verify country filter** in your WHERE clause before running expensive queries
-4. **Export per-country datasets** for ML - never train models on mixed-country data
-5. **Monitor data quality** with orphaned answer checks weekly
+1. **Always JOIN profiles table** when querying `profile_answers` to access `country_iso`
+2. **Use ISO codes (`country_iso`)** for readable queries, dial codes (`country_code`) remain source of truth
+3. **Use `find_users_by_criteria()`** for targeting - it has isolation built-in
+4. **Verify country filter** in your WHERE clause before running expensive queries
+5. **Export per-country datasets** for ML - never train models on mixed-country data
+6. **Monitor data quality** with orphaned answer checks weekly
 
 ---
 

@@ -52,16 +52,21 @@ export const useProfileQuestions = () => {
     queryFn: async () => {
       if (!userId) throw new Error('User not authenticated');
 
-      // Get user's country code
+      // Get user's country code (ISO format preferred for filtering)
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
-        .select('country_code')
+        .select('country_code, country_iso')
         .eq('user_id', userId)
         .single();
 
       if (profileError) throw profileError;
 
-      const userCountry = profile?.country_code || 'ZA'; // Default to South Africa
+      // Use ISO code for filtering (ZA, NG, etc.), fall back to dial code if needed
+      const userCountry = profile?.country_iso || profile?.country_code || 'ZA';
+      
+      if (!profile?.country_iso && !profile?.country_code) {
+        console.warn('User has no country set, defaulting to South Africa');
+      }
 
       // Fetch categories with questions and decay config
       const { data: categories, error: categoriesError } = await supabase

@@ -30,3 +30,26 @@ export const validateCountryCode = (dialCode: string): boolean => {
 export const getAllCountries = (): Country[] => {
   return [...countries];
 };
+
+/**
+ * Get ISO code from dial code
+ * Mirrors the database function get_country_iso_from_dial_code()
+ * 
+ * @param dialCode - Phone dial code with + prefix (e.g., '+27')
+ * @returns ISO 3166-1 alpha-2 code (e.g., 'ZA') or undefined
+ */
+export const getISOFromDialCode = (dialCode: string): string | undefined => {
+  const country = getCountryByDialCode(dialCode);
+  return country?.code;
+};
+
+/**
+ * Get dial code from ISO code
+ * 
+ * @param isoCode - ISO 3166-1 alpha-2 code (e.g., 'ZA')
+ * @returns Phone dial code with + prefix (e.g., '+27') or undefined
+ */
+export const getDialCodeFromISO = (isoCode: string): string | undefined => {
+  const country = getCountryByCode(isoCode);
+  return country?.dialCode;
+};

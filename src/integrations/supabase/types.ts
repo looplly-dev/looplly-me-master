@@ -981,6 +981,7 @@ export type Database = {
           address: string | null
           badge_preview_mode: boolean | null
           country_code: string | null
+          country_iso: string | null
           created_at: string | null
           date_of_birth: string | null
           email: string | null
@@ -1006,6 +1007,7 @@ export type Database = {
           address?: string | null
           badge_preview_mode?: boolean | null
           country_code?: string | null
+          country_iso?: string | null
           created_at?: string | null
           date_of_birth?: string | null
           email?: string | null
@@ -1031,6 +1033,7 @@ export type Database = {
           address?: string | null
           badge_preview_mode?: boolean | null
           country_code?: string | null
+          country_iso?: string | null
           created_at?: string | null
           date_of_birth?: string | null
           email?: string | null
@@ -1527,6 +1530,10 @@ export type Database = {
           phone: string
           user_id: string
         }[]
+      }
+      get_country_iso_from_dial_code: {
+        Args: { p_dial_code: string }
+        Returns: string
       }
       get_targeting_values_by_question: {
         Args: { p_country_code: string; p_question_key: string }

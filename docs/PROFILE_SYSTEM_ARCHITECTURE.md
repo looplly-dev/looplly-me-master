@@ -992,26 +992,54 @@ AdminQuestionsPage
 
 ## 7. Country-Specific Data Isolation & Engineering Guarantees
 
-### 7.1 Architecture Guarantee: No Cross-Country Pollution
+### 7.1 Country Identification Strategy
+
+The system uses a **dual-column approach** for country identification:
+
+#### `country_code` (Dial Code) - Source of Truth
+- **Purpose**: User identification via mobile number
+- **Format**: Dial code with `+` prefix (e.g., `+27`, `+234`)
+- **Source**: Selected during registration from mobile country picker
+- **Immutable**: Never changes after account creation
+- **Use Cases**: Mobile number formatting, SMS delivery routing, user authentication
+
+#### `country_iso` (ISO Code) - Auto-Derived
+- **Purpose**: Data segmentation, queries, integrations
+- **Format**: 2-letter ISO 3166-1 alpha-2 code (e.g., `ZA`, `NG`)
+- **Source**: Auto-derived from `country_code` via database trigger
+- **Use Cases**: Profile question filtering, analytics, external API integrations
+
+**Data Flow:**
+```
+User Registration → country_code = '+27' → [Trigger Fires] → country_iso = 'ZA'
+```
+
+📖 **Full documentation**: [COUNTRY_CODE_SPECIFICATION.md](./COUNTRY_CODE_SPECIFICATION.md)
+
+---
+
+### 7.2 Architecture Guarantee: No Cross-Country Pollution
 
 The system implements **three-layer protection** to ensure data from different countries never mixes:
 
 #### Layer 1: User Layer
 - `country_code` stored in `profiles` table (immutable after mobile verification)
-- Derived from verified mobile number's country code
+- Derived from verified mobile number's dial code prefix
+- `country_iso` automatically populated via database trigger
 - Cannot be changed without admin intervention
 
 #### Layer 2: Answer Layer
 - All answers in `profile_answers` linked to `user_id`
-- `user_id` links to `country_code` via `profiles` table
+- `user_id` links to `country_code` and `country_iso` via `profiles` table
 - Even if question is globally available, answer is country-tagged via user
 
 #### Layer 3: Query Layer
-- All targeting SQL functions enforce `country_code` filter
+- All targeting SQL functions enforce country filter (prefer `country_iso` for readability)
 - Example from `find_users_by_criteria()`:
   ```sql
   WHERE 
-    p.country_code = p_country_code  -- ← Hardcoded country filter
+    p.country_iso = p_country_iso  -- ← Readable ISO code filter
+    -- OR p.country_code = p_country_code (also valid, uses dial code)
     AND pa.targeting_metadata->>'question_key' = criteria.key
   ```
 
