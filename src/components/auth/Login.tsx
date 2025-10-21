@@ -7,6 +7,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { Eye, EyeOff, UserPlus } from 'lucide-react';
+import { analytics } from '@/utils/analytics';
 
 interface LoginProps {
   onForgotPassword: () => void;
@@ -38,6 +39,9 @@ export default function Login({ onForgotPassword, onRegister }: LoginProps) {
       return;
     }
 
+    // Track login attempt
+    analytics.trackLoginAttempt('email');
+
     setIsSubmitting(true);
     
     try {
@@ -45,15 +49,25 @@ export default function Login({ onForgotPassword, onRegister }: LoginProps) {
       const success = await login(formData.email, formData.password);
       
       if (!success) {
+        // Track login failure
+        analytics.trackLogin('email', false);
+        
         toast({
           title: 'Login Failed',
           description: 'Invalid email or password. Please try again or create an account.',
           variant: 'destructive'
         });
         setShowSignupPrompt(true);
+      } else {
+        // Track login success
+        analytics.trackLogin('email', true);
       }
     } catch (error: any) {
       console.error('Login component error:', error);
+      
+      // Track login failure
+      analytics.trackLogin('email', false);
+      
       toast({
         title: 'Login Error',
         description: error?.message || 'Something went wrong. Please try again.',
@@ -66,6 +80,9 @@ export default function Login({ onForgotPassword, onRegister }: LoginProps) {
   };
 
   const handleSignupRedirect = () => {
+    // Track signup redirect
+    analytics.trackButtonClick('create_account_click', 'authentication', 'from_login');
+    
     // Pass the email to the register form for a seamless experience
     onRegister();
   };
@@ -176,7 +193,10 @@ export default function Login({ onForgotPassword, onRegister }: LoginProps) {
                 type="button"
                 variant="link"
                 className="p-0 h-auto text-primary"
-                onClick={onForgotPassword}
+                onClick={() => {
+                  analytics.trackButtonClick('forgot_password_click', 'authentication');
+                  onForgotPassword();
+                }}
               >
                 Forgot Password?
               </Button>

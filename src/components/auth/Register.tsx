@@ -13,6 +13,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { deleteConflictingUser } from '@/utils/deleteConflictingUser';
 import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
+import { analytics } from '@/utils/analytics';
 
 interface RegisterProps {
   onBack: () => void;
@@ -61,17 +62,26 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
       return;
     }
 
+    // Track signup start
+    analytics.trackSignupStart('email');
+
     setIsSubmitting(true);
     
     try {
       const success = await register(formData);
       if (success) {
+        // Track successful signup
+        analytics.trackSignup('email', true);
+        
         toast({
           title: 'Account Created!',
           description: 'Please verify your account with the OTP sent to your mobile.',
         });
         onOTPRequired();
       } else {
+        // Track signup failure
+        analytics.trackSignup('email', false);
+        
         toast({
           title: 'Error',
           description: 'Failed to create account. Please try again.',
@@ -80,6 +90,9 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
       }
     } catch (error: any) {
       console.error('Registration catch block error:', error);
+      
+      // Track signup failure
+      analytics.trackSignup('email', false);
       
       if (error?.code === 'user_already_exists' || error?.message?.includes('User already registered') || error?.name === 'AuthApiError') {
         toast({

@@ -51,6 +51,7 @@ import { useProfileQuestions } from '@/hooks/useProfileQuestions';
 import { useStaleProfileCheck } from '@/hooks/useStaleProfileCheck';
 import { ProfileUpdateModal } from '@/components/dashboard/ProfileUpdateModal';
 import { useNavigate } from 'react-router-dom';
+import { analytics } from '@/utils/analytics';
 
 export default function SimplifiedEarnTab() {
   const navigate = useNavigate();
@@ -120,6 +121,9 @@ export default function SimplifiedEarnTab() {
     const currentStreak = userStats.streaks.currentStreak + 1;
     const repReward = currentStreak >= 30 ? 25 : currentStreak >= 14 ? 15 : currentStreak >= 7 ? 10 : 5;
     
+    // Track daily check-in
+    analytics.trackDailyCheckin(currentStreak, repReward);
+    
     // Add Rep increase with progressive rewards
     addTransaction({
       type: 'bonus',
@@ -144,6 +148,14 @@ export default function SimplifiedEarnTab() {
   };
 
   const handleStartTask = (type: string, title: string, reward: number) => {
+    // Track task click
+    analytics.trackEarningActivity(
+      type as 'survey' | 'video' | 'task', 
+      'click', 
+      title, 
+      reward
+    );
+    
     // More celebratory feedback
     toast({
       title: '✨ Task Started!',
@@ -183,6 +195,10 @@ export default function SimplifiedEarnTab() {
     };
     
     const earnings = earningsMap[type];
+    
+    // Track data sharing toggle
+    analytics.trackDataSharing(nameMap[type], checked, earnings);
+    
     const action = checked ? 'Opted In' : 'Opted Out';
     const description = checked 
       ? `You'll now earn $${earnings.toFixed(2)}/month from ${nameMap[type]} data sharing.`
@@ -329,7 +345,10 @@ export default function SimplifiedEarnTab() {
             </ul>
           </CardContent>
         </Card>
-        <Button onClick={() => navigate('/profile')} size="lg" className="text-lg px-8 py-6">
+        <Button onClick={() => {
+          analytics.trackProfileComplete();
+          navigate('/profile');
+        }} size="lg" className="text-lg px-8 py-6">
           <ArrowRight className="h-5 w-5 mr-2" />
           Complete Profile Now
         </Button>

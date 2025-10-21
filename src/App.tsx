@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import AuthProvider from "./components/auth/AuthProvider";
+import { useAnalytics } from "./hooks/useAnalytics";
 import LoopllyApp from "./components/LoopllyApp";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminUsers from "./pages/AdminUsers";
@@ -23,15 +24,12 @@ import ResetPassword from "./components/auth/ResetPassword";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <HelmetProvider>
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <AuthProvider>
-          <BrowserRouter>
-            <Routes>
+const AppContent = () => {
+  // Track page views automatically on route changes
+  useAnalytics();
+  
+  return (
+    <Routes>
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/admin/users" element={<AdminUsers />} />
               <Route path="/admin/content" element={<AdminContent />} />
@@ -48,6 +46,18 @@ const App = () => (
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/*" element={<LoopllyApp />} />
             </Routes>
+  );
+};
+
+const App = () => (
+  <HelmetProvider>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <AuthProvider>
+          <BrowserRouter>
+            <AppContent />
           </BrowserRouter>
         </AuthProvider>
       </TooltipProvider>

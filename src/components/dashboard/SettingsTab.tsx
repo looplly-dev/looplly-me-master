@@ -20,6 +20,7 @@ import {
   Save,
   X
 } from 'lucide-react';
+import { analytics } from '@/utils/analytics';
 
 export default function ProfileTab() {
   const { authState } = useAuth();
@@ -37,6 +38,9 @@ export default function ProfileTab() {
   const { toast } = useToast();
 
   const handleSave = () => {
+    // Track settings save
+    analytics.trackSettingsSave('profile');
+    
     // Mock save functionality
     toast({
       title: 'Profile Updated',

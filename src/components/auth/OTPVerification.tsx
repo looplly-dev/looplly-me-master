@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, Shield } from 'lucide-react';
+import { analytics } from '@/utils/analytics';
 
 interface OTPVerificationProps {
   onBack: () => void;
@@ -68,12 +69,18 @@ export default function OTPVerification({ onBack, onSuccess }: OTPVerificationPr
     try {
       const success = await verifyOTP(otpCode);
       if (success) {
+        // Track OTP success
+        analytics.trackOTPSubmit(true);
+        
         toast({
           title: 'Verified!',
           description: 'Your account has been verified. Please log in.',
         });
         onSuccess();
       } else {
+        // Track OTP failure
+        analytics.trackOTPSubmit(false);
+        
         toast({
           title: 'Invalid Code',
           description: 'The verification code is incorrect. Please try again.',
@@ -82,6 +89,9 @@ export default function OTPVerification({ onBack, onSuccess }: OTPVerificationPr
         setOtp(['', '', '', '', '']);
       }
     } catch (error) {
+      // Track OTP failure
+      analytics.trackOTPSubmit(false);
+      
       toast({
         title: 'Error',
         description: 'Something went wrong. Please try again.',
@@ -93,6 +103,9 @@ export default function OTPVerification({ onBack, onSuccess }: OTPVerificationPr
   };
 
   const handleResend = () => {
+    // Track OTP resend
+    analytics.trackOTPResend();
+    
     setResendTimer(30);
     setCanResend(false);
     toast({

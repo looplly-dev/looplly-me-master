@@ -7,6 +7,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { Coins, Wallet, User, Users, Trophy, MessageSquare, LogOut, Settings as SettingsIcon, HelpCircle, Shield, Moon, Sun } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { HeaderActionsMenu } from './HeaderActionsMenu';
+import { analytics } from '@/utils/analytics';
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -113,6 +114,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
               <Link
                 key={item.path}
                 to={item.path}
+                onClick={() => {
+                  analytics.trackNavigation(location.pathname, item.path, 'bottom_nav');
+                }}
                 className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors ${
                   isActive(item.path)
                     ? 'text-primary bg-primary/10'

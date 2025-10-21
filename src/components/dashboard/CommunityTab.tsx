@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import { mockCommunityPosts, type CommunityPost } from '@/mock_data';
 import { useToast } from '@/hooks/use-toast';
+import { analytics } from '@/utils/analytics';
 
 export default function CommunityTab() {
   const [posts, setPosts] = useState<CommunityPost[]>(mockCommunityPosts);
@@ -74,6 +75,9 @@ export default function CommunityTab() {
       });
       return;
     }
+
+    // Track community post creation
+    analytics.trackCommunityPost('create');
 
     // Mock LLM moderation
     const relevanceScore = Math.random() * 40 + 60; // 60-100
