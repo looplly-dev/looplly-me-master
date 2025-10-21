@@ -9,7 +9,10 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
+import { Sparkles, Loader2, RefreshCw, Check } from 'lucide-react';
 
 interface CountryOptionsDialogProps {
   question: any;
@@ -22,6 +25,9 @@ export function CountryOptionsDialog({ question, onClose }: CountryOptionsDialog
   const [selectedCountry, setSelectedCountry] = useState(question.country_codes?.[0] || 'ZA');
   const [countryOptions, setCountryOptions] = useState<Record<string, any>>({});
   const [countryMetadata, setCountryMetadata] = useState<Record<string, any>>({});
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [showPreviewModal, setShowPreviewModal] = useState(false);
+  const [generatedPreview, setGeneratedPreview] = useState<any>(null);
 
   // Fetch existing country options
   const { data: existingOptions } = useQuery({
@@ -97,6 +103,67 @@ export function CountryOptionsDialog({ question, onClose }: CountryOptionsDialog
     }));
   };
 
+  const handleAutoGenerate = async (countryCode: string) => {
+    setIsGenerating(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('auto-generate-country-options', {
+        body: {
+          gapId: `manual-${Date.now()}`,
+          countryCode,
+          questionId: question.id,
+          questionKey: question.question_key
+        }
+      });
+      
+      if (error) throw error;
+      
+      // Fetch the generated options from database
+      const { data: gapData } = await supabase
+        .from('country_profiling_gaps')
+        .select('draft_options, confidence_score')
+        .eq('question_id', question.id)
+        .eq('country_code', countryCode)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+      
+      if (gapData?.draft_options) {
+        const draftOptions = gapData.draft_options as any;
+        setGeneratedPreview({
+          countryCode,
+          options: draftOptions.options || [],
+          confidence: gapData.confidence_score,
+          sources: draftOptions.sources || [],
+          notes: draftOptions.notes
+        });
+        setShowPreviewModal(true);
+        toast({ title: `Generated ${draftOptions.options?.length || 0} options` });
+      } else {
+        toast({ title: 'Generation completed but no data found', variant: 'destructive' });
+      }
+    } catch (error: any) {
+      toast({
+        title: 'Generation failed',
+        description: error.message,
+        variant: 'destructive'
+      });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleApproveGenerated = () => {
+    if (!generatedPreview) return;
+    
+    setCountryOptions(prev => ({
+      ...prev,
+      [generatedPreview.countryCode]: generatedPreview.options
+    }));
+    
+    setShowPreviewModal(false);
+    toast({ title: 'Options applied! Review and save when ready.' });
+  };
+
   return (
     <Dialog open={true} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -116,7 +183,27 @@ export function CountryOptionsDialog({ question, onClose }: CountryOptionsDialog
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-4">
                   <div>
-                    <Label>Options JSON</Label>
+                    <div className="flex items-center justify-between mb-2">
+                      <Label>Options JSON</Label>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleAutoGenerate(cc)}
+                        disabled={isGenerating}
+                      >
+                        {isGenerating ? (
+                          <>
+                            <Loader2 className="mr-2 h-3 w-3 animate-spin" />
+                            Generating...
+                          </>
+                        ) : (
+                          <>
+                            <Sparkles className="mr-2 h-3 w-3" />
+                            Auto-Generate
+                          </>
+                        )}
+                      </Button>
+                    </div>
                     <Textarea
                       value={JSON.stringify(countryOptions[cc] || [], null, 2)}
                       onChange={(e) => updateOptions(cc, e.target.value)}
@@ -183,6 +270,80 @@ export function CountryOptionsDialog({ question, onClose }: CountryOptionsDialog
           </Button>
         </DialogFooter>
       </DialogContent>
+
+      {/* AI Generation Preview Modal */}
+      <Dialog open={showPreviewModal} onOpenChange={setShowPreviewModal}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>AI-Generated Options Preview</DialogTitle>
+          </DialogHeader>
+          
+          {generatedPreview && (
+            <div className="space-y-4">
+              <Card className="p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <Label>Confidence Score</Label>
+                  <Badge variant={generatedPreview.confidence >= 80 ? 'default' : 'secondary'}>
+                    {generatedPreview.confidence}%
+                  </Badge>
+                </div>
+                <Progress value={generatedPreview.confidence} className="h-2" />
+              </Card>
+              
+              <Card className="p-4">
+                <Label className="mb-2 block">
+                  Generated Options ({generatedPreview.options.length})
+                </Label>
+                <div className="space-y-2 max-h-64 overflow-y-auto">
+                  {generatedPreview.options.map((opt: any, idx: number) => (
+                    <div key={idx} className="flex items-start gap-2 p-2 border rounded text-sm">
+                      <div className="flex-1">
+                        <div className="font-medium">{opt.label}</div>
+                        <div className="text-xs text-muted-foreground">
+                          Value: {opt.value}
+                          {opt.local_context && ` • ${opt.local_context}`}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+              
+              <Card className="p-4">
+                <Label className="mb-2 block">Sources & Notes</Label>
+                <div className="space-y-1 text-sm text-muted-foreground">
+                  <div><strong>Sources:</strong> {generatedPreview.sources.join(', ')}</div>
+                  {generatedPreview.notes && (
+                    <div><strong>Notes:</strong> {generatedPreview.notes}</div>
+                  )}
+                </div>
+              </Card>
+            </div>
+          )}
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowPreviewModal(false)}>
+              Cancel
+            </Button>
+            <Button 
+              variant="outline"
+              onClick={() => {
+                setShowPreviewModal(false);
+                if (generatedPreview) {
+                  handleAutoGenerate(generatedPreview.countryCode);
+                }
+              }}
+            >
+              <RefreshCw className="mr-2 h-4 w-4" />
+              Regenerate
+            </Button>
+            <Button onClick={handleApproveGenerated}>
+              <Check className="mr-2 h-4 w-4" />
+              Approve & Apply
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Dialog>
   );
 }

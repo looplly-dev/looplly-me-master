@@ -183,11 +183,19 @@ function IntegrationCard({ integration }: { integration: IntegrationConfig }) {
       
       if (error) throw error;
       
-      setAITestResults(data);
-      toast.success('AI provider test successful');
+      // Check if the data itself contains an error
+      if (data?.error) {
+        setAITestResults({ error: data.error });
+        toast.error(`Test failed: ${data.error}`);
+      } else {
+        setAITestResults(data);
+        const optionCount = data?.options?.length || 0;
+        toast.success(`Test successful! Generated ${optionCount} options.`);
+      }
     } catch (error) {
-      toast.error('AI provider test failed: ' + (error as Error).message);
-      setAITestResults({ error: (error as Error).message });
+      const errorMsg = (error as Error).message;
+      toast.error('AI provider test failed: ' + errorMsg);
+      setAITestResults({ error: errorMsg });
     } finally {
       setIsTesting(false);
     }
@@ -199,7 +207,13 @@ function IntegrationCard({ integration }: { integration: IntegrationConfig }) {
       return;
     }
     
-    toast.success('API key configuration initiated. Add VITE_AI_PROVIDER_API_KEY and VITE_AI_PROVIDER secrets.');
+    toast.success(
+      'Configuration saved. Now add secrets in Backend: ' +
+      '1) AI_PROVIDER = "' + aiProvider + '" ' +
+      '2) AI_PROVIDER_API_KEY = "<your key>"',
+      { duration: 8000 }
+    );
+    
     setShowAIConfigModal(false);
     setAIApiKey('');
     setTestPrompt('Generate 5 household income ranges for South Africa.');

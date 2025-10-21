@@ -190,6 +190,228 @@ function sanitizeOutput(options: AIGeneratedOptions): AIGeneratedOptions {
   };
 }
 
+function parseAIResponse(content: string): AIGeneratedOptions {
+  let jsonContent = content.trim();
+  
+  // Remove markdown code blocks
+  if (jsonContent.startsWith('```json')) {
+    jsonContent = jsonContent.replace(/```json\n?/, '').replace(/\n?```$/, '');
+  } else if (jsonContent.startsWith('```')) {
+    jsonContent = jsonContent.replace(/```\n?/, '').replace(/\n?```$/, '');
+  }
+  
+  // Remove leading text before JSON
+  const jsonStart = jsonContent.indexOf('{');
+  if (jsonStart > 0) {
+    jsonContent = jsonContent.substring(jsonStart);
+  }
+  
+  try {
+    const parsed = JSON.parse(jsonContent);
+    
+    // Validate structure
+    if (!parsed.options || !Array.isArray(parsed.options)) {
+      throw new Error('Missing or invalid "options" array');
+    }
+    
+    return parsed as AIGeneratedOptions;
+  } catch (error) {
+    console.error('[AUTO-GEN] JSON parse error:', error);
+    console.error('[AUTO-GEN] Raw content:', content);
+    throw new Error(`Failed to parse AI response: ${error instanceof Error ? error.message : 'Invalid JSON'}`);
+  }
+}
+
+async function callOpenAI(prompt: string, apiKey: string): Promise<AIGeneratedOptions> {
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: 'gpt-4',
+      messages: [
+        { role: 'system', content: 'You are a market research expert specializing in localization. Always respond with valid JSON only.' },
+        { role: 'user', content: prompt }
+      ],
+      temperature: 0.3,
+      max_tokens: 2000
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    if (response.status === 401) {
+      throw new Error('OpenAI API key is invalid. Please check your configuration.');
+    } else if (response.status === 429) {
+      throw new Error('OpenAI rate limit exceeded. Please try again later.');
+    } else if (response.status === 402) {
+      throw new Error('OpenAI payment required. Please check your billing.');
+    }
+    throw new Error(`OpenAI API error (${response.status}): ${errorText}`);
+  }
+
+  const data = await response.json();
+  const content = data.choices?.[0]?.message?.content;
+  
+  if (!content) {
+    throw new Error('OpenAI returned empty response');
+  }
+
+  return parseAIResponse(content);
+}
+
+async function callAnthropic(prompt: string, apiKey: string): Promise<AIGeneratedOptions> {
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: 'claude-3-sonnet-20240229',
+      max_tokens: 4096,
+      messages: [{
+        role: 'user',
+        content: prompt
+      }],
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    if (response.status === 401) {
+      throw new Error('Anthropic API key is invalid. Please check your configuration.');
+    } else if (response.status === 429) {
+      throw new Error('Anthropic rate limit exceeded. Please try again later.');
+    } else if (response.status === 402) {
+      throw new Error('Anthropic payment required. Please check your billing.');
+    }
+    throw new Error(`Anthropic API error (${response.status}): ${errorText}`);
+  }
+
+  const data = await response.json();
+  const content = data.content?.[0]?.text;
+  
+  if (!content) {
+    throw new Error('Anthropic returned empty response');
+  }
+
+  return parseAIResponse(content);
+}
+
+async function callGoogleGemini(prompt: string, apiKey: string): Promise<AIGeneratedOptions> {
+  const response = await fetch(
+    `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${apiKey}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{
+          parts: [{ text: prompt }]
+        }],
+      }),
+    }
+  );
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    if (response.status === 401 || response.status === 403) {
+      throw new Error('Google Gemini API key is invalid. Please check your configuration.');
+    } else if (response.status === 429) {
+      throw new Error('Google Gemini rate limit exceeded. Please try again later.');
+    }
+    throw new Error(`Google Gemini API error (${response.status}): ${errorText}`);
+  }
+
+  const data = await response.json();
+  const content = data.candidates?.[0]?.content?.parts?.[0]?.text;
+  
+  if (!content) {
+    throw new Error('Google Gemini returned empty response');
+  }
+
+  return parseAIResponse(content);
+}
+
+function mockResponse(questionKey: string, countryCode: string): AIGeneratedOptions {
+  const mockDatabase: Record<string, Record<string, any>> = {
+    household_income: {
+      ET: {
+        options: [
+          { value: '0-5000', label: 'Less than 5,000 ETB', local_context: '~$0-$90 USD/month' },
+          { value: '5000-10000', label: '5,000 - 10,000 ETB', local_context: '~$90-$180 USD/month' },
+          { value: '10000-20000', label: '10,000 - 20,000 ETB', local_context: '~$180-$360 USD/month' },
+          { value: '20000-30000', label: '20,000 - 30,000 ETB', local_context: '~$360-$540 USD/month' },
+          { value: '30000+', label: '30,000+ ETB', local_context: '~$540+ USD/month' }
+        ],
+        confidence: 85
+      },
+      ZA: {
+        options: [
+          { value: '0-5000', label: 'R0 - R5,000', local_context: '~$0-$300 USD/month' },
+          { value: '5000-10000', label: 'R5,000 - R10,000', local_context: '~$300-$600 USD/month' },
+          { value: '10000-20000', label: 'R10,000 - R20,000', local_context: '~$600-$1,200 USD/month' },
+          { value: '20000-40000', label: 'R20,000 - R40,000', local_context: '~$1,200-$2,400 USD/month' },
+          { value: '40000+', label: 'R40,000+', local_context: '~$2,400+ USD/month' }
+        ],
+        confidence: 85
+      },
+      NG: {
+        options: [
+          { value: '0-50000', label: 'Less than ₦50,000', local_context: '~$0-$120 USD/month' },
+          { value: '50000-100000', label: '₦50,000 - ₦100,000', local_context: '~$120-$240 USD/month' },
+          { value: '100000-200000', label: '₦100,000 - ₦200,000', local_context: '~$240-$480 USD/month' },
+          { value: '200000-400000', label: '₦200,000 - ₦400,000', local_context: '~$480-$960 USD/month' },
+          { value: '400000+', label: '₦400,000+', local_context: '~$960+ USD/month' }
+        ],
+        confidence: 85
+      }
+    },
+    beverage_brands: {
+      ET: {
+        options: [
+          { value: 'habesha_beer', label: 'Habesha Beer', local_context: 'Popular local Ethiopian beer' },
+          { value: 'bedele', label: 'Bedele Special Beer', local_context: 'Local brewery brand' },
+          { value: 'coca-cola', label: 'Coca-Cola', local_context: 'International soft drink' },
+          { value: 'pepsi', label: 'Pepsi', local_context: 'International soft drink' },
+          { value: 'ambo', label: 'Ambo Mineral Water', local_context: 'Local mineral water brand' }
+        ],
+        confidence: 80
+      },
+      ZA: {
+        options: [
+          { value: 'castle', label: 'Castle Lager', local_context: 'South African beer brand' },
+          { value: 'black_label', label: 'Black Label', local_context: 'Popular SA beer' },
+          { value: 'coca-cola', label: 'Coca-Cola', local_context: 'International soft drink' },
+          { value: 'appletiser', label: 'Appletiser', local_context: 'Local sparkling apple juice' },
+          { value: 'iron_brew', label: 'Iron Brew', local_context: 'Local soft drink' }
+        ],
+        confidence: 80
+      }
+    }
+  };
+
+  const questionData = mockDatabase[questionKey] || {};
+  const countryData = questionData[countryCode] || {
+    options: [
+      { value: 'option1', label: 'Option 1', local_context: 'Standard option' },
+      { value: 'option2', label: 'Option 2', local_context: 'Standard option' },
+      { value: 'option3', label: 'Option 3', local_context: 'Standard option' }
+    ],
+    confidence: 65
+  };
+
+  return {
+    options: countryData.options,
+    sources: ['Mock Data (Development Mode)'],
+    confidence: countryData.confidence,
+    notes: 'Mock data for development. Configure AI provider in Admin → Integrations for real generation.'
+  };
+}
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -199,15 +421,8 @@ serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
-
-    if (!lovableApiKey) {
-      console.error('[AUTO-GEN] LOVABLE_API_KEY not configured');
-      return new Response(
-        JSON.stringify({ error: 'AI service not configured' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
+    const aiProvider = Deno.env.get('AI_PROVIDER') || 'mock';
+    const aiApiKey = Deno.env.get('AI_PROVIDER_API_KEY');
 
     const supabase = createClient(supabaseUrl, supabaseKey);
     const { gapId, countryCode, questionId, questionKey } = await req.json() as RequestBody;
@@ -249,103 +464,47 @@ serve(async (req) => {
     // Build AI prompt
     const prompt = buildPrompt(questionKey, countryName, question.question_text);
 
-    console.log(`[AUTO-GEN] Calling Lovable AI with google/gemini-2.5-pro`);
+    let aiResponse: AIGeneratedOptions;
 
-    // Call Lovable AI with retry logic
-    let retries = 0;
-    const maxRetries = 3;
-    let aiResponse: AIGeneratedOptions | null = null;
-
-    while (retries < maxRetries && !aiResponse) {
-      try {
-        const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${lovableApiKey}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            model: 'google/gemini-2.5-pro',
-            messages: [
-              { role: 'system', content: 'You are a market research expert specializing in localization and cultural adaptation. Always respond with valid JSON only.' },
-              { role: 'user', content: prompt }
-            ],
-            temperature: 0.7,
-            max_tokens: 2000
-          }),
-        });
-
-        if (response.status === 429) {
-          console.warn('[AUTO-GEN] Rate limit hit, waiting before retry...');
-          await supabase
-            .from('country_profiling_gaps')
-            .update({ status: 'rate_limited', error_log: 'Rate limit exceeded, will retry' })
-            .eq('id', gapId);
-          
-          await new Promise(resolve => setTimeout(resolve, Math.pow(2, retries) * 2000));
-          retries++;
-          continue;
-        }
-
-        if (response.status === 402) {
-          console.error('[AUTO-GEN] Payment required');
-          await supabase
-            .from('country_profiling_gaps')
-            .update({ status: 'payment_required', error_log: 'AI service payment required' })
-            .eq('id', gapId);
-          
-          return new Response(
-            JSON.stringify({ error: 'Payment required for AI service' }),
-            { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-          );
-        }
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error('[AUTO-GEN] AI API error:', response.status, errorText);
-          throw new Error(`AI API error: ${response.status}`);
-        }
-
-        const data = await response.json();
-        const content = data.choices?.[0]?.message?.content;
-
-        if (!content) {
-          throw new Error('No content in AI response');
-        }
-
-        console.log(`[AUTO-GEN] AI Response received`);
-
-        // Parse JSON response (handle markdown code blocks)
-        let jsonContent = content.trim();
-        if (jsonContent.startsWith('```json')) {
-          jsonContent = jsonContent.replace(/```json\n?/, '').replace(/\n?```$/, '');
-        } else if (jsonContent.startsWith('```')) {
-          jsonContent = jsonContent.replace(/```\n?/, '').replace(/\n?```$/, '');
-        }
-
-        aiResponse = JSON.parse(jsonContent);
-        break;
-
-      } catch (error) {
-        console.error(`[AUTO-GEN] Attempt ${retries + 1} failed:`, error);
-        retries++;
-        if (retries < maxRetries) {
-          await new Promise(resolve => setTimeout(resolve, Math.pow(2, retries) * 2000));
-        }
-      }
-    }
-
-    if (!aiResponse) {
-      console.error('[AUTO-GEN] All retry attempts failed');
-      await supabase
-        .from('country_profiling_gaps')
-        .update({ status: 'failed', error_log: 'Failed after multiple retry attempts' })
-        .eq('id', gapId);
+    // Route to correct provider or use mock
+    if (!aiApiKey || aiProvider === 'mock') {
+      console.log('[AUTO-GEN] Using MOCK data (no provider configured)');
+      aiResponse = mockResponse(questionKey, countryCode);
+    } else {
+      console.log(`[AUTO-GEN] Using AI provider: ${aiProvider}`);
       
-      return new Response(
-        JSON.stringify({ error: 'Failed to generate options' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      try {
+        switch (aiProvider) {
+          case 'openai':
+            aiResponse = await callOpenAI(prompt, aiApiKey);
+            break;
+          case 'anthropic':
+            aiResponse = await callAnthropic(prompt, aiApiKey);
+            break;
+          case 'google':
+            aiResponse = await callGoogleGemini(prompt, aiApiKey);
+            break;
+          default:
+            console.warn(`[AUTO-GEN] Unknown provider "${aiProvider}", falling back to mock`);
+            aiResponse = mockResponse(questionKey, countryCode);
+        }
+      } catch (error) {
+        console.error('[AUTO-GEN] Provider error:', error);
+        
+        // Update gap status with error
+        await supabase
+          .from('country_profiling_gaps')
+          .update({ 
+            status: 'failed', 
+            error_log: error instanceof Error ? error.message : 'Unknown provider error'
+          })
+          .eq('id', gapId);
+        
+        return new Response(
+          JSON.stringify({ error: error instanceof Error ? error.message : 'AI generation failed' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
     }
 
     // Validate response structure
