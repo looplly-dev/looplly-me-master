@@ -15,6 +15,7 @@ import {
   Clock,
   MessageSquare,
   Wrench,
+  Plug,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -49,6 +50,7 @@ const adminNavItems = [
   { title: 'Questions', url: '/admin/questions', icon: MessageSquare },
   { title: 'Redemptions', url: '/admin/redemptions', icon: DollarSign },
   { title: 'Analytics', url: '/admin/analytics', icon: BarChart3 },
+  { title: 'Integrations', url: '/admin/integrations', icon: Plug },
   { title: 'AI Agents', url: '/admin/agents', icon: Brain },
   { title: 'Migration', url: '/admin/migration', icon: ArrowRightLeft },
 ];
@@ -130,6 +132,7 @@ function AdminBreadcrumb() {
       'question-builder': 'Question Management',
       redemptions: 'Redemptions',
       analytics: 'Analytics',
+      integrations: 'Integrations',
       agents: 'AI Agents',
       migration: 'Migration Helper',
     };

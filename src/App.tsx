@@ -13,6 +13,7 @@ import AdminContent from "./pages/AdminContent";
 import AdminBadges from "./pages/AdminBadges";
 import AdminRedemptions from "./pages/AdminRedemptions";
 import AdminAnalytics from "./pages/AdminAnalytics";
+import AdminIntegrations from "./pages/AdminIntegrations";
 import AdminAgents from "./pages/AdminAgents";
 import AdminMigration from "./pages/AdminMigration";
 import AdminStreakConfig from "./pages/AdminStreakConfig";
@@ -36,6 +37,7 @@ const AppContent = () => {
               <Route path="/admin/badges" element={<AdminBadges />} />
               <Route path="/admin/redemptions" element={<AdminRedemptions />} />
               <Route path="/admin/analytics" element={<AdminAnalytics />} />
+              <Route path="/admin/integrations" element={<AdminIntegrations />} />
               <Route path="/admin/agents" element={<AdminAgents />} />
               <Route path="/admin/migration" element={<AdminMigration />} />
               <Route path="/admin/streak-config" element={<AdminStreakConfig />} />

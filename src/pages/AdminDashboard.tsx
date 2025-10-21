@@ -1,18 +1,33 @@
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Users, DollarSign, Award, TrendingUp, Eye } from 'lucide-react';
+import { Users, DollarSign, Award, TrendingUp, Eye, CheckCircle2, AlertTriangle, XCircle, Settings2, ArrowRight } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
+import { useIntegrationStatus } from '@/hooks/useIntegrationStatus';
+import { useNavigate } from 'react-router-dom';
+import type { IntegrationStatus } from '@/types/integrations';
+
+const statusConfig: Record<IntegrationStatus, { icon: any; className: string; label: string }> = {
+  active: { icon: CheckCircle2, className: 'bg-green-500/20 text-green-700 dark:text-green-400', label: 'Active' },
+  mock: { icon: AlertTriangle, className: 'bg-amber-500/20 text-amber-700 dark:text-amber-400', label: 'Mock Mode' },
+  configured: { icon: CheckCircle2, className: 'bg-blue-500/20 text-blue-700 dark:text-blue-400', label: 'Configured' },
+  not_configured: { icon: Settings2, className: 'bg-gray-500/20 text-gray-700 dark:text-gray-400', label: 'Not Configured' },
+  error: { icon: XCircle, className: 'bg-red-500/20 text-red-700 dark:text-red-400', label: 'Error' }
+};
 
 function AdminDashboardContent() {
   const { authState } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const { data: integrationData } = useIntegrationStatus();
 
   // Fetch admin's badge preview setting
   const { data: profile } = useQuery({
@@ -163,43 +178,59 @@ function AdminDashboardContent() {
         </Card>
       </div>
 
-      <Card className="border-amber-500/50 bg-amber-500/5">
+      <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Award className="h-5 w-5 text-amber-500" />
-            Integration Status
+          <CardTitle className="flex items-center justify-between">
+            <span className="flex items-center gap-2">
+              <Settings2 className="h-5 w-5" />
+              Integration Status
+            </span>
+            {integrationData && (
+              <div className="flex items-center gap-2 text-sm">
+                <Badge variant="secondary" className="gap-1">
+                  <CheckCircle2 className="h-3 w-3" />
+                  {integrationData.summary.active} Active
+                </Badge>
+                {integrationData.summary.mock > 0 && (
+                  <Badge variant="secondary" className="gap-1 bg-amber-500/20 text-amber-700 dark:text-amber-400">
+                    <AlertTriangle className="h-3 w-3" />
+                    {integrationData.summary.mock} Mock
+                  </Badge>
+                )}
+              </div>
+            )}
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-3">
-            <div className="flex items-center justify-between p-3 rounded-lg bg-background/50">
-              <div>
-                <p className="font-medium">Email Service</p>
-                <p className="text-sm text-muted-foreground">Resend API for transactional emails</p>
-              </div>
-              <span className="px-3 py-1 text-xs font-medium rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-400">
-                Mock
-              </span>
+          {integrationData ? (
+            <div className="space-y-3">
+              {integrationData.integrations.slice(0, 4).map((integration) => {
+                const { icon: StatusIcon, className, label } = statusConfig[integration.status];
+                return (
+                  <div key={integration.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+                    <div className="flex-1">
+                      <p className="font-medium">{integration.name}</p>
+                      <p className="text-sm text-muted-foreground">{integration.description}</p>
+                    </div>
+                    <Badge variant="secondary" className={`${className} gap-1 shrink-0`}>
+                      <StatusIcon className="h-3 w-3" />
+                      {label}
+                    </Badge>
+                  </div>
+                );
+              })}
+              <Button 
+                variant="outline" 
+                className="w-full mt-2"
+                onClick={() => navigate('/admin/integrations')}
+              >
+                View All Integrations
+                <ArrowRight className="h-4 w-4 ml-2" />
+              </Button>
             </div>
-            <div className="flex items-center justify-between p-3 rounded-lg bg-background/50">
-              <div>
-                <p className="font-medium">Payment Gateway</p>
-                <p className="text-sm text-muted-foreground">Stripe or Razorpay integration</p>
-              </div>
-              <span className="px-3 py-1 text-xs font-medium rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-400">
-                Pending
-              </span>
-            </div>
-            <div className="flex items-center justify-between p-3 rounded-lg bg-background/50">
-              <div>
-                <p className="font-medium">SMS Service</p>
-                <p className="text-sm text-muted-foreground">Twilio for OTP and notifications</p>
-              </div>
-              <span className="px-3 py-1 text-xs font-medium rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-400">
-                Pending
-              </span>
-            </div>
-          </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">Loading integration status...</p>
+          )}
         </CardContent>
       </Card>
     </div>
