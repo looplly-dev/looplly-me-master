@@ -1,7 +1,10 @@
+import ProtectedRoute from '@/components/auth/ProtectedRoute';
+import AdminLayout from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Input } from '@/components/ui/input';
 import { useIntegrationStatus, useTestIntegration } from '@/hooks/useIntegrationStatus';
 import { 
   CheckCircle2, 
@@ -10,17 +13,20 @@ import {
   Settings2, 
   ExternalLink,
   RefreshCw,
-  PlayCircle
+  PlayCircle,
+  Search
 } from 'lucide-react';
 import type { IntegrationConfig, IntegrationStatus } from '@/types/integrations';
 import { toast } from 'sonner';
+import { useState, useMemo } from 'react';
+import { useDebounce } from '@/hooks/use-debounce';
 
 const statusConfig: Record<IntegrationStatus, { icon: any; className: string; label: string }> = {
-  active: { icon: CheckCircle2, className: 'text-green-600 bg-green-50', label: 'Active' },
-  mock: { icon: AlertTriangle, className: 'text-amber-600 bg-amber-50', label: 'Mock Mode' },
-  configured: { icon: CheckCircle2, className: 'text-blue-600 bg-blue-50', label: 'Configured' },
-  not_configured: { icon: Settings2, className: 'text-gray-400 bg-gray-50', label: 'Not Configured' },
-  error: { icon: XCircle, className: 'text-red-600 bg-red-50', label: 'Error' }
+  active: { icon: CheckCircle2, className: 'bg-green-500/20 text-green-700 dark:text-green-400', label: 'Active' },
+  mock: { icon: AlertTriangle, className: 'bg-amber-500/20 text-amber-700 dark:text-amber-400', label: 'Mock Mode' },
+  configured: { icon: CheckCircle2, className: 'bg-blue-500/20 text-blue-700 dark:text-blue-400', label: 'Configured' },
+  not_configured: { icon: Settings2, className: 'bg-muted text-muted-foreground', label: 'Not Configured' },
+  error: { icon: XCircle, className: 'bg-red-500/20 text-red-700 dark:text-red-400', label: 'Error' }
 };
 
 const categoryIcons = {
@@ -143,14 +149,40 @@ function IntegrationCard({ integration }: { integration: IntegrationConfig }) {
   );
 }
 
-export default function AdminIntegrations() {
+function AdminIntegrationsContent() {
   const { data, isLoading, refetch } = useIntegrationStatus();
+  const [searchQuery, setSearchQuery] = useState('');
+  const debouncedSearch = useDebounce(searchQuery, 300);
+
+  // Filter integrations based on search
+  const filteredData = useMemo(() => {
+    if (!data || !debouncedSearch) return data;
+
+    const filtered = data.integrations.filter(integration => 
+      integration.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+      integration.description.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+      integration.category.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+      integration.features?.some(f => f.toLowerCase().includes(debouncedSearch.toLowerCase()))
+    );
+
+    return {
+      ...data,
+      integrations: filtered,
+      summary: {
+        total: filtered.length,
+        active: filtered.filter(i => i.status === 'active').length,
+        mock: filtered.filter(i => i.status === 'mock').length,
+        notConfigured: filtered.filter(i => i.status === 'not_configured').length,
+        error: filtered.filter(i => i.status === 'error').length,
+      }
+    };
+  }, [data, debouncedSearch]);
 
   if (isLoading) {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold mb-2">Integration Management</h1>
+          <h1 className="text-3xl font-bold">Integration Management</h1>
           <p className="text-muted-foreground">Manage and monitor all external service integrations</p>
         </div>
         <div className="space-y-4">
@@ -170,9 +202,9 @@ export default function AdminIntegrations() {
     );
   }
 
-  if (!data) return null;
+  if (!filteredData) return null;
 
-  const groupedIntegrations = data.integrations.reduce((acc, integration) => {
+  const groupedIntegrations = filteredData.integrations.reduce((acc, integration) => {
     if (!acc[integration.category]) {
       acc[integration.category] = [];
     }
@@ -180,18 +212,39 @@ export default function AdminIntegrations() {
     return acc;
   }, {} as Record<string, IntegrationConfig[]>);
 
+  const hasResults = filteredData.integrations.length > 0;
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold mb-2">Integration Management</h1>
-          <p className="text-muted-foreground">Manage and monitor all external service integrations</p>
-        </div>
-        <Button variant="outline" size="sm" onClick={() => refetch()}>
-          <RefreshCw className="h-4 w-4 mr-2" />
-          Refresh
-        </Button>
+      <div>
+        <h1 className="text-3xl font-bold">Integration Management</h1>
+        <p className="text-muted-foreground">
+          Manage and monitor all external service integrations ({data?.summary.total} total)
+        </p>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Search Integrations</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search by name, category, or features..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-9"
+              />
+            </div>
+            <Button variant="outline" size="default" onClick={() => refetch()}>
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Refresh
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
@@ -199,7 +252,12 @@ export default function AdminIntegrations() {
             <CardTitle className="text-sm font-medium text-muted-foreground">Total Integrations</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{data.summary.total}</div>
+            <div className="text-2xl font-bold">{filteredData.summary.total}</div>
+            {debouncedSearch && (
+              <p className="text-xs text-muted-foreground">
+                of {data?.summary.total} total
+              </p>
+            )}
           </CardContent>
         </Card>
         <Card>
@@ -207,7 +265,9 @@ export default function AdminIntegrations() {
             <CardTitle className="text-sm font-medium text-muted-foreground">Active</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{data.summary.active}</div>
+            <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+              {filteredData.summary.active}
+            </div>
           </CardContent>
         </Card>
         <Card>
@@ -215,7 +275,9 @@ export default function AdminIntegrations() {
             <CardTitle className="text-sm font-medium text-muted-foreground">Mock Mode</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-amber-600">{data.summary.mock}</div>
+            <div className="text-2xl font-bold text-amber-600 dark:text-amber-400">
+              {filteredData.summary.mock}
+            </div>
           </CardContent>
         </Card>
         <Card>
@@ -223,26 +285,46 @@ export default function AdminIntegrations() {
             <CardTitle className="text-sm font-medium text-muted-foreground">Not Configured</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-gray-400">{data.summary.notConfigured}</div>
+            <div className="text-2xl font-bold text-muted-foreground">
+              {filteredData.summary.notConfigured}
+            </div>
           </CardContent>
         </Card>
       </div>
 
-      <div className="space-y-8">
-        {Object.entries(groupedIntegrations).map(([category, integrations]) => (
-          <div key={category}>
-            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-              <span>{categoryIcons[category as keyof typeof categoryIcons]}</span>
-              {categoryLabels[category as keyof typeof categoryLabels]}
-            </h2>
-            <div className="grid grid-cols-1 gap-4">
-              {integrations.map((integration) => (
-                <IntegrationCard key={integration.id} integration={integration} />
-              ))}
+      {!hasResults && debouncedSearch ? (
+        <Card>
+          <CardContent className="py-12 text-center">
+            <p className="text-muted-foreground">No integrations found matching "{debouncedSearch}"</p>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="space-y-8">
+          {Object.entries(groupedIntegrations).map(([category, integrations]) => (
+            <div key={category}>
+              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                <span>{categoryIcons[category as keyof typeof categoryIcons]}</span>
+                {categoryLabels[category as keyof typeof categoryLabels]}
+              </h2>
+              <div className="grid grid-cols-1 gap-4">
+                {integrations.map((integration) => (
+                  <IntegrationCard key={integration.id} integration={integration} />
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
+  );
+}
+
+export default function AdminIntegrations() {
+  return (
+    <ProtectedRoute requiredRole="admin">
+      <AdminLayout>
+        <AdminIntegrationsContent />
+      </AdminLayout>
+    </ProtectedRoute>
   );
 }
