@@ -1,5 +1,8 @@
 project_id = "chlqpvzreztzxmjjdjpk"
 
+[functions.auto-generate-country-options]
+verify_jwt = true
+
 [functions.badge-service-api]
 verify_jwt = false
 
