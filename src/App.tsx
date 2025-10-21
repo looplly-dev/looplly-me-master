@@ -8,6 +8,7 @@ import AuthProvider from "./components/auth/AuthProvider";
 import { useAnalytics } from "./hooks/useAnalytics";
 import LoopllyApp from "./components/LoopllyApp";
 import AdminDashboard from "./pages/AdminDashboard";
+import AdminTeam from "./pages/AdminTeam";
 import AdminUsers from "./pages/AdminUsers";
 import AdminContent from "./pages/AdminContent";
 import AdminBadges from "./pages/AdminBadges";
@@ -32,6 +33,7 @@ const AppContent = () => {
   return (
     <Routes>
               <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/admin/team" element={<AdminTeam />} />
               <Route path="/admin/users" element={<AdminUsers />} />
               <Route path="/admin/content" element={<AdminContent />} />
               <Route path="/admin/badges" element={<AdminBadges />} />

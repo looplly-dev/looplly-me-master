@@ -3,6 +3,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
   Users,
+  UserCog,
   Briefcase,
   Award,
   DollarSign,
@@ -43,6 +44,7 @@ import {
 
 const adminNavItems = [
   { title: 'Dashboard', url: '/admin', icon: LayoutDashboard, exact: true },
+  { title: 'Team', url: '/admin/team', icon: UserCog },
   { title: 'Users', url: '/admin/users', icon: Users },
   { title: 'Content', url: '/admin/content', icon: Briefcase },
   { title: 'Badges', url: '/admin/badges', icon: Award },
@@ -122,6 +124,7 @@ function AdminBreadcrumb() {
   const getBreadcrumbLabel = (segment: string) => {
     const labels: Record<string, string> = {
       admin: 'Admin',
+      team: 'Team Management',
       users: 'Users',
       content: 'Content',
       badges: 'Badge Generator',
