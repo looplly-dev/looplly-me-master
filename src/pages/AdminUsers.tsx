@@ -58,9 +58,9 @@ function AdminUsersContent() {
       </Card>
 
       <Card>
-        <CardHeader>
+        <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
-            <CardTitle>Filter by Role</CardTitle>
+            <CardTitle className="text-lg">Filter by Role</CardTitle>
             {selectedRoles.length > 0 && (
               <Button 
                 variant="ghost" 
@@ -72,24 +72,24 @@ function AdminUsersContent() {
             )}
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pb-4">
           <ToggleGroup 
             type="multiple" 
             value={selectedRoles}
             onValueChange={setSelectedRoles}
-            className="justify-start flex-wrap"
+            className="justify-start flex-wrap gap-2"
           >
-            <ToggleGroupItem value="super_admin" className="gap-2">
-              <Badge variant="destructive" className="h-5 px-2">SA</Badge>
-              Super Admin
+            <ToggleGroupItem value="super_admin" size="sm" className="gap-1.5">
+              <Badge variant="destructive" className="h-4 px-1.5 text-xs">SA</Badge>
+              <span className="text-sm">Super Admin</span>
             </ToggleGroupItem>
-            <ToggleGroupItem value="admin" className="gap-2">
-              <Badge variant="default" className="h-5 px-2">A</Badge>
-              Admin
+            <ToggleGroupItem value="admin" size="sm" className="gap-1.5">
+              <Badge variant="default" className="h-4 px-1.5 text-xs">A</Badge>
+              <span className="text-sm">Admin</span>
             </ToggleGroupItem>
-            <ToggleGroupItem value="user" className="gap-2">
-              <Badge variant="secondary" className="h-5 px-2">U</Badge>
-              User
+            <ToggleGroupItem value="user" size="sm" className="gap-1.5">
+              <Badge variant="secondary" className="h-4 px-1.5 text-xs">U</Badge>
+              <span className="text-sm">User</span>
             </ToggleGroupItem>
           </ToggleGroup>
         </CardContent>
