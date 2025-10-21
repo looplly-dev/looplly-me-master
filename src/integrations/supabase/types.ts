@@ -1516,6 +1516,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      can_view_user_profile: {
+        Args: { _target_user_id: string; _viewer_id: string }
+        Returns: boolean
+      }
       find_users_by_criteria: {
         Args: { p_country_code: string; p_criteria: Json }
         Returns: {

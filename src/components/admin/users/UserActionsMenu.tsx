@@ -38,6 +38,7 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { AdminUser } from '@/hooks/useAdminUsers';
+import { useRole } from '@/hooks/useRole';
 
 interface UserActionsMenuProps {
   user: AdminUser;
@@ -45,6 +46,7 @@ interface UserActionsMenuProps {
 }
 
 export function UserActionsMenu({ user, onUpdate }: UserActionsMenuProps) {
+  const { isSuperAdmin } = useRole();
   const [showRoleDialog, setShowRoleDialog] = useState(false);
   const [showSuspendDialog, setShowSuspendDialog] = useState(false);
   const [selectedRole, setSelectedRole] = useState<'super_admin' | 'admin' | 'user'>(
@@ -169,7 +171,9 @@ export function UserActionsMenu({ user, onUpdate }: UserActionsMenuProps) {
                 <SelectContent>
                   <SelectItem value="user">User</SelectItem>
                   <SelectItem value="admin">Admin</SelectItem>
-                  <SelectItem value="super_admin">Super Admin</SelectItem>
+                  {isSuperAdmin() && (
+                    <SelectItem value="super_admin">Super Admin</SelectItem>
+                  )}
                 </SelectContent>
               </Select>
             </div>

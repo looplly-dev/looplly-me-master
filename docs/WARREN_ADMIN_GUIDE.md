@@ -77,6 +77,37 @@ Level 1 questions are identity and security fields tied to:
 
 ---
 
+## User Visibility and Management
+
+### Role-Based Visibility Rules
+
+The system enforces **database-level security** to ensure proper separation of concerns:
+
+#### What Super Admins Can See:
+- ✅ **All users** (super admins, admins, and regular users)
+- ✅ Can view, edit, suspend, and manage anyone
+- ✅ Can assign any role including super_admin
+
+#### What Admins Can See:
+- ✅ **Regular users only** (users with 'user' role)
+- ❌ **Cannot see other admins**
+- ❌ **Cannot see super admins**
+- ✅ Can manage regular users (suspend, assign user/admin roles)
+- ❌ Cannot assign super_admin role (option hidden in UI)
+
+#### Security Implementation:
+- 🔒 **Database-level enforcement**: RLS policies prevent admins from querying admin/super_admin profiles
+- 🔒 **Not just UI hiding**: Security is enforced at the database, not just frontend
+- 🔒 **Prevents privilege escalation**: Admins cannot attempt to contact or target super admins
+
+### Why This Matters:
+- **Super admins remain invisible** to lower-tier admins for security
+- **Clear separation of concerns**: Admins focus on managing regular users
+- **Prevents social engineering**: Admins cannot identify who the super admins are
+- **Audit trail protection**: Super admin actions cannot be monitored by regular admins
+
+---
+
 ## Assigning Roles
 
 ### How to Change a User's Role:
@@ -85,17 +116,23 @@ Level 1 questions are identity and security fields tied to:
 2. Find the user in the table
 3. Click the **⋮** (three dots) menu
 4. Select **"Change Role"**
-5. Choose from:
-   - User (default)
-   - Admin
-   - Super Admin (⚠️ use sparingly!)
+5. Choose from available roles:
+   - **User** (default)
+   - **Admin** (for regular administrators)
+   - **Super Admin** (⚠️ only visible if you're a super admin!)
 6. Confirm the change
 
 ### Role Assignment Rules:
 - ✅ Super Admins can assign any role to anyone
-- ✅ Admins can assign `admin` or `user` roles
-- ❌ Admins cannot create Super Admins
+- ✅ Admins can assign `admin` or `user` roles only
+- ❌ Admins cannot see or assign `super_admin` role
+- ❌ Admins cannot modify other admin or super admin accounts
 - ❌ Users cannot change roles
+
+### Important Notes:
+- If you're an admin and don't see the "Super Admin" option, **this is intentional** for security
+- If you need to promote someone to super admin, ask an existing super admin
+- Only super admins can demote other super admins
 
 ---
 
