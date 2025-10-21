@@ -44,7 +44,7 @@ function AdminUsersContent() {
         <CardHeader>
           <CardTitle>Search Users</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
           <div className="relative">
             <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             <Input
@@ -54,44 +54,38 @@ function AdminUsersContent() {
               className="pl-9"
             />
           </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">Filter by Role</CardTitle>
+          
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-sm text-muted-foreground">Filter by role:</span>
+            <ToggleGroup 
+              type="multiple" 
+              value={selectedRoles}
+              onValueChange={setSelectedRoles}
+              className="justify-start gap-2"
+            >
+              <ToggleGroupItem value="super_admin" size="sm" className="gap-1.5">
+                <Badge variant="destructive" className="h-4 px-1.5 text-xs">SA</Badge>
+                <span className="text-sm">Super Admin</span>
+              </ToggleGroupItem>
+              <ToggleGroupItem value="admin" size="sm" className="gap-1.5">
+                <Badge variant="default" className="h-4 px-1.5 text-xs">A</Badge>
+                <span className="text-sm">Admin</span>
+              </ToggleGroupItem>
+              <ToggleGroupItem value="user" size="sm" className="gap-1.5">
+                <Badge variant="secondary" className="h-4 px-1.5 text-xs">U</Badge>
+                <span className="text-sm">User</span>
+              </ToggleGroupItem>
+            </ToggleGroup>
             {selectedRoles.length > 0 && (
               <Button 
                 variant="ghost" 
                 size="sm"
                 onClick={() => setSelectedRoles([])}
               >
-                Clear filters
+                Clear
               </Button>
             )}
           </div>
-        </CardHeader>
-        <CardContent className="pb-4">
-          <ToggleGroup 
-            type="multiple" 
-            value={selectedRoles}
-            onValueChange={setSelectedRoles}
-            className="justify-start flex-wrap gap-2"
-          >
-            <ToggleGroupItem value="super_admin" size="sm" className="gap-1.5">
-              <Badge variant="destructive" className="h-4 px-1.5 text-xs">SA</Badge>
-              <span className="text-sm">Super Admin</span>
-            </ToggleGroupItem>
-            <ToggleGroupItem value="admin" size="sm" className="gap-1.5">
-              <Badge variant="default" className="h-4 px-1.5 text-xs">A</Badge>
-              <span className="text-sm">Admin</span>
-            </ToggleGroupItem>
-            <ToggleGroupItem value="user" size="sm" className="gap-1.5">
-              <Badge variant="secondary" className="h-4 px-1.5 text-xs">U</Badge>
-              <span className="text-sm">User</span>
-            </ToggleGroupItem>
-          </ToggleGroup>
         </CardContent>
       </Card>
 
