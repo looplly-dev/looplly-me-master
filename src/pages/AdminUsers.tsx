@@ -17,9 +17,7 @@ function AdminUsersContent() {
   const debouncedSearch = useDebounce(searchQuery, 500);
   const { users, isLoading, error, refetch } = useAdminUsers(debouncedSearch);
 
-  const filteredUsers = selectedRoles.length === 0
-    ? users
-    : users.filter(u => selectedRoles.includes(u.role || 'user'));
+  const filteredUsers = users;
 
   return (
     <div className="space-y-6">

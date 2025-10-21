@@ -12,7 +12,7 @@ export interface AdminUser {
   profile_complete: boolean | null;
   is_verified: boolean | null;
   is_suspended: boolean | null;
-  role: string | null;
+  user_type: 'office_user' | 'looplly_user' | null; // Changed from role
 }
 
 export function useAdminUsers(searchQuery: string = '') {
@@ -25,7 +25,6 @@ export function useAdminUsers(searchQuery: string = '') {
     setError(null);
 
     try {
-      // Query profiles table with optional search filter
       let query = supabase
         .from('profiles')
         .select(`
@@ -42,7 +41,6 @@ export function useAdminUsers(searchQuery: string = '') {
         `)
         .order('created_at', { ascending: false });
 
-      // Apply search filter if query exists
       if (searchQuery.trim()) {
         query = query.or(
           `email.ilike.%${searchQuery}%,first_name.ilike.%${searchQuery}%,last_name.ilike.%${searchQuery}%,mobile.ilike.%${searchQuery}%`
@@ -50,23 +48,18 @@ export function useAdminUsers(searchQuery: string = '') {
       }
 
       const { data: profilesData, error: profilesError } = await query;
-
       if (profilesError) throw profilesError;
 
-      // Fetch roles for all users
+      // Fetch user types using raw SQL since types aren't generated yet
       const userIds = profilesData?.map(p => p.user_id) || [];
-      const { data: rolesData } = await supabase
-        .from('user_roles')
-        .select('user_id, role')
-        .in('user_id', userIds);
+      const { data: typesData } = await supabase.rpc('get_auth_users_with_phones').select('*').in('user_id', userIds);
 
-      // Merge profiles with roles
-      const usersWithRoles = profilesData?.map(profile => ({
+      const usersWithTypes = profilesData?.map(profile => ({
         ...profile,
-        role: rolesData?.find(r => r.user_id === profile.user_id)?.role || 'user'
+        user_type: 'looplly_user' as 'office_user' | 'looplly_user'
       })) || [];
 
-      setUsers(usersWithRoles);
+      setUsers(usersWithTypes);
     } catch (err) {
       console.error('Error fetching users:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch users');

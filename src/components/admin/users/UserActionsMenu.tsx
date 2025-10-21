@@ -47,10 +47,10 @@ interface UserActionsMenuProps {
 
 export function UserActionsMenu({ user, onUpdate }: UserActionsMenuProps) {
   const { isSuperAdmin } = useRole();
-  const [showRoleDialog, setShowRoleDialog] = useState(false);
+  const [showTypeDialog, setShowTypeDialog] = useState(false);
   const [showSuspendDialog, setShowSuspendDialog] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<'super_admin' | 'admin' | 'user'>(
-    (user.role as 'super_admin' | 'admin' | 'user') || 'user'
+  const [selectedUserType, setSelectedUserType] = useState<'office_user' | 'looplly_user'>(
+    user.user_type || 'looplly_user'
   );
   const [isUpdating, setIsUpdating] = useState(false);
 

@@ -5,7 +5,13 @@ import { useAuth } from '@/hooks/useAuth';
 
 export type UserRole = 'super_admin' | 'admin' | 'user' | null;
 
-// Role hierarchy levels
+/**
+ * Role hierarchy for staff permissions
+ * super_admin (Level 3) > admin (Level 2) > user (Level 1)
+ * 
+ * Note: This is separate from user_types (office_user, looplly_user)
+ * which control feature access, not admin permissions.
+ */
 const ROLE_HIERARCHY: Record<NonNullable<UserRole>, number> = {
   super_admin: 3,
   admin: 2,
