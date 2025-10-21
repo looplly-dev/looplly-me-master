@@ -54,6 +54,10 @@ function IntegrationCard({ integration }: { integration: IntegrationConfig }) {
   const [showConfigModal, setShowConfigModal] = useState(false);
   const [apiKey, setApiKey] = useState('');
   const [isConfiguring, setIsConfiguring] = useState(false);
+  const [testAddress, setTestAddress] = useState('');
+  const [testResults, setTestResults] = useState<any[]>([]);
+  const [isTesting, setIsTesting] = useState(false);
+  const [selectedPlace, setSelectedPlace] = useState<any>(null);
 
   const handleTest = async () => {
     const result = await testMutation.mutateAsync(integration.id);
@@ -61,6 +65,65 @@ function IntegrationCard({ integration }: { integration: IntegrationConfig }) {
       toast.success(result.message);
     } else {
       toast.error(result.message);
+    }
+  };
+
+  const handleTestAddress = async () => {
+    if (!apiKey.trim()) {
+      toast.error('Please enter an API key first');
+      return;
+    }
+    if (!testAddress.trim()) {
+      toast.error('Please enter an address to test');
+      return;
+    }
+
+    setIsTesting(true);
+    setTestResults([]);
+    setSelectedPlace(null);
+    
+    try {
+      const response = await fetch(
+        `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(testAddress)}&key=${apiKey}`
+      );
+      const data = await response.json();
+      
+      if (data.status === 'OK' && data.predictions) {
+        setTestResults(data.predictions);
+        toast.success(`Found ${data.predictions.length} results`);
+      } else if (data.status === 'REQUEST_DENIED') {
+        toast.error('API key is invalid or Places API is not enabled');
+        setTestResults([]);
+      } else {
+        toast.error(data.error_message || 'No results found');
+        setTestResults([]);
+      }
+    } catch (error) {
+      toast.error('Failed to test API');
+      setTestResults([]);
+    } finally {
+      setIsTesting(false);
+    }
+  };
+
+  const handleSelectPlace = async (placeId: string) => {
+    setIsTesting(true);
+    try {
+      const response = await fetch(
+        `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&key=${apiKey}`
+      );
+      const data = await response.json();
+      
+      if (data.status === 'OK' && data.result) {
+        setSelectedPlace(data.result);
+        toast.success('Place details loaded successfully');
+      } else {
+        toast.error('Failed to load place details');
+      }
+    } catch (error) {
+      toast.error('Failed to fetch place details');
+    } finally {
+      setIsTesting(false);
     }
   };
 
@@ -77,6 +140,9 @@ function IntegrationCard({ integration }: { integration: IntegrationConfig }) {
       // The actual secret will be added via the secrets tool
       setShowConfigModal(false);
       setApiKey('');
+      setTestAddress('');
+      setTestResults([]);
+      setSelectedPlace(null);
     } catch (error) {
       toast.error('Failed to configure API key');
     } finally {
@@ -184,7 +250,7 @@ function IntegrationCard({ integration }: { integration: IntegrationConfig }) {
         {/* Configuration Modal for Google Places API */}
         {integration.id === 'google-places' && (
           <Dialog open={showConfigModal} onOpenChange={setShowConfigModal}>
-            <DialogContent className="sm:max-w-[550px]">
+            <DialogContent className="sm:max-w-[650px] max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Configure Google Places API</DialogTitle>
                 <DialogDescription>
@@ -214,6 +280,82 @@ function IntegrationCard({ integration }: { integration: IntegrationConfig }) {
                       Google Cloud Console
                     </a>
                   </p>
+                </div>
+
+                {/* Test API Section */}
+                <div className="rounded-lg border border-border bg-card p-4 space-y-3">
+                  <h4 className="text-sm font-semibold">Test API Key</h4>
+                  <p className="text-xs text-muted-foreground">
+                    Verify your API key works by searching for an address
+                  </p>
+                  
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="Type an address to test..."
+                      value={testAddress}
+                      onChange={(e) => setTestAddress(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && handleTestAddress()}
+                      disabled={!apiKey.trim()}
+                    />
+                    <Button 
+                      onClick={handleTestAddress} 
+                      disabled={!apiKey.trim() || !testAddress.trim() || isTesting}
+                      size="default"
+                    >
+                      {isTesting ? 'Testing...' : 'Test'}
+                    </Button>
+                  </div>
+
+                  {testResults.length > 0 && (
+                    <div className="space-y-2 mt-3">
+                      <p className="text-xs font-medium">Results ({testResults.length}):</p>
+                      <div className="max-h-[200px] overflow-y-auto space-y-1 border rounded-md p-2">
+                        {testResults.map((result) => (
+                          <Button
+                            key={result.place_id}
+                            variant="ghost"
+                            className="w-full justify-start text-left h-auto py-2 px-3"
+                            onClick={() => handleSelectPlace(result.place_id)}
+                          >
+                            <div className="flex-1">
+                              <p className="text-sm">{result.description}</p>
+                              <p className="text-xs text-muted-foreground">
+                                Place ID: {result.place_id}
+                              </p>
+                            </div>
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {selectedPlace && (
+                    <div className="mt-3 rounded-md bg-green-500/10 border border-green-500/20 p-3">
+                      <p className="text-xs font-semibold text-green-700 dark:text-green-400 mb-2">
+                        ✓ Selected Place Details
+                      </p>
+                      <div className="space-y-1 text-xs">
+                        <div>
+                          <span className="text-muted-foreground">Name: </span>
+                          <span className="font-medium">{selectedPlace.name}</span>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">Address: </span>
+                          <span>{selectedPlace.formatted_address}</span>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">Location: </span>
+                          <span className="font-mono">
+                            {selectedPlace.geometry?.location?.lat}, {selectedPlace.geometry?.location?.lng}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">Place ID: </span>
+                          <span className="font-mono text-[10px]">{selectedPlace.place_id}</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="rounded-lg bg-muted p-4 space-y-2">
