@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -11,11 +12,13 @@ import { documentationIndex, DocumentationItem } from '@/data/documentationIndex
 import { toast } from 'sonner';
 
 interface DocumentationViewerProps {
-  documentId: string;
-  onBack: () => void;
+  onBack?: () => void;
 }
 
-export default function DocumentationViewer({ documentId, onBack }: DocumentationViewerProps) {
+export default function DocumentationViewer({ onBack }: DocumentationViewerProps) {
+  const { docId } = useParams<{ docId: string }>();
+  const navigate = useNavigate();
+  const documentId = docId || '';
   const [content, setContent] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
@@ -54,12 +57,20 @@ export default function DocumentationViewer({ documentId, onBack }: Documentatio
     setTimeout(() => setCopiedCode(null), 2000);
   };
 
+  const handleBack = () => {
+    if (onBack) {
+      onBack();
+    } else {
+      navigate('/admin/knowledge');
+    }
+  };
+
   if (!doc) {
     return (
       <Card>
         <CardContent className="pt-6">
           <p className="text-center text-muted-foreground">Document not found</p>
-          <Button onClick={onBack} className="mt-4 mx-auto block">
+          <Button onClick={handleBack} className="mt-4 mx-auto block">
             Back to Knowledge Center
           </Button>
         </CardContent>
@@ -71,7 +82,7 @@ export default function DocumentationViewer({ documentId, onBack }: Documentatio
     <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <Button variant="ghost" onClick={onBack}>
+        <Button variant="ghost" onClick={handleBack}>
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Knowledge Center
         </Button>

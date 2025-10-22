@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -12,6 +13,7 @@ interface DocumentationSearchProps {
 }
 
 export default function DocumentationSearch({ searchQuery, onSearchChange }: DocumentationSearchProps) {
+  const navigate = useNavigate();
   const [results, setResults] = useState<DocumentationItem[]>([]);
 
   // Configure Fuse.js for fuzzy search
@@ -79,7 +81,11 @@ export default function DocumentationSearch({ searchQuery, onSearchChange }: Doc
           </p>
           <div className="grid gap-3">
             {results.map((doc) => (
-              <Card key={doc.id} className="hover:shadow-md transition-shadow cursor-pointer">
+              <Card 
+                key={doc.id} 
+                className="hover:shadow-md transition-shadow cursor-pointer"
+                onClick={() => navigate(`/admin/knowledge/${doc.id}`)}
+              >
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1">

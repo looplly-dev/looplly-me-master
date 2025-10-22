@@ -50,6 +50,7 @@ export default function KnowledgeDashboard() {
             <Card 
               key={category} 
               className="hover:shadow-lg transition-all cursor-pointer group"
+              onClick={() => setSearchQuery(category)}
             >
               <CardContent className="pt-6 text-center space-y-3">
                 <IconComponent className="h-12 w-12 mx-auto text-primary group-hover:scale-110 transition-transform" />
