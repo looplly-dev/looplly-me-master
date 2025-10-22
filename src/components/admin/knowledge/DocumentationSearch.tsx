@@ -37,18 +37,40 @@ export default function DocumentationSearch({ searchQuery, onSearchChange }: Doc
     setResults(searchResults.map(result => result.item));
   }, [searchQuery, fuse]);
 
+  const popularSearches = ['Mobile validation', 'Reputation system', 'User types', 'Profile questions'];
+
   return (
     <div className="space-y-4">
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          type="text"
-          placeholder="Search documentation... (e.g., 'mobile validation', 'reputation', 'profiling')"
-          value={searchQuery}
-          onChange={(e) => onSearchChange(e.target.value)}
-          className="pl-10"
-        />
-      </div>
+      <Card className="border-2 shadow-lg">
+        <CardContent className="pt-6">
+          <div className="relative">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+            <Input
+              type="text"
+              placeholder="What do you need help with?"
+              value={searchQuery}
+              onChange={(e) => onSearchChange(e.target.value)}
+              className="pl-12 h-14 text-lg"
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      {!searchQuery && (
+        <div className="flex flex-wrap gap-2 justify-center">
+          <span className="text-sm text-muted-foreground">Popular:</span>
+          {popularSearches.map((term) => (
+            <Badge
+              key={term}
+              variant="secondary"
+              className="cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
+              onClick={() => onSearchChange(term)}
+            >
+              {term}
+            </Badge>
+          ))}
+        </div>
+      )}
 
       {results.length > 0 && (
         <div className="space-y-3">
