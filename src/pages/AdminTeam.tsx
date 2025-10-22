@@ -3,6 +3,8 @@ import AdminLayout from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Search, Loader2, UserPlus } from 'lucide-react';
 import { useState } from 'react';
 import { useAdminTeam } from '@/hooks/useAdminTeam';
@@ -12,15 +14,27 @@ import { useRole } from '@/hooks/useRole';
 
 function AdminTeamContent() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
   const debouncedSearch = useDebounce(searchQuery, 500);
   const { teamMembers, isLoading, error, refetch } = useAdminTeam(debouncedSearch);
   const { isSuperAdmin } = useRole();
+
+  const filteredTeamMembers = selectedRoles.length > 0
+    ? teamMembers.filter(member => selectedRoles.includes(member.role))
+    : teamMembers;
 
   return (
     <div className="space-y-6">
       <div>
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold">Team Management</h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-3xl font-bold">Team Management</h1>
+            {selectedRoles.length > 0 && (
+              <Badge variant="outline">
+                {selectedRoles.length} {selectedRoles.length === 1 ? 'filter' : 'filters'} active
+              </Badge>
+            )}
+          </div>
           {isSuperAdmin() && (
             <Button>
               <UserPlus className="h-4 w-4 mr-2" />
@@ -29,7 +43,10 @@ function AdminTeamContent() {
           )}
         </div>
         <p className="text-muted-foreground mt-2">
-          Manage Looplly staff members (super admins and admins)
+          Manage Looplly staff members (super admins and admins) ({selectedRoles.length > 0 
+            ? `${filteredTeamMembers.length} of ${teamMembers.length} members`
+            : `${teamMembers.length} ${teamMembers.length === 1 ? 'member' : 'members'}`
+          })
         </p>
       </div>
 
@@ -37,7 +54,7 @@ function AdminTeamContent() {
         <CardHeader>
           <CardTitle>Search Team Members</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
           <div className="relative">
             <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             <Input
@@ -46,6 +63,34 @@ function AdminTeamContent() {
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-9"
             />
+          </div>
+
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-sm text-muted-foreground">Filter by role:</span>
+            <ToggleGroup 
+              type="multiple" 
+              value={selectedRoles}
+              onValueChange={setSelectedRoles}
+              className="justify-start gap-2"
+            >
+              <ToggleGroupItem value="super_admin" size="sm" className="gap-1.5">
+                <Badge variant="destructive" className="h-4 px-1.5 text-xs">SA</Badge>
+                <span className="text-sm">Super Admin</span>
+              </ToggleGroupItem>
+              <ToggleGroupItem value="admin" size="sm" className="gap-1.5">
+                <Badge variant="default" className="h-4 px-1.5 text-xs">A</Badge>
+                <span className="text-sm">Admin</span>
+              </ToggleGroupItem>
+            </ToggleGroup>
+            {selectedRoles.length > 0 && (
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => setSelectedRoles([])}
+              >
+                Clear
+              </Button>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -63,7 +108,7 @@ function AdminTeamContent() {
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
       ) : (
-        <TeamListTable teamMembers={teamMembers} onUpdate={refetch} />
+        <TeamListTable teamMembers={filteredTeamMembers} onUpdate={refetch} />
       )}
     </div>
   );
