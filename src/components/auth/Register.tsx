@@ -14,6 +14,8 @@ import { useToast } from '@/hooks/use-toast';
 import { deleteConflictingUser } from '@/utils/deleteConflictingUser';
 import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import { analytics } from '@/utils/analytics';
+import { validateAndNormalizeMobile } from '@/utils/mobileValidation';
+import { cn } from '@/lib/utils';
 
 interface RegisterProps {
   onBack: () => void;
@@ -46,8 +48,42 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [mobileValidation, setMobileValidation] = useState<{
+    isValid: boolean;
+    preview?: string;
+    error?: string;
+  }>({ isValid: false });
   const { register } = useAuth();
   const { toast } = useToast();
+
+  const handleMobileChange = (value: string) => {
+    updateField('mobile', value);
+    
+    // Real-time validation
+    if (value.length >= 3) {
+      const result = validateAndNormalizeMobile(value, formData.countryCode);
+      setMobileValidation({
+        isValid: result.isValid,
+        preview: result.nationalFormat,
+        error: result.error
+      });
+    } else {
+      setMobileValidation({ isValid: false });
+    }
+  };
+
+  const handleCountryChange = (value: string) => {
+    updateField('countryCode', value);
+    // Re-validate mobile number with new country code
+    if (formData.mobile && formData.mobile.length >= 3) {
+      const result = validateAndNormalizeMobile(formData.mobile, value);
+      setMobileValidation({
+        isValid: result.isValid,
+        preview: result.nationalFormat,
+        error: result.error
+      });
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -179,7 +215,7 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
               <div className="flex gap-2">
                 <Select 
                   value={formData.countryCode} 
-                  onValueChange={(value) => updateField('countryCode', value)}
+                  onValueChange={handleCountryChange}
                 >
                   <SelectTrigger className="w-24 h-12">
                      <SelectValue>
@@ -196,15 +232,44 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
                      ))}
                   </SelectContent>
                 </Select>
-                <Input
-                  id="mobile"
-                  type="tel"
-                  placeholder="Mobile number"
-                  value={formData.mobile}
-                  onChange={(e) => updateField('mobile', e.target.value)}
-                  className="flex-1 h-12"
-                  required
-                />
+                <div className="flex-1 space-y-1">
+                  <Input
+                    id="mobile"
+                    type="tel"
+                    placeholder="823093959 or 0823093959"
+                    value={formData.mobile}
+                    onChange={(e) => handleMobileChange(e.target.value)}
+                    className={cn(
+                      "h-12",
+                      mobileValidation.error && "border-destructive",
+                      mobileValidation.isValid && "border-green-500"
+                    )}
+                    required
+                  />
+                  
+                  {/* Real-time feedback */}
+                  {formData.mobile && mobileValidation.preview && (
+                    <div className="flex items-center gap-1 text-xs">
+                      <span className="text-green-600">✓</span>
+                      <span className="text-muted-foreground">
+                        Will be saved as: {mobileValidation.preview}
+                      </span>
+                    </div>
+                  )}
+                  
+                  {mobileValidation.error && (
+                    <p className="text-xs text-destructive">
+                      {mobileValidation.error}
+                    </p>
+                  )}
+                  
+                  {/* Helper text */}
+                  {!formData.mobile && (
+                    <p className="text-xs text-muted-foreground">
+                      Enter without country code (leading 0 is okay)
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
 

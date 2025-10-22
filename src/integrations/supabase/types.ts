@@ -303,7 +303,7 @@ export type Database = {
           action: string
           created_at: string | null
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           metadata: Json | null
           resource_id: string | null
           resource_type: string | null
@@ -315,7 +315,7 @@ export type Database = {
           action: string
           created_at?: string | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           metadata?: Json | null
           resource_id?: string | null
           resource_type?: string | null
@@ -327,7 +327,7 @@ export type Database = {
           action?: string
           created_at?: string | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           metadata?: Json | null
           resource_id?: string | null
           resource_type?: string | null
@@ -1697,7 +1697,7 @@ export type Database = {
         }[]
       }
       get_auth_users_with_phones: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           email: string
           phone: string
@@ -1715,10 +1715,7 @@ export type Database = {
           value: string
         }[]
       }
-      get_user_tenant_id: {
-        Args: { p_user_id: string }
-        Returns: string
-      }
+      get_user_tenant_id: { Args: { p_user_id: string }; Returns: string }
       has_role: {
         Args: { p_role: string; p_user_id: string }
         Returns: boolean
@@ -1739,6 +1736,10 @@ export type Database = {
           p_tenant_id: string
           p_user_id: string
         }
+        Returns: string
+      }
+      normalize_mobile_number: {
+        Args: { country_dial_code: string; mobile_number: string }
         Returns: string
       }
       validate_tenant_api_key: {

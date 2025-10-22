@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { formatMobileForDisplay } from '@/utils/mobileValidation';
 
 export interface AdminUser {
   user_id: string;
@@ -52,7 +53,10 @@ export function useAdminUsers(searchQuery: string = '') {
 
       const usersWithTypes = profilesData?.map(profile => ({
         ...profile,
-        user_type: 'looplly_user' as 'office_user' | 'looplly_user'
+        user_type: 'looplly_user' as 'office_user' | 'looplly_user',
+        mobile: profile.mobile && profile.country_code 
+          ? formatMobileForDisplay(profile.mobile, profile.country_code, 'international')
+          : profile.mobile
       })) || [];
 
       setUsers(usersWithTypes);

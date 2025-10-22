@@ -1,5 +1,6 @@
 // Authentication utilities
 import { supabase } from '@/integrations/supabase/client';
+import { validateAndNormalizeMobile } from './mobileValidation';
 
 export interface RegistrationParams {
   mobile: string;
@@ -19,8 +20,15 @@ export const registerUser = async (params: RegistrationParams): Promise<{ succes
   try {
     console.log('Registering user with email:', params.email);
     
-    // Format mobile number for metadata storage
-    const fullMobile = `${params.countryCode}${params.mobile}`;
+    // Validate and normalize mobile number
+    const mobileValidation = validateAndNormalizeMobile(params.mobile, params.countryCode);
+    
+    if (!mobileValidation.isValid) {
+      console.error('Mobile validation error:', mobileValidation.error);
+      return { success: false, error: { message: mobileValidation.error || 'Invalid mobile number' } };
+    }
+    
+    const normalizedMobile = mobileValidation.normalizedNumber!;
     
     // Use email-based auth instead of phone
     const { error } = await supabase.auth.signUp({
@@ -31,7 +39,7 @@ export const registerUser = async (params: RegistrationParams): Promise<{ succes
         data: {
           first_name: params.firstName || '',
           last_name: params.lastName || '',
-          mobile: fullMobile,
+          mobile: normalizedMobile,
           country_code: params.countryCode
         }
       }
