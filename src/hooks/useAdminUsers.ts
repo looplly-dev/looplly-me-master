@@ -50,10 +50,6 @@ export function useAdminUsers(searchQuery: string = '') {
       const { data: profilesData, error: profilesError } = await query;
       if (profilesError) throw profilesError;
 
-      // Fetch user types using raw SQL since types aren't generated yet
-      const userIds = profilesData?.map(p => p.user_id) || [];
-      const { data: typesData } = await supabase.rpc('get_auth_users_with_phones').select('*').in('user_id', userIds);
-
       const usersWithTypes = profilesData?.map(profile => ({
         ...profile,
         user_type: 'looplly_user' as 'office_user' | 'looplly_user'
