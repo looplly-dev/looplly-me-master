@@ -231,6 +231,27 @@ To add support for a new country:
 
 2. No changes needed to validation - libphonenumber-js handles all country rules automatically
 
+---
+
+## Global Expansion
+
+For comprehensive guidance on expanding mobile validation to support more countries (from 5 to 230+), see:
+
+📘 **[MOBILE_VALIDATION_GLOBAL_EXPANSION.md](./MOBILE_VALIDATION_GLOBAL_EXPANSION.md)**
+
+This child document covers:
+- Three approaches to global expansion (database-driven, full global, hybrid)
+- Database schema considerations for dynamic country management
+- UX/UI patterns for different country list sizes
+- Legal & compliance requirements per region
+- Operational considerations (SMS providers, fraud prevention, support)
+- Phased rollout strategy with decision matrix
+- Analytics and monitoring for data-driven expansion
+
+The validation system is already globally capable through `libphonenumber-js`—expanding is primarily a strategic and UX decision.
+
+---
+
 ## Dependencies
 
 - **libphonenumber-js** (v1.11.18+) - Google's phone number validation library
