@@ -18,6 +18,7 @@ import {
   MessageSquare,
   Wrench,
   Plug,
+  BookOpen,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -45,6 +46,7 @@ import {
 
 const adminNavItems = [
   { title: 'Dashboard', url: '/admin', icon: LayoutDashboard, exact: true },
+  { title: 'Knowledge Center', url: '/admin/knowledge', icon: BookOpen },
   { title: 'Team', url: '/admin/team', icon: UserCog },
   { title: 'Users', url: '/admin/users', icon: Users },
   { title: 'Content', url: '/admin/content', icon: Briefcase },
@@ -126,6 +128,7 @@ function AdminBreadcrumb() {
   const getBreadcrumbLabel = (segment: string) => {
     const labels: Record<string, string> = {
       admin: 'Admin',
+      knowledge: 'Knowledge Center',
       team: 'Team Management',
       users: 'Users',
       content: 'Content',

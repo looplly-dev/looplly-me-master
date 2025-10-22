@@ -23,6 +23,7 @@ import AdminProfileQuestions from "./pages/AdminProfileQuestions";
 import AdminQuestionBuilder from "./pages/AdminQuestionBuilder";
 import AdminQuestions from "./pages/AdminQuestions";
 import AdminEarningRules from "./pages/AdminEarningRules";
+import AdminKnowledge from "./pages/AdminKnowledge";
 import ResetPassword from "./components/auth/ResetPassword";
 
 const queryClient = new QueryClient();
@@ -49,6 +50,7 @@ const AppContent = () => {
               <Route path="/admin/profile-questions" element={<AdminProfileQuestions />} />
               <Route path="/admin/question-builder" element={<AdminQuestionBuilder />} />
               <Route path="/admin/earning-rules" element={<AdminEarningRules />} />
+              <Route path="/admin/knowledge" element={<AdminKnowledge />} />
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/*" element={<LoopllyApp />} />
             </Routes>
