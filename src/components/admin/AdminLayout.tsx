@@ -20,7 +20,9 @@ import {
   Plug,
   BookOpen,
   Globe,
+  TestTube,
 } from 'lucide-react';
+import { useRole } from '@/hooks/useRole';
 import {
   Sidebar,
   SidebarContent,
@@ -45,27 +47,31 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 
+type UserRole = 'super_admin' | 'admin' | 'tester' | 'user';
+
 const adminNavItems = [
-  { title: 'Dashboard', url: '/admin', icon: LayoutDashboard, exact: true },
-  { title: 'Knowledge Center', url: '/admin/knowledge', icon: BookOpen },
-  { title: 'Team', url: '/admin/team', icon: UserCog },
-  { title: 'Users', url: '/admin/users', icon: Users },
-  { title: 'Content', url: '/admin/content', icon: Briefcase },
-  { title: 'Badges', url: '/admin/badges', icon: Award },
-  { title: 'Streak Config', url: '/admin/streak-config', icon: Flame },
-  { title: 'Questions', url: '/admin/questions', icon: MessageSquare },
-  { title: 'Country Blocklist', url: '/admin/country-blocklist', icon: Globe },
-  { title: 'Redemptions', url: '/admin/redemptions', icon: DollarSign },
-  { title: 'Analytics', url: '/admin/analytics', icon: BarChart3 },
-  { title: 'Integrations', url: '/admin/integrations', icon: Plug },
-  { title: 'AI Agents', url: '/admin/agents', icon: Brain },
-  { title: 'Earning Rules', url: '/admin/earning-rules', icon: CheckCircle2 },
-  { title: 'Migration', url: '/admin/migration', icon: ArrowRightLeft },
+  { title: 'Dashboard', url: '/admin', icon: LayoutDashboard, exact: true, minRole: 'admin' as UserRole },
+  { title: 'Journey Simulator', url: '/admin/simulator', icon: TestTube, minRole: 'tester' as UserRole },
+  { title: 'Knowledge Center', url: '/admin/knowledge', icon: BookOpen, minRole: 'tester' as UserRole },
+  { title: 'Team', url: '/admin/team', icon: UserCog, minRole: 'admin' as UserRole },
+  { title: 'Users', url: '/admin/users', icon: Users, minRole: 'admin' as UserRole },
+  { title: 'Content', url: '/admin/content', icon: Briefcase, minRole: 'admin' as UserRole },
+  { title: 'Badges', url: '/admin/badges', icon: Award, minRole: 'admin' as UserRole },
+  { title: 'Streak Config', url: '/admin/streak-config', icon: Flame, minRole: 'admin' as UserRole },
+  { title: 'Questions', url: '/admin/questions', icon: MessageSquare, minRole: 'admin' as UserRole },
+  { title: 'Country Blocklist', url: '/admin/country-blocklist', icon: Globe, minRole: 'admin' as UserRole },
+  { title: 'Redemptions', url: '/admin/redemptions', icon: DollarSign, minRole: 'admin' as UserRole },
+  { title: 'Analytics', url: '/admin/analytics', icon: BarChart3, minRole: 'admin' as UserRole },
+  { title: 'Integrations', url: '/admin/integrations', icon: Plug, minRole: 'admin' as UserRole },
+  { title: 'AI Agents', url: '/admin/agents', icon: Brain, minRole: 'admin' as UserRole },
+  { title: 'Earning Rules', url: '/admin/earning-rules', icon: CheckCircle2, minRole: 'admin' as UserRole },
+  { title: 'Migration', url: '/admin/migration', icon: ArrowRightLeft, minRole: 'admin' as UserRole },
 ];
 
 function AdminSidebar() {
   const { state } = useSidebar();
   const location = useLocation();
+  const { hasRole } = useRole();
 
   const isActive = (url: string, exact?: boolean) => {
     if (exact) {
@@ -75,6 +81,11 @@ function AdminSidebar() {
   };
 
   const isCollapsed = state === 'collapsed';
+  
+  // Filter nav items based on user's role
+  const visibleNavItems = adminNavItems.filter(item => 
+    hasRole(item.minRole)
+  );
 
   return (
     <Sidebar className={isCollapsed ? 'w-14' : 'w-60'} collapsible="icon">
@@ -97,7 +108,7 @@ function AdminSidebar() {
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {adminNavItems.map((item) => (
+              {visibleNavItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <NavLink
@@ -130,6 +141,7 @@ function AdminBreadcrumb() {
   const getBreadcrumbLabel = (segment: string) => {
     const labels: Record<string, string> = {
       admin: 'Admin',
+      simulator: 'Journey Simulator',
       knowledge: 'Knowledge Center',
       team: 'Team Management',
       users: 'Users',

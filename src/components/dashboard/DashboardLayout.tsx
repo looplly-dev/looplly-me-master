@@ -2,9 +2,10 @@ import { ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { useRole } from '@/hooks/useRole';
+import { useUserType } from '@/hooks/useUserType';
 import { useDarkMode } from '@/hooks/useDarkMode';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { Coins, Wallet, User, Users, Trophy, MessageSquare, LogOut, Settings as SettingsIcon, HelpCircle, Shield, Moon, Sun } from 'lucide-react';
+import { Coins, Wallet, User, Users, Trophy, MessageSquare, LogOut, Settings as SettingsIcon, HelpCircle, Shield, Moon, Sun, BookOpen } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { HeaderActionsMenu } from './HeaderActionsMenu';
 import { analytics } from '@/utils/analytics';
@@ -17,6 +18,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const location = useLocation();
   const { authState, logout } = useAuth();
   const { isAdmin } = useRole();
+  const { isOfficeUser } = useUserType();
   const { isDarkMode, toggleDarkMode } = useDarkMode();
   const isMobile = useIsMobile();
 
@@ -26,7 +28,8 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
   const isActive = (path: string) => location.pathname === path;
 
-  const navItems = [
+  // Build nav items based on user type
+  const baseNavItems = [
     { path: '/', icon: Coins, label: 'Earn' },
     { path: '/wallet', icon: Wallet, label: 'Wallet' },
     { path: '/profile', icon: User, label: 'Profile' },
@@ -34,6 +37,10 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     { path: '/community', icon: MessageSquare, label: 'Community' },
     { path: '/rep', icon: Trophy, label: 'Rep' },
   ];
+  
+  const navItems = isOfficeUser() 
+    ? [...baseNavItems, { path: '/knowledge', icon: BookOpen, label: 'Knowledge' }]
+    : baseNavItems;
 
   return (
     <div className="min-h-screen bg-background pb-20">

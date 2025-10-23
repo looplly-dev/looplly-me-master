@@ -4,7 +4,7 @@ import KnowledgeDashboard from '@/components/admin/knowledge/KnowledgeDashboard'
 
 export default function AdminKnowledge() {
   return (
-    <ProtectedRoute requiredRole="user">
+    <ProtectedRoute requiredRole="tester">
       <AdminLayout>
         <KnowledgeDashboard />
       </AdminLayout>

@@ -24,10 +24,19 @@ export function useUserType() {
 
     const fetchUserType = async () => {
       try {
-        // Default to looplly_user until types table is available
-        // After Supabase types regenerate, we can query user_types table directly
-        setUserType('looplly_user');
-        
+        // Type assertion since types haven't regenerated yet
+        const result = await supabase
+          .from('user_types' as any)
+          .select('user_type')
+          .eq('user_id', authState.user!.id)
+          .single();
+
+        if (result.error) {
+          console.error('Error fetching user type:', result.error);
+          setUserType('looplly_user'); // Default fallback
+        } else {
+          setUserType((result.data as any)?.user_type || 'looplly_user');
+        }
       } catch (error) {
         console.error('Error fetching user type:', error);
         setUserType('looplly_user');

@@ -26,6 +26,9 @@ import AdminEarningRules from "./pages/AdminEarningRules";
 import AdminKnowledge from "./pages/AdminKnowledge";
 import AdminKnowledgeDoc from "./pages/AdminKnowledgeDoc";
 import AdminCountryBlocklist from "./pages/AdminCountryBlocklist";
+import AdminSimulator from "./pages/AdminSimulator";
+import Knowledge from "./pages/Knowledge";
+import KnowledgeDoc from "./pages/KnowledgeDoc";
 import ResetPassword from "./components/auth/ResetPassword";
 
 const queryClient = new QueryClient();
@@ -52,9 +55,15 @@ const AppContent = () => {
               <Route path="/admin/profile-questions" element={<AdminProfileQuestions />} />
               <Route path="/admin/question-builder" element={<AdminQuestionBuilder />} />
               <Route path="/admin/earning-rules" element={<AdminEarningRules />} />
+              <Route path="/admin/simulator" element={<AdminSimulator />} />
               <Route path="/admin/knowledge" element={<AdminKnowledge />} />
               <Route path="/admin/knowledge/:docId" element={<AdminKnowledgeDoc />} />
               <Route path="/admin/country-blocklist" element={<AdminCountryBlocklist />} />
+              
+              {/* B2B Knowledge Routes */}
+              <Route path="/knowledge" element={<Knowledge />} />
+              <Route path="/knowledge/:docId" element={<KnowledgeDoc />} />
+              
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/*" element={<LoopllyApp />} />
             </Routes>

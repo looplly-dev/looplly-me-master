@@ -3,11 +3,11 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 
-export type UserRole = 'super_admin' | 'admin' | 'user' | null;
+export type UserRole = 'super_admin' | 'admin' | 'tester' | 'user' | null;
 
 /**
  * Role hierarchy for staff permissions
- * super_admin (Level 3) > admin (Level 2) > user (Level 1)
+ * super_admin (Level 3) > admin (Level 2) > tester (Level 1.5) > user (Level 1)
  * 
  * Note: This is separate from user_types (office_user, looplly_user)
  * which control feature access, not admin permissions.
@@ -15,6 +15,7 @@ export type UserRole = 'super_admin' | 'admin' | 'user' | null;
 const ROLE_HIERARCHY: Record<NonNullable<UserRole>, number> = {
   super_admin: 3,
   admin: 2,
+  tester: 1.5,
   user: 1,
 };
 
@@ -83,6 +84,13 @@ export function useRole() {
   };
 
   /**
+   * Check if user is tester or higher
+   */
+  const isTester = (): boolean => {
+    return hasRole('tester');
+  };
+
+  /**
    * Get numeric role level (higher = more permissions)
    */
   const getRoleLevel = (): number => {
@@ -95,6 +103,7 @@ export function useRole() {
     hasRole,
     isAdmin,
     isSuperAdmin,
+    isTester,
     getRoleLevel,
   };
 }

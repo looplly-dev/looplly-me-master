@@ -1,12 +1,12 @@
 import AdminLayout from '@/components/admin/AdminLayout';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
-import DocumentationViewer from '@/components/admin/knowledge/DocumentationViewer';
+import SimulatorDashboard from '@/components/admin/simulator/SimulatorDashboard';
 
-export default function AdminKnowledgeDoc() {
+export default function AdminSimulator() {
   return (
     <ProtectedRoute requiredRole="tester">
       <AdminLayout>
-        <DocumentationViewer />
+        <SimulatorDashboard />
       </AdminLayout>
     </ProtectedRoute>
   );
