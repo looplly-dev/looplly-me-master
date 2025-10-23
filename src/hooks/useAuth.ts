@@ -94,6 +94,57 @@ export const useAuthLogic = () => {
 
               if (!mounted) return;
 
+              // Check if user must change password (B2B invitation flow)
+              if (profile?.must_change_password) {
+                // Check if temp password expired
+                if (profile.temp_password_expires_at && 
+                    new Date(profile.temp_password_expires_at) < new Date()) {
+                  console.log('Temporary password expired');
+                  await logoutUser();
+                  if (mounted) {
+                    setAuthState({
+                      user: null,
+                      isAuthenticated: false,
+                      isLoading: false,
+                      step: 'login'
+                    });
+                  }
+                  return;
+                }
+                
+                console.log('User must change password - redirecting to reset page');
+                if (mounted) {
+                  setAuthState({
+                    user: {
+                      id: session.user.id,
+                      mobile: profile?.mobile || session.user.phone || '',
+                      countryCode: profile?.country_code || '+1',
+                      email: session.user.email,
+                      firstName: profile?.first_name,
+                      lastName: profile?.last_name,
+                      isVerified: profile?.is_verified || false,
+                      profileComplete: profile?.profile_complete || false,
+                      profile: profile ? {
+                        sec: (profile.sec as 'A' | 'B' | 'C1' | 'C2' | 'D' | 'E') || 'B',
+                        gender: (profile.gender as 'male' | 'female' | 'other') || 'other',
+                        dateOfBirth: profile.date_of_birth ? new Date(profile.date_of_birth) : new Date(),
+                        address: profile.address || '',
+                        gpsEnabled: profile.gps_enabled || false,
+                        firstName: profile.first_name || '',
+                        lastName: profile.last_name || '',
+                        email: profile.email || session.user.email || '',
+                        country_code: profile.country_code,
+                        country_iso: profile.country_iso
+                      } : undefined
+                    },
+                    isAuthenticated: true,
+                    isLoading: false,
+                    step: 'login' // Will be redirected by route guard
+                  });
+                }
+                return;
+              }
+
               const user: User = {
                 id: session.user.id,
                 mobile: profile?.mobile || session.user.phone || '',

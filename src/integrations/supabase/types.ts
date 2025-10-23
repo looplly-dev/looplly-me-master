@@ -1251,83 +1251,107 @@ export type Database = {
         Row: {
           address: string | null
           badge_preview_mode: boolean | null
+          company_name: string | null
+          company_role: string | null
           country_code: string | null
           country_iso: string | null
           created_at: string | null
           date_of_birth: string | null
           email: string | null
           ethnicity: string | null
+          first_login_at: string | null
           first_name: string | null
           gender: string | null
           gps_enabled: boolean | null
           household_income: string | null
+          invitation_sent_at: string | null
+          invited_by: string | null
           is_suspended: boolean | null
           is_verified: boolean | null
           last_name: string | null
           last_profile_update: string | null
           mobile: string | null
+          must_change_password: boolean | null
           profile_complete: boolean | null
           profile_completeness_score: number | null
           profile_level: number | null
           sec: string | null
           short_id: string | null
+          temp_password_expires_at: string | null
           tenant_id: string | null
           updated_at: string | null
           user_id: string
+          user_type: Database["public"]["Enums"]["user_type"] | null
         }
         Insert: {
           address?: string | null
           badge_preview_mode?: boolean | null
+          company_name?: string | null
+          company_role?: string | null
           country_code?: string | null
           country_iso?: string | null
           created_at?: string | null
           date_of_birth?: string | null
           email?: string | null
           ethnicity?: string | null
+          first_login_at?: string | null
           first_name?: string | null
           gender?: string | null
           gps_enabled?: boolean | null
           household_income?: string | null
+          invitation_sent_at?: string | null
+          invited_by?: string | null
           is_suspended?: boolean | null
           is_verified?: boolean | null
           last_name?: string | null
           last_profile_update?: string | null
           mobile?: string | null
+          must_change_password?: boolean | null
           profile_complete?: boolean | null
           profile_completeness_score?: number | null
           profile_level?: number | null
           sec?: string | null
           short_id?: string | null
+          temp_password_expires_at?: string | null
           tenant_id?: string | null
           updated_at?: string | null
           user_id: string
+          user_type?: Database["public"]["Enums"]["user_type"] | null
         }
         Update: {
           address?: string | null
           badge_preview_mode?: boolean | null
+          company_name?: string | null
+          company_role?: string | null
           country_code?: string | null
           country_iso?: string | null
           created_at?: string | null
           date_of_birth?: string | null
           email?: string | null
           ethnicity?: string | null
+          first_login_at?: string | null
           first_name?: string | null
           gender?: string | null
           gps_enabled?: boolean | null
           household_income?: string | null
+          invitation_sent_at?: string | null
+          invited_by?: string | null
           is_suspended?: boolean | null
           is_verified?: boolean | null
           last_name?: string | null
           last_profile_update?: string | null
           mobile?: string | null
+          must_change_password?: boolean | null
           profile_complete?: boolean | null
           profile_completeness_score?: number | null
           profile_level?: number | null
           sec?: string | null
           short_id?: string | null
+          temp_password_expires_at?: string | null
           tenant_id?: string | null
           updated_at?: string | null
           user_id?: string
+          user_type?: Database["public"]["Enums"]["user_type"] | null
         }
         Relationships: [
           {
@@ -1912,6 +1936,7 @@ export type Database = {
       config_data_type: "string" | "number" | "boolean" | "json"
       dependency_type: "triggers" | "requires" | "observes"
       execution_status: "success" | "failure" | "timeout" | "cancelled"
+      user_type: "looplly_user" | "office_user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2044,6 +2069,7 @@ export const Constants = {
       config_data_type: ["string", "number", "boolean", "json"],
       dependency_type: ["triggers", "requires", "observes"],
       execution_status: ["success", "failure", "timeout", "cancelled"],
+      user_type: ["looplly_user", "office_user"],
     },
   },
 } as const

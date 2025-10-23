@@ -50,6 +50,14 @@ export default function ProtectedRoute({
     );
   }
 
+  // Check if user must change password and redirect (except if already on reset page)
+  if (authState.user?.profile && 
+      (authState.user.profile as any).must_change_password && 
+      window.location.pathname !== '/reset-password-required') {
+    navigate('/reset-password-required');
+    return null;
+  }
+
   // Insufficient permissions (using hierarchical role check)
   if (requiredRole && !hasRole(requiredRole)) {
     return fallback || (

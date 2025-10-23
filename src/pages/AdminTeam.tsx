@@ -11,10 +11,12 @@ import { useAdminTeam } from '@/hooks/useAdminTeam';
 import { TeamListTable } from '@/components/admin/team/TeamListTable';
 import { useDebounce } from '@/hooks/use-debounce';
 import { useRole } from '@/hooks/useRole';
+import { AddB2BUserModal } from '@/components/admin/team/AddB2BUserModal';
 
 function AdminTeamContent() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
+  const [showAddModal, setShowAddModal] = useState(false);
   const debouncedSearch = useDebounce(searchQuery, 500);
   const { teamMembers, isLoading, error, refetch } = useAdminTeam(debouncedSearch);
   const { isSuperAdmin } = useRole();
@@ -36,7 +38,7 @@ function AdminTeamContent() {
             )}
           </div>
           {isSuperAdmin() && (
-            <Button>
+            <Button onClick={() => setShowAddModal(true)}>
               <UserPlus className="h-4 w-4 mr-2" />
               Add Team Member
             </Button>
@@ -110,6 +112,14 @@ function AdminTeamContent() {
       ) : (
         <TeamListTable teamMembers={filteredTeamMembers} onUpdate={refetch} />
       )}
+
+      <AddB2BUserModal 
+        open={showAddModal}
+        onOpenChange={setShowAddModal}
+        onSuccess={() => {
+          refetch();
+        }}
+      />
     </div>
   );
 }

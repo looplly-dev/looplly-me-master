@@ -30,6 +30,7 @@ import AdminSimulator from "./pages/AdminSimulator";
 import Knowledge from "./pages/Knowledge";
 import KnowledgeDoc from "./pages/KnowledgeDoc";
 import ResetPassword from "./components/auth/ResetPassword";
+import ResetPasswordRequired from "./pages/ResetPasswordRequired";
 
 const queryClient = new QueryClient();
 
@@ -65,6 +66,7 @@ const AppContent = () => {
               <Route path="/knowledge/:docId" element={<KnowledgeDoc />} />
               
               <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/reset-password-required" element={<ResetPasswordRequired />} />
               <Route path="/*" element={<LoopllyApp />} />
             </Routes>
   );
