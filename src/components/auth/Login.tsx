@@ -46,7 +46,8 @@ export default function Login({ onForgotPassword, onRegister }: LoginProps) {
     
     try {
       console.log('Attempting login with:', formData.email);
-      const success = await login(formData.email, formData.password);
+      // Pass 'looplly_user' to enforce regular user login
+      const success = await login(formData.email, formData.password, 'looplly_user');
       
       if (!success) {
         // Track login failure
@@ -68,9 +69,12 @@ export default function Login({ onForgotPassword, onRegister }: LoginProps) {
       // Track login failure
       analytics.trackLogin('email', false);
       
+      // Show more specific error message
+      const errorMessage = error?.message || 'Something went wrong. Please try again.';
+      
       toast({
         title: 'Login Error',
-        description: error?.message || 'Something went wrong. Please try again.',
+        description: errorMessage,
         variant: 'destructive'
       });
       setShowSignupPrompt(true);

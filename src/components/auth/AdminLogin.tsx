@@ -9,6 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Eye, EyeOff, Shield, ArrowLeft } from 'lucide-react';
 import { useRole } from '@/hooks/useRole';
 import { useUserType } from '@/hooks/useUserType';
+import { supabase } from '@/integrations/supabase/client';
 
 export default function AdminLogin() {
   const navigate = useNavigate();
@@ -47,9 +48,27 @@ export default function AdminLogin() {
     setIsSubmitting(true);
     
     try {
-      const success = await login(formData.email, formData.password);
+      // Pass 'looplly_team_user' to enforce team member login
+      const success = await login(formData.email, formData.password, 'looplly_team_user');
       
       if (success) {
+        // Check if user needs to change password
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (session?.user) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('must_change_password')
+            .eq('user_id', session.user.id)
+            .single();
+          
+          if (profile?.must_change_password) {
+            // Redirect to admin password reset page
+            navigate('/admin/reset-password');
+            return;
+          }
+        }
+        
         // Wait a moment for auth state to update, then redirect
         setTimeout(() => {
           navigate('/admin');

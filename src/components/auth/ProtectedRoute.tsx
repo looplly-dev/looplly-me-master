@@ -77,10 +77,17 @@ export default function ProtectedRoute({
 
   // Check if user must change password and redirect (except if already on reset page)
   if (authState.user?.profile && 
-      (authState.user.profile as any).must_change_password && 
-      window.location.pathname !== '/reset-password-required') {
-    navigate('/reset-password-required');
-    return null;
+      (authState.user.profile as any).must_change_password) {
+    // Team members go to admin reset password page
+    if (userType === 'looplly_team_user' && window.location.pathname !== '/admin/reset-password') {
+      navigate('/admin/reset-password');
+      return null;
+    }
+    // Regular users go to regular reset password page
+    if (userType === 'looplly_user' && window.location.pathname !== '/reset-password-required') {
+      navigate('/reset-password-required');
+      return null;
+    }
   }
 
   // Check if this is an admin route (requires both team member status AND admin role)

@@ -33,6 +33,7 @@ import SimulatorSession from "./pages/SimulatorSession";
 import ResetPassword from "./components/auth/ResetPassword";
 import ResetPasswordRequired from "./pages/ResetPasswordRequired";
 import AdminLogin from "./components/auth/AdminLogin";
+import AdminResetPassword from "./pages/AdminResetPassword";
 
 const queryClient = new QueryClient();
 
@@ -42,8 +43,9 @@ const AppContent = () => {
   
   return (
     <Routes>
-              {/* Admin Login - Must be before protected routes */}
+      {/* Admin Login - Must be before protected routes */}
               <Route path="/admin/login" element={<AdminLogin />} />
+              <Route path="/admin/reset-password" element={<AdminResetPassword />} />
               
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/admin/team" element={<AdminTeam />} />

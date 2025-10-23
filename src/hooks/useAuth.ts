@@ -10,7 +10,7 @@ import { auditActions } from '@/utils/auditLogger';
 
 const AuthContext = createContext<{
   authState: AuthState;
-  login: (email: string, password: string) => Promise<boolean>;
+  login: (email: string, password: string, expectedUserType?: 'looplly_user' | 'looplly_team_user' | 'client_user') => Promise<boolean>;
   verifyOTP: (code: string) => Promise<boolean>;
   register: (data: any) => Promise<boolean>;
   completeProfile: (profile: any) => Promise<boolean>;
@@ -249,8 +249,8 @@ export const useAuthLogic = () => {
     }
   });
 
-  const login = withRateLimit('login', async (email: string, password: string): Promise<boolean> => {
-    console.log('Logging in user with email:', email);
+  const login = withRateLimit('login', async (email: string, password: string, expectedUserType?: 'looplly_user' | 'looplly_team_user' | 'client_user'): Promise<boolean> => {
+    console.log('Logging in user with email:', email, 'expected type:', expectedUserType);
     setAuthState(prev => ({ ...prev, isLoading: true }));
     
     try {
@@ -297,6 +297,48 @@ export const useAuthLogic = () => {
       const result = await loginUser({ email, password });
       
       if (result.success) {
+        // If expectedUserType is provided, validate after successful auth
+        if (expectedUserType) {
+          // Wait for session to be established
+          const { data: { session } } = await supabase.auth.getSession();
+          
+          if (session?.user) {
+            // Fetch user profile to check user_type
+            const { data: profile, error } = await supabase
+              .from('profiles')
+              .select('user_type')
+              .eq('user_id', session.user.id)
+              .single();
+            
+            if (error) {
+              console.error('Error fetching profile for user type check:', error);
+              setAuthState(prev => ({ ...prev, isLoading: false }));
+              return false;
+            }
+            
+            const actualUserType = profile?.user_type || 'looplly_user';
+            
+            // Check if user type matches expected
+            if (actualUserType !== expectedUserType) {
+              console.log('User type mismatch:', actualUserType, 'vs expected:', expectedUserType);
+              
+              // Log them out since they used wrong portal
+              await logoutUser();
+              
+              setAuthState(prev => ({ ...prev, isLoading: false }));
+              
+              // Return specific error based on mismatch
+              if (expectedUserType === 'looplly_team_user') {
+                throw new Error('Access denied. This portal is for team members only. Please use the main site to log in.');
+              } else if (expectedUserType === 'looplly_user') {
+                throw new Error('Please use the admin portal at /admin/login to access your team account.');
+              }
+              
+              return false;
+            }
+          }
+        }
+        
         return true;
       } else {
         console.error('Login failed:', result.error);
@@ -306,7 +348,7 @@ export const useAuthLogic = () => {
     } catch (error) {
       console.error('Login error:', error);
       setAuthState(prev => ({ ...prev, isLoading: false }));
-      return false;
+      throw error; // Re-throw to let caller handle the specific error message
     }
   });
 
