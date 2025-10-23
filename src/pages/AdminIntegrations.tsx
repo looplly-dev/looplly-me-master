@@ -147,21 +147,17 @@ function IntegrationCard({ integration }: { integration: IntegrationConfig }) {
       return;
     }
 
-    setIsConfiguring(true);
-    try {
-      // Store the API key securely using Lovable Cloud secrets
-      toast.success('API key configuration initiated. Please complete the secure setup in the modal that opens.');
-      // The actual secret will be added via the secrets tool
-      setShowConfigModal(false);
-      setApiKey('');
-      setTestAddress('');
-      setTestResults([]);
-      setSelectedPlace(null);
-    } catch (error) {
-      toast.error('Failed to configure API key');
-    } finally {
-      setIsConfiguring(false);
-    }
+    // Note: Actual secret storage happens via Lovable Cloud UI
+    // This is a placeholder for future implementation when secrets API is available
+    toast.success(
+      "To enable Google Places API, add VITE_GOOGLE_PLACES_API_KEY secret in Backend settings.",
+      { duration: 5000 }
+    );
+    setShowConfigModal(false);
+    setApiKey('');
+    setTestAddress('');
+    setTestResults([]);
+    setSelectedPlace(null);
   };
 
   // AI Provider handlers
@@ -208,15 +204,15 @@ function IntegrationCard({ integration }: { integration: IntegrationConfig }) {
       toast.error('Please enter an API key');
       return;
     }
-    
+
+    // Note: Actual secret storage happens via Lovable Cloud UI
+    // This is a placeholder for future implementation when secrets API is available
     toast.success(
-      'Configuration saved. Now add secrets in Backend: ' +
-      '1) AI_PROVIDER = "' + aiProvider + '" ' +
-      '2) AI_PROVIDER_API_KEY = "<your key>"',
-      { duration: 8000 }
+      `To enable ${aiProvider}, add VITE_AI_PROVIDER and VITE_AI_PROVIDER_API_KEY secrets in Backend settings.`,
+      { duration: 5000 }
     );
-    
     setShowAIConfigModal(false);
+    setAIProvider('openai');
     setAIApiKey('');
     setTestPrompt('Generate 5 household income ranges for South Africa.');
     setAITestResults(null);
