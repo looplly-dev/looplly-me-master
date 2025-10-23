@@ -13,7 +13,7 @@ export interface AdminUser {
   profile_complete: boolean | null;
   is_verified: boolean | null;
   is_suspended: boolean | null;
-  user_type: 'office_user' | 'looplly_user' | null; // Changed from role
+  user_type: 'looplly_user' | 'looplly_team_user' | 'client_user' | null;
 }
 
 export function useAdminUsers(searchQuery: string = '') {
@@ -38,8 +38,10 @@ export function useAdminUsers(searchQuery: string = '') {
           created_at,
           profile_complete,
           is_verified,
-          is_suspended
+          is_suspended,
+          user_type
         `)
+        .eq('user_type', 'looplly_user')
         .order('created_at', { ascending: false });
 
       if (searchQuery.trim()) {
@@ -53,7 +55,6 @@ export function useAdminUsers(searchQuery: string = '') {
 
       const usersWithTypes = profilesData?.map(profile => ({
         ...profile,
-        user_type: 'looplly_user' as 'office_user' | 'looplly_user',
         mobile: profile.mobile && profile.country_code 
           ? formatMobileForDisplay(profile.mobile, profile.country_code, 'international')
           : profile.mobile

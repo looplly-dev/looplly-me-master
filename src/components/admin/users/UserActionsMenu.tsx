@@ -47,7 +47,7 @@ interface UserActionsMenuProps {
 export function UserActionsMenu({ user, onUpdate }: UserActionsMenuProps) {
   const [showTypeDialog, setShowTypeDialog] = useState(false);
   const [showSuspendDialog, setShowSuspendDialog] = useState(false);
-  const [selectedUserType, setSelectedUserType] = useState<'office_user' | 'looplly_user'>(
+  const [selectedUserType, setSelectedUserType] = useState<'looplly_user' | 'looplly_team_user' | 'client_user'>(
     user.user_type || 'looplly_user'
   );
   const [isUpdating, setIsUpdating] = useState(false);
@@ -155,18 +155,19 @@ export function UserActionsMenu({ user, onUpdate }: UserActionsMenuProps) {
               <Label htmlFor="userType">User Type</Label>
               <Select 
                 value={selectedUserType} 
-                onValueChange={(value) => setSelectedUserType(value as 'office_user' | 'looplly_user')}
+                onValueChange={(value) => setSelectedUserType(value as 'looplly_user' | 'looplly_team_user' | 'client_user')}
               >
                 <SelectTrigger id="userType">
                   <SelectValue placeholder="Select a user type" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="looplly_user">Looplly User</SelectItem>
-                  <SelectItem value="office_user">Office User</SelectItem>
+                  <SelectItem value="looplly_team_user">Team User</SelectItem>
+                  <SelectItem value="client_user">Client User</SelectItem>
                 </SelectContent>
               </Select>
               <p className="text-sm text-muted-foreground">
-                Looplly Users are direct B2C users. Office Users are B2B customers.
+                Looplly Users are regular customers. Team Users are Looplly staff. Client Users are B2B customers.
               </p>
             </div>
           </div>

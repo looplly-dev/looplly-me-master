@@ -80,8 +80,8 @@ export function UserListTable({ users, onUpdate }: UserListTableProps) {
                 )}
               </TableCell>
               <TableCell>
-                <Badge variant={user.user_type === 'office_user' ? 'default' : 'secondary'}>
-                  {user.user_type === 'office_user' ? 'Office User' : 'Looplly User'}
+                <Badge variant="secondary">
+                  Looplly User
                 </Badge>
               </TableCell>
               <TableCell>
