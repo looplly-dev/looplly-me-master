@@ -1906,6 +1906,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_looplly_team_member: { Args: { _user_id: string }; Returns: boolean }
       log_audit_event: {
         Args: {
           p_action: string
@@ -1936,7 +1937,7 @@ export type Database = {
       config_data_type: "string" | "number" | "boolean" | "json"
       dependency_type: "triggers" | "requires" | "observes"
       execution_status: "success" | "failure" | "timeout" | "cancelled"
-      user_type: "looplly_user" | "office_user"
+      user_type: "looplly_user" | "client_user" | "looplly_team_user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2069,7 +2070,7 @@ export const Constants = {
       config_data_type: ["string", "number", "boolean", "json"],
       dependency_type: ["triggers", "requires", "observes"],
       execution_status: ["success", "failure", "timeout", "cancelled"],
-      user_type: ["looplly_user", "office_user"],
+      user_type: ["looplly_user", "client_user", "looplly_team_user"],
     },
   },
 } as const

@@ -5,7 +5,7 @@ import KnowledgeDashboard from '@/components/admin/knowledge/KnowledgeDashboard'
 import { Loader2 } from 'lucide-react';
 
 export default function Knowledge() {
-  const { isOfficeUser, isLoading } = useUserType();
+  const { isTeamMember, isLoading } = useUserType();
 
   if (isLoading) {
     return (
@@ -15,7 +15,7 @@ export default function Knowledge() {
     );
   }
 
-  if (!isOfficeUser()) {
+  if (!isTeamMember()) {
     return <Navigate to="/" replace />;
   }
 

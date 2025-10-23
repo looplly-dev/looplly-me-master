@@ -94,7 +94,7 @@ export const useAuthLogic = () => {
 
               if (!mounted) return;
 
-              // Check if user must change password (B2B invitation flow)
+              // Check if user must change password (team member invitation flow)
               if (profile?.must_change_password) {
                 // Check if temp password expired
                 if (profile.temp_password_expires_at && 

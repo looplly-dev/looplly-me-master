@@ -11,7 +11,7 @@ import { useAdminTeam } from '@/hooks/useAdminTeam';
 import { TeamListTable } from '@/components/admin/team/TeamListTable';
 import { useDebounce } from '@/hooks/use-debounce';
 import { useRole } from '@/hooks/useRole';
-import { AddB2BUserModal } from '@/components/admin/team/AddB2BUserModal';
+import { AddTeamMemberModal } from '@/components/admin/team/AddTeamMemberModal';
 
 function AdminTeamContent() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -113,7 +113,7 @@ function AdminTeamContent() {
         <TeamListTable teamMembers={filteredTeamMembers} onUpdate={refetch} />
       )}
 
-      <AddB2BUserModal 
+      <AddTeamMemberModal 
         open={showAddModal}
         onOpenChange={setShowAddModal}
         onSuccess={() => {

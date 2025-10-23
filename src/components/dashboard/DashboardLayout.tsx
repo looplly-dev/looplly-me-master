@@ -18,7 +18,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const location = useLocation();
   const { authState, logout } = useAuth();
   const { isAdmin } = useRole();
-  const { isOfficeUser } = useUserType();
+  const { isTeamMember } = useUserType();
   const { isDarkMode, toggleDarkMode } = useDarkMode();
   const isMobile = useIsMobile();
 
@@ -38,7 +38,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     { path: '/rep', icon: Trophy, label: 'Rep' },
   ];
   
-  const navItems = isOfficeUser() 
+  const navItems = isTeamMember() 
     ? [...baseNavItems, { path: '/knowledge', icon: BookOpen, label: 'Knowledge' }]
     : baseNavItems;
 

@@ -2,13 +2,18 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 
-export type UserType = 'office_user' | 'looplly_user' | null;
+export type UserType = 'looplly_user' | 'looplly_team_user' | 'client_user' | null;
 
 /**
- * Hook to manage user types (office_user vs looplly_user)
+ * Hook to manage user types
  * 
- * This is separate from useRole which manages staff roles (super_admin, admin, user).
- * User types control feature access, not admin permissions.
+ * User Types:
+ * - looplly_user: Regular users (main user base, no admin portal access)
+ * - looplly_team_user: Looplly staff (access admin portal, have roles in user_roles table)
+ * - client_user: B2B clients (future - companies using Looplly services)
+ * 
+ * This is separate from useRole which manages staff roles (super_admin, admin, tester).
+ * User types control WHAT features you access, roles control PERMISSION LEVEL within those features.
  */
 export function useUserType() {
   const [userType, setUserType] = useState<UserType>(null);
@@ -24,9 +29,8 @@ export function useUserType() {
 
     const fetchUserType = async () => {
       try {
-        // Type assertion since types haven't regenerated yet
         const result = await supabase
-          .from('user_types' as any)
+          .from('profiles')
           .select('user_type')
           .eq('user_id', authState.user!.id)
           .single();
@@ -35,7 +39,7 @@ export function useUserType() {
           console.error('Error fetching user type:', result.error);
           setUserType('looplly_user'); // Default fallback
         } else {
-          setUserType((result.data as any)?.user_type || 'looplly_user');
+          setUserType(result.data?.user_type as UserType || 'looplly_user');
         }
       } catch (error) {
         console.error('Error fetching user type:', error);
@@ -57,14 +61,21 @@ export function useUserType() {
   };
 
   /**
-   * Check if user is an office user (B2B customer)
+   * Check if user is Looplly staff member
    */
-  const isOfficeUser = (): boolean => {
-    return userType === 'office_user';
+  const isTeamMember = (): boolean => {
+    return userType === 'looplly_team_user';
   };
 
   /**
-   * Check if user is a looplly user (direct B2C user)
+   * Check if user is a B2B client (future)
+   */
+  const isClientUser = (): boolean => {
+    return userType === 'client_user';
+  };
+
+  /**
+   * Check if user is a regular Looplly user
    */
   const isLoopllyUser = (): boolean => {
     return userType === 'looplly_user';
@@ -74,7 +85,8 @@ export function useUserType() {
     userType,
     isLoading,
     hasUserType,
-    isOfficeUser,
+    isTeamMember,
+    isClientUser,
     isLoopllyUser,
   };
 }

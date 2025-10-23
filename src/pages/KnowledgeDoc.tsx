@@ -5,7 +5,7 @@ import DocumentationViewer from '@/components/admin/knowledge/DocumentationViewe
 import { Loader2 } from 'lucide-react';
 
 export default function KnowledgeDoc() {
-  const { isOfficeUser, isLoading } = useUserType();
+  const { isTeamMember, isLoading } = useUserType();
 
   if (isLoading) {
     return (
@@ -15,7 +15,7 @@ export default function KnowledgeDoc() {
     );
   }
 
-  if (!isOfficeUser()) {
+  if (!isTeamMember()) {
     return <Navigate to="/" replace />;
   }
 
