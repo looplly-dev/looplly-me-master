@@ -1,11 +1,10 @@
 import { ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
-import { useRole } from '@/hooks/useRole';
 import { useUserType } from '@/hooks/useUserType';
 import { useDarkMode } from '@/hooks/useDarkMode';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { Coins, Wallet, User, Users, Trophy, MessageSquare, LogOut, Settings as SettingsIcon, HelpCircle, Shield, Moon, Sun, BookOpen } from 'lucide-react';
+import { Coins, Wallet, User, Users, Trophy, MessageSquare, LogOut, Settings as SettingsIcon, HelpCircle, Moon, Sun, BookOpen } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { HeaderActionsMenu } from './HeaderActionsMenu';
 import { analytics } from '@/utils/analytics';
@@ -17,7 +16,6 @@ interface DashboardLayoutProps {
 export function DashboardLayout({ children }: DashboardLayoutProps) {
   const location = useLocation();
   const { authState, logout } = useAuth();
-  const { isAdmin } = useRole();
   const { isTeamMember } = useUserType();
   const { isDarkMode, toggleDarkMode } = useDarkMode();
   const isMobile = useIsMobile();
@@ -57,14 +55,6 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           </div>
 
           <div className="flex items-center gap-2 md:gap-3">
-            {isAdmin() && (
-              <Link to="/admin">
-                <Button variant="ghost" size="icon" className="h-10 w-10 md:h-9 md:w-9">
-                  <Shield className="h-6 w-6 md:h-5 md:w-5" />
-                </Button>
-              </Link>
-            )}
-
             <Button
               variant="ghost"
               size="icon"
