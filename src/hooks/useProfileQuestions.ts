@@ -55,14 +55,26 @@ export const useProfileQuestions = () => {
     queryFn: async () => {
       if (!userId) throw new Error('User not authenticated');
 
-      // Get user's country code (ISO format preferred for filtering)
+      // Check if user is a team member - they don't need profile questions
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
-        .select('country_code, country_iso')
+        .select('country_code, country_iso, user_type')
         .eq('user_id', userId)
         .single();
 
       if (profileError) throw profileError;
+
+      // Team users don't have profile questions
+      if (profile?.user_type === 'looplly_team_user') {
+        return {
+          categoriesWithQuestions: [],
+          level2Categories: [],
+          level3Categories: [],
+          level2Complete: true,
+          level3Percentage: 100,
+          staleQuestionCount: 0,
+        };
+      }
 
       // Use ISO code for filtering (ZA, NG, etc.), fall back to dial code if needed
       const userCountry = profile?.country_iso || profile?.country_code || 'ZA';

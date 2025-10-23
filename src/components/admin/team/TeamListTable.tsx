@@ -53,7 +53,10 @@ export function TeamListTable({ teamMembers, onUpdate }: TeamListTableProps) {
               <TableRow>
                 <TableHead>Name</TableHead>
                 <TableHead>Email</TableHead>
+                <TableHead>Team</TableHead>
+                <TableHead>Job Title</TableHead>
                 <TableHead>Role</TableHead>
+                <TableHead>Status</TableHead>
                 <TableHead>Joined</TableHead>
                 {isSuperAdmin() && <TableHead className="text-right">Actions</TableHead>}
               </TableRow>
@@ -67,9 +70,20 @@ export function TeamListTable({ teamMembers, onUpdate }: TeamListTableProps) {
                       : member.email?.split('@')[0] || 'Unknown'}
                   </TableCell>
                   <TableCell>{member.email || 'N/A'}</TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {member.company_name || 'Not set'}
+                  </TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {member.company_role || 'Not set'}
+                  </TableCell>
                   <TableCell>
                     <Badge variant={getRoleBadgeVariant(member.role)}>
                       {getRoleLabel(member.role)}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={member.is_active ? 'default' : 'secondary'}>
+                      {member.is_active ? 'Active' : 'Inactive'}
                     </Badge>
                   </TableCell>
                   <TableCell>

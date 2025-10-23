@@ -6,8 +6,11 @@ export interface TeamMember {
   email: string | null;
   first_name: string | null;
   last_name: string | null;
+  company_name: string | null;
+  company_role: string | null;
   role: 'super_admin' | 'admin';
   created_at: string;
+  is_active: boolean;
 }
 
 /**
@@ -26,14 +29,17 @@ export function useAdminTeam(searchQuery: string = '') {
       setIsLoading(true);
       setError(null);
 
-      // Fetch users with admin roles (super_admin or admin only)
+      // Fetch team members from team_profiles with their roles
       let query = supabase
-        .from('profiles')
+        .from('team_profiles')
         .select(`
           user_id,
           email,
           first_name,
           last_name,
+          company_name,
+          company_role,
+          is_active,
           created_at,
           user_roles!inner(role)
         `)
@@ -59,6 +65,9 @@ export function useAdminTeam(searchQuery: string = '') {
         email: profile.email,
         first_name: profile.first_name,
         last_name: profile.last_name,
+        company_name: profile.company_name,
+        company_role: profile.company_role,
+        is_active: profile.is_active,
         role: profile.user_roles.role as 'super_admin' | 'admin',
         created_at: profile.created_at,
       }));

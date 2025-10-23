@@ -1460,6 +1460,104 @@ export type Database = {
           },
         ]
       }
+      team_activity_log: {
+        Row: {
+          action: string
+          created_at: string | null
+          id: string
+          metadata: Json | null
+          resource_id: string | null
+          resource_type: string | null
+          team_user_id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          resource_id?: string | null
+          resource_type?: string | null
+          team_user_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          resource_id?: string | null
+          resource_type?: string | null
+          team_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_activity_log_team_user_id_fkey"
+            columns: ["team_user_id"]
+            isOneToOne: false
+            referencedRelation: "team_profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      team_profiles: {
+        Row: {
+          company_name: string | null
+          company_role: string | null
+          country_code: string | null
+          created_at: string | null
+          email: string
+          first_login_at: string | null
+          first_name: string | null
+          id: string
+          invitation_sent_at: string | null
+          invited_by: string | null
+          is_active: boolean | null
+          last_name: string | null
+          mobile: string | null
+          must_change_password: boolean | null
+          temp_password_expires_at: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          company_name?: string | null
+          company_role?: string | null
+          country_code?: string | null
+          created_at?: string | null
+          email: string
+          first_login_at?: string | null
+          first_name?: string | null
+          id?: string
+          invitation_sent_at?: string | null
+          invited_by?: string | null
+          is_active?: boolean | null
+          last_name?: string | null
+          mobile?: string | null
+          must_change_password?: boolean | null
+          temp_password_expires_at?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          company_name?: string | null
+          company_role?: string | null
+          country_code?: string | null
+          created_at?: string | null
+          email?: string
+          first_login_at?: string | null
+          first_name?: string | null
+          id?: string
+          invitation_sent_at?: string | null
+          invited_by?: string | null
+          is_active?: boolean | null
+          last_name?: string | null
+          mobile?: string | null
+          must_change_password?: boolean | null
+          temp_password_expires_at?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       tenants: {
         Row: {
           api_key: string
@@ -1897,6 +1995,22 @@ export type Database = {
           value: string
         }[]
       }
+      get_team_profile: {
+        Args: { p_user_id: string }
+        Returns: {
+          company_name: string
+          company_role: string
+          country_code: string
+          created_at: string
+          email: string
+          first_name: string
+          id: string
+          is_active: boolean
+          last_name: string
+          mobile: string
+          user_id: string
+        }[]
+      }
       get_user_tenant_id: { Args: { p_user_id: string }; Returns: string }
       has_role: {
         Args: { p_role: string; p_user_id: string }
@@ -1910,6 +2024,7 @@ export type Database = {
         Returns: boolean
       }
       is_looplly_team_member: { Args: { _user_id: string }; Returns: boolean }
+      is_team_member: { Args: { p_user_id: string }; Returns: boolean }
       log_audit_event: {
         Args: {
           p_action: string

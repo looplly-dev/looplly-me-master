@@ -4,13 +4,25 @@ import { useToast } from '@/hooks/use-toast';
 import { updateUserProfile } from '@/utils/profile';
 import { validateProfile, ProfileData } from '@/utils/validation';
 import { useAuth } from '@/hooks/useAuth';
+import { useUserType } from '@/hooks/useUserType';
 
 export const useProfile = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const { authState } = useAuth();
+  const { isTeamMember } = useUserType();
 
   const completeProfile = async (profileData: ProfileData): Promise<boolean> => {
+    // Team members don't complete profiles
+    if (isTeamMember()) {
+      toast({
+        title: "Not Applicable",
+        description: "Team members don't require profile completion.",
+        variant: "default",
+      });
+      return false;
+    }
+
     if (!authState.user?.id) {
       toast({
         title: "Error",

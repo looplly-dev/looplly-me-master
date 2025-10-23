@@ -1,5 +1,45 @@
 # User Classification System
 
+## Database Architecture
+
+### Tables for `looplly_user` ONLY
+- `profiles` (with profiling data like gender, DOB, SEC, address)
+- `profile_answers`
+- `profile_categories`
+- `profile_questions`
+- `address_components`
+- `user_reputation`
+- `user_balances`
+- `earning_activities`
+- `user_badges`
+- `transactions`
+- `user_referrals`
+
+### Tables for `looplly_team_user` ONLY
+- `team_profiles` (email, name, company_name, company_role)
+- `user_roles` (role assignments)
+- `team_activity_log` (optional activity tracking)
+
+### Shared/System Tables
+- `tenants`
+- `documentation`
+- `ai_agents`
+- `audit_logs` (for logging all user actions)
+- Configuration tables
+
+**CRITICAL**: Team users and regular users have completely separate data structures. Team users:
+- Do NOT complete profiling questionnaires
+- Do NOT have reputation scores
+- Do NOT earn rewards
+- Do NOT have balance/wallet functionality
+- Are stored in separate `team_profiles` table
+
+Regular users (`looplly_user`) cannot access admin functionality and have no entries in `user_roles` table.
+
+See [TABLE_ARCHITECTURE.md](./TABLE_ARCHITECTURE.md) for detailed architecture documentation.
+
+---
+
 ## Overview
 Looplly has 3 distinct user types, each with different purposes and access levels.
 

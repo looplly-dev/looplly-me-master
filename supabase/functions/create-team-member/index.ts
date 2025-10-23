@@ -92,14 +92,20 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Check if user already exists
+    // Check if user already exists in team_profiles or profiles
+    const { data: existingTeamUser } = await supabaseAdmin
+      .from('team_profiles')
+      .select('user_id')
+      .eq('email', email)
+      .single();
+
     const { data: existingUser } = await supabaseAdmin
       .from('profiles')
       .select('user_id')
       .eq('email', email)
       .single();
 
-    if (existingUser) {
+    if (existingTeamUser || existingUser) {
       return new Response(
         JSON.stringify({ error: 'A user with this email already exists' }),
         { status: 409, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -131,28 +137,43 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Update profile with team member specific fields
-    const { error: profileError } = await supabaseAdmin
-      .from('profiles')
-      .update({
-        user_type: 'looplly_team_user',
+    // Create team profile entry
+    const { error: teamProfileError } = await supabaseAdmin
+      .from('team_profiles')
+      .insert({
+        user_id: newUser.user.id,
+        email: email,
         company_name: team_name,
         company_role: job_title,
         must_change_password: true,
         invited_by: caller.id,
         invitation_sent_at: new Date().toISOString(),
         temp_password_expires_at: expiresAt.toISOString()
+      });
+
+    if (teamProfileError) {
+      console.error('Error creating team profile:', teamProfileError);
+      // Rollback: delete the auth user
+      await supabaseAdmin.auth.admin.deleteUser(newUser.user.id);
+      return new Response(
+        JSON.stringify({ error: 'Failed to create team profile', details: teamProfileError.message }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Also update the base profile with minimal data and team user type
+    const { error: profileError } = await supabaseAdmin
+      .from('profiles')
+      .update({
+        user_type: 'looplly_team_user',
+        must_change_password: true,
+        temp_password_expires_at: expiresAt.toISOString()
       })
       .eq('user_id', newUser.user.id);
 
     if (profileError) {
       console.error('Error updating profile:', profileError);
-      // Rollback: delete the auth user
-      await supabaseAdmin.auth.admin.deleteUser(newUser.user.id);
-      return new Response(
-        JSON.stringify({ error: 'Failed to update profile', details: profileError.message }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      // Note: Not a critical error, team_profile is primary
     }
 
     // Assign role in user_roles table
