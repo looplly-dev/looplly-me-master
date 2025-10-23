@@ -27,6 +27,24 @@ export const useProfileAnswers = () => {
         ? value 
         : (value?.value || JSON.stringify(value));
 
+      // Extract selected_option_short_id if value is an object with short_id
+      let selectedOptionShortId: string | null = null;
+      if (typeof value === 'object' && value?.short_id) {
+        selectedOptionShortId = value.short_id;
+      } else if (typeof value === 'string') {
+        // Try to find the option short_id by matching the value
+        const { data: matchedOption } = await supabase
+          .from('question_answer_options')
+          .select('short_id')
+          .eq('question_id', questionId)
+          .eq('value', value)
+          .single();
+        
+        if (matchedOption) {
+          selectedOptionShortId = matchedOption.short_id;
+        }
+      }
+
       const { error } = await supabase
         .from('profile_answers')
         .upsert([
@@ -35,8 +53,9 @@ export const useProfileAnswers = () => {
             question_id: questionId,
             answer_value: typeof value === 'string' ? value : null,
             answer_json: typeof value === 'object' ? value : null,
-            answer_normalized: normalizedValue, // For fast targeting
-            last_updated: new Date().toISOString(), // Decay uses this
+            answer_normalized: normalizedValue,
+            selected_option_short_id: selectedOptionShortId,
+            last_updated: new Date().toISOString(),
             is_stale: false
           }
         ], {

@@ -139,11 +139,21 @@ export function QuestionRenderer({ question, onAnswerChange, onAddressChange, di
               <SelectValue placeholder={question.placeholder || 'Select an option'} />
             </SelectTrigger>
             <SelectContent>
-              {question.options?.map((option) => (
-                <SelectItem key={option} value={option}>
-                  {option}
-                </SelectItem>
-              ))}
+              {question.options?.map((option) => {
+                // Support both new structured format and legacy string format
+                if (typeof option === 'string') {
+                  return (
+                    <SelectItem key={option} value={option}>
+                      {option}
+                    </SelectItem>
+                  );
+                }
+                return (
+                  <SelectItem key={option.short_id || option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                );
+              })}
             </SelectContent>
           </Select>
         );

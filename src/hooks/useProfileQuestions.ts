@@ -4,12 +4,13 @@ import { useAuth } from '@/hooks/useAuth';
 
 export interface ProfileQuestion {
   id: string;
+  short_id?: string | null;
   category_id: string;
   question_key: string;
   question_text: string;
   question_type: 'text' | 'select' | 'multiselect' | 'date' | 'number' | 'address' | 'email' | 'phone' | 'boolean';
   validation_rules: any;
-  options: string[] | null;
+  options: Array<{ label: string; value: string; short_id?: string }> | string[] | null;
   placeholder: string | null;
   help_text: string | null;
   level: number;
@@ -26,11 +27,13 @@ export interface ProfileQuestion {
     answer_json: any | null;
     is_stale: boolean | null;
     last_updated: string | null;
+    selected_option_short_id?: string | null;
   } | null;
 }
 
 export interface ProfileCategory {
   id: string;
+  short_id?: string | null;
   name: string;
   display_name: string;
   description: string | null;
@@ -102,6 +105,13 @@ export const useProfileQuestions = () => {
 
       if (questionsError) throw questionsError;
 
+      // Fetch structured answer options from new table
+      const { data: answerOptions } = await supabase
+        .from('question_answer_options')
+        .select('*')
+        .eq('is_active', true)
+        .order('display_order');
+
       // Get IDs of country-specific questions
       const countrySpecificIds = questions
         ?.filter((q: any) => q.applicability === 'country_specific')
@@ -145,11 +155,24 @@ export const useProfileQuestions = () => {
           .map((q: any) => {
             const userAnswer = answerMap.get(q.id);
             
-            // Merge country-specific options if applicable
-            const countryData = optionsMap.get(q.id);
-            const finalOptions = q.applicability === 'country_specific' && countryData
-              ? countryData.options
-              : q.options;
+            // Get structured options from new table if available
+            const structuredOptions = answerOptions?.filter(opt => opt.question_id === q.id)
+              .map(opt => ({
+                label: opt.label,
+                value: opt.value,
+                short_id: opt.short_id
+              }));
+            
+            // Priority: structured options → country-specific options → fallback to JSONB
+            let finalOptions: any = q.options;
+            if (structuredOptions && structuredOptions.length > 0) {
+              finalOptions = structuredOptions;
+            } else {
+              const countryData = optionsMap.get(q.id);
+              if (q.applicability === 'country_specific' && countryData) {
+                finalOptions = countryData.options;
+              }
+            }
             
             // Resolve decay config: question override → category default
             const decayConfig = q.question_decay_config || cat.default_decay_config;

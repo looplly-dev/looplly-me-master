@@ -1017,6 +1017,7 @@ export type Database = {
           is_verified: boolean | null
           last_updated: string | null
           question_id: string
+          selected_option_short_id: string | null
           targeting_metadata: Json | null
           user_id: string
           verified_at: string | null
@@ -1032,6 +1033,7 @@ export type Database = {
           is_verified?: boolean | null
           last_updated?: string | null
           question_id: string
+          selected_option_short_id?: string | null
           targeting_metadata?: Json | null
           user_id: string
           verified_at?: string | null
@@ -1047,6 +1049,7 @@ export type Database = {
           is_verified?: boolean | null
           last_updated?: string | null
           question_id?: string
+          selected_option_short_id?: string | null
           targeting_metadata?: Json | null
           user_id?: string
           verified_at?: string | null
@@ -1074,6 +1077,7 @@ export type Database = {
           is_active: boolean | null
           level: number
           name: string
+          short_id: string | null
           updated_at: string | null
         }
         Insert: {
@@ -1087,6 +1091,7 @@ export type Database = {
           is_active?: boolean | null
           level: number
           name: string
+          short_id?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -1100,6 +1105,7 @@ export type Database = {
           is_active?: boolean | null
           level?: number
           name?: string
+          short_id?: string | null
           updated_at?: string | null
         }
         Relationships: [
@@ -1166,6 +1172,7 @@ export type Database = {
           question_key: string
           question_text: string
           question_type: string
+          short_id: string | null
           staleness_days: number | null
           targeting_tags: string[] | null
           updated_at: string | null
@@ -1191,6 +1198,7 @@ export type Database = {
           question_key: string
           question_text: string
           question_type: string
+          short_id?: string | null
           staleness_days?: number | null
           targeting_tags?: string[] | null
           updated_at?: string | null
@@ -1216,6 +1224,7 @@ export type Database = {
           question_key?: string
           question_text?: string
           question_type?: string
+          short_id?: string | null
           staleness_days?: number | null
           targeting_tags?: string[] | null
           updated_at?: string | null
@@ -1261,6 +1270,7 @@ export type Database = {
           profile_completeness_score: number | null
           profile_level: number | null
           sec: string | null
+          short_id: string | null
           tenant_id: string | null
           updated_at: string | null
           user_id: string
@@ -1287,6 +1297,7 @@ export type Database = {
           profile_completeness_score?: number | null
           profile_level?: number | null
           sec?: string | null
+          short_id?: string | null
           tenant_id?: string | null
           updated_at?: string | null
           user_id: string
@@ -1313,6 +1324,7 @@ export type Database = {
           profile_completeness_score?: number | null
           profile_level?: number | null
           sec?: string | null
+          short_id?: string | null
           tenant_id?: string | null
           updated_at?: string | null
           user_id?: string
@@ -1323,6 +1335,56 @@ export type Database = {
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      question_answer_options: {
+        Row: {
+          created_at: string | null
+          display_order: number
+          id: string
+          is_active: boolean | null
+          label: string
+          metadata: Json | null
+          question_id: string
+          question_short_id: string
+          short_id: string
+          updated_at: string | null
+          value: string
+        }
+        Insert: {
+          created_at?: string | null
+          display_order?: number
+          id?: string
+          is_active?: boolean | null
+          label: string
+          metadata?: Json | null
+          question_id: string
+          question_short_id: string
+          short_id: string
+          updated_at?: string | null
+          value: string
+        }
+        Update: {
+          created_at?: string | null
+          display_order?: number
+          id?: string
+          is_active?: boolean | null
+          label?: string
+          metadata?: Json | null
+          question_id?: string
+          question_short_id?: string
+          short_id?: string
+          updated_at?: string | null
+          value?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "question_answer_options_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "profile_questions"
             referencedColumns: ["id"]
           },
         ]
