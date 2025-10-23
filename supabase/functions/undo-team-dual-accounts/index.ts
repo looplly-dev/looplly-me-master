@@ -58,78 +58,63 @@ Deno.serve(async (req) => {
     const results = [];
     const errors = [];
 
-    // Step 1: Get existing user IDs for nadia@looplly.me and warren@looplly.me
+    // Get all 4 accounts to delete
     const { data: existingUsers } = await supabaseAdmin.auth.admin.listUsers();
     
-    const nadiaUser = existingUsers?.users.find(u => u.email === 'nadia@looplly.me');
-    const warrenUser = existingUsers?.users.find(u => u.email === 'warren@looplly.me');
+    const emailsToDelete = [
+      'nadia@looplly.me',
+      'warren@looplly.me',
+      'nadia.gaspari1@outlook.com',
+      'warrenleroux@gmail.com'
+    ];
 
-    // Step 2: Update existing accounts' emails
-    if (nadiaUser) {
-      const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
-        nadiaUser.id,
-        { email: 'nadia.gaspari1@outlook.com' }
-      );
+    // Delete all 4 accounts
+    for (const email of emailsToDelete) {
+      const userToDelete = existingUsers?.users.find(u => u.email === email);
+      
+      if (userToDelete) {
+        const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(
+          userToDelete.id
+        );
 
-      if (updateError) {
-        errors.push({ user: 'nadia@looplly.me', action: 'email_update', error: updateError.message });
-      } else {
-        // Update profile email and reset to regular user
-        await supabaseAdmin
-          .from('profiles')
-          .update({ 
-            email: 'nadia.gaspari1@outlook.com',
-            user_type: 'looplly_user'
-          })
-          .eq('user_id', nadiaUser.id);
-        
-        results.push({ user: 'nadia@looplly.me', action: 'email_updated_to', new_email: 'nadia.gaspari1@outlook.com' });
+        if (deleteError) {
+          errors.push({ email, action: 'delete', error: deleteError.message });
+        } else {
+          results.push({ email, action: 'deleted' });
+        }
       }
     }
 
-    if (warrenUser) {
-      const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
-        warrenUser.id,
-        { email: 'warrenleroux@gmail.com' }
-      );
-
-      if (updateError) {
-        errors.push({ user: 'warren@looplly.me', action: 'email_update', error: updateError.message });
-      } else {
-        // Update profile email and reset to regular user
-        await supabaseAdmin
-          .from('profiles')
-          .update({ 
-            email: 'warrenleroux@gmail.com',
-            user_type: 'looplly_user'
-          })
-          .eq('user_id', warrenUser.id);
-        
-        results.push({ user: 'warren@looplly.me', action: 'email_updated_to', new_email: 'warrenleroux@gmail.com' });
-      }
-    }
-
-    // Step 3: Create new team accounts
-    const teamAccounts = [
-      { 
-        email: 'nadia@looplly.me', 
-        firstName: 'Nadia', 
+    // Now restore the original 2 accounts
+    const originalAccounts = [
+      {
+        email: 'nadia@looplly.me',
+        firstName: 'Nadia',
         lastName: 'Gaspari',
         role: 'super_admin',
         mobile: '+27741234001',
-        country_code: '+27'
+        country_code: '+27',
+        date_of_birth: '1977-08-19',
+        gender: 'female',
+        sec: 'A',
+        user_type: 'looplly_team_user'
       },
-      { 
-        email: 'warren@looplly.me', 
-        firstName: 'Warren', 
+      {
+        email: 'warren@looplly.me',
+        firstName: 'Warren',
         lastName: 'Le Roux',
         role: 'admin',
         mobile: '+27741234002',
-        country_code: '+27'
-      },
+        country_code: '+27',
+        date_of_birth: '1979-10-14',
+        gender: 'male',
+        sec: 'A',
+        address: '50 Risi Road, Fish Hoek, Cape Town, 7975',
+        user_type: 'looplly_team_user'
+      }
     ];
 
-    for (const account of teamAccounts) {
+    for (const account of originalAccounts) {
       // Create user in auth.users
       const { data: authUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
         email: account.email,
@@ -143,18 +128,27 @@ Deno.serve(async (req) => {
       });
 
       if (createError) {
-        errors.push({ user: account.email, action: 'create_team_account', error: createError.message });
+        errors.push({ email: account.email, action: 'create', error: createError.message });
         continue;
       }
 
-      // Update profile to set user_type to looplly_team_user
+      // Update profile with full data
       const { error: updateProfileError } = await supabaseAdmin
         .from('profiles')
-        .update({ user_type: 'looplly_team_user' })
+        .update({
+          user_type: account.user_type,
+          date_of_birth: account.date_of_birth,
+          gender: account.gender,
+          sec: account.sec,
+          address: account.address || null,
+          profile_complete: true,
+          profile_level: 2,
+          profile_completeness_score: 100
+        })
         .eq('user_id', authUser.user.id);
 
       if (updateProfileError) {
-        errors.push({ user: account.email, action: 'update_user_type', error: updateProfileError.message });
+        errors.push({ email: account.email, action: 'update_profile', error: updateProfileError.message });
         continue;
       }
 
@@ -167,13 +161,13 @@ Deno.serve(async (req) => {
         });
 
       if (roleError) {
-        errors.push({ user: account.email, action: 'assign_role', error: roleError.message });
+        errors.push({ email: account.email, action: 'assign_role', error: roleError.message });
       } else {
-        results.push({ 
-          user: account.email, 
-          action: 'team_account_created', 
+        results.push({
+          email: account.email,
+          action: 'restored',
           user_id: authUser.user.id,
-          role: account.role 
+          role: account.role
         });
       }
     }
@@ -183,13 +177,14 @@ Deno.serve(async (req) => {
       .from('audit_logs')
       .insert({
         user_id: user.id,
-        action: 'create_team_dual_accounts',
+        action: 'undo_team_dual_accounts',
         metadata: { results, errors, timestamp: new Date().toISOString() },
       });
 
     return new Response(
       JSON.stringify({
         success: true,
+        message: 'Original team accounts restored successfully',
         results,
         errors: errors.length > 0 ? errors : undefined,
       }),
@@ -197,10 +192,10 @@ Deno.serve(async (req) => {
     );
 
   } catch (error) {
-    console.error('Create team dual accounts error:', error);
+    console.error('Undo team dual accounts error:', error);
     return new Response(
       JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }),
-      { 
+      {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       }

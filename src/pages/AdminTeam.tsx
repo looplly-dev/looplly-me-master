@@ -12,7 +12,7 @@ import { TeamListTable } from '@/components/admin/team/TeamListTable';
 import { useDebounce } from '@/hooks/use-debounce';
 import { useRole } from '@/hooks/useRole';
 import { AddTeamMemberModal } from '@/components/admin/team/AddTeamMemberModal';
-import { CreateTeamDualAccountsButton } from '@/components/admin/team/CreateTeamDualAccountsButton';
+import { UndoTeamSetupButton } from '@/components/admin/team/UndoTeamSetupButton';
 
 function AdminTeamContent() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -40,7 +40,7 @@ function AdminTeamContent() {
           </div>
           {isSuperAdmin() && (
             <div className="flex gap-2">
-              <CreateTeamDualAccountsButton />
+              <UndoTeamSetupButton />
               <Button onClick={() => setShowAddModal(true)}>
                 <UserPlus className="h-4 w-4 mr-2" />
                 Add Team Member
