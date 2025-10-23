@@ -1267,6 +1267,7 @@ export type Database = {
           invitation_sent_at: string | null
           invited_by: string | null
           is_suspended: boolean | null
+          is_test_account: boolean | null
           is_verified: boolean | null
           last_name: string | null
           last_profile_update: string | null
@@ -1302,6 +1303,7 @@ export type Database = {
           invitation_sent_at?: string | null
           invited_by?: string | null
           is_suspended?: boolean | null
+          is_test_account?: boolean | null
           is_verified?: boolean | null
           last_name?: string | null
           last_profile_update?: string | null
@@ -1337,6 +1339,7 @@ export type Database = {
           invitation_sent_at?: string | null
           invited_by?: string | null
           is_suspended?: boolean | null
+          is_test_account?: boolean | null
           is_verified?: boolean | null
           last_name?: string | null
           last_profile_update?: string | null
@@ -1922,6 +1925,13 @@ export type Database = {
         Args: { country_dial_code: string; mobile_number: string }
         Returns: string
       }
+      reset_user_journey: {
+        Args: {
+          p_stage: Database["public"]["Enums"]["journey_stage"]
+          p_target_user_id: string
+        }
+        Returns: Json
+      }
       validate_tenant_api_key: {
         Args: { api_key_input: string }
         Returns: string
@@ -1937,6 +1947,13 @@ export type Database = {
       config_data_type: "string" | "number" | "boolean" | "json"
       dependency_type: "triggers" | "requires" | "observes"
       execution_status: "success" | "failure" | "timeout" | "cancelled"
+      journey_stage:
+        | "fresh_signup"
+        | "otp_verified"
+        | "basic_profile"
+        | "full_profile"
+        | "first_survey"
+        | "established_user"
       user_type: "looplly_user" | "client_user" | "looplly_team_user"
     }
     CompositeTypes: {
@@ -2070,6 +2087,14 @@ export const Constants = {
       config_data_type: ["string", "number", "boolean", "json"],
       dependency_type: ["triggers", "requires", "observes"],
       execution_status: ["success", "failure", "timeout", "cancelled"],
+      journey_stage: [
+        "fresh_signup",
+        "otp_verified",
+        "basic_profile",
+        "full_profile",
+        "first_survey",
+        "established_user",
+      ],
       user_type: ["looplly_user", "client_user", "looplly_team_user"],
     },
   },

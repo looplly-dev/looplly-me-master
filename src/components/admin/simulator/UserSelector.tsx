@@ -29,17 +29,17 @@ export default function UserSelector({ onUserSelect }: UserSelectorProps) {
   const fetchUsers = async () => {
     setIsLoading(true);
     try {
-      // Fetch ONLY test accounts (using type assertion until types regenerate)
-      const result: any = await supabase
+      // Fetch ONLY test accounts
+      const { data, error } = await supabase
         .from('profiles')
         .select('user_id, email, first_name, last_name, is_test_account')
         .eq('is_test_account', true)
         .eq('user_type', 'looplly_user')
         .order('email', { ascending: true });
 
-      if (result.error) throw result.error;
+      if (error) throw error;
 
-      const userOptions: UserOption[] = (result.data || []).map((profile: any) => ({
+      const userOptions: UserOption[] = (data || []).map((profile: any) => ({
         id: profile.user_id,
         email: profile.email || 'No email',
         firstName: profile.first_name || '',

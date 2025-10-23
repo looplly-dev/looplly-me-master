@@ -8,6 +8,7 @@ import UserSelector from './UserSelector';
 import StageSelector from './StageSelector';
 import SimulatorIframe from './SimulatorIframe';
 import StateInspector from './StateInspector';
+import SeedTestUsersButton from './SeedTestUsersButton';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -75,11 +76,14 @@ export default function SimulatorDashboard() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">User Journey Simulator</h1>
-        <p className="text-muted-foreground mt-2">
-          Experience the app as a test user at different journey stages
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">User Journey Simulator</h1>
+          <p className="text-muted-foreground mt-2">
+            Experience the app as a test user at different journey stages
+          </p>
+        </div>
+        <SeedTestUsersButton />
       </div>
 
       <Alert>
