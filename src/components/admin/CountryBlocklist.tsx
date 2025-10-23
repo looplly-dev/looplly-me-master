@@ -284,6 +284,7 @@ export function CountryBlocklist() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Country</TableHead>
+                  <TableHead>ISO</TableHead>
                   <TableHead>Dial Code</TableHead>
                   <TableHead>Reason</TableHead>
                   <TableHead>Blocked Date</TableHead>
@@ -294,6 +295,11 @@ export function CountryBlocklist() {
                 {filteredCountries.map((country) => (
                   <TableRow key={country.id}>
                     <TableCell className="font-medium">{country.country_name}</TableCell>
+                    <TableCell>
+                      <span className="font-mono text-xs bg-muted px-2 py-1 rounded">
+                        {country.country_code}
+                      </span>
+                    </TableCell>
                     <TableCell>{country.dial_code}</TableCell>
                     <TableCell className="max-w-md">
                       <p className="text-sm text-muted-foreground line-clamp-2">
