@@ -29,41 +29,27 @@ export default function UserSelector({ onUserSelect }: UserSelectorProps) {
   const fetchUsers = async () => {
     setIsLoading(true);
     try {
-      const { data: profiles, error } = await supabase
+      // Fetch ONLY test accounts (using type assertion until types regenerate)
+      const result: any = await supabase
         .from('profiles')
-        .select(`
-          user_id,
-          email,
-          first_name,
-          last_name
-        `)
-        .order('created_at', { ascending: false })
-        .limit(100);
+        .select('user_id, email, first_name, last_name, is_test_account')
+        .eq('is_test_account', true)
+        .eq('user_type', 'looplly_user')
+        .order('email', { ascending: true });
 
-      if (error) throw error;
+      if (result.error) throw result.error;
 
-      // Fetch user types separately (type assertion since types haven't regenerated yet)
-      const userIds = profiles?.map(p => p.user_id) || [];
-      const { data: userTypes } = await supabase
-        .from('user_types' as any)
-        .select('user_id, user_type')
-        .in('user_id', userIds);
-
-      const userTypeMap = new Map(
-        userTypes?.map((ut: any) => [ut.user_id, ut.user_type]) || []
-      );
-
-      const userOptions: UserOption[] = (profiles || []).map(profile => ({
+      const userOptions: UserOption[] = (result.data || []).map((profile: any) => ({
         id: profile.user_id,
         email: profile.email || 'No email',
         firstName: profile.first_name || '',
         lastName: profile.last_name || '',
-        userType: userTypeMap.get(profile.user_id) || 'looplly_user',
+        userType: 'Test User',
       }));
 
       setUsers(userOptions);
     } catch (error) {
-      console.error('Error fetching users:', error);
+      console.error('Error fetching test users:', error);
     } finally {
       setIsLoading(false);
     }
@@ -101,8 +87,8 @@ export default function UserSelector({ onUserSelect }: UserSelectorProps) {
                         ? `${user.firstName} ${user.lastName}`.trim()
                         : user.email}
                     </span>
-                    <Badge variant="outline" className="ml-auto text-xs">
-                      {user.userType === 'office_user' ? 'B2B' : 'B2C'}
+                    <Badge variant="secondary" className="ml-auto text-xs">
+                      Test User
                     </Badge>
                   </div>
                 </SelectItem>
