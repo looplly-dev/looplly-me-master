@@ -73,7 +73,7 @@ Deno.serve(async (req) => {
     }
 
     // Update team_profiles
-    const { error: updateProfileError } = await supabaseAdmin
+    const { error: updateTeamProfileError } = await supabaseAdmin
       .from('team_profiles')
       .update({
         must_change_password: true,
@@ -82,8 +82,23 @@ Deno.serve(async (req) => {
       })
       .eq('user_id', teamProfile.user_id)
 
+    if (updateTeamProfileError) {
+      console.error('Error updating team profile:', updateTeamProfileError)
+      throw updateTeamProfileError
+    }
+
+    // CRITICAL: Also update profiles table (main table used by auth system)
+    const { error: updateProfileError } = await supabaseAdmin
+      .from('profiles')
+      .update({
+        must_change_password: true,
+        temp_password_expires_at: expiresAt.toISOString(),
+        updated_at: new Date().toISOString()
+      })
+      .eq('user_id', teamProfile.user_id)
+
     if (updateProfileError) {
-      console.error('Error updating team profile:', updateProfileError)
+      console.error('Error updating main profile:', updateProfileError)
       throw updateProfileError
     }
 

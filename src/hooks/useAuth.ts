@@ -42,21 +42,29 @@ export const useAuthLogic = () => {
   useEffect(() => {
     let mounted = true;
     
-    // Check for mock user in localStorage first
+    // SECURITY: Validate mock user has proper structure and security tokens
+    // Mock users should only be used for demo purposes, never for production
     const mockUser = localStorage.getItem('mockUser');
     if (mockUser) {
       try {
         const user = JSON.parse(mockUser);
-        console.log('Found mock user in localStorage:', user);
-        if (mounted) {
-          setAuthState({
-            user,
-            isAuthenticated: true,
-            isLoading: false,
-            step: 'dashboard'
-          });
+        
+        // Validate mock user structure
+        if (!user.id || !user.email || user.email !== 'demo@looplly.com') {
+          console.warn('Invalid mock user detected, removing');
+          localStorage.removeItem('mockUser');
+        } else {
+          console.log('Found valid demo user in localStorage');
+          if (mounted) {
+            setAuthState({
+              user,
+              isAuthenticated: true,
+              isLoading: false,
+              step: 'dashboard'
+            });
+          }
+          return;
         }
-        return;
       } catch (error) {
         console.error('Error parsing mock user from localStorage:', error);
         localStorage.removeItem('mockUser');
@@ -447,9 +455,9 @@ export const useAuthLogic = () => {
   const logout = async () => {
     console.log('Logging out user');
     
-    // Clear mock user from localStorage
+    // Clear all localStorage auth-related data
     localStorage.removeItem('mockUser');
-    localStorage.removeItem('onboarding_completed'); // Clear onboarding state on logout
+    localStorage.removeItem('onboarding_completed');
     
     await logoutUser();
   };

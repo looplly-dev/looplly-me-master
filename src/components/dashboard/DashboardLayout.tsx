@@ -1,11 +1,11 @@
-import { ReactNode } from 'react';
+import { ReactNode, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserType } from '@/hooks/useUserType';
 import { useDarkMode } from '@/hooks/useDarkMode';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Coins, Wallet, User, Users, Trophy, MessageSquare, LogOut, Settings as SettingsIcon, HelpCircle, Moon, Sun, BookOpen } from 'lucide-react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { HeaderActionsMenu } from './HeaderActionsMenu';
 import { analytics } from '@/utils/analytics';
 
@@ -15,10 +15,19 @@ interface DashboardLayoutProps {
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {
   const location = useLocation();
+  const navigate = useNavigate();
   const { authState, logout } = useAuth();
   const { isTeamMember } = useUserType();
   const { isDarkMode, toggleDarkMode } = useDarkMode();
   const isMobile = useIsMobile();
+
+  // Redirect team members away from regular user routes
+  useEffect(() => {
+    if (isTeamMember() && !location.pathname.startsWith('/admin') && !location.pathname.startsWith('/knowledge')) {
+      console.log('Team member accessing regular user route, redirecting to /admin');
+      navigate('/admin', { replace: true });
+    }
+  }, [isTeamMember, location.pathname, navigate]);
 
   const handleLogout = () => {
     logout();
