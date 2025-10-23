@@ -778,6 +778,45 @@ export type Database = {
           },
         ]
       }
+      documentation: {
+        Row: {
+          audience: string
+          category: string
+          content: string
+          created_at: string | null
+          description: string
+          id: string
+          parent: string | null
+          tags: string[]
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          audience: string
+          category: string
+          content: string
+          created_at?: string | null
+          description: string
+          id: string
+          parent?: string | null
+          tags: string[]
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          audience?: string
+          category?: string
+          content?: string
+          created_at?: string | null
+          description?: string
+          id?: string
+          parent?: string | null
+          tags?: string[]
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       earning_activities: {
         Row: {
           activity_type: string

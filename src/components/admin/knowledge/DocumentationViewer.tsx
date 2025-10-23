@@ -10,6 +10,7 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { documentationIndex, DocumentationItem } from '@/data/documentationIndex';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 interface DocumentationViewerProps {
   onBack?: () => void;
@@ -31,9 +32,19 @@ export default function DocumentationViewer({ onBack }: DocumentationViewerProps
     const loadDocument = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch(doc.path);
-        const text = await response.text();
-        setContent(text);
+        const { data, error } = await supabase
+          .from('documentation')
+          .select('content')
+          .eq('id', documentId)
+          .single();
+
+        if (error) {
+          console.error('Error loading document:', error);
+          toast.error('Failed to load document');
+          setContent('# Error\n\nFailed to load document content.');
+        } else {
+          setContent(data.content);
+        }
       } catch (error) {
         console.error('Error loading document:', error);
         toast.error('Failed to load document');
@@ -44,7 +55,7 @@ export default function DocumentationViewer({ onBack }: DocumentationViewerProps
     };
 
     loadDocument();
-  }, [doc]);
+  }, [doc, documentId]);
 
   const handlePrint = () => {
     window.print();
