@@ -47,12 +47,18 @@ import {
 } from '@/components/ui/popover';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
-import { Plus, Trash2, Edit, Globe, Check, ChevronsUpDown } from 'lucide-react';
+import { Plus, ShieldOff, Edit, Globe, Check, ChevronsUpDown } from 'lucide-react';
 import { countries } from '@/data/countries';
 import { format } from 'date-fns';
 import { auditActions } from '@/utils/auditLogger';
 import { cn } from '@/lib/utils';
 import type { Country } from '@/types/auth';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 interface BlockedCountry {
   id: string;
@@ -302,9 +308,18 @@ export function CountryBlocklist() {
                     </TableCell>
                     <TableCell>{country.dial_code}</TableCell>
                     <TableCell className="max-w-md">
-                      <p className="text-sm text-muted-foreground line-clamp-2">
-                        {country.reason}
-                      </p>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <p className="text-sm text-muted-foreground line-clamp-2 cursor-help">
+                              {country.reason}
+                            </p>
+                          </TooltipTrigger>
+                          <TooltipContent className="max-w-md">
+                            <p className="text-sm">{country.reason}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                     </TableCell>
                     <TableCell>
                       {format(new Date(country.blocked_at), 'MMM d, yyyy')}
@@ -322,8 +337,9 @@ export function CountryBlocklist() {
                           variant="ghost"
                           size="sm"
                           onClick={() => handleUnblockClick(country)}
+                          title="Unblock country"
                         >
-                          <Trash2 className="h-4 w-4 text-destructive" />
+                          <ShieldOff className="h-4 w-4 text-warning" />
                         </Button>
                       </div>
                     </TableCell>
