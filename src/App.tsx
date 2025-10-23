@@ -25,6 +25,7 @@ import AdminQuestions from "./pages/AdminQuestions";
 import AdminEarningRules from "./pages/AdminEarningRules";
 import AdminKnowledge from "./pages/AdminKnowledge";
 import AdminKnowledgeDoc from "./pages/AdminKnowledgeDoc";
+import AdminCountryBlocklist from "./pages/AdminCountryBlocklist";
 import ResetPassword from "./components/auth/ResetPassword";
 
 const queryClient = new QueryClient();
@@ -53,6 +54,7 @@ const AppContent = () => {
               <Route path="/admin/earning-rules" element={<AdminEarningRules />} />
               <Route path="/admin/knowledge" element={<AdminKnowledge />} />
               <Route path="/admin/knowledge/:docId" element={<AdminKnowledgeDoc />} />
+              <Route path="/admin/country-blocklist" element={<AdminCountryBlocklist />} />
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/*" element={<LoopllyApp />} />
             </Routes>

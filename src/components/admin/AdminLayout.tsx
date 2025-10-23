@@ -19,6 +19,7 @@ import {
   Wrench,
   Plug,
   BookOpen,
+  Globe,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -53,6 +54,7 @@ const adminNavItems = [
   { title: 'Badges', url: '/admin/badges', icon: Award },
   { title: 'Streak Config', url: '/admin/streak-config', icon: Flame },
   { title: 'Questions', url: '/admin/questions', icon: MessageSquare },
+  { title: 'Country Blocklist', url: '/admin/country-blocklist', icon: Globe },
   { title: 'Redemptions', url: '/admin/redemptions', icon: DollarSign },
   { title: 'Analytics', url: '/admin/analytics', icon: BarChart3 },
   { title: 'Integrations', url: '/admin/integrations', icon: Plug },
@@ -135,6 +137,7 @@ function AdminBreadcrumb() {
       badges: 'Badge Generator',
       'streak-config': 'Streak Configuration',
       questions: 'Question Management',
+      'country-blocklist': 'Country Blocklist',
       'profile-decay': 'Question Management',
       'profile-questions': 'Question Management',
       'question-builder': 'Question Management',
