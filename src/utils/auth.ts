@@ -2,6 +2,17 @@
 import { supabase } from '@/integrations/supabase/client';
 import { validateAndNormalizeMobile } from './mobileValidation';
 
+// Blocked country codes (data residency compliance)
+const BLOCKED_COUNTRY_CODES = [
+  '+91',  // India
+  '+86',  // China
+  '+7',   // Russia/Kazakhstan
+  '+84',  // Vietnam
+  '+62',  // Indonesia
+  '+92',  // Pakistan
+  '+90',  // Turkey
+];
+
 export interface RegistrationParams {
   mobile: string;
   countryCode: string;
@@ -19,6 +30,16 @@ export interface LoginParams {
 export const registerUser = async (params: RegistrationParams): Promise<{ success: boolean; error?: any }> => {
   try {
     console.log('Registering user with email:', params.email);
+    
+    // Check if country is blocked
+    if (BLOCKED_COUNTRY_CODES.includes(params.countryCode)) {
+      return { 
+        success: false, 
+        error: { 
+          message: 'Registration is not available in your country due to data residency requirements. We apologize for the inconvenience.' 
+        } 
+      };
+    }
     
     // Validate and normalize mobile number
     const mobileValidation = validateAndNormalizeMobile(params.mobile, params.countryCode);

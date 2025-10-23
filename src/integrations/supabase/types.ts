@@ -656,6 +656,60 @@ export type Database = {
           },
         ]
       }
+      country_blocklist: {
+        Row: {
+          blocked_at: string | null
+          country_code: string
+          country_name: string
+          created_at: string | null
+          dial_code: string
+          id: string
+          reason: string
+        }
+        Insert: {
+          blocked_at?: string | null
+          country_code: string
+          country_name: string
+          created_at?: string | null
+          dial_code: string
+          id?: string
+          reason: string
+        }
+        Update: {
+          blocked_at?: string | null
+          country_code?: string
+          country_name?: string
+          created_at?: string | null
+          dial_code?: string
+          id?: string
+          reason?: string
+        }
+        Relationships: []
+      }
+      country_legal_age: {
+        Row: {
+          country_code: string
+          created_at: string | null
+          id: string
+          minimum_age: number
+          updated_at: string | null
+        }
+        Insert: {
+          country_code: string
+          created_at?: string | null
+          id?: string
+          minimum_age?: number
+          updated_at?: string | null
+        }
+        Update: {
+          country_code?: string
+          created_at?: string | null
+          id?: string
+          minimum_age?: number
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       country_profiling_gaps: {
         Row: {
           admin_feedback: string | null
@@ -1784,6 +1838,10 @@ export type Database = {
       validate_tenant_api_key: {
         Args: { api_key_input: string }
         Returns: string
+      }
+      validate_user_age: {
+        Args: { p_date_of_birth: string; p_user_id: string }
+        Returns: boolean
       }
     }
     Enums: {

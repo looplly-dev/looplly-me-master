@@ -13,6 +13,8 @@ import type { AddressComponents } from '@/services/googlePlacesService';
 import { Switch } from '@/components/ui/switch';
 import { Calendar as CalendarIcon, AlertCircle, Lock, Clock } from 'lucide-react';
 import type { ProfileQuestion } from '@/hooks/useProfileQuestions';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 
 interface QuestionRendererProps {
   question: ProfileQuestion;
@@ -25,6 +27,9 @@ export function QuestionRenderer({ question, onAnswerChange, onAddressChange, di
   const [value, setValue] = useState<any>(
     question.user_answer?.answer_json || question.user_answer?.answer_value || ''
   );
+  const [ageError, setAgeError] = useState<string>('');
+  const [minimumAge, setMinimumAge] = useState<number>(18);
+  const { authState } = useAuth();
 
   const isLocked = question.is_immutable && !!question.user_answer?.answer_value;
   
@@ -34,6 +39,32 @@ export function QuestionRenderer({ question, onAnswerChange, onAddressChange, di
         (Date.now() - new Date(question.user_answer.last_updated).getTime()) / (1000 * 60 * 60 * 24)
       )
     : null;
+
+  // Fetch minimum age for user's country if this is a date_of_birth question
+  useEffect(() => {
+    if (question.question_key === 'date_of_birth' && authState.user?.id) {
+      const fetchMinimumAge = async () => {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('country_code')
+          .eq('user_id', authState.user!.id)
+          .single();
+
+        const countryCode = profile?.country_code || 'GLOBAL';
+        
+        const { data: legalAge } = await supabase
+          .from('country_legal_age')
+          .select('minimum_age')
+          .eq('country_code', countryCode)
+          .single();
+
+        if (legalAge) {
+          setMinimumAge(legalAge.minimum_age);
+        }
+      };
+      fetchMinimumAge();
+    }
+  }, [question.question_key, authState.user?.id]);
 
   useEffect(() => {
     if (question.question_type === 'text' || question.question_type === 'email' || question.question_type === 'phone') {
@@ -47,6 +78,24 @@ export function QuestionRenderer({ question, onAnswerChange, onAddressChange, di
   }, [value, question.id, question.question_type, question.user_answer?.answer_value, onAnswerChange]);
 
   const handleChange = (newValue: any) => {
+    // Validate age for date_of_birth questions
+    if (question.question_key === 'date_of_birth' && newValue) {
+      const birthDate = new Date(newValue);
+      const today = new Date();
+      const age = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+      const actualAge = monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate()) 
+        ? age - 1 
+        : age;
+
+      if (actualAge < minimumAge) {
+        setAgeError(`You must be at least ${minimumAge} years old to register.`);
+        return;
+      } else {
+        setAgeError('');
+      }
+    }
+    
     setValue(newValue);
     if (question.question_type !== 'text' && question.question_type !== 'email' && question.question_type !== 'phone') {
       onAnswerChange(question.id, newValue);
@@ -101,33 +150,38 @@ export function QuestionRenderer({ question, onAnswerChange, onAddressChange, di
 
       case 'date':
         return (
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant={'outline'}
-                className={cn(
-                  'w-full justify-start text-left font-normal',
-                  !value && 'text-muted-foreground'
-                )}
-                disabled={disabled || isLocked}
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {value ? format(new Date(value), 'PPP') : <span>Pick a date</span>}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0">
-              <Calendar
-                mode="single"
-                selected={value ? new Date(value) : undefined}
-                onSelect={(date) => {
-                  if (date) {
-                    handleChange(date.toISOString());
-                  }
-                }}
-                initialFocus
-              />
-            </PopoverContent>
-          </Popover>
+          <div>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant={'outline'}
+                  className={cn(
+                    'w-full justify-start text-left font-normal',
+                    !value && 'text-muted-foreground'
+                  )}
+                  disabled={disabled || isLocked}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {value ? format(new Date(value), 'PPP') : <span>Pick a date</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0">
+                <Calendar
+                  mode="single"
+                  selected={value ? new Date(value) : undefined}
+                  onSelect={(date) => {
+                    if (date) {
+                      handleChange(date.toISOString());
+                    }
+                  }}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
+            {ageError && (
+              <p className="text-sm text-destructive mt-1">{ageError}</p>
+            )}
+          </div>
         );
 
       case 'address':
