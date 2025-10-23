@@ -32,6 +32,7 @@ import KnowledgeDoc from "./pages/KnowledgeDoc";
 import SimulatorSession from "./pages/SimulatorSession";
 import ResetPassword from "./components/auth/ResetPassword";
 import ResetPasswordRequired from "./pages/ResetPasswordRequired";
+import AdminLogin from "./components/auth/AdminLogin";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +42,9 @@ const AppContent = () => {
   
   return (
     <Routes>
+              {/* Admin Login - Must be before protected routes */}
+              <Route path="/admin/login" element={<AdminLogin />} />
+              
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/admin/team" element={<AdminTeam />} />
               <Route path="/admin/users" element={<AdminUsers />} />

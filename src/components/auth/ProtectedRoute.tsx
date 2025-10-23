@@ -52,6 +52,9 @@ export default function ProtectedRoute({
 
   // Not authenticated
   if (!authState.isAuthenticated) {
+    // If trying to access admin routes, redirect to admin login
+    const isAdminRoute = requiredRole === 'admin' || requiredRole === 'super_admin';
+    
     return fallback || (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <Card className="max-w-md w-full">
@@ -59,10 +62,12 @@ export default function ProtectedRoute({
             <Lock className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
             <h2 className="text-xl font-semibold mb-2">Authentication Required</h2>
             <p className="text-muted-foreground mb-6">
-              Please log in to access this content.
+              {isAdminRoute 
+                ? 'Please log in with your team account to access the admin portal.'
+                : 'Please log in to access this content.'}
             </p>
-            <Button onClick={() => navigate('/')}>
-              Go to Login
+            <Button onClick={() => navigate(isAdminRoute ? '/admin/login' : '/')}>
+              {isAdminRoute ? 'Admin Login' : 'Go to Login'}
             </Button>
           </CardContent>
         </Card>
@@ -88,10 +93,10 @@ export default function ProtectedRoute({
               <Shield className="h-12 w-12 text-destructive mx-auto mb-4" />
               <h2 className="text-xl font-semibold mb-2">Team Members Only</h2>
               <p className="text-muted-foreground mb-6">
-                The admin portal is restricted to Looplly team members.
+                The admin portal is restricted to Looplly team members. Please log in with your team account.
               </p>
-              <Button variant="secondary" onClick={() => navigate('/dashboard')}>
-                Go to Dashboard
+              <Button onClick={() => navigate('/admin/login')}>
+                Admin Login
               </Button>
             </CardContent>
           </Card>
