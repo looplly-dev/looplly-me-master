@@ -34,6 +34,7 @@ import ResetPassword from "./components/auth/ResetPassword";
 import ResetPasswordRequired from "./pages/ResetPasswordRequired";
 import AdminLogin from "./components/auth/AdminLogin";
 import AdminResetPassword from "./pages/AdminResetPassword";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -69,9 +70,17 @@ const AppContent = () => {
               <Route path="/admin/knowledge/:docId" element={<AdminKnowledgeDoc />} />
               <Route path="/admin/country-blocklist" element={<AdminCountryBlocklist />} />
               
-              {/* B2B Knowledge Routes */}
-              <Route path="/knowledge" element={<Knowledge />} />
-              <Route path="/knowledge/:docId" element={<KnowledgeDoc />} />
+              {/* B2B Knowledge Routes - Team Members Only */}
+              <Route path="/knowledge" element={
+                <ProtectedRoute requiredRole="tester">
+                  <Knowledge />
+                </ProtectedRoute>
+              } />
+              <Route path="/knowledge/:docId" element={
+                <ProtectedRoute requiredRole="tester">
+                  <KnowledgeDoc />
+                </ProtectedRoute>
+              } />
               
               {/* Simulator Session Route */}
               <Route path="/simulator-session" element={<SimulatorSession />} />
