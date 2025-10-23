@@ -29,48 +29,47 @@ export function useAdminTeam(searchQuery: string = '') {
       setIsLoading(true);
       setError(null);
 
-      // Fetch team members from team_profiles with their roles
-      let query = supabase
+      // Step 1: Fetch team profiles with optional search filter
+      let profileQuery = supabase
         .from('team_profiles')
-        .select(`
-          user_id,
-          email,
-          first_name,
-          last_name,
-          company_name,
-          company_role,
-          is_active,
-          created_at,
-          user_roles!inner(role)
-        `)
-        .in('user_roles.role', ['super_admin', 'admin'])
+        .select('user_id, email, first_name, last_name, company_name, company_role, is_active, created_at')
+        .eq('is_active', true)
         .order('created_at', { ascending: false });
 
-      // Apply search filter if provided
       if (searchQuery.trim()) {
-        query = query.or(
+        profileQuery = profileQuery.or(
           `email.ilike.%${searchQuery}%,first_name.ilike.%${searchQuery}%,last_name.ilike.%${searchQuery}%`
         );
       }
 
-      const { data, error: queryError } = await query;
+      const { data: profiles, error: profileError } = await profileQuery;
+      if (profileError) throw profileError;
 
-      if (queryError) {
-        throw queryError;
-      }
+      // Step 2: Fetch user roles for admin/super_admin only
+      const { data: roles, error: rolesError } = await supabase
+        .from('user_roles')
+        .select('user_id, role')
+        .in('role', ['super_admin', 'admin']);
 
-      // Transform data to TeamMember format
-      const members: TeamMember[] = (data || []).map((profile: any) => ({
-        user_id: profile.user_id,
-        email: profile.email,
-        first_name: profile.first_name,
-        last_name: profile.last_name,
-        company_name: profile.company_name,
-        company_role: profile.company_role,
-        is_active: profile.is_active,
-        role: profile.user_roles.role as 'super_admin' | 'admin',
-        created_at: profile.created_at,
-      }));
+      if (rolesError) throw rolesError;
+
+      // Step 3: Create a role lookup map
+      const roleMap = new Map(roles?.map(r => [r.user_id, r.role]) || []);
+
+      // Step 4: Merge profiles with roles, filtering out non-admin users
+      const members: TeamMember[] = (profiles || [])
+        .filter(profile => roleMap.has(profile.user_id))
+        .map(profile => ({
+          user_id: profile.user_id,
+          email: profile.email,
+          first_name: profile.first_name,
+          last_name: profile.last_name,
+          company_name: profile.company_name,
+          company_role: profile.company_role,
+          is_active: profile.is_active,
+          role: roleMap.get(profile.user_id) as 'super_admin' | 'admin',
+          created_at: profile.created_at,
+        }));
 
       setTeamMembers(members);
     } catch (err) {
