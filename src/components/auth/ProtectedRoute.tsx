@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useRole, UserRole } from '@/hooks/useRole';
@@ -24,6 +24,22 @@ export default function ProtectedRoute({
   const { authState } = useAuth();
   const { hasRole, isLoading: roleLoading, isAdmin, isSuperAdmin } = useRole();
   const { userType, isLoading: typeLoading } = useUserType();
+  const toastShownRef = useRef(false);
+
+  // Show access denied toast once when user lacks admin permissions
+  useEffect(() => {
+    if (!authState.isLoading && !roleLoading && !typeLoading && 
+        requiredRole && (requiredRole === 'admin' || requiredRole === 'super_admin') &&
+        (userType !== 'looplly_team_user' || (!isAdmin() && !isSuperAdmin())) &&
+        !toastShownRef.current) {
+      toast({
+        title: 'Access Denied',
+        description: 'Admin portal is restricted to Looplly team members only.',
+        variant: 'destructive'
+      });
+      toastShownRef.current = true;
+    }
+  }, [authState.isLoading, roleLoading, typeLoading, requiredRole, userType, isAdmin, isSuperAdmin, toast]);
 
   // Show loading while checking authentication
   if (authState.isLoading || roleLoading || typeLoading) {
@@ -65,11 +81,6 @@ export default function ProtectedRoute({
   // Check if this is an admin route (requires both team member status AND admin role)
   if (requiredRole && (requiredRole === 'admin' || requiredRole === 'super_admin')) {
     if (userType !== 'looplly_team_user' || (!isAdmin() && !isSuperAdmin())) {
-      toast({
-        title: 'Access Denied',
-        description: 'Admin portal is restricted to Looplly team members only.',
-        variant: 'destructive'
-      });
       return fallback || (
         <div className="min-h-screen bg-background flex items-center justify-center p-4">
           <Card className="max-w-md w-full">
