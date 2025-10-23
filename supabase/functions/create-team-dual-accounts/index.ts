@@ -74,10 +74,13 @@ Deno.serve(async (req) => {
       if (updateError) {
         errors.push({ user: 'nadia@looplly.me', action: 'email_update', error: updateError.message });
       } else {
-        // Update profile email
+        // Update profile email and reset to regular user
         await supabaseAdmin
           .from('profiles')
-          .update({ email: 'nadia.gaspari1@outlook.com' })
+          .update({ 
+            email: 'nadia.gaspari1@outlook.com',
+            user_type: 'looplly_user'
+          })
           .eq('user_id', nadiaUser.id);
         
         results.push({ user: 'nadia@looplly.me', action: 'email_updated_to', new_email: 'nadia.gaspari1@outlook.com' });
@@ -93,10 +96,13 @@ Deno.serve(async (req) => {
       if (updateError) {
         errors.push({ user: 'warren@looplly.me', action: 'email_update', error: updateError.message });
       } else {
-        // Update profile email
+        // Update profile email and reset to regular user
         await supabaseAdmin
           .from('profiles')
-          .update({ email: 'warrenleroux@gmail.com' })
+          .update({ 
+            email: 'warrenleroux@gmail.com',
+            user_type: 'looplly_user'
+          })
           .eq('user_id', warrenUser.id);
         
         results.push({ user: 'warren@looplly.me', action: 'email_updated_to', new_email: 'warrenleroux@gmail.com' });
