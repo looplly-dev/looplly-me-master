@@ -132,6 +132,7 @@ export const useAuthLogic = () => {
                       lastName: profile?.last_name,
                       isVerified: profile?.is_verified || false,
                       profileComplete: profile?.profile_complete || false,
+                      mustChangePassword: true,
                       profile: profile ? {
                         sec: (profile.sec as 'A' | 'B' | 'C1' | 'C2' | 'D' | 'E') || 'B',
                         gender: (profile.gender as 'male' | 'female' | 'other') || 'other',
@@ -142,7 +143,8 @@ export const useAuthLogic = () => {
                         lastName: profile.last_name || '',
                         email: profile.email || session.user.email || '',
                         country_code: profile.country_code,
-                        country_iso: profile.country_iso
+                        country_iso: profile.country_iso,
+                        must_change_password: true
                       } : undefined
                     },
                     isAuthenticated: true,

@@ -7,6 +7,7 @@ export interface User {
   lastName?: string;
   isVerified: boolean;
   profileComplete: boolean;
+  mustChangePassword?: boolean;
   profile?: UserProfile;
 }
 
@@ -39,6 +40,7 @@ export interface UserProfile {
   user_type?: 'looplly_user' | 'looplly_team_user' | 'client_user';
   company_name?: string;  // For team members: team name; For clients: company name
   company_role?: string;  // For team members: job title; For clients: role at company
+  must_change_password?: boolean;  // Team member invitation flag
 }
 
 export interface AuthState {
