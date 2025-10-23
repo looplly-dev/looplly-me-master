@@ -33,16 +33,26 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Trash2, Edit, Globe } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import { Plus, Trash2, Edit, Globe, Check, ChevronsUpDown } from 'lucide-react';
 import { countries } from '@/data/countries';
 import { format } from 'date-fns';
+import { auditActions } from '@/utils/auditLogger';
+import { cn } from '@/lib/utils';
+import type { Country } from '@/types/auth';
 
 interface BlockedCountry {
   id: string;
@@ -57,11 +67,13 @@ interface BlockedCountry {
 export function CountryBlocklist() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { authState } = useAuth();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isUnblockDialogOpen, setIsUnblockDialogOpen] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState<BlockedCountry | null>(null);
-  const [newCountryCode, setNewCountryCode] = useState('');
+  const [selectedNewCountry, setSelectedNewCountry] = useState<Country | null>(null);
+  const [open, setOpen] = useState(false);
   const [newReason, setNewReason] = useState('');
   const [editReason, setEditReason] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
@@ -83,29 +95,39 @@ export function CountryBlocklist() {
   // Add country mutation
   const addCountryMutation = useMutation({
     mutationFn: async () => {
-      const country = countries.find((c) => c.code === newCountryCode);
-      if (!country) throw new Error('Country not found');
+      if (!selectedNewCountry) throw new Error('Country not selected');
 
       const { error } = await supabase
         .from('country_blocklist')
         .insert({
-          country_code: country.code,
-          dial_code: country.dialCode,
-          country_name: country.name,
+          country_code: selectedNewCountry.code,
+          dial_code: selectedNewCountry.dialCode,
+          country_name: selectedNewCountry.name,
           reason: newReason,
         });
 
       if (error) throw error;
     },
     onSuccess: () => {
+      // Log the action
+      if (authState.user?.id && selectedNewCountry) {
+        auditActions.countryBlock(
+          authState.user.id, 
+          selectedNewCountry.code, 
+          selectedNewCountry.name, 
+          newReason
+        );
+      }
+
       toast({
         title: 'Country blocked',
         description: 'New registrations from this country will be blocked.',
       });
       queryClient.invalidateQueries({ queryKey: ['country-blocklist'] });
       setIsAddDialogOpen(false);
-      setNewCountryCode('');
+      setSelectedNewCountry(null);
       setNewReason('');
+      setOpen(false);
     },
     onError: (error: any) => {
       toast({
@@ -129,6 +151,17 @@ export function CountryBlocklist() {
       if (error) throw error;
     },
     onSuccess: () => {
+      // Log the action
+      if (authState.user?.id && selectedCountry) {
+        auditActions.countryReasonUpdate(
+          authState.user.id,
+          selectedCountry.country_code,
+          selectedCountry.country_name,
+          selectedCountry.reason,
+          editReason
+        );
+      }
+
       toast({
         title: 'Reason updated',
         description: 'The blocking reason has been updated.',
@@ -160,6 +193,15 @@ export function CountryBlocklist() {
       if (error) throw error;
     },
     onSuccess: () => {
+      // Log the action
+      if (authState.user?.id && selectedCountry) {
+        auditActions.countryUnblock(
+          authState.user.id,
+          selectedCountry.country_code,
+          selectedCountry.country_name
+        );
+      }
+
       toast({
         title: 'Country unblocked',
         description: 'Registrations from this country are now allowed.',
@@ -178,7 +220,7 @@ export function CountryBlocklist() {
   });
 
   const handleAddCountry = () => {
-    if (!newCountryCode || !newReason.trim()) {
+    if (!selectedNewCountry || !newReason.trim()) {
       toast({
         title: 'Validation Error',
         description: 'Please select a country and provide a reason.',
@@ -303,18 +345,49 @@ export function CountryBlocklist() {
           <div className="space-y-4">
             <div className="space-y-2">
               <Label>Country</Label>
-              <Select value={newCountryCode} onValueChange={setNewCountryCode}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a country" />
-                </SelectTrigger>
-                <SelectContent>
-                  {availableCountries.map((country) => (
-                    <SelectItem key={country.code} value={country.code}>
-                      {country.flag} {country.name} ({country.dialCode})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Popover open={open} onOpenChange={setOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={open}
+                    className="w-full justify-between"
+                  >
+                    {selectedNewCountry
+                      ? `${selectedNewCountry.flag} ${selectedNewCountry.name} (${selectedNewCountry.dialCode})`
+                      : "Search countries..."}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-full p-0" align="start">
+                  <Command>
+                    <CommandInput placeholder="Search by name, code, or dial..." />
+                    <CommandList>
+                      <CommandEmpty>No countries found.</CommandEmpty>
+                      <CommandGroup>
+                        {availableCountries.map((country) => (
+                          <CommandItem
+                            key={country.code}
+                            value={`${country.name} ${country.dialCode} ${country.code}`}
+                            onSelect={() => {
+                              setSelectedNewCountry(country);
+                              setOpen(false);
+                            }}
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                selectedNewCountry?.code === country.code ? "opacity-100" : "opacity-0"
+                              )}
+                            />
+                            {country.flag} {country.name} ({country.dialCode})
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </div>
             <div className="space-y-2">
               <Label>Reason *</Label>

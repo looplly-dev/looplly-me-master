@@ -162,4 +162,43 @@ export const auditActions = {
       resource_type: 'badge',
       metadata: { badgeName, tier, category },
     }),
+
+  countryBlock: (adminUserId: string, countryCode: string, countryName: string, reason: string) =>
+    auditLogger.log({
+      user_id: adminUserId,
+      action: 'country.block',
+      resource_type: 'country_blocklist',
+      resource_id: countryCode,
+      metadata: { 
+        country_name: countryName,
+        reason,
+        action_type: 'block'
+      },
+    }),
+
+  countryUnblock: (adminUserId: string, countryCode: string, countryName: string) =>
+    auditLogger.log({
+      user_id: adminUserId,
+      action: 'country.unblock',
+      resource_type: 'country_blocklist',
+      resource_id: countryCode,
+      metadata: { 
+        country_name: countryName,
+        action_type: 'unblock'
+      },
+    }),
+
+  countryReasonUpdate: (adminUserId: string, countryCode: string, countryName: string, oldReason: string, newReason: string) =>
+    auditLogger.log({
+      user_id: adminUserId,
+      action: 'country.update_reason',
+      resource_type: 'country_blocklist',
+      resource_id: countryCode,
+      metadata: { 
+        country_name: countryName,
+        old_reason: oldReason,
+        new_reason: newReason,
+        action_type: 'update_reason'
+      },
+    }),
 };
