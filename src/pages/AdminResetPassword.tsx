@@ -102,8 +102,9 @@ export default function AdminResetPassword() {
         description: 'Your password has been successfully changed'
       });
 
-      // Redirect to admin dashboard
-      navigate('/admin');
+      // Sign out and redirect to login with new password
+      await supabase.auth.signOut();
+      navigate('/admin/login');
 
     } catch (error: any) {
       console.error('Password reset error:', error);
