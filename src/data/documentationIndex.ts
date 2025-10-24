@@ -284,6 +284,70 @@ export const documentationIndex: DocumentationItem[] = [
     description: 'Backend configuration and management',
     audience: 'super_admin'
   },
+  {
+    id: 'admin-portal-guide',
+    title: 'Admin Portal Guide',
+    category: 'Admin Guides',
+    tags: ['admin', 'portal', 'guide', 'management'],
+    description: 'Complete guide to the Admin Portal features and sections',
+    audience: 'admin'
+  },
+  {
+    id: 'knowledge-centre',
+    title: 'Knowledge Centre Guide',
+    category: 'Admin Guides',
+    tags: ['documentation', 'knowledge', 'search', 'version-control'],
+    description: 'Complete guide to using the Knowledge Centre',
+    audience: 'all'
+  },
+  {
+    id: 'account-management',
+    title: 'Account Management',
+    category: 'Admin Guides',
+    tags: ['accounts', 'deletion', 'team-management'],
+    description: 'Managing user and team member accounts',
+    audience: 'admin'
+  },
+  {
+    id: 'documentation-version-control',
+    title: 'Documentation Version Control',
+    category: 'Technical Reference',
+    tags: ['version-control', 'documentation', 'history'],
+    description: 'Version control system for documentation',
+    audience: 'admin'
+  },
+  {
+    id: 'table-architecture',
+    title: 'Table Architecture',
+    category: 'Technical Reference',
+    tags: ['database', 'architecture', 'tables'],
+    description: 'Database table architecture and separation',
+    audience: 'admin'
+  },
+  {
+    id: 'user-classification',
+    title: 'User Classification',
+    category: 'Technical Reference',
+    tags: ['users', 'classification', 'types'],
+    description: 'User type classification and management',
+    audience: 'admin'
+  },
+  {
+    id: 'integrations-setup',
+    title: 'Integrations Setup',
+    category: 'Technical Reference',
+    tags: ['integrations', 'setup', 'configuration'],
+    description: 'Setting up external integrations',
+    audience: 'admin'
+  },
+  {
+    id: 'password-reset-flow',
+    title: 'Password Reset Flow',
+    category: 'Technical Reference',
+    tags: ['password', 'reset', 'security'],
+    description: 'Password reset flow and implementation',
+    audience: 'admin'
+  },
 
   // Strategy
   {

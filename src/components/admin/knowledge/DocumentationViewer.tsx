@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Printer, Copy, Check } from 'lucide-react';
+import { ArrowLeft, Printer, Copy, Check, Clock, Edit } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
@@ -11,6 +11,8 @@ import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { documentationIndex, DocumentationItem } from '@/data/documentationIndex';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { useRole } from '@/hooks/useRole';
+import VersionHistory from './VersionHistory';
 
 interface DocumentationViewerProps {
   onBack?: () => void;
@@ -23,6 +25,9 @@ export default function DocumentationViewer({ onBack }: DocumentationViewerProps
   const [content, setContent] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
+  const [version, setVersion] = useState<number>(1);
+  const [showVersionHistory, setShowVersionHistory] = useState(false);
+  const { hasRole } = useRole();
 
   const doc = documentationIndex.find(d => d.id === documentId);
 
@@ -34,16 +39,20 @@ export default function DocumentationViewer({ onBack }: DocumentationViewerProps
         setIsLoading(true);
         const { data, error } = await supabase
           .from('documentation')
-          .select('content')
+          .select('content, version')
           .eq('id', documentId)
-          .single();
+          .maybeSingle();
 
         if (error) {
           console.error('Error loading document:', error);
           toast.error('Failed to load document');
           setContent('# Error\n\nFailed to load document content.');
+        } else if (data) {
+          const docData = data as any;
+          setContent(docData.content);
+          setVersion(docData.version || 1);
         } else {
-          setContent(data.content);
+          setContent('# Document Not Found\n\nThis document has not been seeded yet.');
         }
       } catch (error) {
         console.error('Error loading document:', error);
@@ -95,12 +104,24 @@ export default function DocumentationViewer({ onBack }: DocumentationViewerProps
       <div className="flex items-center justify-between">
         <Button variant="ghost" onClick={handleBack}>
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Knowledge Center
+          Back to Knowledge Centre
         </Button>
-        <Button variant="outline" onClick={handlePrint}>
-          <Printer className="h-4 w-4 mr-2" />
-          Print
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => setShowVersionHistory(true)}>
+            <Clock className="h-4 w-4 mr-2" />
+            History
+          </Button>
+          {(hasRole('admin') || hasRole('super_admin')) && (
+            <Button variant="outline" onClick={() => navigate(`/admin/knowledge/edit/${documentId}`)}>
+              <Edit className="h-4 w-4 mr-2" />
+              Edit
+            </Button>
+          )}
+          <Button variant="outline" onClick={handlePrint}>
+            <Printer className="h-4 w-4 mr-2" />
+            Print
+          </Button>
+        </div>
       </div>
 
       {/* Document Info */}
@@ -108,7 +129,10 @@ export default function DocumentationViewer({ onBack }: DocumentationViewerProps
         <CardHeader>
           <div className="flex items-start justify-between gap-4">
             <div>
-              <CardTitle className="text-2xl">{doc.title}</CardTitle>
+              <div className="flex items-center gap-2">
+                <CardTitle className="text-2xl">{doc.title}</CardTitle>
+                <Badge variant="outline">v{version}</Badge>
+              </div>
               <p className="text-muted-foreground mt-2">{doc.description}</p>
             </div>
             <Badge>{doc.category}</Badge>
@@ -176,6 +200,35 @@ export default function DocumentationViewer({ onBack }: DocumentationViewerProps
           )}
         </CardContent>
       </Card>
+
+      <VersionHistory
+        docId={documentId}
+        currentVersion={version}
+        open={showVersionHistory}
+        onOpenChange={setShowVersionHistory}
+        onRestore={() => {
+          // Reload the document after restore
+          const loadDocument = async () => {
+            try {
+              const { data, error } = await supabase
+                .from('documentation')
+                .select('content, version')
+                .eq('id', documentId)
+                .maybeSingle();
+
+              if (error) throw error;
+              if (data) {
+                const docData = data as any;
+                setContent(docData.content);
+                setVersion(docData.version || 1);
+              }
+            } catch (error) {
+              console.error('Error reloading document:', error);
+            }
+          };
+          loadDocument();
+        }}
+      />
     </div>
   );
 }

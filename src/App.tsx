@@ -25,6 +25,7 @@ import AdminQuestions from "./pages/AdminQuestions";
 import AdminEarningRules from "./pages/AdminEarningRules";
 import AdminKnowledge from "./pages/AdminKnowledge";
 import AdminKnowledgeDoc from "./pages/AdminKnowledgeDoc";
+import AdminKnowledgeEdit from "./pages/AdminKnowledgeEdit";
 import AdminCountryBlocklist from "./pages/AdminCountryBlocklist";
 import AdminSimulator from "./pages/AdminSimulator";
 import Knowledge from "./pages/Knowledge";
@@ -67,7 +68,8 @@ const AppContent = () => {
               <Route path="/admin/earning-rules" element={<AdminEarningRules />} />
               <Route path="/admin/simulator" element={<AdminSimulator />} />
               <Route path="/admin/knowledge" element={<AdminKnowledge />} />
-              <Route path="/admin/knowledge/:docId" element={<AdminKnowledgeDoc />} />
+              <Route path="/admin/knowledge/doc/:docId" element={<AdminKnowledgeDoc />} />
+              <Route path="/admin/knowledge/edit/:docId" element={<AdminKnowledgeEdit />} />
               <Route path="/admin/country-blocklist" element={<AdminCountryBlocklist />} />
               
               {/* B2B Knowledge Routes - Team Members Only */}

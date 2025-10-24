@@ -285,6 +285,78 @@ const documentationIndex = [
     audience: 'admin',
     tags: ['warren', 'admin', 'guide'],
     path: '/docs/WARREN_ADMIN_GUIDE.md'
+  },
+  {
+    id: 'admin-portal-guide',
+    title: 'Admin Portal Guide',
+    category: 'Admin Guides',
+    description: 'Complete guide to the Admin Portal features and sections',
+    audience: 'admin',
+    tags: ['admin', 'portal', 'guide', 'management'],
+    path: '/docs/ADMIN_PORTAL_GUIDE.md'
+  },
+  {
+    id: 'knowledge-centre',
+    title: 'Knowledge Centre Guide',
+    category: 'Admin Guides',
+    description: 'Complete guide to using the Knowledge Centre',
+    audience: 'all',
+    tags: ['documentation', 'knowledge', 'search', 'version-control'],
+    path: '/docs/KNOWLEDGE_CENTRE.md'
+  },
+  {
+    id: 'account-management',
+    title: 'Account Management',
+    category: 'Admin Guides',
+    description: 'Managing user and team member accounts',
+    audience: 'admin',
+    tags: ['accounts', 'deletion', 'team-management'],
+    path: '/docs/ACCOUNT_MANAGEMENT.md'
+  },
+  {
+    id: 'documentation-version-control',
+    title: 'Documentation Version Control',
+    category: 'Technical Reference',
+    description: 'Version control system for documentation',
+    audience: 'admin',
+    tags: ['version-control', 'documentation', 'history'],
+    path: '/docs/DOCUMENTATION_VERSION_CONTROL.md'
+  },
+  {
+    id: 'table-architecture',
+    title: 'Table Architecture',
+    category: 'Technical Reference',
+    description: 'Database table architecture and separation',
+    audience: 'developer',
+    tags: ['database', 'architecture', 'tables'],
+    path: '/docs/TABLE_ARCHITECTURE.md'
+  },
+  {
+    id: 'user-classification',
+    title: 'User Classification',
+    category: 'Technical Reference',
+    description: 'User type classification and management',
+    audience: 'developer',
+    tags: ['users', 'classification', 'types'],
+    path: '/docs/USER_CLASSIFICATION.md'
+  },
+  {
+    id: 'integrations-setup',
+    title: 'Integrations Setup',
+    category: 'Development',
+    description: 'Setting up external integrations',
+    audience: 'developer',
+    tags: ['integrations', 'setup', 'configuration'],
+    path: '/docs/INTEGRATIONS_SETUP.md'
+  },
+  {
+    id: 'password-reset-flow',
+    title: 'Password Reset Flow',
+    category: 'Technical Reference',
+    description: 'Password reset flow and implementation',
+    audience: 'developer',
+    tags: ['password', 'reset', 'security'],
+    path: '/docs/PASSWORD_RESET_FLOW.md'
   }
 ];
 
