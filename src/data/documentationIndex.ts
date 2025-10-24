@@ -6,20 +6,22 @@ export interface DocumentationItem {
   description: string;
   parent?: string;
   audience: 'all' | 'office_user' | 'admin' | 'super_admin';
+  status?: 'draft' | 'published' | 'coming_soon';
 }
 
 // NOTE: Documentation content is now stored securely in the database.
 // Content is only accessible to authenticated users via the documentation table.
 
 export const documentationIndex: DocumentationItem[] = [
-  // Core Systems
+  // Wave 1 - Core Systems (Published)
   {
     id: 'mobile-validation',
     title: 'Mobile Number Validation',
     category: 'Core Systems',
     tags: ['validation', 'mobile', 'international', 'e164'],
     description: 'Country-aware mobile validation system using E.164 format',
-    audience: 'all'
+    audience: 'all',
+    status: 'published'
   },
   {
     id: 'mobile-validation-global',
@@ -28,7 +30,8 @@ export const documentationIndex: DocumentationItem[] = [
     tags: ['validation', 'mobile', 'global', 'expansion', 'strategy'],
     description: 'Strategies for expanding mobile validation to global markets',
     parent: 'mobile-validation',
-    audience: 'admin'
+    audience: 'admin',
+    status: 'coming_soon'
   },
   {
     id: 'profile-system',
@@ -36,7 +39,8 @@ export const documentationIndex: DocumentationItem[] = [
     category: 'Core Systems',
     tags: ['profile', 'architecture', 'database', 'schema'],
     description: 'Complete architecture for the user profile system',
-    audience: 'all'
+    audience: 'all',
+    status: 'published'
   },
   {
     id: 'reputation-system',
@@ -44,7 +48,8 @@ export const documentationIndex: DocumentationItem[] = [
     category: 'Core Systems',
     tags: ['reputation', 'classification', 'points', 'levels'],
     description: 'User reputation and classification system rules',
-    audience: 'all'
+    audience: 'all',
+    status: 'published'
   },
   {
     id: 'reputation-beta-pitfalls',
@@ -52,7 +57,8 @@ export const documentationIndex: DocumentationItem[] = [
     category: 'Core Systems',
     tags: ['reputation', 'beta', 'issues', 'lessons'],
     description: 'Lessons learned and pitfalls to avoid in reputation system',
-    audience: 'admin'
+    audience: 'admin',
+    status: 'coming_soon'
   },
   {
     id: 'streak-reputation',
@@ -60,7 +66,8 @@ export const documentationIndex: DocumentationItem[] = [
     category: 'Core Systems',
     tags: ['streak', 'reputation', 'engagement', 'rewards'],
     description: 'Daily streak tracking and reputation integration',
-    audience: 'all'
+    audience: 'all',
+    status: 'published'
   },
   {
     id: 'country-codes',
@@ -68,7 +75,8 @@ export const documentationIndex: DocumentationItem[] = [
     category: 'Core Systems',
     tags: ['country', 'codes', 'iso', 'localization'],
     description: 'ISO country code standards and usage',
-    audience: 'all'
+    audience: 'all',
+    status: 'published'
   },
   {
     id: 'data-isolation',
@@ -76,9 +84,20 @@ export const documentationIndex: DocumentationItem[] = [
     category: 'Technical Reference',
     tags: ['security', 'rls', 'isolation', 'multi-tenant'],
     description: 'Quick reference for data isolation and RLS policies',
-    audience: 'admin'
+    audience: 'admin',
+    status: 'published'
+  },
+  {
+    id: 'knowledge-centre',
+    title: 'Knowledge Centre Guide',
+    category: 'Admin Guides',
+    tags: ['documentation', 'knowledge', 'search', 'version-control'],
+    description: 'Complete guide to using the Knowledge Centre',
+    audience: 'all',
+    status: 'published'
   },
 
+  // Wave 2 & 3 - Coming Soon
   // Admin Guides
   {
     id: 'user-type-management',
@@ -86,7 +105,8 @@ export const documentationIndex: DocumentationItem[] = [
     category: 'Admin Guides',
     tags: ['user-types', 'office-user', 'looplly-user', 'b2b'],
     description: 'Managing office_user vs looplly_user classifications',
-    audience: 'admin'
+    audience: 'admin',
+    status: 'coming_soon'
   },
   {
     id: 'role-architecture',
@@ -94,7 +114,8 @@ export const documentationIndex: DocumentationItem[] = [
     category: 'Technical Reference',
     tags: ['roles', 'permissions', 'security', 'rls'],
     description: 'Dual-table architecture for roles and user types',
-    audience: 'super_admin'
+    audience: 'super_admin',
+    status: 'coming_soon'
   },
   {
     id: 'warren-admin-guide',
@@ -102,7 +123,8 @@ export const documentationIndex: DocumentationItem[] = [
     category: 'Admin Guides',
     tags: ['admin', 'guide', 'operations', 'management'],
     description: 'Administrative guide for platform management',
-    audience: 'admin'
+    audience: 'admin',
+    status: 'coming_soon'
   },
   {
     id: 'admin-setup',
@@ -110,7 +132,8 @@ export const documentationIndex: DocumentationItem[] = [
     category: 'Admin Guides',
     tags: ['setup', 'admin', 'installation', 'configuration'],
     description: 'Step-by-step admin setup and configuration',
-    audience: 'super_admin'
+    audience: 'super_admin',
+    status: 'coming_soon'
   },
   {
     id: 'phase1-setup',
@@ -118,7 +141,8 @@ export const documentationIndex: DocumentationItem[] = [
     category: 'Admin Guides',
     tags: ['setup', 'phase1', 'deployment', 'migration'],
     description: 'Phase 1 deployment and setup instructions',
-    audience: 'super_admin'
+    audience: 'super_admin',
+    status: 'coming_soon'
   },
 
   // Profiling System
@@ -128,7 +152,8 @@ export const documentationIndex: DocumentationItem[] = [
     category: 'Core Systems',
     tags: ['profiling', 'overview', 'architecture'],
     description: 'Complete overview of the user profiling system',
-    audience: 'all'
+    audience: 'all',
+    status: 'coming_soon'
   },
   {
     id: 'profiling-architecture',
@@ -136,7 +161,8 @@ export const documentationIndex: DocumentationItem[] = [
     category: 'Technical Reference',
     tags: ['profiling', 'architecture', 'technical', 'database'],
     description: 'Technical architecture of the profiling system',
-    audience: 'admin'
+    audience: 'admin',
+    status: 'coming_soon'
   },
   {
     id: 'profiling-user-guide',
@@ -144,7 +170,8 @@ export const documentationIndex: DocumentationItem[] = [
     category: 'Admin Guides',
     tags: ['profiling', 'user-guide', 'how-to'],
     description: 'End-user guide for completing profiles',
-    audience: 'all'
+    audience: 'all',
+    status: 'coming_soon'
   },
   {
     id: 'profiling-admin-guide',
@@ -152,7 +179,8 @@ export const documentationIndex: DocumentationItem[] = [
     category: 'Admin Guides',
     tags: ['profiling', 'admin', 'management', 'questions'],
     description: 'Admin guide for managing profiling questions',
-    audience: 'admin'
+    audience: 'admin',
+    status: 'coming_soon'
   },
   {
     id: 'profiling-question-builder',
@@ -160,7 +188,8 @@ export const documentationIndex: DocumentationItem[] = [
     category: 'Admin Guides',
     tags: ['profiling', 'questions', 'builder', 'tool'],
     description: 'Guide to using the question builder interface',
-    audience: 'admin'
+    audience: 'admin',
+    status: 'coming_soon'
   },
   {
     id: 'profiling-ai-generation',
@@ -168,7 +197,8 @@ export const documentationIndex: DocumentationItem[] = [
     category: 'Admin Guides',
     tags: ['profiling', 'ai', 'generation', 'prompts'],
     description: 'AI prompt templates for generating profile questions',
-    audience: 'admin'
+    audience: 'admin',
+    status: 'coming_soon'
   },
   {
     id: 'profiling-admin-auto-generation',
@@ -176,7 +206,8 @@ export const documentationIndex: DocumentationItem[] = [
     category: 'Admin Guides',
     tags: ['profiling', 'ai', 'auto-generation', 'admin'],
     description: 'Guide for auto-generating profile questions with AI',
-    audience: 'admin'
+    audience: 'admin',
+    status: 'coming_soon'
   },
   {
     id: 'profiling-country-questions',
@@ -184,7 +215,8 @@ export const documentationIndex: DocumentationItem[] = [
     category: 'Admin Guides',
     tags: ['profiling', 'country', 'localization', 'questions'],
     description: 'Managing country-specific profile questions',
-    audience: 'admin'
+    audience: 'admin',
+    status: 'coming_soon'
   },
   {
     id: 'profiling-auto-scaling',
@@ -192,7 +224,8 @@ export const documentationIndex: DocumentationItem[] = [
     category: 'Technical Reference',
     tags: ['profiling', 'scaling', 'performance', 'optimization'],
     description: 'Auto-scaling system for profile question delivery',
-    audience: 'admin'
+    audience: 'admin',
+    status: 'coming_soon'
   },
   {
     id: 'profiling-decay-system',
@@ -200,7 +233,8 @@ export const documentationIndex: DocumentationItem[] = [
     category: 'Core Systems',
     tags: ['profiling', 'decay', 'freshness', 'updates'],
     description: 'Profile data decay and freshness system',
-    audience: 'admin'
+    audience: 'admin',
+    status: 'coming_soon'
   },
   {
     id: 'profiling-earning-rules',
@@ -208,7 +242,8 @@ export const documentationIndex: DocumentationItem[] = [
     category: 'Core Systems',
     tags: ['profiling', 'earning', 'rewards', 'points'],
     description: 'Earning rules for profile completion',
-    audience: 'all'
+    audience: 'all',
+    status: 'coming_soon'
   },
   {
     id: 'profiling-level-strategy',
@@ -216,7 +251,8 @@ export const documentationIndex: DocumentationItem[] = [
     category: 'Core Systems',
     tags: ['profiling', 'levels', 'progression', 'strategy'],
     description: 'User progression and level strategy',
-    audience: 'admin'
+    audience: 'admin',
+    status: 'coming_soon'
   },
   {
     id: 'profiling-contextual-triggers',
@@ -224,7 +260,8 @@ export const documentationIndex: DocumentationItem[] = [
     category: 'Technical Reference',
     tags: ['profiling', 'triggers', 'context', 'automation'],
     description: 'Contextual triggers for smart question delivery',
-    audience: 'admin'
+    audience: 'admin',
+    status: 'coming_soon'
   },
   {
     id: 'profiling-global-vs-local',
@@ -232,7 +269,8 @@ export const documentationIndex: DocumentationItem[] = [
     category: 'Strategy',
     tags: ['profiling', 'brands', 'global', 'local'],
     description: 'Strategy for global vs local brand questions',
-    audience: 'admin'
+    audience: 'admin',
+    status: 'coming_soon'
   },
   {
     id: 'profiling-integration',
@@ -240,7 +278,8 @@ export const documentationIndex: DocumentationItem[] = [
     category: 'Technical Reference',
     tags: ['profiling', 'integration', 'api', 'technical'],
     description: 'Technical integration guide for profiling system',
-    audience: 'admin'
+    audience: 'admin',
+    status: 'coming_soon'
   },
   {
     id: 'profiling-rollout',
@@ -248,7 +287,8 @@ export const documentationIndex: DocumentationItem[] = [
     category: 'Admin Guides',
     tags: ['profiling', 'rollout', 'deployment', 'checklist'],
     description: 'Checklist for rolling out profiling features',
-    audience: 'admin'
+    audience: 'admin',
+    status: 'coming_soon'
   },
 
   // Technical Reference
@@ -258,7 +298,8 @@ export const documentationIndex: DocumentationItem[] = [
     category: 'Technical Reference',
     tags: ['analytics', 'tracking', 'metrics', 'reporting'],
     description: 'Analytics system architecture and usage',
-    audience: 'admin'
+    audience: 'admin',
+    status: 'coming_soon'
   },
   {
     id: 'deployment-config',
@@ -266,7 +307,8 @@ export const documentationIndex: DocumentationItem[] = [
     category: 'Technical Reference',
     tags: ['deployment', 'config', 'environment', 'production'],
     description: 'Production deployment configuration guide',
-    audience: 'super_admin'
+    audience: 'super_admin',
+    status: 'coming_soon'
   },
   {
     id: 'environment-setup',
@@ -274,7 +316,8 @@ export const documentationIndex: DocumentationItem[] = [
     category: 'Technical Reference',
     tags: ['environment', 'setup', 'configuration', 'dev'],
     description: 'Development environment setup guide',
-    audience: 'admin'
+    audience: 'admin',
+    status: 'coming_soon'
   },
   {
     id: 'supabase-config',
@@ -282,7 +325,8 @@ export const documentationIndex: DocumentationItem[] = [
     category: 'Technical Reference',
     tags: ['supabase', 'config', 'backend', 'database'],
     description: 'Backend configuration and management',
-    audience: 'super_admin'
+    audience: 'super_admin',
+    status: 'coming_soon'
   },
   {
     id: 'admin-portal-guide',
@@ -290,15 +334,8 @@ export const documentationIndex: DocumentationItem[] = [
     category: 'Admin Guides',
     tags: ['admin', 'portal', 'guide', 'management'],
     description: 'Complete guide to the Admin Portal features and sections',
-    audience: 'admin'
-  },
-  {
-    id: 'knowledge-centre',
-    title: 'Knowledge Centre Guide',
-    category: 'Admin Guides',
-    tags: ['documentation', 'knowledge', 'search', 'version-control'],
-    description: 'Complete guide to using the Knowledge Centre',
-    audience: 'all'
+    audience: 'admin',
+    status: 'coming_soon'
   },
   {
     id: 'account-management',
@@ -306,7 +343,8 @@ export const documentationIndex: DocumentationItem[] = [
     category: 'Admin Guides',
     tags: ['accounts', 'deletion', 'team-management'],
     description: 'Managing user and team member accounts',
-    audience: 'admin'
+    audience: 'admin',
+    status: 'coming_soon'
   },
   {
     id: 'documentation-version-control',
@@ -314,7 +352,8 @@ export const documentationIndex: DocumentationItem[] = [
     category: 'Technical Reference',
     tags: ['version-control', 'documentation', 'history'],
     description: 'Version control system for documentation',
-    audience: 'admin'
+    audience: 'admin',
+    status: 'coming_soon'
   },
   {
     id: 'table-architecture',
@@ -322,7 +361,8 @@ export const documentationIndex: DocumentationItem[] = [
     category: 'Technical Reference',
     tags: ['database', 'architecture', 'tables'],
     description: 'Database table architecture and separation',
-    audience: 'admin'
+    audience: 'admin',
+    status: 'coming_soon'
   },
   {
     id: 'user-classification',
@@ -330,7 +370,8 @@ export const documentationIndex: DocumentationItem[] = [
     category: 'Technical Reference',
     tags: ['users', 'classification', 'types'],
     description: 'User type classification and management',
-    audience: 'admin'
+    audience: 'admin',
+    status: 'coming_soon'
   },
   {
     id: 'integrations-setup',
@@ -338,7 +379,8 @@ export const documentationIndex: DocumentationItem[] = [
     category: 'Technical Reference',
     tags: ['integrations', 'setup', 'configuration'],
     description: 'Setting up external integrations',
-    audience: 'admin'
+    audience: 'admin',
+    status: 'coming_soon'
   },
   {
     id: 'password-reset-flow',
@@ -346,7 +388,8 @@ export const documentationIndex: DocumentationItem[] = [
     category: 'Technical Reference',
     tags: ['password', 'reset', 'security'],
     description: 'Password reset flow and implementation',
-    audience: 'admin'
+    audience: 'admin',
+    status: 'coming_soon'
   },
 
   // Strategy
@@ -356,6 +399,7 @@ export const documentationIndex: DocumentationItem[] = [
     category: 'Strategy',
     tags: ['seo', 'marketing', 'optimization', 'strategy'],
     description: 'SEO optimization strategy and guidelines',
-    audience: 'admin'
+    audience: 'admin',
+    status: 'coming_soon'
   },
 ];

@@ -10,14 +10,21 @@ import Fuse from 'fuse.js';
 interface DocumentationSearchProps {
   searchQuery: string;
   onSearchChange: (query: string) => void;
+  statusFilter?: 'all' | 'published' | 'coming_soon';
 }
 
-export default function DocumentationSearch({ searchQuery, onSearchChange }: DocumentationSearchProps) {
+export default function DocumentationSearch({ searchQuery, onSearchChange, statusFilter = 'all' }: DocumentationSearchProps) {
   const navigate = useNavigate();
   const [results, setResults] = useState<DocumentationItem[]>([]);
 
+  // Filter by status first
+  const filteredDocs = useMemo(() => {
+    if (statusFilter === 'all') return documentationIndex;
+    return documentationIndex.filter(doc => doc.status === statusFilter);
+  }, [statusFilter]);
+
   // Configure Fuse.js for fuzzy search
-  const fuse = useMemo(() => new Fuse(documentationIndex, {
+  const fuse = useMemo(() => new Fuse(filteredDocs, {
     keys: [
       { name: 'title', weight: 2 },
       { name: 'description', weight: 1.5 },
@@ -27,7 +34,7 @@ export default function DocumentationSearch({ searchQuery, onSearchChange }: Doc
     threshold: 0.4,
     includeScore: true,
     minMatchCharLength: 2,
-  }), []);
+  }), [filteredDocs]);
 
   useEffect(() => {
     if (searchQuery.trim().length < 2) {
@@ -40,6 +47,24 @@ export default function DocumentationSearch({ searchQuery, onSearchChange }: Doc
   }, [searchQuery, fuse]);
 
   const popularSearches = ['Mobile validation', 'Reputation system', 'User types', 'Profile questions'];
+
+  const getStatusBadge = (status?: string) => {
+    if (status === 'published') {
+      return (
+        <Badge variant="default" className="gap-1 ml-2">
+          <span className="text-xs">●</span> Live
+        </Badge>
+      );
+    }
+    if (status === 'coming_soon') {
+      return (
+        <Badge variant="secondary" className="gap-1 ml-2">
+          <span className="text-xs">○</span> Coming Soon
+        </Badge>
+      );
+    }
+    return null;
+  };
 
   return (
     <div className="space-y-4">
@@ -84,7 +109,11 @@ export default function DocumentationSearch({ searchQuery, onSearchChange }: Doc
               <Card 
                 key={doc.id} 
                 className="hover:shadow-md transition-shadow cursor-pointer"
-                onClick={() => navigate(`/admin/knowledge/${doc.id}`)}
+                onClick={() => {
+                  if (doc.status === 'published') {
+                    navigate(`/admin/knowledge/${doc.id}`);
+                  }
+                }}
               >
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between gap-4">
@@ -92,6 +121,7 @@ export default function DocumentationSearch({ searchQuery, onSearchChange }: Doc
                       <CardTitle className="text-base flex items-center gap-2">
                         <FileText className="h-4 w-4 text-primary" />
                         {doc.title}
+                        {getStatusBadge(doc.status)}
                       </CardTitle>
                       <CardDescription className="mt-1">
                         {doc.description}
@@ -110,6 +140,11 @@ export default function DocumentationSearch({ searchQuery, onSearchChange }: Doc
                       </Badge>
                     ))}
                   </div>
+                  {doc.status === 'coming_soon' && (
+                    <p className="text-xs text-muted-foreground mt-2 italic">
+                      Documentation available soon
+                    </p>
+                  )}
                 </CardContent>
               </Card>
             ))}
