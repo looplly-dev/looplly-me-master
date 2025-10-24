@@ -8,9 +8,9 @@ export default function QuickReference() {
   const stats = [
     {
       icon: Globe,
-      value: '5',
-      label: 'Supported Countries',
-      sublabel: 'ZA, NG, KE, GB, IN',
+      value: '193',
+      label: 'Available Countries',
+      sublabel: '16 blocked for regulatory reasons',
       link: 'mobile-validation'
     },
     {
