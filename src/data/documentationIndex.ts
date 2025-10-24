@@ -52,15 +52,6 @@ export const documentationIndex: DocumentationItem[] = [
     status: 'published'
   },
   {
-    id: 'reputation-beta-pitfalls',
-    title: 'Reputation System Beta Pitfalls',
-    category: 'Core Systems',
-    tags: ['reputation', 'beta', 'issues', 'lessons'],
-    description: 'Lessons learned and pitfalls to avoid in reputation system',
-    audience: 'admin',
-    status: 'coming_soon'
-  },
-  {
     id: 'streak-reputation',
     title: 'Streak & Reputation System',
     category: 'Core Systems',
@@ -278,15 +269,6 @@ export const documentationIndex: DocumentationItem[] = [
     category: 'Technical Reference',
     tags: ['profiling', 'integration', 'api', 'technical'],
     description: 'Technical integration guide for profiling system',
-    audience: 'admin',
-    status: 'coming_soon'
-  },
-  {
-    id: 'profiling-rollout',
-    title: 'Rollout Checklist',
-    category: 'Admin Guides',
-    tags: ['profiling', 'rollout', 'deployment', 'checklist'],
-    description: 'Checklist for rolling out profiling features',
     audience: 'admin',
     status: 'coming_soon'
   },
