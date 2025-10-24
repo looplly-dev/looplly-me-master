@@ -15,7 +15,9 @@ import { deleteConflictingUser } from '@/utils/deleteConflictingUser';
 import { Eye, EyeOff, ArrowLeft, AlertCircle } from 'lucide-react';
 import { analytics } from '@/utils/analytics';
 import { validateAndNormalizeMobile } from '@/utils/mobileValidation';
+import { validateAndNormalizeEmail } from '@/utils/emailValidation';
 import { cn } from '@/lib/utils';
+import { Check, X } from 'lucide-react';
 
 interface RegisterProps {
   onBack: () => void;
@@ -53,6 +55,12 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
     preview?: string;
     error?: string;
   }>({ isValid: false });
+  const [emailValidation, setEmailValidation] = useState<{
+    isValid: boolean;
+    normalizedEmail?: string;
+    error?: string;
+    warning?: string;
+  }>({ isValid: false });
   const { register } = useAuth();
   const { toast } = useToast();
 
@@ -82,6 +90,23 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
         preview: result.nationalFormat,
         error: result.error
       });
+    }
+  };
+
+  const handleEmailChange = (value: string) => {
+    updateField('email', value);
+    
+    // Real-time validation (only after 3+ characters to avoid early errors)
+    if (value.length >= 3) {
+      const result = validateAndNormalizeEmail(value);
+      setEmailValidation({
+        isValid: result.isValid,
+        normalizedEmail: result.normalizedEmail,
+        error: result.error,
+        warning: result.warning
+      });
+    } else {
+      setEmailValidation({ isValid: false });
     }
   };
 
@@ -322,16 +347,53 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email">Email *</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="Email address"
-                value={formData.email}
-                onChange={(e) => updateField('email', e.target.value)}
-                className="h-12"
-                required
-              />
+              <Label htmlFor="email">
+                Email <span className="text-xs text-muted-foreground">(Optional)</span>
+              </Label>
+              <div className="relative">
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="email@example.com (optional)"
+                  value={formData.email}
+                  onChange={(e) => handleEmailChange(e.target.value)}
+                  className={cn(
+                    "h-12 pr-10",
+                    formData.email.length >= 3 && (
+                      emailValidation.isValid 
+                        ? "border-green-500 focus-visible:ring-green-500" 
+                        : "border-red-500 focus-visible:ring-red-500"
+                    )
+                  )}
+                />
+                {formData.email.length >= 3 && (
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                    {emailValidation.isValid ? (
+                      <Check className="h-5 w-5 text-green-500" />
+                    ) : (
+                      <X className="h-5 w-5 text-red-500" />
+                    )}
+                  </div>
+                )}
+              </div>
+              
+              {/* Show normalized preview if valid */}
+              {emailValidation.isValid && emailValidation.normalizedEmail && formData.email.length >= 3 && (
+                <div className="flex items-center gap-1 text-xs">
+                  <span className="text-green-600">✓</span>
+                  <span className="text-muted-foreground">
+                    Will be saved as: {emailValidation.normalizedEmail}
+                  </span>
+                </div>
+              )}
+              
+              {/* Show error message if invalid */}
+              {emailValidation.error && formData.email.length >= 3 && (
+                <div className="flex items-start gap-2 text-sm text-destructive">
+                  <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                  <p>{emailValidation.error}</p>
+                </div>
+              )}
             </div>
 
             <div className="flex items-center space-x-2 p-3 bg-muted/50 rounded-md">

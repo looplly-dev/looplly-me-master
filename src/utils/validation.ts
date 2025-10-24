@@ -1,4 +1,5 @@
 // Centralized validation utilities
+import { isValidPublicEmail } from './emailValidation';
 export interface ValidationResult {
   isValid: boolean;
   errors: string[];
@@ -57,10 +58,11 @@ export const validateRegistration = (data: RegistrationData): ValidationResult =
     errors.push('Please accept the terms and privacy policy');
   }
 
-  if (!data.email?.trim()) {
-    errors.push('Email is required');
-  } else if (!isValidEmail(data.email)) {
-    errors.push('Please enter a valid email address');
+  // Email is now OPTIONAL but must be valid if provided
+  if (data.email && data.email.trim()) {
+    if (!isValidPublicEmail(data.email)) {
+      errors.push('Please enter a valid email address');
+    }
   }
 
   return {

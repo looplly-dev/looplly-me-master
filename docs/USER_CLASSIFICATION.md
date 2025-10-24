@@ -93,6 +93,79 @@ Looplly has 3 distinct user types, each with different purposes and access level
 3. First login → Forced password reset
 4. After reset → Access admin portal
 
+**Email Domain Restrictions:**
+
+Staff members with `@looplly.me` email addresses are **blocked from registering** on the User Portal. This ensures proper onboarding flow and prevents user type mismatches.
+
+**Why This Restriction Exists:**
+
+1. **Correct User Type Assignment**
+   - Staff members must have `user_type = 'looplly_team_user'`
+   - User Portal registration sets `user_type = 'looplly_user'`
+   - Incorrect assignment breaks role-based access control
+
+2. **Proper Role Assignment**
+   - Staff members need roles in `user_roles` table ('admin', 'super_admin', 'tester')
+   - User Portal registration doesn't assign team roles
+   - Missing roles prevent Admin Portal access
+
+3. **Team Profile Creation**
+   - Staff members need records in `team_profiles` table
+   - User Portal registration doesn't create team profiles
+   - Missing team profile breaks Admin Portal features
+
+4. **Temporary Password Workflow**
+   - Staff onboarding uses temporary passwords via "Add Team Member"
+   - User Portal uses permanent passwords
+   - Different security workflows
+
+**What Happens If Staff Tries to Register on User Portal:**
+
+**Without Email Validation Block:**
+1. Staff member enters `admin@looplly.me` on User Portal registration
+2. Two scenarios:
+   - **If already onboarded**: Gets "Email already exists" error (confusing)
+   - **If not yet onboarded**: Successfully registers with wrong `user_type`
+3. Attempts to login on User Portal
+4. If login succeeds, immediately redirected: "Please use the admin portal at /admin/login to access your team account"
+5. Confused staff member contacts support
+
+**With Email Validation Block:**
+1. Staff member enters `admin@looplly.me` on User Portal registration
+2. Immediate feedback: "Staff emails must use the Admin Portal"
+3. Clear UX guidance before form submission
+4. No confusion, proper onboarding flow
+
+**Correct Onboarding Flow for Staff:**
+```
+Super Admin accesses Admin Portal
+          ↓
+Navigate to Team Management (/admin/team)
+          ↓
+Click "Add Team Member" button
+          ↓
+Fill form: email (@looplly.me), first name, last name, role
+          ↓
+System creates:
+  - auth.users record
+  - profiles record (user_type = 'looplly_team_user')
+  - user_roles record (role = 'admin' or 'super_admin')
+  - team_profiles record
+          ↓
+Temporary password emailed to staff member
+          ↓
+Staff member logs in at /admin/login
+          ↓
+Forced to change password on first login
+          ↓
+✅ Staff member fully onboarded with correct access
+```
+
+**Email Domain Validation:**
+- **User Portal Registration**: `@looplly.me` emails blocked (real-time validation)
+- **Admin Portal "Add Team Member"**: `@looplly.me` emails required (enforced)
+- **Journey Simulator Test Users**: `@looplly-testing.internal` (blocked on User Portal)
+
 ---
 
 ## 3. `client_user` (B2B Clients - Future)
