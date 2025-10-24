@@ -160,7 +160,7 @@ export function TeamActionsMenu({ member, onUpdate }: TeamActionsMenuProps) {
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(tempPassword);
-    toast.success('Password copied to clipboard');
+    toast.success('✓ Password copied to clipboard!');
   };
 
   return (
@@ -337,53 +337,53 @@ export function TeamActionsMenu({ member, onUpdate }: TeamActionsMenuProps) {
       <Dialog open={showPasswordResultDialog} onOpenChange={setShowPasswordResultDialog}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Password Reset Successful</DialogTitle>
+            <DialogTitle className="text-2xl">✓ Password Reset Successful</DialogTitle>
             <DialogDescription>
-              Share this temporary password securely with the team member.
+              Copy this temporary password and share it with {member.email} via a secure channel.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
-            <div className="bg-muted/50 p-4 rounded-lg border border-border space-y-3">
+            <div className="bg-primary/5 p-6 rounded-lg border-2 border-primary/20 space-y-4">
               <div className="space-y-2">
-                <Label className="text-sm font-semibold">Temporary Password</Label>
-                <div className="flex items-center gap-2">
-                  <div className="flex-1 font-mono text-sm bg-background px-3 py-2 rounded border border-border">
-                    {showPassword ? tempPassword : '••••••••••••••••'}
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={copyToClipboard}
-                  >
-                    <Copy className="h-4 w-4" />
-                  </Button>
+                <Label className="text-sm font-semibold text-muted-foreground">Temporary Password</Label>
+                <div className="relative">
+                  <code className="block w-full font-mono text-base bg-background px-4 py-3 rounded-md border-2 border-border select-all text-center tracking-wide break-all">
+                    {tempPassword}
+                  </code>
+                  <p className="text-xs text-muted-foreground text-center mt-2">
+                    {tempPassword.length} characters • Click to select all
+                  </p>
                 </div>
               </div>
-              <div className="space-y-1">
-                <Label className="text-sm font-semibold">Expires</Label>
-                <p className="text-sm text-muted-foreground">{passwordExpiry}</p>
-              </div>
+              <Button
+                size="lg"
+                className="w-full"
+                onClick={copyToClipboard}
+              >
+                <Copy className="h-4 w-4 mr-2" />
+                Copy Password to Clipboard
+              </Button>
             </div>
-            <div className="bg-accent/50 p-3 rounded-lg border border-accent">
-              <p className="text-sm text-foreground">
-                <strong>Important:</strong> The team member must change this password on their first login. 
-                The temporary password will expire in 7 days.
-              </p>
+            <div className="bg-muted/50 p-4 rounded-lg border border-border space-y-2">
+              <p className="text-sm font-semibold">Important Instructions:</p>
+              <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+                <li>Password expires: <strong className="text-foreground">{passwordExpiry}</strong></li>
+                <li>User <strong className="text-foreground">must change</strong> password on first login</li>
+                <li>Use the copy button to avoid typos</li>
+                <li>Verify the password was copied correctly (check character count)</li>
+                <li>Login at: <strong className="text-foreground">looplly.me/admin/login</strong></li>
+              </ul>
             </div>
           </div>
           <DialogFooter>
-            <Button onClick={() => {
-              setShowPasswordResultDialog(false);
-              setShowPassword(false);
-            }}>
-              Done
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setShowPasswordResultDialog(false);
+                setShowPassword(false);
+              }}
+            >
+              Close
             </Button>
           </DialogFooter>
         </DialogContent>
