@@ -6,11 +6,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Lightbulb, BookOpen, FileText, Sparkles, CheckCircle2, Clock } from 'lucide-react';
 import DocumentationSearch from './DocumentationSearch';
 import QuickReference from './QuickReference';
+import SeedDocumentationButton from './SeedDocumentationButton';
 import { documentationIndex } from '@/data/documentationIndex';
+import { useRole } from '@/hooks/useRole';
 
 export default function KnowledgeDashboard() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'published' | 'coming_soon'>('all');
+  const { isAdmin } = useRole();
 
   const categories = Array.from(new Set(documentationIndex.map(doc => doc.category)));
   const categoryCounts = categories.map(cat => {
@@ -150,6 +153,11 @@ export default function KnowledgeDashboard() {
           )}
         </TabsContent>
       </Tabs>
+
+      {/* Admin Seeding Tool */}
+      {isAdmin && !searchQuery && (
+        <SeedDocumentationButton />
+      )}
 
       {/* Quick Stats */}
       {!searchQuery && <QuickReference />}
