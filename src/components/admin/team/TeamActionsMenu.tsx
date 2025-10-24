@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { MoreVertical, UserCog, Trash2 } from 'lucide-react';
+import { MoreVertical, UserCog, Trash2, KeyRound, Copy, Eye, EyeOff } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -49,6 +49,11 @@ export function TeamActionsMenu({ member, onUpdate }: TeamActionsMenuProps) {
   const [showRoleDialog, setShowRoleDialog] = useState(false);
   const [showRemoveDialog, setShowRemoveDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
+  const [showResetPasswordDialog, setShowResetPasswordDialog] = useState(false);
+  const [showPasswordResultDialog, setShowPasswordResultDialog] = useState(false);
+  const [tempPassword, setTempPassword] = useState<string>('');
+  const [passwordExpiry, setPasswordExpiry] = useState<string>('');
+  const [showPassword, setShowPassword] = useState(false);
   const [selectedRole, setSelectedRole] = useState<'super_admin' | 'admin'>(member.role);
   const [editFormData, setEditFormData] = useState({
     first_name: member.first_name || '',
@@ -127,6 +132,37 @@ export function TeamActionsMenu({ member, onUpdate }: TeamActionsMenuProps) {
     }
   };
 
+  const handleResetPassword = async () => {
+    setIsUpdating(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('reset-team-member-password', {
+        body: { email: member.email }
+      });
+
+      if (error) throw error;
+
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to reset password');
+      }
+
+      setTempPassword(data.temporary_password);
+      setPasswordExpiry(new Date(data.expires_at).toLocaleString());
+      setShowResetPasswordDialog(false);
+      setShowPasswordResultDialog(true);
+      toast.success('Password reset successfully');
+    } catch (error) {
+      console.error('Error resetting password:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to reset password');
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(tempPassword);
+    toast.success('Password copied to clipboard');
+  };
+
   return (
     <>
       <DropdownMenu>
@@ -142,6 +178,10 @@ export function TeamActionsMenu({ member, onUpdate }: TeamActionsMenuProps) {
           <DropdownMenuItem onClick={() => setShowEditDialog(true)}>
             <UserCog className="mr-2 h-4 w-4" />
             <span>Edit Details</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setShowResetPasswordDialog(true)}>
+            <KeyRound className="mr-2 h-4 w-4" />
+            <span>Reset Password</span>
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => setShowRoleDialog(true)}>
             <UserCog className="mr-2 h-4 w-4" />
@@ -260,6 +300,90 @@ export function TeamActionsMenu({ member, onUpdate }: TeamActionsMenuProps) {
             </Button>
             <Button onClick={handleRoleChange} disabled={isUpdating}>
               {isUpdating ? 'Updating...' : 'Update Role'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Reset Password Confirmation Dialog */}
+      <AlertDialog open={showResetPasswordDialog} onOpenChange={setShowResetPasswordDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Reset Team Member Password</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to reset the password for {member.email}?
+              <br /><br />
+              This will:
+              <ul className="list-disc list-inside mt-2 space-y-1">
+                <li>Generate a new temporary password (expires in 7 days)</li>
+                <li>Invalidate their current session</li>
+                <li>Force them to change password on next login</li>
+              </ul>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isUpdating}>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleResetPassword} 
+              disabled={isUpdating}
+            >
+              {isUpdating ? 'Resetting...' : 'Reset Password'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Password Result Dialog */}
+      <Dialog open={showPasswordResultDialog} onOpenChange={setShowPasswordResultDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Password Reset Successful</DialogTitle>
+            <DialogDescription>
+              Share this temporary password securely with the team member.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="bg-muted/50 p-4 rounded-lg border border-border space-y-3">
+              <div className="space-y-2">
+                <Label className="text-sm font-semibold">Temporary Password</Label>
+                <div className="flex items-center gap-2">
+                  <div className="flex-1 font-mono text-sm bg-background px-3 py-2 rounded border border-border">
+                    {showPassword ? tempPassword : '••••••••••••••••'}
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={copyToClipboard}
+                  >
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+              <div className="space-y-1">
+                <Label className="text-sm font-semibold">Expires</Label>
+                <p className="text-sm text-muted-foreground">{passwordExpiry}</p>
+              </div>
+            </div>
+            <div className="bg-accent/50 p-3 rounded-lg border border-accent">
+              <p className="text-sm text-foreground">
+                <strong>Important:</strong> The team member must change this password on their first login. 
+                The temporary password will expire in 7 days.
+              </p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button onClick={() => {
+              setShowPasswordResultDialog(false);
+              setShowPassword(false);
+            }}>
+              Done
             </Button>
           </DialogFooter>
         </DialogContent>
