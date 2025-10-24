@@ -152,6 +152,19 @@ Deno.serve(async (req) => {
         continue;
       }
 
+      // Add to team_members table (secure)
+      const { error: teamMemberError } = await supabaseAdmin
+        .from('team_members')
+        .insert({
+          user_id: authUser.user.id,
+          department: 'Looplly Core Team',
+          is_active: true
+        });
+
+      if (teamMemberError) {
+        errors.push({ email: account.email, action: 'add_team_member', error: teamMemberError.message });
+      }
+
       // Add role to user_roles table
       const { error: roleError } = await supabaseAdmin
         .from('user_roles')

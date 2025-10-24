@@ -29,6 +29,20 @@ export function useUserType() {
 
     const fetchUserType = async () => {
       try {
+        // SECURITY: Check team_members table first (most secure, super_admin only visibility)
+        const { data: teamMember } = await supabase
+          .from('team_members')
+          .select('is_active')
+          .eq('user_id', authState.user!.id)
+          .maybeSingle();
+
+        if (teamMember?.is_active) {
+          setUserType('looplly_team_user');
+          setIsLoading(false);
+          return;
+        }
+
+        // Fallback to profiles for backward compatibility
         const result = await supabase
           .from('profiles')
           .select('user_type')

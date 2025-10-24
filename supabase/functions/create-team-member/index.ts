@@ -161,7 +161,27 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Also update the base profile with minimal data and team user type
+    // Add to team_members table (secure, super_admin-only visibility)
+    const { error: teamMemberError } = await supabaseAdmin
+      .from('team_members')
+      .insert({
+        user_id: newUser.user.id,
+        department: team_name,
+        added_by: caller.id,
+        is_active: true
+      });
+
+    if (teamMemberError) {
+      console.error('Error adding to team_members:', teamMemberError);
+      // Rollback: delete the auth user
+      await supabaseAdmin.auth.admin.deleteUser(newUser.user.id);
+      return new Response(
+        JSON.stringify({ error: 'Failed to add to team_members', details: teamMemberError.message }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Also update the base profile with minimal data and team user type (deprecated, for backward compatibility)
     const { error: profileError } = await supabaseAdmin
       .from('profiles')
       .update({
@@ -173,7 +193,7 @@ Deno.serve(async (req) => {
 
     if (profileError) {
       console.error('Error updating profile:', profileError);
-      // Note: Not a critical error, team_profile is primary
+      // Note: Not a critical error, team_members is primary
     }
 
     // Assign role in user_roles table

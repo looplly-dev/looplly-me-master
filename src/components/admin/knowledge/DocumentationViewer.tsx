@@ -12,6 +12,7 @@ import { documentationIndex, DocumentationItem } from '@/data/documentationIndex
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useRole } from '@/hooks/useRole';
+import { useAuth } from '@/hooks/useAuth';
 import VersionHistory from './VersionHistory';
 
 interface DocumentationViewerProps {
@@ -28,8 +29,25 @@ export default function DocumentationViewer({ onBack }: DocumentationViewerProps
   const [version, setVersion] = useState<number>(1);
   const [showVersionHistory, setShowVersionHistory] = useState(false);
   const { hasRole } = useRole();
+  const { authState } = useAuth();
 
   const doc = documentationIndex.find(d => d.id === documentId);
+
+  // SECURITY: Audit log document views
+  useEffect(() => {
+    if (doc && authState.user) {
+      supabase
+        .from('documentation_access_log')
+        .insert({
+          user_id: authState.user.id,
+          document_id: documentId,
+          action: 'view'
+        })
+        .then(({ error }) => {
+          if (error) console.error('Failed to log document view:', error);
+        });
+    }
+  }, [doc, documentId, authState.user]);
 
   useEffect(() => {
     if (!doc) return;

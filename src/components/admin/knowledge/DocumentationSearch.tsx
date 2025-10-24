@@ -5,6 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Search, FileText } from 'lucide-react';
 import { documentationIndex, DocumentationItem } from '@/data/documentationIndex';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 import Fuse from 'fuse.js';
 
 interface DocumentationSearchProps {
@@ -16,6 +18,23 @@ interface DocumentationSearchProps {
 export default function DocumentationSearch({ searchQuery, onSearchChange, statusFilter = 'all' }: DocumentationSearchProps) {
   const navigate = useNavigate();
   const [results, setResults] = useState<DocumentationItem[]>([]);
+  const { authState } = useAuth();
+
+  // SECURITY: Audit log search queries
+  useEffect(() => {
+    if (searchQuery.trim().length >= 2 && authState.user) {
+      supabase
+        .from('documentation_access_log')
+        .insert({
+          user_id: authState.user.id,
+          action: 'search',
+          search_query: searchQuery
+        })
+        .then(({ error }) => {
+          if (error) console.error('Failed to log search query:', error);
+        });
+    }
+  }, [searchQuery, authState.user]);
 
   // Filter by status first
   const filteredDocs = useMemo(() => {
@@ -111,7 +130,7 @@ export default function DocumentationSearch({ searchQuery, onSearchChange, statu
                 className="hover:shadow-md transition-shadow cursor-pointer"
                 onClick={() => {
                   if (doc.status === 'published') {
-                    navigate(`/admin/knowledge/${doc.id}`);
+                    navigate(`/admin/knowledge/doc/${doc.id}`);
                   }
                 }}
               >

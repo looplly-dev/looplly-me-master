@@ -28,8 +28,6 @@ import AdminKnowledgeDoc from "./pages/AdminKnowledgeDoc";
 import AdminKnowledgeEdit from "./pages/AdminKnowledgeEdit";
 import AdminCountryBlocklist from "./pages/AdminCountryBlocklist";
 import AdminSimulator from "./pages/AdminSimulator";
-import Knowledge from "./pages/Knowledge";
-import KnowledgeDoc from "./pages/KnowledgeDoc";
 import SimulatorSession from "./pages/SimulatorSession";
 import ResetPassword from "./components/auth/ResetPassword";
 import ResetPasswordRequired from "./pages/ResetPasswordRequired";
@@ -71,18 +69,6 @@ const AppContent = () => {
               <Route path="/admin/knowledge/doc/:docId" element={<AdminKnowledgeDoc />} />
               <Route path="/admin/knowledge/edit/:docId" element={<AdminKnowledgeEdit />} />
               <Route path="/admin/country-blocklist" element={<AdminCountryBlocklist />} />
-              
-              {/* B2B Knowledge Routes - Team Members Only */}
-              <Route path="/knowledge" element={
-                <ProtectedRoute requiredRole="tester">
-                  <Knowledge />
-                </ProtectedRoute>
-              } />
-              <Route path="/knowledge/:docId" element={
-                <ProtectedRoute requiredRole="tester">
-                  <KnowledgeDoc />
-                </ProtectedRoute>
-              } />
               
               {/* Simulator Session Route */}
               <Route path="/simulator-session" element={<SimulatorSession />} />

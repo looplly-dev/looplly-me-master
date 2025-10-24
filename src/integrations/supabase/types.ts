@@ -892,6 +892,39 @@ export type Database = {
         }
         Relationships: []
       }
+      documentation_access_log: {
+        Row: {
+          accessed_at: string | null
+          action: string
+          document_id: string | null
+          id: string
+          ip_address: unknown
+          search_query: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          accessed_at?: string | null
+          action: string
+          document_id?: string | null
+          id?: string
+          ip_address?: unknown
+          search_query?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          accessed_at?: string | null
+          action?: string
+          document_id?: string | null
+          id?: string
+          ip_address?: unknown
+          search_query?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       documentation_history: {
         Row: {
           audience: string
@@ -1567,6 +1600,39 @@ export type Database = {
           },
         ]
       }
+      team_members: {
+        Row: {
+          access_level: string | null
+          added_at: string | null
+          added_by: string | null
+          department: string | null
+          id: string
+          is_active: boolean | null
+          notes: string | null
+          user_id: string
+        }
+        Insert: {
+          access_level?: string | null
+          added_at?: string | null
+          added_by?: string | null
+          department?: string | null
+          id?: string
+          is_active?: boolean | null
+          notes?: string | null
+          user_id: string
+        }
+        Update: {
+          access_level?: string | null
+          added_at?: string | null
+          added_by?: string | null
+          department?: string | null
+          id?: string
+          is_active?: boolean | null
+          notes?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       team_profiles: {
         Row: {
           company_name: string | null
@@ -2086,8 +2152,7 @@ export type Database = {
         }
         Returns: boolean
       }
-      is_looplly_team_member: { Args: { _user_id: string }; Returns: boolean }
-      is_team_member: { Args: { p_user_id: string }; Returns: boolean }
+      is_team_member: { Args: { _user_id: string }; Returns: boolean }
       log_audit_event: {
         Args: {
           p_action: string
