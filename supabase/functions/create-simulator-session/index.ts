@@ -62,7 +62,7 @@ serve(async (req) => {
     // Verify target is a test account
     const { data: testUser } = await supabaseAdmin
       .from('profiles')
-      .select('is_test_account, email, first_name, last_name')
+      .select('is_test_account, email, mobile, first_name, last_name')
       .eq('user_id', test_user_id)
       .single();
 
@@ -126,6 +126,7 @@ serve(async (req) => {
         test_user: {
           id: test_user_id,
           email: testUser.email,
+          mobile: testUser.mobile,
           name: `${testUser.first_name} ${testUser.last_name}`.trim()
         },
         stage_info: resetResult,

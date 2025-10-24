@@ -1502,7 +1502,6 @@ export type Database = {
         Row: {
           company_name: string | null
           company_role: string | null
-          country_code: string | null
           created_at: string | null
           email: string
           first_login_at: string | null
@@ -1512,7 +1511,6 @@ export type Database = {
           invited_by: string | null
           is_active: boolean | null
           last_name: string | null
-          mobile: string | null
           must_change_password: boolean | null
           temp_password_expires_at: string | null
           updated_at: string | null
@@ -1521,7 +1519,6 @@ export type Database = {
         Insert: {
           company_name?: string | null
           company_role?: string | null
-          country_code?: string | null
           created_at?: string | null
           email: string
           first_login_at?: string | null
@@ -1531,7 +1528,6 @@ export type Database = {
           invited_by?: string | null
           is_active?: boolean | null
           last_name?: string | null
-          mobile?: string | null
           must_change_password?: boolean | null
           temp_password_expires_at?: string | null
           updated_at?: string | null
@@ -1540,7 +1536,6 @@ export type Database = {
         Update: {
           company_name?: string | null
           company_role?: string | null
-          country_code?: string | null
           created_at?: string | null
           email?: string
           first_login_at?: string | null
@@ -1550,7 +1545,6 @@ export type Database = {
           invited_by?: string | null
           is_active?: boolean | null
           last_name?: string | null
-          mobile?: string | null
           must_change_password?: boolean | null
           temp_password_expires_at?: string | null
           updated_at?: string | null

@@ -8,8 +8,6 @@ export interface TeamProfile {
   email: string;
   first_name: string | null;
   last_name: string | null;
-  mobile: string | null;
-  country_code: string | null;
   company_name: string | null;
   company_role: string | null;
   is_active: boolean;

@@ -70,8 +70,9 @@ Deno.serve(async (req) => {
 
     for (let i = 0; i < testUsers.length; i++) {
       const testUser = testUsers[i];
+      const mobileNumber = `+274129900${(i + 1).toString().padStart(1, '0')}`;
       
-      // Check if user already exists
+      // Check if user already exists by email
       const { data: existingProfile } = await supabaseAdmin
         .from('profiles')
         .select('user_id')
@@ -83,6 +84,23 @@ Deno.serve(async (req) => {
         continue;
       }
 
+      // Check if mobile number already exists
+      const { data: existingMobile } = await supabaseAdmin
+        .from('profiles')
+        .select('user_id, email')
+        .eq('mobile', mobileNumber)
+        .maybeSingle();
+
+      if (existingMobile) {
+        results.push({ 
+          email: testUser.email, 
+          status: 'mobile_conflict', 
+          user_id: existingMobile.user_id,
+          conflicting_email: existingMobile.email
+        });
+        continue;
+      }
+
       // Create user in auth.users
       const { data: authUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
         email: testUser.email,
@@ -90,7 +108,7 @@ Deno.serve(async (req) => {
         user_metadata: {
           first_name: testUser.firstName,
           last_name: testUser.lastName,
-          mobile: `+2774123400${i + 1}`,
+          mobile: mobileNumber,
           country_code: '+27',
         },
       });
