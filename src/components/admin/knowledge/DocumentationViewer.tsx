@@ -70,7 +70,7 @@ export default function DocumentationViewer({ onBack }: DocumentationViewerProps
           setContent(docData.content);
           setVersion(docData.version || 1);
         } else {
-          setContent('# Document Not Found\n\nThis document has not been seeded yet.');
+          setContent('# Document Not Found\n\nThis document has not been seeded into the database yet. Please use the "Seed Documentation" button in the Knowledge Centre to populate the database with all documentation files.');
         }
       } catch (error) {
         console.error('Error loading document:', error);
