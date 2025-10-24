@@ -441,6 +441,25 @@ Deno.serve(async (req) => {
 
     console.log(`Admin user ${user.id} authorized. Starting documentation seeding process...`);
 
+    // Try to parse request body for alternate modes
+    let inputDocs: any[] | null = null;
+    let requestAction: string | null = null;
+    try {
+      const body = await req.json();
+      if (Array.isArray(body?.docs)) inputDocs = body.docs;
+      if (typeof body?.action === 'string') requestAction = body.action;
+    } catch (_) {
+      // No JSON body provided - continue with default behavior
+    }
+
+    // If the caller is asking for the index, return it so the frontend can fetch files client-side
+    if (requestAction === 'get-index') {
+      return new Response(
+        JSON.stringify({ index: documentationIndex }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
+      );
+    }
+
     // Use service role key for actual seeding operations
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
@@ -448,12 +467,62 @@ Deno.serve(async (req) => {
     let errorCount = 0;
     const errors: string[] = [];
 
+    // If docs were provided in the request body, upsert them directly (preferred - avoids filesystem access in edge runtime)
+    if (inputDocs && inputDocs.length > 0) {
+      for (const doc of inputDocs) {
+        try {
+          const { error: insertError } = await supabase
+            .from('documentation')
+            .upsert({
+              id: doc.id,
+              title: doc.title,
+              content: doc.content ?? '',
+              category: doc.category,
+              tags: doc.tags,
+              description: doc.description,
+              audience: doc.audience,
+              parent: doc.parent ?? null,
+              status: doc.status || 'draft'
+            }, {
+              onConflict: 'id'
+            });
+
+          if (insertError) {
+            console.error(`Failed to insert ${doc.id}:`, insertError);
+            errors.push(`Insert failed for ${doc.id}: ${insertError.message}`);
+            errorCount++;
+          } else {
+            console.log(`✓ Seeded: ${doc.title}`);
+            successCount++;
+          }
+        } catch (error) {
+          console.error(`Error processing ${doc.id}:`, error);
+          const errorMessage = error instanceof Error ? error.message : String(error);
+          errors.push(`Processing error for ${doc.id}: ${errorMessage}`);
+          errorCount++;
+        }
+      }
+
+      console.log(`Seeding complete (client-provided): ${successCount} success, ${errorCount} errors`);
+
+      return new Response(
+        JSON.stringify({
+          success: true,
+          message: `Seeded ${successCount} documents successfully`,
+          errors,
+          stats: { total: (inputDocs?.length ?? 0), success: successCount, failed: errorCount }
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
+      );
+    }
+
+    // Fallback: attempt to read files from the repository (expected under web app public/docs). This may fail in hosted edge runtimes.
     for (const doc of documentationIndex) {
       try {
-        // Read file content
+        // Read file content from public/docs path
         const filePath = `./public${doc.path}`;
         let content = '';
-        
+
         try {
           content = await Deno.readTextFile(filePath);
         } catch (fileError) {

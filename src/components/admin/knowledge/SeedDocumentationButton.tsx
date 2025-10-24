@@ -20,16 +20,55 @@ export default function SeedDocumentationButton() {
     setResult(null);
 
     try {
+      // 1) Ask backend for the documentation index (ids + metadata + paths)
+      const { data: indexResp, error: indexErr } = await supabase.functions.invoke('seed-documentation', {
+        body: { action: 'get-index' }
+      });
+      if (indexErr) throw indexErr;
+
+      const index = Array.isArray(indexResp?.index) ? indexResp.index : [];
+
+      // 2) Fetch markdown files from the app (public/docs) in parallel
+      const fetched = await Promise.all(
+        index.map(async (doc: any) => {
+          try {
+            const res = await fetch(doc.path);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const content = await res.text();
+            return { ...doc, content };
+          } catch (e: any) {
+            return { ...doc, __error: `File not found: ${doc.path}` };
+          }
+        })
+      );
+
+      const docs = fetched.filter((d: any) => !d.__error);
+      const fileErrors = fetched.filter((d: any) => d.__error).map((d: any) => d.__error as string);
+
+      // 3) Send docs to backend for secure upsert
       const { data, error } = await supabase.functions.invoke('seed-documentation', {
-        body: {}
+        body: { docs }
       });
 
       if (error) throw error;
 
-      setResult(data);
-      
-      if (data.success) {
-        toast.success(`Successfully seeded ${data.stats.success} documents!`);
+      // Merge fileErrors into response for full visibility
+      const merged = {
+        ...data,
+        errors: [...(data?.errors || []), ...fileErrors],
+        stats: {
+          total: index.length,
+          success: data?.stats?.success || 0,
+          failed: (data?.stats?.failed || 0) + fileErrors.length
+        }
+      };
+
+      setResult(merged);
+
+      if (merged.success && merged.stats.failed === 0) {
+        toast.success(`Successfully seeded ${merged.stats.success} documents!`);
+      } else if (merged.success) {
+        toast.success(`Seeded ${merged.stats.success} docs with ${merged.stats.failed} errors`);
       } else {
         toast.error('Seeding completed with some errors');
       }
