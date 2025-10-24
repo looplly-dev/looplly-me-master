@@ -269,9 +269,16 @@ if (dialCode === '+1') {
 }
 ```
 
-### Country Blocklis​t
+### Country Blocklist
 
-Some countries may be blocked for regulatory reasons:
+**16 Countries Currently Blocked** for regulatory reasons (data localization requirements):
+
+- Argentina, Brazil, China, India, Indonesia, Iran, Kazakhstan, Pakistan
+- Russia, Saudi Arabia, Singapore, South Korea, Thailand, Turkey, UAE, Vietnam
+
+Countries are blocked due to data localization regulations, not technical limitations. The platform supports **193 available countries** for registration (209 total - 16 blocked).
+
+**Management**: Admin Portal → Country Blocklist (`/admin/country-blocklist`)
 
 ```sql
 CREATE TABLE country_blocklist (

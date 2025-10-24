@@ -1,23 +1,34 @@
-# Mobile Validation Global Expansion Guide
+# Mobile Validation Documentation Guide
 
 ## Overview
 
-This guide covers how to expand mobile number validation to support new countries in the Looplly platform.
+This guide explains how to **document validation patterns** for specific countries. Mobile validation already works globally for all non-blocked countries—this guide is about adding detailed documentation and examples, not enabling support.
+
+**Important**: The platform validates mobile numbers for **193 available countries** (209 total - 16 blocked) automatically using `libphonenumber-js`. You don't need to add code to support new countries; they already work. This guide is for documenting country-specific validation patterns.
 
 ## Current Implementation
 
-The platform uses `libphonenumber-js` for comprehensive mobile validation across countries.
+The platform uses `libphonenumber-js` for comprehensive mobile validation across **all 193 available countries** (209 total - 16 blocked).
 
-### Supported Countries
+### Global Coverage
 
-Currently configured countries (see `src/data/countries.ts`):
+**193 Countries Available**:
+- All countries listed in `src/data/countries.ts` except those on the blocklist
+- Validation happens automatically—no code changes needed
+- Countries are blocked for data localization regulations, not technical limitations
+
+**16 Countries Blocked**:
+- Argentina, Brazil, China, India, Indonesia, Iran, Kazakhstan, Pakistan, Russia, Saudi Arabia, Singapore, South Korea, Thailand, Turkey, UAE, Vietnam
+- Managed via Admin Portal → Country Blocklist (`/admin/country-blocklist`)
+
+### Documented Example Countries
+
+The following countries have detailed validation patterns documented (examples only, not limitations):
 - South Africa (+27)
 - Nigeria (+234)
 - Kenya (+254)
 - United Kingdom (+44)
 - United States (+1)
-- India (+91)
-- And many more...
 
 ## Adding a New Country
 

@@ -26,7 +26,22 @@ Users can enter numbers in various formats:
 
 All are normalized to: `+27712345678`
 
-## Supported Countries
+## Global Coverage
+
+✅ **193 Countries Available**
+- Mobile validation works for all countries in `src/data/countries.ts` (209 total) except those on the blocklist
+- Powered by `libphonenumber-js` for comprehensive international support
+- Automatic parsing, validation, and formatting for all country formats
+- No code changes needed to support additional countries
+
+❌ **16 Countries Blocked**
+- Argentina, Brazil, China, India, Indonesia, Iran, Kazakhstan, Pakistan, Russia, Saudi Arabia, Singapore, South Korea, Thailand, Turkey, UAE, Vietnam
+- Blocked due to data localization regulations (not technical limitations)
+- Managed via Admin Portal → Country Blocklist (`/admin/country-blocklist`)
+
+## Example Country Validation Patterns
+
+The following countries have **documented validation patterns** for reference. These are not the only supported countries—all 193 available countries work automatically.
 
 ### South Africa (ZA)
 

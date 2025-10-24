@@ -19,19 +19,19 @@ export const documentationIndex: DocumentationItem[] = [
     title: 'Mobile Number Validation',
     category: 'Core Systems',
     tags: ['validation', 'mobile', 'international', 'e164'],
-    description: 'Country-aware mobile validation system using E.164 format',
+    description: 'Global mobile validation system supporting 193 countries using E.164 format',
     audience: 'all',
     status: 'published'
   },
   {
     id: 'mobile-validation-global',
-    title: 'Global Expansion Strategy',
+    title: 'Mobile Validation Documentation Guide',
     category: 'Core Systems',
-    tags: ['validation', 'mobile', 'global', 'expansion', 'strategy'],
-    description: 'Strategies for expanding mobile validation to global markets',
+    tags: ['validation', 'mobile', 'documentation', 'patterns'],
+    description: 'Guide for documenting mobile validation patterns for new countries (validation works globally)',
     parent: 'mobile-validation',
     audience: 'admin',
-    status: 'coming_soon'
+    status: 'published'
   },
   {
     id: 'profile-system',
