@@ -28,6 +28,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
@@ -47,7 +48,14 @@ interface TeamActionsMenuProps {
 export function TeamActionsMenu({ member, onUpdate }: TeamActionsMenuProps) {
   const [showRoleDialog, setShowRoleDialog] = useState(false);
   const [showRemoveDialog, setShowRemoveDialog] = useState(false);
+  const [showEditDialog, setShowEditDialog] = useState(false);
   const [selectedRole, setSelectedRole] = useState<'super_admin' | 'admin'>(member.role);
+  const [editFormData, setEditFormData] = useState({
+    first_name: member.first_name || '',
+    last_name: member.last_name || '',
+    company_name: member.company_name || '',
+    company_role: member.company_role || ''
+  });
   const [isUpdating, setIsUpdating] = useState(false);
 
   const handleRoleChange = async () => {
@@ -66,6 +74,33 @@ export function TeamActionsMenu({ member, onUpdate }: TeamActionsMenuProps) {
     } catch (error) {
       console.error('Error updating role:', error);
       toast.error('Failed to update team member role');
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleEditDetails = async () => {
+    setIsUpdating(true);
+    try {
+      const { error } = await supabase
+        .from('team_profiles')
+        .update({
+          first_name: editFormData.first_name,
+          last_name: editFormData.last_name,
+          company_name: editFormData.company_name,
+          company_role: editFormData.company_role,
+          updated_at: new Date().toISOString()
+        })
+        .eq('user_id', member.user_id);
+
+      if (error) throw error;
+
+      toast.success('Team member details updated successfully');
+      setShowEditDialog(false);
+      onUpdate();
+    } catch (error) {
+      console.error('Error updating details:', error);
+      toast.error('Failed to update team member details');
     } finally {
       setIsUpdating(false);
     }
@@ -104,6 +139,10 @@ export function TeamActionsMenu({ member, onUpdate }: TeamActionsMenuProps) {
         <DropdownMenuContent align="end" className="w-[200px] z-50 bg-background">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
           <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={() => setShowEditDialog(true)}>
+            <UserCog className="mr-2 h-4 w-4" />
+            <span>Edit Details</span>
+          </DropdownMenuItem>
           <DropdownMenuItem onClick={() => setShowRoleDialog(true)}>
             <UserCog className="mr-2 h-4 w-4" />
             <span>Change Role</span>
@@ -117,6 +156,70 @@ export function TeamActionsMenu({ member, onUpdate }: TeamActionsMenuProps) {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+
+      {/* Edit Details Dialog */}
+      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Team Member Details</DialogTitle>
+            <DialogDescription>
+              Update profile information for {member.email}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="first_name">First Name</Label>
+                <Input
+                  id="first_name"
+                  value={editFormData.first_name}
+                  onChange={(e) => setEditFormData({ ...editFormData, first_name: e.target.value })}
+                  placeholder="First name"
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="last_name">Last Name</Label>
+                <Input
+                  id="last_name"
+                  value={editFormData.last_name}
+                  onChange={(e) => setEditFormData({ ...editFormData, last_name: e.target.value })}
+                  placeholder="Last name"
+                />
+              </div>
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="company_name">Team/Company Name</Label>
+              <Input
+                id="company_name"
+                value={editFormData.company_name}
+                onChange={(e) => setEditFormData({ ...editFormData, company_name: e.target.value })}
+                placeholder="e.g., Looplly"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="company_role">Job Title</Label>
+              <Input
+                id="company_role"
+                value={editFormData.company_role}
+                onChange={(e) => setEditFormData({ ...editFormData, company_role: e.target.value })}
+                placeholder="e.g., B2C Guru, Product Manager"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowEditDialog(false)}
+              disabled={isUpdating}
+            >
+              Cancel
+            </Button>
+            <Button onClick={handleEditDetails} disabled={isUpdating}>
+              {isUpdating ? 'Saving...' : 'Save Changes'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Role Change Dialog */}
       <Dialog open={showRoleDialog} onOpenChange={setShowRoleDialog}>
