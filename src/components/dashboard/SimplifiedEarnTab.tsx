@@ -7,6 +7,7 @@ import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CollapsibleSection } from '@/components/ui/collapsible-section';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
 import { 
   Coins, 
@@ -52,6 +53,7 @@ import { useStaleProfileCheck } from '@/hooks/useStaleProfileCheck';
 import { ProfileUpdateModal } from '@/components/dashboard/ProfileUpdateModal';
 import { useNavigate } from 'react-router-dom';
 import { analytics } from '@/utils/analytics';
+import OTPVerification from '@/components/auth/OTPVerification';
 
 export default function SimplifiedEarnTab() {
   const navigate = useNavigate();
@@ -68,6 +70,7 @@ export default function SimplifiedEarnTab() {
   const { hasStaleData, staleQuestions, staleCount } = useStaleProfileCheck();
   const [checkInDone, setCheckInDone] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(true);
+  const [showOTPModal, setShowOTPModal] = useState(false);
   const [dataOptIns, setDataOptIns] = useState({
     shopping: false,
     appUsage: false,
@@ -88,6 +91,8 @@ export default function SimplifiedEarnTab() {
   const { authState } = useAuth();
   const { surveys: cintSurveys, isLoading: cintLoading, startSurvey } = useCintSurveys();
   const isMobile = useIsMobile();
+  
+  const isVerified = authState.user?.profile?.is_verified ?? false;
 
   // Skip tracking for stale profile updates
   const SKIP_TIMESTAMP_KEY = 'profile_update_skip_timestamp';
@@ -148,6 +153,16 @@ export default function SimplifiedEarnTab() {
   };
 
   const handleStartTask = (type: string, title: string, reward: number) => {
+    // Check verification status first
+    if (!isVerified) {
+      toast({
+        title: 'Verification Required',
+        description: 'Please verify your mobile number to start earning',
+        variant: 'default'
+      });
+      return;
+    }
+    
     // Track task click
     analytics.trackEarningActivity(
       type as 'survey' | 'video' | 'task', 
@@ -378,6 +393,27 @@ export default function SimplifiedEarnTab() {
       
       {/* Normal Earn content renders underneath */}
       <div className="pt-0 pb-24 md:pb-20 lg:pb-8 px-0 md:px-6 lg:px-8 space-y-3">
+        {/* Verification Banner */}
+        {!isVerified && (
+          <Alert className="mx-4 border-amber-500 bg-amber-500/10">
+            <Shield className="h-5 w-5 text-amber-600" />
+            <AlertTitle className="text-amber-700 font-bold">
+              Mobile Verification Required
+            </AlertTitle>
+            <AlertDescription className="text-sm text-muted-foreground">
+              Verify your mobile number to unlock earning opportunities.
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="mt-2 border-amber-500 text-amber-700 hover:bg-amber-500 hover:text-white"
+                onClick={() => setShowOTPModal(true)}
+              >
+                Verify Now →
+              </Button>
+            </AlertDescription>
+          </Alert>
+        )}
+        
         {/* Enhanced Balance Card with Progress */}
         <Card className="bg-card border-0 shadow-lg">
           <CardContent className="p-4">
@@ -1381,6 +1417,22 @@ export default function SimplifiedEarnTab() {
          </div>
        </CollapsibleSection>
      </div>
+     
+     {/* OTP Modal */}
+     {showOTPModal && (
+       <OTPVerification 
+         onBack={() => setShowOTPModal(false)}
+         onSuccess={() => {
+           setShowOTPModal(false);
+           toast({
+             title: 'Mobile Verified!',
+             description: 'You can now start earning',
+           });
+           // Refresh page to update verification status
+           window.location.reload();
+         }}
+       />
+     )}
     </TooltipProvider>
   );
 }

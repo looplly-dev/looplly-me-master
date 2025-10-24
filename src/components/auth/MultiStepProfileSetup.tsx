@@ -84,16 +84,17 @@ export default function MultiStepProfileSetup({ onBack, onComplete }: MultiStepP
     try {
       const success = await completeProfile(profileData);
       if (success) {
+        console.log('Profile completion successful');
         toast({
-          title: "Profile completed!",
-          description: "Welcome to Looplly! Your profile has been set up successfully.",
+          title: 'Profile Complete!',
+          description: 'Verify your mobile to start earning.',
         });
-        // Don't call onComplete() - let the auth state update handle the redirect
+        onComplete();
       } else {
         toast({
-          title: "Error",
-          description: "Failed to complete profile. Please try again.",
-          variant: "destructive",
+          title: 'Error',
+          description: 'Failed to save profile. Please try again.',
+          variant: 'destructive'
         });
       }
     } catch (error) {

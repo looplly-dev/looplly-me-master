@@ -41,6 +41,7 @@ export interface UserProfile {
   company_name?: string;  // For team members: team name; For clients: company name
   company_role?: string;  // For team members: job title; For clients: role at company
   must_change_password?: boolean;  // Team member invitation flag
+  is_verified?: boolean;  // Mobile verification status
 }
 
 export interface AuthState {

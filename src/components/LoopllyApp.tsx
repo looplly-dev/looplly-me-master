@@ -90,17 +90,7 @@ export default function LoopllyApp() {
       <Register
         onBack={() => setAuthFlow('login')}
         onSuccess={() => setAuthFlow('login')}
-        onOTPRequired={() => setAuthFlow('otp')}
-      />
-    );
-  }
-
-  if (authFlow === 'otp') {
-    console.log('LoopllyApp - Showing OTP verification');
-    return (
-      <OTPVerification 
-        onBack={() => setAuthFlow('register')}
-        onSuccess={() => setAuthFlow('login')}
+        onOTPRequired={() => setAuthFlow('login')}
       />
     );
   }
