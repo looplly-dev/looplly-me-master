@@ -5,8 +5,9 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Documentation index mapping
+// Documentation index mapping - Wave 1 (Published), Wave 2 & 3 (Coming Soon)
 const documentationIndex = [
+  // Wave 1 - Core Systems (Published)
   {
     id: 'country-code-spec',
     title: 'Country Code Specification',
@@ -14,7 +15,8 @@ const documentationIndex = [
     description: 'Dual-column country identification system',
     audience: 'developer',
     tags: ['country', 'data-model', 'schema'],
-    path: '/docs/COUNTRY_CODE_SPECIFICATION.md'
+    path: '/docs/COUNTRY_CODE_SPECIFICATION.md',
+    status: 'published'
   },
   {
     id: 'data-isolation',
@@ -23,25 +25,8 @@ const documentationIndex = [
     description: 'Ensuring data isolation by country',
     audience: 'developer',
     tags: ['country', 'data-isolation', 'queries'],
-    path: '/docs/DATA_ISOLATION_QUICK_REFERENCE.md'
-  },
-  {
-    id: 'environment-setup',
-    title: 'Environment Setup',
-    category: 'Development',
-    description: 'Environment variable configuration guide',
-    audience: 'developer',
-    tags: ['setup', 'environment', 'configuration'],
-    path: '/docs/ENVIRONMENT_SETUP.md'
-  },
-  {
-    id: 'profiling-readme',
-    title: 'Profiling System Overview',
-    category: 'Profiling',
-    description: 'Comprehensive profiling system documentation hub',
-    audience: 'all',
-    tags: ['profiling', 'overview', 'navigation'],
-    path: '/docs/PROFILING/README.md'
+    path: '/docs/DATA_ISOLATION_QUICK_REFERENCE.md',
+    status: 'published'
   },
   {
     id: 'mobile-validation',
@@ -50,178 +35,8 @@ const documentationIndex = [
     description: 'Country-aware mobile number validation',
     audience: 'developer',
     tags: ['validation', 'mobile', 'country'],
-    path: '/docs/MOBILE_VALIDATION.md'
-  },
-  {
-    id: 'user-type-management',
-    title: 'User Type Management',
-    category: 'User Management',
-    description: 'Office users vs Looplly users management',
-    audience: 'admin',
-    tags: ['user-types', 'management', 'admin'],
-    path: '/docs/USER_TYPE_MANAGEMENT.md'
-  },
-  {
-    id: 'profiling-user-guide',
-    title: 'Profiling User Guide',
-    category: 'Profiling',
-    description: 'End-user guide to the profile system',
-    audience: 'user',
-    tags: ['profiling', 'user-guide', 'levels'],
-    path: '/docs/PROFILING/USER_GUIDE.md'
-  },
-  {
-    id: 'earning-rules',
-    title: 'Earning Rules',
-    category: 'Profiling',
-    description: 'Hierarchical earning access requirements',
-    audience: 'developer',
-    tags: ['earning', 'rules', 'targeting'],
-    path: '/docs/PROFILING/EARNING_RULES.md'
-  },
-  {
-    id: 'role-architecture',
-    title: 'Role Architecture',
-    category: 'Security',
-    description: 'Dual-table roles and user types system',
-    audience: 'developer',
-    tags: ['roles', 'security', 'architecture'],
-    path: '/docs/ROLE_ARCHITECTURE.md'
-  },
-  {
-    id: 'level-strategy',
-    title: 'Progressive Profiling Strategy',
-    category: 'Profiling',
-    description: '3-level progressive profiling system',
-    audience: 'strategy',
-    tags: ['profiling', 'strategy', 'levels'],
-    path: '/docs/PROFILING/LEVEL_STRATEGY.md'
-  },
-  {
-    id: 'analytics',
-    title: 'Analytics Implementation',
-    category: 'Development',
-    description: 'Google Analytics tracking guide',
-    audience: 'developer',
-    tags: ['analytics', 'tracking', 'gtag'],
-    path: '/docs/ANALYTICS.md'
-  },
-  {
-    id: 'global-local-brands',
-    title: 'Global vs Local Brands',
-    category: 'Profiling',
-    description: 'Managing global and local brand options',
-    audience: 'developer',
-    tags: ['brands', 'country', 'options'],
-    path: '/docs/PROFILING/GLOBAL_VS_LOCAL_BRANDS.md'
-  },
-  {
-    id: 'auto-scaling',
-    title: 'Auto-Scaling System',
-    category: 'Profiling',
-    description: 'AI-powered country option generation',
-    audience: 'developer',
-    tags: ['ai', 'automation', 'scaling'],
-    path: '/docs/PROFILING/AUTO_SCALING_SYSTEM.md'
-  },
-  {
-    id: 'admin-guide',
-    title: 'Admin Guide',
-    category: 'Profiling',
-    description: 'Comprehensive admin portal guide',
-    audience: 'admin',
-    tags: ['admin', 'guide', 'management'],
-    path: '/docs/PROFILING/ADMIN_GUIDE.md'
-  },
-  {
-    id: 'question-builder',
-    title: 'Question Builder Guide',
-    category: 'Profiling',
-    description: 'Creating and managing profile questions',
-    audience: 'admin',
-    tags: ['questions', 'builder', 'admin'],
-    path: '/docs/PROFILING/QUESTION_BUILDER_GUIDE.md'
-  },
-  {
-    id: 'decay-system',
-    title: 'Data Decay System',
-    category: 'Profiling',
-    description: 'Profile data expiration and refresh',
-    audience: 'developer',
-    tags: ['decay', 'staleness', 'data-quality'],
-    path: '/docs/PROFILING/DECAY_SYSTEM.md'
-  },
-  {
-    id: 'architecture',
-    title: 'Profiling Architecture',
-    category: 'Profiling',
-    description: 'Technical architecture and data flow',
-    audience: 'developer',
-    tags: ['architecture', 'technical', 'database'],
-    path: '/docs/PROFILING/ARCHITECTURE.md'
-  },
-  {
-    id: 'integration-guide',
-    title: 'Integration Guide',
-    category: 'Profiling',
-    description: 'Integrating profiling into features',
-    audience: 'developer',
-    tags: ['integration', 'hooks', 'api'],
-    path: '/docs/PROFILING/INTEGRATION_GUIDE.md'
-  },
-  {
-    id: 'contextual-triggers',
-    title: 'Contextual Triggers',
-    category: 'Profiling',
-    description: 'Smart question triggering system',
-    audience: 'developer',
-    tags: ['triggers', 'context', 'ux'],
-    path: '/docs/PROFILING/CONTEXTUAL_TRIGGERS.md'
-  },
-  {
-    id: 'country-question-management',
-    title: 'Country Question Management',
-    category: 'Profiling',
-    description: 'Managing country-specific options',
-    audience: 'admin',
-    tags: ['country', 'options', 'admin'],
-    path: '/docs/PROFILING/COUNTRY_QUESTION_MANAGEMENT.md'
-  },
-  {
-    id: 'ai-generation-prompts',
-    title: 'AI Generation Prompts',
-    category: 'Profiling',
-    description: 'AI prompts for generating country options',
-    audience: 'developer',
-    tags: ['ai', 'prompts', 'generation'],
-    path: '/docs/PROFILING/AI_GENERATION_PROMPTS.md'
-  },
-  {
-    id: 'admin-auto-generation',
-    title: 'Admin Auto-Generation Guide',
-    category: 'Profiling',
-    description: 'Using AI auto-generation in admin portal',
-    audience: 'admin',
-    tags: ['ai', 'admin', 'automation'],
-    path: '/docs/PROFILING/ADMIN_AUTO_GENERATION_GUIDE.md'
-  },
-  {
-    id: 'rollout-checklist',
-    title: 'Rollout Checklist',
-    category: 'Profiling',
-    description: 'Launch checklist for profiling system',
-    audience: 'strategy',
-    tags: ['rollout', 'checklist', 'launch'],
-    path: '/docs/PROFILING/ROLLOUT_CHECKLIST.md'
-  },
-  {
-    id: 'mobile-validation-global',
-    title: 'Mobile Validation Global Expansion',
-    category: 'Core Systems',
-    description: 'Expanding mobile validation to new countries',
-    audience: 'developer',
-    tags: ['mobile', 'validation', 'expansion'],
-    path: '/docs/MOBILE_VALIDATION_GLOBAL_EXPANSION.md'
+    path: '/docs/MOBILE_VALIDATION.md',
+    status: 'published'
   },
   {
     id: 'profile-system-architecture',
@@ -230,70 +45,28 @@ const documentationIndex = [
     description: 'Complete profile system architecture',
     audience: 'developer',
     tags: ['architecture', 'profile', 'system'],
-    path: '/docs/PROFILE_SYSTEM_ARCHITECTURE.md'
-  },
-  {
-    id: 'deployment-config',
-    title: 'Deployment Configuration',
-    category: 'Development',
-    description: 'Deployment configuration guide',
-    audience: 'developer',
-    tags: ['deployment', 'config', 'production'],
-    path: '/docs/DEPLOYMENT_CONFIG.md'
-  },
-  {
-    id: 'reputation-beta-pitfalls',
-    title: 'Reputation Beta Pitfalls',
-    category: 'Reputation',
-    description: 'Common pitfalls in reputation system',
-    audience: 'developer',
-    tags: ['reputation', 'beta', 'pitfalls'],
-    path: '/docs/REPUTATION_BETA_PITFALLS.md'
+    path: '/docs/PROFILE_SYSTEM_ARCHITECTURE.md',
+    status: 'published'
   },
   {
     id: 'rep-classification',
     title: 'Reputation Classification System',
-    category: 'Reputation',
+    category: 'Strategy',
     description: 'User reputation classification',
     audience: 'developer',
     tags: ['reputation', 'classification', 'tiers'],
-    path: '/docs/REP_CLASSIFICATION_SYSTEM.md'
+    path: '/docs/REP_CLASSIFICATION_SYSTEM.md',
+    status: 'published'
   },
   {
     id: 'streak-reputation',
     title: 'Streak & Reputation System',
-    category: 'Reputation',
+    category: 'Strategy',
     description: 'Integrated streak and reputation system',
     audience: 'developer',
     tags: ['streak', 'reputation', 'gamification'],
-    path: '/docs/STREAK_REPUTATION_SYSTEM.md'
-  },
-  {
-    id: 'supabase-config',
-    title: 'Supabase Config Management',
-    category: 'Development',
-    description: 'Managing Supabase configuration',
-    audience: 'developer',
-    tags: ['supabase', 'config', 'backend'],
-    path: '/docs/SUPABASE_CONFIG_MANAGEMENT.md'
-  },
-  {
-    id: 'warren-admin',
-    title: 'Warren Admin Guide',
-    category: 'Admin',
-    description: 'Admin guide for Warren',
-    audience: 'admin',
-    tags: ['warren', 'admin', 'guide'],
-    path: '/docs/WARREN_ADMIN_GUIDE.md'
-  },
-  {
-    id: 'admin-portal-guide',
-    title: 'Admin Portal Guide',
-    category: 'Admin Guides',
-    description: 'Complete guide to the Admin Portal features and sections',
-    audience: 'admin',
-    tags: ['admin', 'portal', 'guide', 'management'],
-    path: '/docs/ADMIN_PORTAL_GUIDE.md'
+    path: '/docs/STREAK_REPUTATION_SYSTEM.md',
+    status: 'published'
   },
   {
     id: 'knowledge-centre',
@@ -302,7 +75,202 @@ const documentationIndex = [
     description: 'Complete guide to using the Knowledge Centre',
     audience: 'all',
     tags: ['documentation', 'knowledge', 'search', 'version-control'],
-    path: '/docs/KNOWLEDGE_CENTRE.md'
+    path: '/docs/KNOWLEDGE_CENTRE.md',
+    status: 'published'
+  },
+  
+  // Wave 2 - Profiling System (Coming Soon)
+  {
+    id: 'profiling-readme',
+    title: 'Profiling System Overview',
+    category: 'Profiling',
+    description: 'Comprehensive profiling system documentation hub',
+    audience: 'all',
+    tags: ['profiling', 'overview', 'navigation'],
+    path: '/docs/PROFILING/README.md',
+    status: 'coming_soon'
+  },
+  {
+    id: 'profiling-user-guide',
+    title: 'Profiling User Guide',
+    category: 'Profiling',
+    description: 'End-user guide to the profile system',
+    audience: 'user',
+    tags: ['profiling', 'user-guide', 'levels'],
+    path: '/docs/PROFILING/USER_GUIDE.md',
+    status: 'coming_soon'
+  },
+  {
+    id: 'level-strategy',
+    title: 'Progressive Profiling Strategy',
+    category: 'Profiling',
+    description: '3-level progressive profiling system',
+    audience: 'strategy',
+    tags: ['profiling', 'strategy', 'levels'],
+    path: '/docs/PROFILING/LEVEL_STRATEGY.md',
+    status: 'coming_soon'
+  },
+  {
+    id: 'earning-rules',
+    title: 'Earning Rules',
+    category: 'Profiling',
+    description: 'Hierarchical earning access requirements',
+    audience: 'developer',
+    tags: ['earning', 'rules', 'targeting'],
+    path: '/docs/PROFILING/EARNING_RULES.md',
+    status: 'coming_soon'
+  },
+  {
+    id: 'global-local-brands',
+    title: 'Global vs Local Brands',
+    category: 'Profiling',
+    description: 'Managing global and local brand options',
+    audience: 'developer',
+    tags: ['brands', 'country', 'options'],
+    path: '/docs/PROFILING/GLOBAL_VS_LOCAL_BRANDS.md',
+    status: 'coming_soon'
+  },
+  {
+    id: 'auto-scaling',
+    title: 'Auto-Scaling System',
+    category: 'Profiling',
+    description: 'AI-powered country option generation',
+    audience: 'developer',
+    tags: ['ai', 'automation', 'scaling'],
+    path: '/docs/PROFILING/AUTO_SCALING_SYSTEM.md',
+    status: 'coming_soon'
+  },
+  {
+    id: 'admin-guide',
+    title: 'Admin Guide',
+    category: 'Profiling',
+    description: 'Comprehensive admin portal guide',
+    audience: 'admin',
+    tags: ['admin', 'guide', 'management'],
+    path: '/docs/PROFILING/ADMIN_GUIDE.md',
+    status: 'coming_soon'
+  },
+  {
+    id: 'question-builder',
+    title: 'Question Builder Guide',
+    category: 'Profiling',
+    description: 'Creating and managing profile questions',
+    audience: 'admin',
+    tags: ['questions', 'builder', 'admin'],
+    path: '/docs/PROFILING/QUESTION_BUILDER_GUIDE.md',
+    status: 'coming_soon'
+  },
+  {
+    id: 'decay-system',
+    title: 'Data Decay System',
+    category: 'Profiling',
+    description: 'Profile data expiration and refresh',
+    audience: 'developer',
+    tags: ['decay', 'staleness', 'data-quality'],
+    path: '/docs/PROFILING/DECAY_SYSTEM.md',
+    status: 'coming_soon'
+  },
+  {
+    id: 'architecture',
+    title: 'Profiling Architecture',
+    category: 'Profiling',
+    description: 'Technical architecture and data flow',
+    audience: 'developer',
+    tags: ['architecture', 'technical', 'database'],
+    path: '/docs/PROFILING/ARCHITECTURE.md',
+    status: 'coming_soon'
+  },
+  {
+    id: 'integration-guide',
+    title: 'Integration Guide',
+    category: 'Profiling',
+    description: 'Integrating profiling into features',
+    audience: 'developer',
+    tags: ['integration', 'hooks', 'api'],
+    path: '/docs/PROFILING/INTEGRATION_GUIDE.md',
+    status: 'coming_soon'
+  },
+  {
+    id: 'contextual-triggers',
+    title: 'Contextual Triggers',
+    category: 'Profiling',
+    description: 'Smart question triggering system',
+    audience: 'developer',
+    tags: ['triggers', 'context', 'ux'],
+    path: '/docs/PROFILING/CONTEXTUAL_TRIGGERS.md',
+    status: 'coming_soon'
+  },
+  {
+    id: 'country-question-management',
+    title: 'Country Question Management',
+    category: 'Profiling',
+    description: 'Managing country-specific options',
+    audience: 'admin',
+    tags: ['country', 'options', 'admin'],
+    path: '/docs/PROFILING/COUNTRY_QUESTION_MANAGEMENT.md',
+    status: 'coming_soon'
+  },
+  {
+    id: 'ai-generation-prompts',
+    title: 'AI Generation Prompts',
+    category: 'Profiling',
+    description: 'AI prompts for generating country options',
+    audience: 'developer',
+    tags: ['ai', 'prompts', 'generation'],
+    path: '/docs/PROFILING/AI_GENERATION_PROMPTS.md',
+    status: 'coming_soon'
+  },
+  {
+    id: 'admin-auto-generation',
+    title: 'Admin Auto-Generation Guide',
+    category: 'Profiling',
+    description: 'Using AI auto-generation in admin portal',
+    audience: 'admin',
+    tags: ['ai', 'admin', 'automation'],
+    path: '/docs/PROFILING/ADMIN_AUTO_GENERATION_GUIDE.md',
+    status: 'coming_soon'
+  },
+  
+  // Wave 3 - Admin & Technical (Coming Soon)
+  {
+    id: 'mobile-validation-global',
+    title: 'Mobile Validation Global Expansion',
+    category: 'Core Systems',
+    description: 'Expanding mobile validation to new countries',
+    audience: 'developer',
+    tags: ['mobile', 'validation', 'expansion'],
+    path: '/docs/MOBILE_VALIDATION_GLOBAL_EXPANSION.md',
+    status: 'coming_soon'
+  },
+  {
+    id: 'user-type-management',
+    title: 'User Type Management',
+    category: 'Admin Guides',
+    description: 'Office users vs Looplly users management',
+    audience: 'admin',
+    tags: ['user-types', 'management', 'admin'],
+    path: '/docs/USER_TYPE_MANAGEMENT.md',
+    status: 'coming_soon'
+  },
+  {
+    id: 'warren-admin',
+    title: 'Warren Admin Guide',
+    category: 'Admin Guides',
+    description: 'Admin guide for Warren',
+    audience: 'admin',
+    tags: ['warren', 'admin', 'guide'],
+    path: '/docs/WARREN_ADMIN_GUIDE.md',
+    status: 'coming_soon'
+  },
+  {
+    id: 'admin-portal-guide',
+    title: 'Admin Portal Guide',
+    category: 'Admin Guides',
+    description: 'Complete guide to the Admin Portal features and sections',
+    audience: 'admin',
+    tags: ['admin', 'portal', 'guide', 'management'],
+    path: '/docs/ADMIN_PORTAL_GUIDE.md',
+    status: 'coming_soon'
   },
   {
     id: 'account-management',
@@ -311,16 +279,18 @@ const documentationIndex = [
     description: 'Managing user and team member accounts',
     audience: 'admin',
     tags: ['accounts', 'deletion', 'team-management'],
-    path: '/docs/ACCOUNT_MANAGEMENT.md'
+    path: '/docs/ACCOUNT_MANAGEMENT.md',
+    status: 'coming_soon'
   },
   {
-    id: 'documentation-version-control',
-    title: 'Documentation Version Control',
+    id: 'role-architecture',
+    title: 'Role Architecture',
     category: 'Technical Reference',
-    description: 'Version control system for documentation',
-    audience: 'admin',
-    tags: ['version-control', 'documentation', 'history'],
-    path: '/docs/DOCUMENTATION_VERSION_CONTROL.md'
+    description: 'Dual-table roles and user types system',
+    audience: 'developer',
+    tags: ['roles', 'security', 'architecture'],
+    path: '/docs/ROLE_ARCHITECTURE.md',
+    status: 'coming_soon'
   },
   {
     id: 'table-architecture',
@@ -329,7 +299,8 @@ const documentationIndex = [
     description: 'Database table architecture and separation',
     audience: 'developer',
     tags: ['database', 'architecture', 'tables'],
-    path: '/docs/TABLE_ARCHITECTURE.md'
+    path: '/docs/TABLE_ARCHITECTURE.md',
+    status: 'coming_soon'
   },
   {
     id: 'user-classification',
@@ -338,16 +309,18 @@ const documentationIndex = [
     description: 'User type classification and management',
     audience: 'developer',
     tags: ['users', 'classification', 'types'],
-    path: '/docs/USER_CLASSIFICATION.md'
+    path: '/docs/USER_CLASSIFICATION.md',
+    status: 'coming_soon'
   },
   {
-    id: 'integrations-setup',
-    title: 'Integrations Setup',
-    category: 'Development',
-    description: 'Setting up external integrations',
-    audience: 'developer',
-    tags: ['integrations', 'setup', 'configuration'],
-    path: '/docs/INTEGRATIONS_SETUP.md'
+    id: 'documentation-version-control',
+    title: 'Documentation Version Control',
+    category: 'Technical Reference',
+    description: 'Version control system for documentation',
+    audience: 'admin',
+    tags: ['version-control', 'documentation', 'history'],
+    path: '/docs/DOCUMENTATION_VERSION_CONTROL.md',
+    status: 'coming_soon'
   },
   {
     id: 'password-reset-flow',
@@ -356,7 +329,58 @@ const documentationIndex = [
     description: 'Password reset flow and implementation',
     audience: 'developer',
     tags: ['password', 'reset', 'security'],
-    path: '/docs/PASSWORD_RESET_FLOW.md'
+    path: '/docs/PASSWORD_RESET_FLOW.md',
+    status: 'coming_soon'
+  },
+  {
+    id: 'environment-setup',
+    title: 'Environment Setup',
+    category: 'Technical Reference',
+    description: 'Environment variable configuration guide',
+    audience: 'developer',
+    tags: ['setup', 'environment', 'configuration'],
+    path: '/docs/ENVIRONMENT_SETUP.md',
+    status: 'coming_soon'
+  },
+  {
+    id: 'analytics',
+    title: 'Analytics Implementation',
+    category: 'Technical Reference',
+    description: 'Google Analytics tracking guide',
+    audience: 'developer',
+    tags: ['analytics', 'tracking', 'gtag'],
+    path: '/docs/ANALYTICS.md',
+    status: 'coming_soon'
+  },
+  {
+    id: 'integrations-setup',
+    title: 'Integrations Setup',
+    category: 'Technical Reference',
+    description: 'Setting up external integrations',
+    audience: 'developer',
+    tags: ['integrations', 'setup', 'configuration'],
+    path: '/docs/INTEGRATIONS_SETUP.md',
+    status: 'coming_soon'
+  },
+  {
+    id: 'deployment-config',
+    title: 'Deployment Configuration',
+    category: 'Technical Reference',
+    description: 'Deployment configuration guide',
+    audience: 'developer',
+    tags: ['deployment', 'config', 'production'],
+    path: '/docs/DEPLOYMENT_CONFIG.md',
+    status: 'coming_soon'
+  },
+  {
+    id: 'supabase-config',
+    title: 'Backend Config Management',
+    category: 'Technical Reference',
+    description: 'Managing backend configuration',
+    audience: 'developer',
+    tags: ['backend', 'config', 'management'],
+    path: '/docs/SUPABASE_CONFIG_MANAGEMENT.md',
+    status: 'coming_soon'
   }
 ];
 
@@ -402,7 +426,8 @@ Deno.serve(async (req) => {
             tags: doc.tags,
             description: doc.description,
             audience: doc.audience,
-            parent: null
+            parent: null,
+            status: doc.status || 'draft'
           }, {
             onConflict: 'id'
           });

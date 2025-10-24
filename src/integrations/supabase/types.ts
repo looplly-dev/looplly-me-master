@@ -836,38 +836,107 @@ export type Database = {
         Row: {
           audience: string
           category: string
+          change_summary: string | null
+          changed_by: string | null
           content: string
           created_at: string | null
           description: string
           id: string
+          is_published: boolean | null
           parent: string | null
+          previous_version_id: string | null
+          published_at: string | null
+          status: string | null
           tags: string[]
           title: string
           updated_at: string | null
+          version: number | null
         }
         Insert: {
           audience: string
           category: string
+          change_summary?: string | null
+          changed_by?: string | null
           content: string
           created_at?: string | null
           description: string
           id: string
+          is_published?: boolean | null
           parent?: string | null
+          previous_version_id?: string | null
+          published_at?: string | null
+          status?: string | null
           tags: string[]
           title: string
           updated_at?: string | null
+          version?: number | null
         }
         Update: {
           audience?: string
           category?: string
+          change_summary?: string | null
+          changed_by?: string | null
           content?: string
           created_at?: string | null
           description?: string
           id?: string
+          is_published?: boolean | null
           parent?: string | null
+          previous_version_id?: string | null
+          published_at?: string | null
+          status?: string | null
           tags?: string[]
           title?: string
           updated_at?: string | null
+          version?: number | null
+        }
+        Relationships: []
+      }
+      documentation_history: {
+        Row: {
+          audience: string
+          category: string
+          change_summary: string | null
+          changed_by: string | null
+          content: string
+          created_at: string | null
+          description: string
+          doc_id: string
+          id: string
+          parent: string | null
+          tags: string[]
+          title: string
+          version: number
+        }
+        Insert: {
+          audience: string
+          category: string
+          change_summary?: string | null
+          changed_by?: string | null
+          content: string
+          created_at?: string | null
+          description: string
+          doc_id: string
+          id?: string
+          parent?: string | null
+          tags: string[]
+          title: string
+          version: number
+        }
+        Update: {
+          audience?: string
+          category?: string
+          change_summary?: string | null
+          changed_by?: string | null
+          content?: string
+          created_at?: string | null
+          description?: string
+          doc_id?: string
+          id?: string
+          parent?: string | null
+          tags?: string[]
+          title?: string
+          version?: number
         }
         Relationships: []
       }
