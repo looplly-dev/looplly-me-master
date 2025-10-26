@@ -13,24 +13,18 @@ export default function SimulatorSession() {
   useEffect(() => {
     const authenticateSimulator = async () => {
       try {
-        const sessionParam = searchParams.get('session');
+        const accessToken = searchParams.get('access_token');
+        const refreshToken = searchParams.get('refresh_token');
         const stage = searchParams.get('stage');
 
-        if (!sessionParam || !stage) {
-          throw new Error('Missing session or stage parameter');
+        if (!accessToken || !refreshToken || !stage) {
+          throw new Error('Missing authentication parameters');
         }
 
-        // Decode the session object
-        const session = JSON.parse(decodeURIComponent(sessionParam));
-
-        if (!session.access_token || !session.refresh_token) {
-          throw new Error('Invalid session format');
-        }
-
-        // Sign in with the provided session
+        // Decode tokens and sign in
         const { data: sessionData, error: authError } = await supabase.auth.setSession({
-          access_token: session.access_token,
-          refresh_token: session.refresh_token
+          access_token: decodeURIComponent(accessToken),
+          refresh_token: decodeURIComponent(refreshToken)
         });
 
         if (authError || !sessionData.session) {

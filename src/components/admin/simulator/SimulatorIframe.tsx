@@ -14,7 +14,9 @@ export default function SimulatorIframe({ sessionToken, stage, onReset }: Simula
   const [iframeKey, setIframeKey] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
-  const simulatorUrl = `${window.location.origin}/simulator-session?session=${sessionToken}&stage=${stage}&key=${iframeKey}`;
+  // Parse session and pass tokens as separate URL params to avoid encoding issues
+  const session = JSON.parse(sessionToken);
+  const simulatorUrl = `${window.location.origin}/simulator-session?access_token=${encodeURIComponent(session.access_token)}&refresh_token=${encodeURIComponent(session.refresh_token)}&stage=${stage}&key=${iframeKey}`;
 
   const handleRefresh = () => {
     setIsLoading(true);
