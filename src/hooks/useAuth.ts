@@ -613,26 +613,34 @@ export const useAuthLogic = () => {
 
       // Validate user type if specified
       if (expectedUserType) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('user_type')
-          .eq('user_id', data.user.id)
-          .single();
+        if (expectedUserType === 'looplly_team_user') {
+          // Check team_profiles table for team members
+          const { data: team, error: teamError } = await supabase
+            .from('team_profiles')
+            .select('user_id, is_active')
+            .eq('user_id', data.user.id)
+            .maybeSingle();
 
-        const actualUserType = profile?.user_type || 'looplly_user';
-
-        if (actualUserType !== expectedUserType) {
-          console.error('[useAuth] User type mismatch:', actualUserType, 'expected:', expectedUserType);
-          await supabase.auth.signOut();
-          setAuthState(prev => ({ ...prev, isLoading: false }));
-          
-          if (expectedUserType === 'looplly_team_user') {
+          if (!team || team.is_active === false) {
+            console.error('[useAuth] Team member not found or inactive');
+            await supabase.auth.signOut();
+            setAuthState(prev => ({ ...prev, isLoading: false }));
             throw new Error('Access denied. This portal is for team members only. Please use the main site to log in.');
-          } else if (expectedUserType === 'looplly_user') {
+          }
+        } else if (expectedUserType === 'looplly_user') {
+          // Check profiles table for regular users
+          const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('user_id')
+            .eq('user_id', data.user.id)
+            .maybeSingle();
+
+          if (!profile) {
+            console.error('[useAuth] Regular user not found in profiles');
+            await supabase.auth.signOut();
+            setAuthState(prev => ({ ...prev, isLoading: false }));
             throw new Error('Please use the admin portal at /admin/login to access your team account.');
           }
-          
-          return false;
         }
       }
 

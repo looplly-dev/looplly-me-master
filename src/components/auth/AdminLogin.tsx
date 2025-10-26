@@ -56,13 +56,13 @@ export default function AdminLogin() {
         const { data: { session } } = await supabase.auth.getSession();
         
         if (session?.user) {
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('must_change_password')
+          const { data: team } = await supabase
+            .from('team_profiles')
+            .select('must_change_password, temp_password_expires_at')
             .eq('user_id', session.user.id)
-            .single();
+            .maybeSingle();
           
-          if (profile?.must_change_password) {
+          if (team?.must_change_password) {
             // Redirect to admin password reset page
             navigate('/admin/reset-password');
             return;
