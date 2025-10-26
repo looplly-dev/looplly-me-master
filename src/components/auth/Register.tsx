@@ -72,38 +72,19 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
     const isFreshSignup = isSimulatorMode && simulatorStage === 'fresh_signup';
     
     if (isFreshSignup) {
-      console.log('[Register] Simulator fresh_signup - pre-filling from snapshot');
+      console.log('[Register] Simulator fresh_signup - mobile prefill disabled');
       
       const snapshotData = sessionStorage.getItem('simulator_user');
       if (snapshotData) {
         try {
           const snapshot = JSON.parse(snapshotData);
           
-          // Pre-fill mobile number and country code
-          if (snapshot.mobile && snapshot.country_code) {
-            const mobileWithoutCode = snapshot.mobile.replace(snapshot.country_code, '');
-            updateField('mobile', mobileWithoutCode);
-            updateField('countryCode', snapshot.country_code);
-            
-            // Trigger validation preview
-            const result = validateAndNormalizeMobile(mobileWithoutCode, snapshot.country_code);
-            setMobileValidation({
-              isValid: result.isValid,
-              preview: result.nationalFormat,
-              error: result.error
-            });
-            
-            console.log('[Register] Pre-filled mobile from snapshot:', {
-              full_mobile: snapshot.mobile,
-              country_code: snapshot.country_code,
-              mobile_input: mobileWithoutCode,
-              validation: result.isValid ? 'valid' : 'invalid'
-            });
-          }
-          
           // Pre-fill names for consistent test user data
           if (snapshot.first_name) updateField('firstName', snapshot.first_name);
           if (snapshot.last_name) updateField('lastName', snapshot.last_name);
+          
+          // Reset mobile validation to ensure no preview/error shows
+          setMobileValidation({ isValid: false });
           
         } catch (error) {
           console.error('[Register] Failed to parse simulator snapshot:', error);
@@ -133,8 +114,8 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
       });
       
       if (profile) {
-        // Pre-populate mobile number (strip dial code for input field)
-        if (profile.mobile && profile.country_code) {
+        // Pre-populate mobile number only when NOT in simulator mode
+        if (!isSimulatorMode && profile.mobile && profile.country_code) {
           const mobileWithoutCode = profile.mobile.replace(profile.country_code, '');
           updateField('mobile', mobileWithoutCode);
           updateField('countryCode', profile.country_code);
