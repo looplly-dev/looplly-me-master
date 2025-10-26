@@ -2187,7 +2187,7 @@ export type Database = {
     }
     Enums: {
       agent_status: "active" | "inactive" | "testing"
-      app_role: "admin" | "user" | "super_admin"
+      app_role: "admin" | "user" | "super_admin" | "tester"
       config_data_type: "string" | "number" | "boolean" | "json"
       dependency_type: "triggers" | "requires" | "observes"
       execution_status: "success" | "failure" | "timeout" | "cancelled"
@@ -2327,7 +2327,7 @@ export const Constants = {
   public: {
     Enums: {
       agent_status: ["active", "inactive", "testing"],
-      app_role: ["admin", "user", "super_admin"],
+      app_role: ["admin", "user", "super_admin", "tester"],
       config_data_type: ["string", "number", "boolean", "json"],
       dependency_type: ["triggers", "requires", "observes"],
       execution_status: ["success", "failure", "timeout", "cancelled"],

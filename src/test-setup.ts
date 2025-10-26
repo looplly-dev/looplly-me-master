@@ -18,6 +18,12 @@ jest.mock('@/integrations/supabase/client', () => ({
       single: jest.fn(),
       maybeSingle: jest.fn(),
     })),
+    functions: {
+      invoke: jest.fn().mockResolvedValue({
+        data: null,
+        error: null
+      })
+    }
   },
 }));
 
