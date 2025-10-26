@@ -30,34 +30,39 @@ export function useUserType() {
     const fetchUserType = async () => {
       try {
         const supabase = getSupabaseClient();
-        // SECURITY: Check team_members table first (most secure, super_admin only visibility)
-        const { data: teamMember } = await supabase
-          .from('team_members')
-          .select('is_active')
+        
+        // Step 1: Check team_profiles first (team members ONLY exist here after table separation)
+        const { data: teamProfile, error: teamError } = await supabase
+          .from('team_profiles')
+          .select('user_id, is_active')
           .eq('user_id', authState.user!.id)
           .maybeSingle();
 
-        if (teamMember?.is_active) {
+        if (teamProfile?.is_active) {
           setUserType('looplly_team_user');
           setIsLoading(false);
           return;
         }
 
-        // Fallback to profiles for backward compatibility
-        const result = await supabase
+        // Step 2: Check profiles for regular users (use maybeSingle to handle missing rows gracefully)
+        const { data: profile, error: profileError } = await supabase
           .from('profiles')
           .select('user_type')
           .eq('user_id', authState.user!.id)
-          .single();
+          .maybeSingle();
 
-        if (result.error) {
-          console.error('Error fetching user type:', result.error);
-          setUserType('looplly_user'); // Default fallback
+        if (profileError && profileError.code !== 'PGRST116') {
+          console.error('Error fetching user type from profiles:', profileError);
+        }
+
+        if (profile) {
+          setUserType((profile.user_type as UserType) || 'looplly_user');
         } else {
-          setUserType(result.data?.user_type as UserType || 'looplly_user');
+          console.warn('[useUserType] User not found in team_profiles or profiles, defaulting to looplly_user');
+          setUserType('looplly_user');
         }
       } catch (error) {
-        console.error('Error fetching user type:', error);
+        console.error('Error in fetchUserType:', error);
         setUserType('looplly_user');
       } finally {
         setIsLoading(false);
