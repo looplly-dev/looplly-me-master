@@ -9,8 +9,11 @@ export function useOnboarding(triggerOnboarding?: boolean) {
     const completed = localStorage.getItem('onboarding_completed');
     setHasCompletedOnboarding(!!completed);
     
-    // If explicitly triggered (from profile completion), force show
-    if (triggerOnboarding) {
+    // Check if user just registered
+    const justRegistered = sessionStorage.getItem('just_registered');
+    
+    // If explicitly triggered OR just registered, force show
+    if (triggerOnboarding || justRegistered === 'true') {
       setShowOnboarding(true);
       return;
     }

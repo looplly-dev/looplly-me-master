@@ -58,9 +58,9 @@ const tourSteps: TourStep[] = [
     icon: <Wallet className="h-6 w-6 text-success" />
   },
   {
-    id: 'profile',
-    title: 'Complete Profile',
-    description: 'Add your details to unlock all earning opportunities and enable withdrawals.',
+    id: 'level2-importance',
+    title: 'Why Complete Your Profile?',
+    description: 'Your basic info helps us match you with the best surveys and opportunities. Plus, it unlocks withdrawals! Takes just 2 minutes.',
     icon: <User className="h-6 w-6 text-primary" />
   }
 ];

@@ -315,8 +315,20 @@ export default function Dashboard({ triggerOnboarding = false }: DashboardProps)
       {/* Onboarding Tour */}
       <OnboardingTour
         isVisible={showOnboarding}
-        onComplete={completeOnboarding}
-        onSkip={skipOnboarding}
+        onComplete={() => {
+          completeOnboarding();
+          // After tour, if Level 2 incomplete, auto-open modal
+          if (!level2Complete) {
+            setShowLevel2Modal(true);
+          }
+        }}
+        onSkip={() => {
+          skipOnboarding();
+          // Even if skipped, still prompt for Level 2
+          if (!level2Complete) {
+            setShowLevel2Modal(true);
+          }
+        }}
       />
       
       {/* Level 2 Profile Modal */}
@@ -327,9 +339,10 @@ export default function Dashboard({ triggerOnboarding = false }: DashboardProps)
           setShowLevel2Modal(false);
           toast({
             title: 'Profile Complete!',
-            description: 'Ready to verify your mobile and start earning!',
+            description: 'Now let\'s verify your mobile number!',
           });
-          window.location.reload();
+          // Auto-open OTP modal instead of reloading
+          setShowOTPModal(true);
         }}
       />
       

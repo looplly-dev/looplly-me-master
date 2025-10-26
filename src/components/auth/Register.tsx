@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -63,8 +64,9 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
     normalized?: string;
     error?: string;
   }>({ isValid: false });
-  const { register, authState } = useAuth();
+  const { register, login, authState } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   // Password match validation
   const passwordsMatch = formData.password && formData.confirmPassword && 
@@ -234,10 +236,19 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
         analytics.trackSignup('email', true);
         
         toast({
-          title: 'Account Created!',
-          description: 'Please verify your account with the OTP sent to your mobile.',
+          title: "Account created successfully!",
+          description: "Let's set up your profile.",
         });
-        onOTPRequired();
+        
+        // Auto-login the user with their credentials
+        const normalizedMobile = `${formData.countryCode}${formData.mobile.replace(/^0+/, '')}`;
+        const loginSuccess = await login(normalizedMobile, formData.password);
+        
+        if (loginSuccess) {
+          // Mark as just registered for onboarding trigger
+          sessionStorage.setItem('just_registered', 'true');
+          navigate('/');
+        }
       } else {
         // Track signup failure
         analytics.trackSignup('email', false);
