@@ -1376,6 +1376,7 @@ export type Database = {
           level_2_complete: boolean | null
           mobile: string | null
           must_change_password: boolean | null
+          password_hash: string | null
           personal_income: string | null
           profile_complete: boolean | null
           profile_completeness_score: number | null
@@ -1414,6 +1415,7 @@ export type Database = {
           level_2_complete?: boolean | null
           mobile?: string | null
           must_change_password?: boolean | null
+          password_hash?: string | null
           personal_income?: string | null
           profile_complete?: boolean | null
           profile_completeness_score?: number | null
@@ -1452,6 +1454,7 @@ export type Database = {
           level_2_complete?: boolean | null
           mobile?: string | null
           must_change_password?: boolean | null
+          password_hash?: string | null
           personal_income?: string | null
           profile_complete?: boolean | null
           profile_completeness_score?: number | null

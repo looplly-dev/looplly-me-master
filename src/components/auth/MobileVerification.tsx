@@ -64,25 +64,33 @@ export default function MobileVerification({ open, onClose, onSuccess }: MobileV
       const userId = authState.user?.id;
       if (!userId) throw new Error('No user ID');
 
-      // TODO Phase 2: Replace with actual Notify verification
-      // POST https://notify-api.com/verify-otp
-      
-      // Stub: Accept hardcoded OTP 12345
-      if (otp === '12345') {
-        await supabase
-          .from('profiles')
-          .update({ is_verified: true })
-          .eq('user_id', userId);
+      // Call custom verify OTP edge function
+      const { data, error } = await supabase.functions.invoke('mock-looplly-verify-otp', {
+        body: {
+          user_id: userId,
+          otp: otp
+        }
+      });
 
-        toast({
-          title: 'Mobile Verified!',
-          description: 'You can now start earning with surveys and opportunities.',
-        });
-
-        onSuccess();
-      } else {
-        setError('Invalid OTP. Try 12345 (development mode)');
+      if (error || !data?.verified) {
+        setError('Invalid OTP code. Try 12345 (development mode)');
+        return;
       }
+
+      // Update local user state
+      const loopllyUser = localStorage.getItem('looplly_user');
+      if (loopllyUser) {
+        const user = JSON.parse(loopllyUser);
+        user.isVerified = true;
+        localStorage.setItem('looplly_user', JSON.stringify(user));
+      }
+
+      toast({
+        title: 'Mobile Verified!',
+        description: 'You can now start earning with surveys and opportunities.',
+      });
+
+      onSuccess();
     } catch (error) {
       console.error('Error verifying OTP:', error);
       toast({

@@ -49,29 +49,25 @@ export const registerUser = async (params: RegistrationParams): Promise<{ succes
       return { success: false, error: { message: mobileValidation.error || 'Invalid mobile number' } };
     }
     
-    const normalizedMobile = mobileValidation.normalizedNumber!;
-    
-    // Use phone-based auth for Looplly users
-    const { error } = await supabase.auth.signUp({
-      phone: normalizedMobile,
-      password: params.password,
-      options: {
-        data: {
-          email: params.email || '',
-          first_name: params.firstName || '',
-          last_name: params.lastName || '',
-          mobile: normalizedMobile,
-          country_code: params.countryCode
-        }
+    // Call custom registration edge function (NOT Supabase Auth)
+    const { data, error } = await supabase.functions.invoke('mock-looplly-register', {
+      body: {
+        mobile: params.mobile,
+        countryCode: params.countryCode,
+        password: params.password,
+        firstName: params.firstName || '',
+        lastName: params.lastName || '',
+        dateOfBirth: null, // Will be set at Level 1 completion
+        gpsEnabled: false  // Will be set at Level 1 completion
       }
     });
 
-    if (error) {
-      console.error('Registration error:', error);
-      return { success: false, error };
+    if (error || !data?.success) {
+      console.error('Registration error:', error || data);
+      return { success: false, error: error || { message: data?.error || 'Registration failed' } };
     }
     
-    console.log('Registration successful');
+    console.log('Registration successful - user_id:', data.user_id);
     return { success: true };
   } catch (error) {
     console.error('Registration failed:', error);
@@ -86,24 +82,39 @@ export const loginUser = async (params: LoginParams): Promise<{ success: boolean
     
     if (isMobileLogin) {
       console.log('Logging in Looplly user with mobile:', params.email);
-      // Mobile login for Looplly users
-      const { error } = await supabase.auth.signInWithPassword({
-        phone: params.email, // params.email contains the mobile number for Looplly users
-        password: params.password
+      
+      // Extract country code and mobile
+      const countryCodeMatch = params.email.match(/^\+\d+/);
+      const countryCode = countryCodeMatch?.[0] || '+27';
+      const mobile = params.email.replace(/^\+\d+/, '');
+      
+      // Call custom login edge function (NOT Supabase Auth)
+      const { data, error } = await supabase.functions.invoke('mock-looplly-login', {
+        body: {
+          mobile,
+          countryCode,
+          password: params.password
+        }
       });
 
-      if (error) {
-        console.error('Login error:', error);
-        const errorMessage = error.message === 'Phone not confirmed' 
-          ? 'Please verify your mobile number before logging in' 
-          : error.message === 'Invalid login credentials'
-          ? 'Invalid mobile number or password'
-          : error.message || 'Login failed';
-        return { success: false, error: { message: errorMessage } };
+      if (error || !data?.token) {
+        console.error('Login error:', error || data);
+        return { 
+          success: false, 
+          error: { 
+            message: error?.message || data?.error || 'Invalid mobile number or password' 
+          } 
+        };
       }
+      
+      // Store custom JWT token and user data
+      localStorage.setItem('looplly_auth_token', data.token);
+      localStorage.setItem('looplly_user', JSON.stringify(data.user));
+      
+      console.log('Login successful - custom JWT stored');
     } else {
       console.log('Logging in admin user with email:', params.email);
-      // Email login for admin/team users
+      // Email login for admin/team users (Supabase Auth)
       const { error } = await supabase.auth.signInWithPassword({
         email: params.email,
         password: params.password
@@ -130,6 +141,12 @@ export const loginUser = async (params: LoginParams): Promise<{ success: boolean
 
 export const logoutUser = async (): Promise<void> => {
   console.log('Logging out user');
+  
+  // Clear custom Looplly auth if present
+  localStorage.removeItem('looplly_auth_token');
+  localStorage.removeItem('looplly_user');
+  
+  // Also sign out from Supabase Auth (for admin/team users)
   await supabase.auth.signOut();
 };
 
