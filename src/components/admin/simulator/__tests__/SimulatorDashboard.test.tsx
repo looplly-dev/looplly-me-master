@@ -173,4 +173,56 @@ describe('SimulatorDashboard', () => {
       });
     });
   });
+
+  it('should handle token verification failure', async () => {
+    const user = userEvent.setup();
+    
+    (supabase.functions.invoke as jest.Mock).mockResolvedValueOnce({
+      data: {
+        success: false,
+        error: 'Failed to verify magic link and create session'
+      },
+      error: null
+    });
+
+    render(<SimulatorDashboard />);
+
+    await user.click(screen.getByText('Select User'));
+    await user.click(screen.getByText('Select Stage'));
+    await user.click(screen.getByText('Start Simulation'));
+
+    await waitFor(() => {
+      expect(mockToast).toHaveBeenCalledWith({
+        title: 'Simulation Failed',
+        description: 'Failed to verify magic link and create session',
+        variant: 'destructive'
+      });
+    });
+  });
+
+  it('should handle non-test account error', async () => {
+    const user = userEvent.setup();
+    
+    (supabase.functions.invoke as jest.Mock).mockResolvedValueOnce({
+      data: {
+        success: false,
+        error: 'Target user is not a test account. Only test accounts can be used in simulator'
+      },
+      error: null
+    });
+
+    render(<SimulatorDashboard />);
+
+    await user.click(screen.getByText('Select User'));
+    await user.click(screen.getByText('Select Stage'));
+    await user.click(screen.getByText('Start Simulation'));
+
+    await waitFor(() => {
+      expect(mockToast).toHaveBeenCalledWith({
+        title: 'Simulation Failed',
+        description: expect.stringContaining('not a test account'),
+        variant: 'destructive'
+      });
+    });
+  });
 });

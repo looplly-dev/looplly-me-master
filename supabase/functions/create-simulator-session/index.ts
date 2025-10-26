@@ -97,13 +97,47 @@ serve(async (req) => {
       throw new Error('Failed to generate simulator session');
     }
 
-    // Extract session token from the action link
-    const actionLink = authData.properties.action_link;
-    const urlParams = new URLSearchParams(actionLink.split('#')[1]);
-    const sessionToken = urlParams.get('access_token');
+    console.log('Magic link generated, exchanging for session...');
+
+    // Exchange the hashed token for a real session
+    let sessionToken: string | null = null;
+    
+    // Try using hashed_token first (preferred method)
+    if (authData.properties.hashed_token) {
+      const { data: sessionData, error: verifyError } = await supabaseAdmin.auth.verifyOtp({
+        email: testUser.email,
+        token: authData.properties.hashed_token,
+        type: 'magiclink'
+      });
+
+      if (verifyError) {
+        console.error('verifyOtp magiclink error:', verifyError);
+      } else if (sessionData.session?.access_token) {
+        sessionToken = sessionData.session.access_token;
+        console.log('Session token obtained via hashed_token');
+      }
+    }
+
+    // Fallback: try email_otp if hashed_token failed
+    if (!sessionToken && authData.properties.email_otp) {
+      console.log('Attempting fallback with email_otp...');
+      const { data: sessionData, error: verifyError } = await supabaseAdmin.auth.verifyOtp({
+        email: testUser.email,
+        token: authData.properties.email_otp,
+        type: 'email'
+      });
+
+      if (verifyError) {
+        console.error('verifyOtp email error:', verifyError);
+      } else if (sessionData.session?.access_token) {
+        sessionToken = sessionData.session.access_token;
+        console.log('Session token obtained via email_otp');
+      }
+    }
 
     if (!sessionToken) {
-      throw new Error('Failed to extract session token');
+      console.error('Failed to create session token from magic link properties');
+      throw new Error('Failed to verify magic link and create session');
     }
 
     // Log simulator session creation
