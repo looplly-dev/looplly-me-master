@@ -71,45 +71,78 @@ Deno.serve(async (req) => {
     let created = 0;
     let updated = 0;
     let failed = 0;
+    let archived = 0;
 
-    // Process test users - Create directly in profiles (NOT auth.users)
+    // Process test users - Idempotent seeder (update existing or create new)
     for (let i = 0; i < testUsers.length; i++) {
       const testUser = testUsers[i];
       // Valid SA mobile: 10 digits after +27 (e.g., +27823093950 to +27823093955)
       const mobileNumber = `+2782309395${i}`;
-      const userId = crypto.randomUUID(); // Generate our own UUID
 
-      console.log(`Processing ${testUser.firstName} (${mobileNumber})...`);
+      console.log(`Processing ${testUser.firstName} ${testUser.lastName} (${mobileNumber})...`);
 
       try {
         // Hash password with bcrypt
         const passwordHash = await bcrypt.hash('Test123!');
 
-        // Check if user already exists by mobile (NOT email)
-        const { data: existingProfile } = await supabaseAdmin
+        // Search for existing test user: first by email, then by name
+        let existingProfile = null;
+        
+        // Try email first
+        const { data: emailMatch } = await supabaseAdmin
           .from('profiles')
-          .select('user_id, mobile')
-          .eq('mobile', mobileNumber)
+          .select('user_id, mobile, first_name, last_name')
+          .eq('email', testUser.email)
+          .eq('is_test_account', true)
           .maybeSingle();
 
+        if (emailMatch) {
+          existingProfile = emailMatch;
+          console.log(`  Found by email: ${testUser.email}`);
+        } else {
+          // Try by name
+          const { data: nameMatch } = await supabaseAdmin
+            .from('profiles')
+            .select('user_id, mobile, first_name, last_name')
+            .eq('first_name', testUser.firstName)
+            .eq('last_name', testUser.lastName)
+            .eq('is_test_account', true)
+            .maybeSingle();
+
+          if (nameMatch) {
+            existingProfile = nameMatch;
+            console.log(`  Found by name: ${testUser.firstName} ${testUser.lastName}`);
+          }
+        }
+
         if (existingProfile) {
-          // Update password hash for existing test user
+          // Update existing user with correct mobile and reset profile state
           const { error: updateError } = await supabaseAdmin
             .from('profiles')
             .update({ 
+              mobile: mobileNumber,
+              country_code: '+27',
               password_hash: passwordHash,
-              is_test_account: true,
               first_name: testUser.firstName,
               last_name: testUser.lastName,
-              email: testUser.email // Keep for reference
+              email: testUser.email,
+              is_test_account: true,
+              profile_level: 1,
+              profile_completeness_score: 0,
+              is_verified: false,
+              level_2_complete: false,
+              profile_complete: false
             })
             .eq('user_id', existingProfile.user_id);
 
           if (updateError) {
-            errors.push({ mobile: mobileNumber, error: updateError.message });
+            console.error(`  Failed to update:`, updateError);
+            errors.push({ user: testUser.firstName, error: updateError.message });
             failed++;
           } else {
+            console.log(`  ✅ Updated existing profile`);
             results.push({
+              name: `${testUser.firstName} ${testUser.lastName}`,
               mobile: mobileNumber,
               status: 'updated',
               user_id: existingProfile.user_id,
@@ -119,7 +152,8 @@ Deno.serve(async (req) => {
           continue;
         }
 
-        // Create NEW user directly in profiles (NOT auth.users)
+        // Create NEW user if not found
+        const userId = crypto.randomUUID();
         const { error: insertError } = await supabaseAdmin
           .from('profiles')
           .insert({
@@ -134,15 +168,19 @@ Deno.serve(async (req) => {
             profile_level: 1,
             profile_completeness_score: 0,
             is_verified: false,
+            level_2_complete: false,
+            profile_complete: false,
             created_at: new Date().toISOString()
           });
 
         if (insertError) {
-          console.error(`Failed to create ${testUser.firstName}:`, insertError);
-          errors.push({ mobile: mobileNumber, error: insertError.message });
+          console.error(`  Failed to create:`, insertError);
+          errors.push({ user: testUser.firstName, error: insertError.message });
           failed++;
         } else {
+          console.log(`  ✅ Created new profile`);
           results.push({ 
+            name: `${testUser.firstName} ${testUser.lastName}`,
             mobile: mobileNumber, 
             status: 'created', 
             user_id: userId 
@@ -150,9 +188,43 @@ Deno.serve(async (req) => {
           created++;
         }
       } catch (userError) {
-        console.error(`Error processing ${testUser.firstName}:`, userError);
-        errors.push({ mobile: mobileNumber, error: userError instanceof Error ? userError.message : 'Unknown error' });
+        console.error(`  Error processing ${testUser.firstName}:`, userError);
+        errors.push({ user: testUser.firstName, error: userError instanceof Error ? userError.message : 'Unknown error' });
         failed++;
+      }
+    }
+
+    // Clean up duplicates: archive extra test accounts with same name
+    console.log('\nCleaning up duplicate test accounts...');
+    for (const testUser of testUsers) {
+      try {
+        const { data: duplicates } = await supabaseAdmin
+          .from('profiles')
+          .select('user_id, mobile, created_at')
+          .eq('first_name', testUser.firstName)
+          .eq('last_name', testUser.lastName)
+          .eq('is_test_account', true)
+          .order('created_at', { ascending: false });
+
+        if (duplicates && duplicates.length > 1) {
+          // Keep the first (most recent), archive the rest
+          const toArchive = duplicates.slice(1);
+          console.log(`  Found ${toArchive.length} duplicate(s) for ${testUser.firstName} ${testUser.lastName}`);
+          
+          for (const dup of toArchive) {
+            const { error: archiveError } = await supabaseAdmin
+              .from('profiles')
+              .update({ is_test_account: false })
+              .eq('user_id', dup.user_id);
+
+            if (!archiveError) {
+              console.log(`    Archived duplicate: ${dup.mobile}`);
+              archived++;
+            }
+          }
+        }
+      } catch (cleanupError) {
+        console.error(`  Error cleaning up duplicates for ${testUser.firstName}:`, cleanupError);
       }
     }
 
@@ -170,7 +242,7 @@ Deno.serve(async (req) => {
         success: true,
         created,
         updated,
-        already_correct: results.filter(r => r.status === 'already_correct').length,
+        archived,
         failed,
         results,
         errors: errors.length > 0 ? errors : undefined,

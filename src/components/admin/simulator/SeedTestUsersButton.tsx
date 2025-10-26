@@ -20,7 +20,7 @@ export default function SeedTestUsersButton() {
         const parts = [];
         if (data.created > 0) parts.push(`Created: ${data.created}`);
         if (data.updated > 0) parts.push(`Updated: ${data.updated}`);
-        if (data.already_correct > 0) parts.push(`Already correct: ${data.already_correct}`);
+        if (data.archived > 0) parts.push(`Archived: ${data.archived}`);
         if (data.failed > 0) parts.push(`Failed: ${data.failed}`);
         
         toast.success(`Test users seeded successfully!`, {
