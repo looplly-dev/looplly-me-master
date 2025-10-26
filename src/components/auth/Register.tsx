@@ -66,15 +66,51 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
   const { toast } = useToast();
 
   // Pre-populate existing profile data for simulator (Stage 2: OTP Verified)
-  // BUT skip prefill if we're in fresh_signup stage
+  // For fresh_signup, pre-fill ONLY mobile/name from snapshot (not from DB)
   useEffect(() => {
     const simulatorStage = sessionStorage.getItem('simulator_stage');
     const isFreshSignup = isSimulatorMode && simulatorStage === 'fresh_signup';
     
     if (isFreshSignup) {
-      console.log('[Register] Simulator fresh_signup detected - resetting form to blank state');
-      reset();
-      return;
+      console.log('[Register] Simulator fresh_signup - pre-filling from snapshot');
+      
+      const snapshotData = sessionStorage.getItem('simulator_user');
+      if (snapshotData) {
+        try {
+          const snapshot = JSON.parse(snapshotData);
+          
+          // Pre-fill mobile number and country code
+          if (snapshot.mobile && snapshot.country_code) {
+            const mobileWithoutCode = snapshot.mobile.replace(snapshot.country_code, '');
+            updateField('mobile', mobileWithoutCode);
+            updateField('countryCode', snapshot.country_code);
+            
+            // Trigger validation preview
+            const result = validateAndNormalizeMobile(mobileWithoutCode, snapshot.country_code);
+            setMobileValidation({
+              isValid: result.isValid,
+              preview: result.nationalFormat,
+              error: result.error
+            });
+            
+            console.log('[Register] Pre-filled mobile from snapshot:', {
+              full_mobile: snapshot.mobile,
+              country_code: snapshot.country_code,
+              mobile_input: mobileWithoutCode,
+              validation: result.isValid ? 'valid' : 'invalid'
+            });
+          }
+          
+          // Optionally pre-fill names (uncomment if desired for faster testing)
+          // if (snapshot.first_name) updateField('firstName', snapshot.first_name);
+          // if (snapshot.last_name) updateField('lastName', snapshot.last_name);
+          
+        } catch (error) {
+          console.error('[Register] Failed to parse simulator snapshot:', error);
+        }
+      }
+      
+      return; // Don't load from DB for fresh_signup
     }
     
     const loadExistingProfile = async () => {
