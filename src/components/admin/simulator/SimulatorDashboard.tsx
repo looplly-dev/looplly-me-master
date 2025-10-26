@@ -48,7 +48,9 @@ export default function SimulatorDashboard() {
         throw new Error(data.error || 'Failed to create simulator session');
       }
 
-      setSessionToken(data.session_token);
+      // Store the full session as a URL-safe string for the iframe
+      const sessionParam = encodeURIComponent(JSON.stringify(data.session));
+      setSessionToken(sessionParam);
       setRefreshKey(prev => prev + 1);
 
       toast({

@@ -100,7 +100,7 @@ serve(async (req) => {
     console.log('Magic link generated, exchanging for session...');
 
     // Exchange the hashed token for a real session
-    let sessionToken: string | null = null;
+    let sessionObject: { access_token: string; refresh_token: string } | null = null;
     
     // Try using hashed_token first (preferred method)
     if (authData.properties.hashed_token) {
@@ -112,14 +112,17 @@ serve(async (req) => {
 
       if (verifyError) {
         console.error('verifyOtp magiclink error:', verifyError);
-      } else if (sessionData.session?.access_token) {
-        sessionToken = sessionData.session.access_token;
-        console.log('Session token obtained via hashed_token');
+      } else if (sessionData.session?.access_token && sessionData.session?.refresh_token) {
+        sessionObject = {
+          access_token: sessionData.session.access_token,
+          refresh_token: sessionData.session.refresh_token
+        };
+        console.log('Session obtained via hashed_token');
       }
     }
 
     // Fallback: try email_otp if hashed_token failed
-    if (!sessionToken && authData.properties.email_otp) {
+    if (!sessionObject && authData.properties.email_otp) {
       console.log('Attempting fallback with email_otp...');
       const { data: sessionData, error: verifyError } = await supabaseAdmin.auth.verifyOtp({
         email: testUser.email,
@@ -129,14 +132,17 @@ serve(async (req) => {
 
       if (verifyError) {
         console.error('verifyOtp email error:', verifyError);
-      } else if (sessionData.session?.access_token) {
-        sessionToken = sessionData.session.access_token;
-        console.log('Session token obtained via email_otp');
+      } else if (sessionData.session?.access_token && sessionData.session?.refresh_token) {
+        sessionObject = {
+          access_token: sessionData.session.access_token,
+          refresh_token: sessionData.session.refresh_token
+        };
+        console.log('Session obtained via email_otp');
       }
     }
 
-    if (!sessionToken) {
-      console.error('Failed to create session token from magic link properties');
+    if (!sessionObject) {
+      console.error('Failed to create session from magic link properties');
       throw new Error('Failed to verify magic link and create session');
     }
 
@@ -157,7 +163,7 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({
         success: true,
-        session_token: sessionToken,
+        session: sessionObject,
         test_user: {
           id: test_user_id,
           email: testUser.email,
