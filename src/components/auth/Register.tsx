@@ -12,7 +12,7 @@ import { validateRegistration, RegistrationData } from '@/utils/validation';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { deleteConflictingUser } from '@/utils/deleteConflictingUser';
-import { Eye, EyeOff, ArrowLeft, AlertCircle, MapPin } from 'lucide-react';
+import { Eye, EyeOff, ArrowLeft, AlertCircle, MapPin, CheckCircle2, XCircle } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { analytics } from '@/utils/analytics';
 import { validateAndNormalizeMobile } from '@/utils/mobileValidation';
@@ -65,6 +65,11 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
   }>({ isValid: false });
   const { register, authState } = useAuth();
   const { toast } = useToast();
+
+  // Password match validation
+  const passwordsMatch = formData.password && formData.confirmPassword && 
+                         formData.password === formData.confirmPassword;
+  const showPasswordMismatch = formData.confirmPassword && formData.password !== formData.confirmPassword;
 
   // Stable token to prevent input 'name' changing every render in simulator
   const antiFillToken = useMemo(() => `${Date.now()}_${Math.random().toString(36).slice(2,8)}`, []);
@@ -442,11 +447,26 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
                   placeholder="Confirm password"
                   value={formData.confirmPassword}
                   onChange={(e) => updateField('confirmPassword', e.target.value)}
-                  className="h-12 pr-10"
+                  className={cn(
+                    "h-12 pr-20",
+                    passwordsMatch && "border-green-500",
+                    showPasswordMismatch && "border-destructive"
+                  )}
                   autoComplete={isSimulatorMode ? 'off' : 'new-password'}
                   name={isSimulatorMode ? `confirmPassword_sim_${antiFillToken}` : 'confirmPassword'}
                   required
                 />
+                {/* Password match indicator */}
+                {passwordsMatch && (
+                  <div className="absolute right-12 top-0 h-12 flex items-center">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                  </div>
+                )}
+                {showPasswordMismatch && (
+                  <div className="absolute right-12 top-0 h-12 flex items-center">
+                    <XCircle className="h-4 w-4 text-destructive" />
+                  </div>
+                )}
                 <Button
                   type="button"
                   variant="ghost"
@@ -457,6 +477,17 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
                   {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </Button>
               </div>
+              {/* Helper text */}
+              {passwordsMatch && (
+                <p className="text-xs text-green-600 dark:text-green-500 flex items-center gap-1">
+                  <span>Passwords match</span>
+                </p>
+              )}
+              {showPasswordMismatch && (
+                <p className="text-xs text-destructive">
+                  Passwords must match
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
