@@ -80,6 +80,20 @@ export default function SimulatorDashboard() {
     setRefreshKey(prev => prev + 1);
   }, [selectedUserId]);
 
+  // Auto-refresh simulator session when switching users during an active session
+  useEffect(() => {
+    if (sessionToken && selectedUserId && selectedStage && !isLoading) {
+      handleStartSimulation();
+    }
+  }, [selectedUserId]);
+
+  // Auto-refresh simulator session when changing stage during an active session
+  useEffect(() => {
+    if (sessionToken && selectedUserId && selectedStage && !isLoading) {
+      handleStartSimulation();
+    }
+  }, [selectedStage]);
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
