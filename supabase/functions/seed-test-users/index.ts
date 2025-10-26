@@ -70,7 +70,7 @@ Deno.serve(async (req) => {
 
     for (let i = 0; i < testUsers.length; i++) {
       const testUser = testUsers[i];
-      const mobileNumber = `+274129900${(i + 1).toString().padStart(1, '0')}`;
+      const mobileNumber = `+2782309395${i}`;
       
       // Check if user already exists by email
       const { data: existingProfile } = await supabaseAdmin
