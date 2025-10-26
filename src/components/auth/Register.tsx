@@ -343,21 +343,35 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
                   </SelectContent>
                 </Select>
                 <div className="flex-1 space-y-1">
-                  <Input
-                    id="mobile"
-                    type="tel"
-                    placeholder="823093959 or 0823093959"
-                    value={formData.mobile}
-                    onChange={(e) => handleMobileChange(e.target.value)}
-                    className={cn(
-                      "h-12",
-                      mobileValidation.error && "border-destructive",
-                      mobileValidation.isValid && "border-green-500"
+                  <div className="relative">
+                    <Input
+                      id="mobile"
+                      type="tel"
+                      placeholder="823093959 or 0823093959"
+                      value={formData.mobile}
+                      onChange={(e) => handleMobileChange(e.target.value)}
+                      className={cn(
+                        "h-12 pr-10",
+                        mobileValidation.error && "border-destructive",
+                        mobileValidation.isValid && "border-green-500"
+                      )}
+                      autoComplete={isSimulatorMode ? 'off' : 'tel'}
+                      name={isSimulatorMode ? `mobile_sim_${Date.now()}` : 'mobile'}
+                      required
+                    />
+                    {formData.mobile && mobileValidation.isValid && (
+                      <Check 
+                        className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-green-600 pointer-events-none" 
+                        aria-hidden="true"
+                      />
                     )}
-                    autoComplete={isSimulatorMode ? 'off' : 'tel'}
-                    name={isSimulatorMode ? `mobile_sim_${Date.now()}` : 'mobile'}
-                    required
-                  />
+                    {formData.mobile && !mobileValidation.isValid && mobileValidation.error && (
+                      <X 
+                        className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-destructive pointer-events-none" 
+                        aria-hidden="true"
+                      />
+                    )}
+                  </div>
                   
                   {/* Real-time feedback */}
                   {formData.mobile && mobileValidation.preview && (
