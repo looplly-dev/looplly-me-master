@@ -33,6 +33,8 @@ export function useRole() {
     const fetchUserRole = async () => {
       try {
         const supabase = getSupabaseClient();
+        
+        // First try user_roles table
         const query = supabase
           .from('user_roles')
           .select('role')
@@ -42,12 +44,35 @@ export function useRole() {
           ? await (query as any).maybeSingle()
           : await (query as any).single();
 
-        if (error) {
-          console.error('Error fetching user role:', error);
-          setRole('user'); // Default to user role
-        } else {
-          setRole((data?.role as UserRole) || 'user');
+        let resolvedRole: UserRole = (data?.role as UserRole) || 'user';
+
+        // If no user_roles entry found, check team_profiles for company_role fallback
+        if (!data || resolvedRole === 'user') {
+          const { data: teamProfile } = await supabase
+            .from('team_profiles')
+            .select('company_role')
+            .eq('user_id', authState.user!.id)
+            .maybeSingle();
+
+          if (teamProfile?.company_role) {
+            // Map company_role to UserRole
+            switch (teamProfile.company_role) {
+              case 'owner':
+                resolvedRole = 'super_admin';
+                break;
+              case 'admin':
+                resolvedRole = 'admin';
+                break;
+              case 'tester':
+                resolvedRole = 'tester';
+                break;
+              default:
+                resolvedRole = 'user';
+            }
+          }
         }
+
+        setRole(resolvedRole);
       } catch (error) {
         console.error('Error fetching user role:', error);
         setRole('user');

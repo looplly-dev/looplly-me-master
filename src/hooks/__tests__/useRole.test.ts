@@ -97,7 +97,7 @@ describe('useRole', () => {
     (supabase.from as jest.Mock).mockReturnValue({
       select: jest.fn().mockReturnThis(),
       eq: jest.fn().mockReturnThis(),
-      single: jest.fn().mockResolvedValue({
+      maybeSingle: jest.fn().mockResolvedValue({
         data: null,
         error: { message: 'Not found' }
       })
@@ -113,5 +113,102 @@ describe('useRole', () => {
     expect(result.current.hasRole('user')).toBe(true);
     expect(result.current.hasRole('tester')).toBe(false);
     expect(result.current.getRoleLevel()).toBe(1);
+  });
+
+  it('should fallback to team_profiles.company_role when user_roles is empty', async () => {
+    let callCount = 0;
+    (supabase.from as jest.Mock).mockImplementation((table: string) => {
+      if (table === 'user_roles') {
+        return {
+          select: jest.fn().mockReturnThis(),
+          eq: jest.fn().mockReturnThis(),
+          maybeSingle: jest.fn().mockResolvedValue({ data: null, error: null })
+        };
+      }
+      if (table === 'team_profiles') {
+        return {
+          select: jest.fn().mockReturnThis(),
+          eq: jest.fn().mockReturnThis(),
+          maybeSingle: jest.fn().mockResolvedValue({
+            data: { company_role: 'admin' },
+            error: null
+          })
+        };
+      }
+    });
+
+    const { result } = renderHook(() => useRole());
+
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false);
+    });
+
+    expect(result.current.role).toBe('admin');
+    expect(result.current.isAdmin()).toBe(true);
+    expect(result.current.hasRole('tester')).toBe(true);
+  });
+
+  it('should map company_role owner to super_admin', async () => {
+    (supabase.from as jest.Mock).mockImplementation((table: string) => {
+      if (table === 'user_roles') {
+        return {
+          select: jest.fn().mockReturnThis(),
+          eq: jest.fn().mockReturnThis(),
+          maybeSingle: jest.fn().mockResolvedValue({ data: null, error: null })
+        };
+      }
+      if (table === 'team_profiles') {
+        return {
+          select: jest.fn().mockReturnThis(),
+          eq: jest.fn().mockReturnThis(),
+          maybeSingle: jest.fn().mockResolvedValue({
+            data: { company_role: 'owner' },
+            error: null
+          })
+        };
+      }
+    });
+
+    const { result } = renderHook(() => useRole());
+
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false);
+    });
+
+    expect(result.current.role).toBe('super_admin');
+    expect(result.current.isSuperAdmin()).toBe(true);
+    expect(result.current.getRoleLevel()).toBe(3);
+  });
+
+  it('should map company_role tester correctly', async () => {
+    (supabase.from as jest.Mock).mockImplementation((table: string) => {
+      if (table === 'user_roles') {
+        return {
+          select: jest.fn().mockReturnThis(),
+          eq: jest.fn().mockReturnThis(),
+          maybeSingle: jest.fn().mockResolvedValue({ data: null, error: null })
+        };
+      }
+      if (table === 'team_profiles') {
+        return {
+          select: jest.fn().mockReturnThis(),
+          eq: jest.fn().mockReturnThis(),
+          maybeSingle: jest.fn().mockResolvedValue({
+            data: { company_role: 'tester' },
+            error: null
+          })
+        };
+      }
+    });
+
+    const { result } = renderHook(() => useRole());
+
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false);
+    });
+
+    expect(result.current.role).toBe('tester');
+    expect(result.current.isTester()).toBe(true);
+    expect(result.current.hasRole('admin')).toBe(false);
   });
 });
