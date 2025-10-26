@@ -12,7 +12,8 @@ import { validateRegistration, RegistrationData } from '@/utils/validation';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { deleteConflictingUser } from '@/utils/deleteConflictingUser';
-import { Eye, EyeOff, ArrowLeft, AlertCircle } from 'lucide-react';
+import { Eye, EyeOff, ArrowLeft, AlertCircle, MapPin } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
 import { analytics } from '@/utils/analytics';
 import { validateAndNormalizeMobile } from '@/utils/mobileValidation';
 import { validateAndNormalizeEmail } from '@/utils/emailValidation';
@@ -40,7 +41,8 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
       mobile: '',
       password: '',
       confirmPassword: '',
-      email: '',
+      dateOfBirth: '',
+      gpsEnabled: false,
       firstName: '',
       lastName: '',
       acceptTerms: false
@@ -56,12 +58,6 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
     preview?: string;
     error?: string;
   }>({ isValid: false });
-  const [emailValidation, setEmailValidation] = useState<{
-    isValid: boolean;
-    normalizedEmail?: string;
-    error?: string;
-    warning?: string;
-  }>({ isValid: false });
   const { register, authState } = useAuth();
   const { toast } = useToast();
 
@@ -73,7 +69,7 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
       const supabase = getSupabaseClient();
       const { data: profile } = await supabase
         .from('profiles')
-        .select('mobile, country_code, first_name, last_name, email')
+        .select('mobile, country_code, first_name, last_name, date_of_birth, gps_enabled')
         .eq('user_id', authState.user.id)
         .single();
       
@@ -97,17 +93,9 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
         if (profile.first_name) updateField('firstName', profile.first_name);
         if (profile.last_name) updateField('lastName', profile.last_name);
         
-        // Pre-populate email if exists
-        if (profile.email) {
-          updateField('email', profile.email);
-          const emailResult = validateAndNormalizeEmail(profile.email);
-          setEmailValidation({
-            isValid: emailResult.isValid,
-            normalizedEmail: emailResult.normalizedEmail,
-            error: emailResult.error,
-            warning: emailResult.warning
-          });
-        }
+        // Pre-populate DOB and GPS
+        if (profile.date_of_birth) updateField('dateOfBirth', profile.date_of_birth);
+        if (profile.gps_enabled !== null) updateField('gpsEnabled', profile.gps_enabled);
       }
     };
     
@@ -143,22 +131,6 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
     }
   };
 
-  const handleEmailChange = (value: string) => {
-    updateField('email', value);
-    
-    // Real-time validation (only after 3+ characters to avoid early errors)
-    if (value.length >= 3) {
-      const result = validateAndNormalizeEmail(value);
-      setEmailValidation({
-        isValid: result.isValid,
-        normalizedEmail: result.normalizedEmail,
-        error: result.error,
-        warning: result.warning
-      });
-    } else {
-      setEmailValidation({ isValid: false });
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -179,7 +151,11 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
     setIsSubmitting(true);
     
     try {
-      const success = await register(formData);
+      const success = await register({
+        ...formData,
+        dateOfBirth: formData.dateOfBirth,
+        gpsEnabled: formData.gpsEnabled
+      });
       if (success) {
         // Track successful signup
         analytics.trackSignup('email', true);
@@ -212,7 +188,7 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
         });
         
         // Delete the conflicting user and try again
-        const deleted = await deleteConflictingUser(formData.email, 'be3e6aad-aa1c-4e1b-814d-0896f85f1737');
+        const deleted = await deleteConflictingUser(formData.mobile, 'be3e6aad-aa1c-4e1b-814d-0896f85f1737');
         if (deleted) {
           toast({
             title: 'Ready to register',
@@ -397,53 +373,36 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email">
-                Email <span className="text-xs text-muted-foreground">(Optional)</span>
-              </Label>
-              <div className="relative">
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="email@example.com (optional)"
-                  value={formData.email}
-                  onChange={(e) => handleEmailChange(e.target.value)}
-                  className={cn(
-                    "h-12 pr-10",
-                    formData.email.length >= 3 && (
-                      emailValidation.isValid 
-                        ? "border-green-500 focus-visible:ring-green-500" 
-                        : "border-red-500 focus-visible:ring-red-500"
-                    )
-                  )}
-                />
-                {formData.email.length >= 3 && (
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                    {emailValidation.isValid ? (
-                      <Check className="h-5 w-5 text-green-500" />
-                    ) : (
-                      <X className="h-5 w-5 text-red-500" />
-                    )}
-                  </div>
-                )}
+              <Label htmlFor="dateOfBirth">Date of Birth *</Label>
+              <Input
+                id="dateOfBirth"
+                type="date"
+                value={formData.dateOfBirth || ''}
+                onChange={(e) => updateField('dateOfBirth', e.target.value)}
+                max={new Date(new Date().setFullYear(new Date().getFullYear() - 18)).toISOString().split('T')[0]}
+                className="h-12"
+                required
+              />
+              <p className="text-xs text-muted-foreground">
+                You must be 18+ to join Looplly
+              </p>
+            </div>
+
+            <div className="flex items-center justify-between p-4 rounded-xl bg-secondary/50">
+              <div className="flex items-center gap-3">
+                <MapPin className="h-5 w-5 text-primary" />
+                <div>
+                  <Label htmlFor="gps" className="font-medium cursor-pointer">Enable GPS Location</Label>
+                  <p className="text-xs text-muted-foreground">
+                    Helps match you with location-based surveys for better earning opportunities
+                  </p>
+                </div>
               </div>
-              
-              {/* Show normalized preview if valid */}
-              {emailValidation.isValid && emailValidation.normalizedEmail && formData.email.length >= 3 && (
-                <div className="flex items-center gap-1 text-xs">
-                  <span className="text-green-600">✓</span>
-                  <span className="text-muted-foreground">
-                    Will be saved as: {emailValidation.normalizedEmail}
-                  </span>
-                </div>
-              )}
-              
-              {/* Show error message if invalid */}
-              {emailValidation.error && formData.email.length >= 3 && (
-                <div className="flex items-start gap-2 text-sm text-destructive">
-                  <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                  <p>{emailValidation.error}</p>
-                </div>
-              )}
+              <Switch
+                id="gps"
+                checked={formData.gpsEnabled || false}
+                onCheckedChange={(checked) => updateField('gpsEnabled', checked)}
+              />
             </div>
 
             <div className="flex items-center space-x-2 p-3 bg-muted/50 rounded-md">

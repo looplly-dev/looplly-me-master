@@ -1373,8 +1373,10 @@ export type Database = {
           is_verified: boolean | null
           last_name: string | null
           last_profile_update: string | null
+          level_2_complete: boolean | null
           mobile: string | null
           must_change_password: boolean | null
+          personal_income: string | null
           profile_complete: boolean | null
           profile_completeness_score: number | null
           profile_level: number | null
@@ -1409,8 +1411,10 @@ export type Database = {
           is_verified?: boolean | null
           last_name?: string | null
           last_profile_update?: string | null
+          level_2_complete?: boolean | null
           mobile?: string | null
           must_change_password?: boolean | null
+          personal_income?: string | null
           profile_complete?: boolean | null
           profile_completeness_score?: number | null
           profile_level?: number | null
@@ -1445,8 +1449,10 @@ export type Database = {
           is_verified?: boolean | null
           last_name?: string | null
           last_profile_update?: string | null
+          level_2_complete?: boolean | null
           mobile?: string | null
           must_change_password?: boolean | null
+          personal_income?: string | null
           profile_complete?: boolean | null
           profile_completeness_score?: number | null
           profile_level?: number | null

@@ -4,7 +4,6 @@ import { useAuth } from '@/hooks/useAuth';
 import Login from './auth/Login';
 import Register from './auth/Register';
 import OTPVerification from './auth/OTPVerification';
-import MultiStepProfileSetup from './auth/MultiStepProfileSetup';
 import CommunicationPreferences from './auth/CommunicationPreferences';
 import ForgotPassword from './auth/ForgotPassword';
 import Earn from '@/pages/Earn';
@@ -42,29 +41,8 @@ export default function LoopllyApp() {
       return <OTPVerification onBack={() => {}} onSuccess={() => {}} />;
     }
     
-    // Check if user needs to complete profile
-    if (authState.step === 'profile-setup') {
-      console.log('LoopllyApp - Showing profile setup');
-      return (
-        <MultiStepProfileSetup 
-          onBack={() => {}}
-          onComplete={() => {
-            setJustCompletedProfile(true);
-          }}
-        />
-      );
-    }
-    
-    // Check if user needs to set communication preferences
-    if (authState.step === 'communication-preferences') {
-      console.log('LoopllyApp - Showing communication preferences');
-      return (
-        <CommunicationPreferences 
-          onBack={() => {}}
-          onComplete={() => {}}
-        />
-      );
-    }
+    // Profile setup now happens in-dashboard via Level2ProfileModal
+    // Skip profile-setup step and go directly to dashboard
     
     // User has completed all steps, show dashboard routes
     console.log('LoopllyApp - Showing dashboard routes');

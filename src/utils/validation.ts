@@ -10,7 +10,8 @@ export interface RegistrationData {
   mobile: string;
   password: string;
   confirmPassword: string;
-  email: string;
+  dateOfBirth: string;
+  gpsEnabled: boolean;
   firstName?: string;
   lastName?: string;
   acceptTerms: boolean;
@@ -58,10 +59,14 @@ export const validateRegistration = (data: RegistrationData): ValidationResult =
     errors.push('Please accept the terms and privacy policy');
   }
 
-  // Email is now OPTIONAL but must be valid if provided
-  if (data.email && data.email.trim()) {
-    if (!isValidPublicEmail(data.email)) {
-      errors.push('Please enter a valid email address');
+  // DOB validation - required and 18+ check
+  if (!data.dateOfBirth?.trim()) {
+    errors.push('Date of birth is required');
+  } else {
+    const dob = new Date(data.dateOfBirth);
+    const age = Math.floor((Date.now() - dob.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
+    if (age < 18) {
+      errors.push('You must be 18 years or older to register');
     }
   }
 

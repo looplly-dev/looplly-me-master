@@ -6,7 +6,6 @@ import { simulatorClient as supabase } from '@/integrations/supabase/simulatorCl
 import Login from '@/components/auth/Login';
 import Register from '@/components/auth/Register';
 import OTPVerification from '@/components/auth/OTPVerification';
-import MultiStepProfileSetup from '@/components/auth/MultiStepProfileSetup';
 import CommunicationPreferences from '@/components/auth/CommunicationPreferences';
 import ForgotPassword from '@/components/auth/ForgotPassword';
 import Earn from '@/pages/Earn';
@@ -66,35 +65,8 @@ export default function SimulatorApp() {
       );
     }
     
-    // Check if user needs to complete profile
-    if (authState.step === 'profile-setup') {
-      console.log('SimulatorApp - Showing profile setup');
-      return (
-        <SimulatorProvider>
-          <SimulatorBanner />
-          <MultiStepProfileSetup 
-            onBack={() => {}}
-            onComplete={() => {
-              setJustCompletedProfile(true);
-            }}
-          />
-        </SimulatorProvider>
-      );
-    }
-    
-    // Check if user needs to set communication preferences
-    if (authState.step === 'communication-preferences') {
-      console.log('SimulatorApp - Showing communication preferences');
-      return (
-        <SimulatorProvider>
-          <SimulatorBanner />
-          <CommunicationPreferences 
-            onBack={() => {}}
-            onComplete={() => {}}
-          />
-        </SimulatorProvider>
-      );
-    }
+    // Profile setup now happens in-dashboard via Level2ProfileModal
+    // Skip profile-setup step and go directly to dashboard
     
     // User has completed all steps, show dashboard routes
     console.log('SimulatorApp - Showing dashboard routes');

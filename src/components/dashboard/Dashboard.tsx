@@ -20,6 +20,8 @@ import { useProfileQuestions } from '@/hooks/useProfileQuestions';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
 import OTPVerification from '@/components/auth/OTPVerification';
+import MobileVerification from '@/components/auth/MobileVerification';
+import Level2ProfileModal from './Level2ProfileModal';
 import { useToast } from '@/hooks/use-toast';
 
 interface DashboardProps {
@@ -31,6 +33,7 @@ export default function Dashboard({ triggerOnboarding = false }: DashboardProps)
   const [showSettings, setShowSettings] = useState(false);
   const [showSupport, setShowSupport] = useState(false);
   const [showOTPModal, setShowOTPModal] = useState(false);
+  const [showLevel2Modal, setShowLevel2Modal] = useState(false);
   const { authState, logout } = useAuth();
   const { isAdmin } = useRole();
   const { isDarkMode, toggleDarkMode } = useDarkMode();
@@ -191,28 +194,7 @@ export default function Dashboard({ triggerOnboarding = false }: DashboardProps)
 
       {/* Main Content */}
       <div className="max-w-md md:max-w-2xl lg:max-w-5xl mx-auto">
-        {/* Verification Banner */}
-        {!isVerified && (
-          <Alert className="mx-4 mt-4 border-amber-500 bg-amber-500/10">
-            <Shield className="h-5 w-5 text-amber-600" />
-            <AlertTitle className="text-amber-700 font-bold">
-              Verify Your Mobile to Start Earning
-            </AlertTitle>
-            <AlertDescription className="text-sm text-muted-foreground">
-              Complete mobile verification to unlock surveys, videos, and earning opportunities.
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="mt-2 border-amber-500 text-amber-700 hover:bg-amber-500 hover:text-white"
-                onClick={() => setShowOTPModal(true)}
-              >
-                Verify Now →
-              </Button>
-            </AlertDescription>
-          </Alert>
-        )}
-        
-        {/* Level 2 Incomplete Alert */}
+        {/* Level 2 Incomplete Alert (highest priority) */}
         {!level2Complete && (
           <Alert className="mx-4 mt-4 border-warning bg-warning/10">
             <AlertCircle className="h-5 w-5 text-warning" />
@@ -223,9 +205,30 @@ export default function Dashboard({ triggerOnboarding = false }: DashboardProps)
                 variant="outline" 
                 size="sm" 
                 className="mt-2 border-warning text-warning hover:bg-warning hover:text-warning-foreground"
-                onClick={() => setActiveTab('profile')}
+                onClick={() => setShowLevel2Modal(true)}
               >
                 Complete Now →
+              </Button>
+            </AlertDescription>
+          </Alert>
+        )}
+        
+        {/* Verification Banner (only show if Level 2 is complete) */}
+        {level2Complete && !isVerified && (
+          <Alert className="mx-4 mt-4 border-green-500 bg-green-50 dark:bg-green-950">
+            <Shield className="h-5 w-5 text-green-600" />
+            <AlertTitle className="text-green-700 font-bold">
+              One Last Step!
+            </AlertTitle>
+            <AlertDescription className="text-sm text-muted-foreground">
+              Verify your mobile number to start earning.
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="mt-2 border-green-500 text-green-700 hover:bg-green-500 hover:text-white"
+                onClick={() => setShowOTPModal(true)}
+              >
+                Verify Now →
               </Button>
             </AlertDescription>
           </Alert>
@@ -316,21 +319,33 @@ export default function Dashboard({ triggerOnboarding = false }: DashboardProps)
         onSkip={skipOnboarding}
       />
       
-      {/* OTP Modal */}
-      {showOTPModal && (
-        <OTPVerification 
-          onBack={() => setShowOTPModal(false)}
-          onSuccess={() => {
-            setShowOTPModal(false);
-            toast({
-              title: 'Mobile Verified!',
-              description: 'You can now start earning',
-            });
-            // Refresh page to update verification status
-            window.location.reload();
-          }}
-        />
-      )}
+      {/* Level 2 Profile Modal */}
+      <Level2ProfileModal
+        open={showLevel2Modal}
+        onClose={() => setShowLevel2Modal(false)}
+        onComplete={() => {
+          setShowLevel2Modal(false);
+          toast({
+            title: 'Profile Complete!',
+            description: 'Ready to verify your mobile and start earning!',
+          });
+          window.location.reload();
+        }}
+      />
+      
+      {/* Mobile Verification Modal */}
+      <MobileVerification
+        open={showOTPModal}
+        onClose={() => setShowOTPModal(false)}
+        onSuccess={() => {
+          setShowOTPModal(false);
+          toast({
+            title: 'Mobile Verified!',
+            description: 'You can now start earning',
+          });
+          window.location.reload();
+        }}
+      />
     </div>
   );
 }
