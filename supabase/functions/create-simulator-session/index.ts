@@ -83,68 +83,49 @@ serve(async (req) => {
       throw new Error(`Failed to reset user journey: ${resetError.message}`);
     }
 
-    // Generate temporary auth link for the test user
-    const { data: authData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
-      type: 'magiclink',
+    // Create a session using service role to sign in as the test user
+    // This bypasses OTP/magic link expiry issues
+    console.log('Creating session tokens for test user...');
+    
+    // Get the test user's auth record
+    const { data: authUser, error: getUserError } = await supabaseAdmin.auth.admin.getUserById(test_user_id);
+    
+    if (getUserError || !authUser.user) {
+      console.error('Failed to get auth user:', getUserError);
+      throw new Error('Could not retrieve test user');
+    }
+
+    // Generate a temporary password for sign-in
+    const tempPassword = `sim_${Date.now()}_${Math.random().toString(36)}`;
+    
+    // Update user with temporary password
+    const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
+      test_user_id,
+      { password: tempPassword }
+    );
+
+    if (updateError) {
+      console.error('Failed to set temp password:', updateError);
+      throw new Error('Could not prepare test user session');
+    }
+
+    // Sign in with the temporary password to get a session
+    const { data: signInData, error: signInError } = await supabaseAdmin.auth.signInWithPassword({
       email: testUser.email,
-      options: {
-        redirectTo: `${req.headers.get('origin')}/simulator-session?stage=${stage}`
-      }
+      password: tempPassword
     });
 
-    if (linkError || !authData.properties) {
-      console.error('Link generation error:', linkError);
-      throw new Error('Failed to generate simulator session');
+    if (signInError || !signInData.session) {
+      console.error('Failed to sign in:', signInError);
+      throw new Error('Could not create test user session');
     }
 
-    console.log('Magic link generated, exchanging for session...');
+    const sessionObject = {
+      access_token: signInData.session.access_token,
+      refresh_token: signInData.session.refresh_token
+    };
 
-    // Exchange the hashed token for a real session
-    let sessionObject: { access_token: string; refresh_token: string } | null = null;
-    
-    // Try using hashed_token first (preferred method)
-    if (authData.properties.hashed_token) {
-      const { data: sessionData, error: verifyError } = await supabaseAdmin.auth.verifyOtp({
-        email: testUser.email,
-        token: authData.properties.hashed_token,
-        type: 'magiclink'
-      });
-
-      if (verifyError) {
-        console.error('verifyOtp magiclink error:', verifyError);
-      } else if (sessionData.session?.access_token && sessionData.session?.refresh_token) {
-        sessionObject = {
-          access_token: sessionData.session.access_token,
-          refresh_token: sessionData.session.refresh_token
-        };
-        console.log('Session obtained via hashed_token');
-      }
-    }
-
-    // Fallback: try email_otp if hashed_token failed
-    if (!sessionObject && authData.properties.email_otp) {
-      console.log('Attempting fallback with email_otp...');
-      const { data: sessionData, error: verifyError } = await supabaseAdmin.auth.verifyOtp({
-        email: testUser.email,
-        token: authData.properties.email_otp,
-        type: 'email'
-      });
-
-      if (verifyError) {
-        console.error('verifyOtp email error:', verifyError);
-      } else if (sessionData.session?.access_token && sessionData.session?.refresh_token) {
-        sessionObject = {
-          access_token: sessionData.session.access_token,
-          refresh_token: sessionData.session.refresh_token
-        };
-        console.log('Session obtained via email_otp');
-      }
-    }
-
-    if (!sessionObject) {
-      console.error('Failed to create session from magic link properties');
-      throw new Error('Failed to verify magic link and create session');
-    }
+    console.log('Session created successfully for test user');
 
     // Log simulator session creation
     await supabaseAdmin

@@ -17,9 +17,17 @@ export default function SimulatorSession() {
         const refreshToken = searchParams.get('refresh_token');
         const stage = searchParams.get('stage');
 
+        console.log('SimulatorSession - Received params:', {
+          hasAccessToken: !!accessToken,
+          hasRefreshToken: !!refreshToken,
+          stage
+        });
+
         if (!accessToken || !refreshToken || !stage) {
           throw new Error('Missing authentication parameters');
         }
+
+        console.log('SimulatorSession - Setting session...');
 
         // Decode tokens and sign in
         const { data: sessionData, error: authError } = await supabase.auth.setSession({
@@ -27,20 +35,35 @@ export default function SimulatorSession() {
           refresh_token: decodeURIComponent(refreshToken)
         });
 
+        console.log('SimulatorSession - setSession result:', {
+          hasSession: !!sessionData?.session,
+          hasUser: !!sessionData?.user,
+          error: authError?.message
+        });
+
         if (authError || !sessionData.session) {
-          throw new Error('Failed to authenticate simulator session');
+          throw new Error(`Authentication failed: ${authError?.message || 'No session returned'}`);
         }
 
-        // Verify this is a test account (using type assertion until types regenerate)
+        console.log('SimulatorSession - Verifying test account...');
+
+        // Verify this is a test account
         const { data: profile } = await supabase
           .from('profiles')
           .select('is_test_account, user_type')
           .eq('user_id', sessionData.session.user.id)
-          .single() as any;
+          .single();
 
-        if (!(profile as any)?.is_test_account) {
+        console.log('SimulatorSession - Profile check:', {
+          isTestAccount: profile?.is_test_account,
+          userType: profile?.user_type
+        });
+
+        if (!profile?.is_test_account) {
           throw new Error('Session is not for a test account');
         }
+
+        console.log('SimulatorSession - Navigating to:', stage);
 
         // Route based on stage
         const stageRoutes: Record<string, string> = {
