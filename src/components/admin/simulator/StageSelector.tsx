@@ -12,44 +12,37 @@ const JOURNEY_STAGES = [
   {
     id: 'fresh_signup',
     name: 'Stage 1: Fresh Signup',
-    description: 'Just created account, needs OTP verification',
+    description: 'Empty account - no registration data yet',
     icon: UserPlus,
     level: 1
   },
   {
-    id: 'otp_verified',
-    name: 'Stage 2: OTP Verified',
-    description: 'Verified mobile, needs profile setup',
-    icon: CheckCircle,
+    id: 'basic_profile',
+    name: 'Stage 2: Registered (Level 1)',
+    description: 'Has Name, DOB, Mobile, GPS - needs Level 2',
+    icon: ClipboardList,
     level: 2
   },
   {
-    id: 'basic_profile',
-    name: 'Stage 3: Basic Profile',
-    description: 'Level 1 questions done, needs Level 2',
-    icon: ClipboardList,
+    id: 'full_profile',
+    name: 'Stage 3: Level 2 Complete',
+    description: 'Profile complete - ready for mobile verification',
+    icon: CheckCircle,
     level: 3
   },
   {
-    id: 'full_profile',
-    name: 'Stage 4: Full Profile',
-    description: 'Level 2 complete, can see surveys',
-    icon: CheckCircle,
+    id: 'first_survey',
+    name: 'Stage 4: Mobile Verified',
+    description: 'Verified + completed first survey, earning $5',
+    icon: Trophy,
     level: 4
   },
   {
-    id: 'first_survey',
-    name: 'Stage 5: First Survey',
-    description: 'Has completed 1 survey, building reputation',
-    icon: ClipboardList,
-    level: 5
-  },
-  {
     id: 'established_user',
-    name: 'Stage 6: Established User',
-    description: 'Has reputation, badges, and earnings',
+    name: 'Stage 5: Established User',
+    description: 'Has reputation, badges, and multiple surveys',
     icon: Trophy,
-    level: 6
+    level: 5
   }
 ];
 

@@ -488,26 +488,72 @@ Both clients use the same backend, only session management differs.
 
 ## Data Seeding Strategy
 
+The simulator pre-populates test user data to match each journey stage. This section explains **what data exists at each checkpoint** and how the `reset_user_journey` RPC function orchestrates the data flow.
+
+---
+
+### Updated Journey Stages (Post-Registration Flow Refactor)
+
+**Stage 1: Fresh Signup**
+- User lands on `/register` page
+- **Profile Data:** ALL fields NULL (first_name, last_name, mobile, DOB, etc.)
+- **State:** `level_2_complete = false`, `is_verified = false`, `profile_level = 1`
+- **Purpose:** Test the registration form with no pre-filled data
+
+**Stage 2: Registered (Level 1 Complete)**
+- User lands on `/dashboard`
+- **Profile Data:** First Name, Last Name, DOB, Mobile, GPS enabled
+- **Missing:** All Level 2 questions (Gender, Address, Ethnicity, HHI, PHI, SEC)
+- **State:** `level_2_complete = false`, `is_verified = false`, `profile_level = 1`
+- **Alert:** "Complete Your Profile" prompt visible
+- **Purpose:** Test Level 2 modal (dashboard popup)
+
+**Stage 3: Level 2 Complete**
+- User lands on `/dashboard`
+- **Profile Data:** All Level 1 + All 6 required Level 2 questions answered
+  - Gender, Address, Ethnicity, HHI, PHI, SEC
+- **State:** `level_2_complete = true`, `is_verified = false`, `profile_level = 2`
+- **Alert:** "One Last Step! Verify your mobile" visible
+- **Purpose:** Test OTP verification flow
+
+**Stage 4: Mobile Verified (First Survey)**
+- User lands on `/dashboard`
+- **Profile Data:** All Level 1 + Level 2 complete
+- **State:** `level_2_complete = true`, `is_verified = true`
+- **Earning Data:** 1 completed survey, $5 balance
+- **Reputation:** 150 points, Bronze Elite
+- **Purpose:** Test earning tab and first survey experience
+
+**Stage 5: Established User**
+- User lands on `/dashboard`
+- **Profile Data:** Fully complete
+- **State:** `level_2_complete = true`, `is_verified = true`
+- **Earning Data:** 5 completed surveys, $50 balance
+- **Reputation:** 850 points, Silver Elite tier
+- **Badges:** Multiple reputation badges
+- **Purpose:** Test advanced features and experienced user flow
+
+---
+
 ### Stage-by-Stage Data Flow
 
 The simulator properly seeds data to match the current system architecture:
 
 | Stage | Control Fields (profiles) | User Data (profile_answers) | Activities | Reputation |
 |-------|---------------------------|------------------------------|-----------|------------|
-| 1: Fresh Signup | `is_verified=false`, `profile_level=1` | ❌ None | ❌ None | 0 (Bronze Novice) |
-| 2: OTP Verified | `is_verified=true` | ❌ None | ❌ None | 0 (Bronze Novice) |
-| 3: Basic Profile | `profile_level=1`, `completeness=40` | ✅ Level 1: gender, DOB | ❌ None | 0 (Bronze Novice) |
-| 4: Full Profile | `profile_complete=true`, `profile_level=2`, `completeness=100` | ✅ Level 1 + 2: SEC, address, income | ❌ None | 0 (Bronze Novice) |
-| 5: First Survey | (same) | (same) | ✅ 1 survey | 150 (Bronze Elite) |
-| 6: Established | (same) | (same) | ✅ 5 surveys | 850 (Silver Elite) |
+| 1: Fresh Signup | `is_verified=false`, `profile_level=1`, ALL fields NULL | ❌ None | ❌ None | 0 (Bronze Novice) |
+| 2: Registered | `profile_level=1`, Name/DOB/Mobile set | ❌ None | ❌ None | 0 (Bronze Novice) |
+| 3: Level 2 Complete | `profile_complete=true`, `level_2_complete=true`, `profile_level=2` | ✅ All 6 Level 2 questions | ❌ None | 0 (Bronze Novice) |
+| 4: Mobile Verified | `is_verified=true` | (same) | ✅ 1 survey | 150 (Bronze Elite) |
+| 5: Established | (same) | (same) | ✅ 5 surveys | 850 (Silver Elite) |
 
 ### Pre-Population Behavior
 
 The simulator pre-fills forms to allow admins to see the actual UX without re-entering data:
 
-- **Stage 1 (Fresh Signup)**: All fields empty (new user experience)
-- **Stage 2 (OTP Verified)**: Mobile, first name, last name pre-populated from `profiles` table
-- **Stage 3+ (Basic/Full Profile)**: All profile questions pre-populated from `profile_answers` table
+- **Stage 1 (Fresh Signup)**: All fields empty (new user experience, lands on `/register`)
+- **Stage 2 (Registered)**: Name, DOB, Mobile pre-populated, user lands on `/dashboard` with "Complete Profile" alert
+- **Stage 3+ (Level 2 Complete)**: All profile questions pre-populated from `profile_answers` table
 - Fields remain **editable** to test validation and submission flows
 - This mirrors the real user experience (returning users see their data)
 

@@ -90,8 +90,8 @@ export default function SimulatorSession() {
         // Route based on stage - all routes use /simulator/* paths
         const stageRoutes: Record<string, string> = {
           'fresh_signup': '/simulator/register',
-          'otp_verified': '/simulator/profile',
-          'basic_profile': '/simulator/profile',
+          'otp_verified': '/simulator/dashboard',
+          'basic_profile': '/simulator/dashboard',
           'full_profile': '/simulator/dashboard',
           'first_survey': '/simulator/dashboard',
           'established_user': '/simulator/dashboard'
