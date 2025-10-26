@@ -30,6 +30,9 @@ interface RegisterProps {
 export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterProps) {
   const defaultCountry = getDefaultCountry();
   
+  // Detect simulator mode to disable browser autofill
+  const isSimulatorMode = window.location.pathname.includes('/simulator');
+  
   const {
     formData,
     errors,
@@ -259,6 +262,8 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
                   value={formData.firstName || ''}
                   onChange={(e) => updateField('firstName', e.target.value)}
                   className="h-12"
+                  autoComplete={isSimulatorMode ? 'off' : 'given-name'}
+                  name={isSimulatorMode ? `firstName_sim_${Date.now()}` : 'firstName'}
                   required
                 />
               </div>
@@ -271,6 +276,8 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
                   value={formData.lastName || ''}
                   onChange={(e) => updateField('lastName', e.target.value)}
                   className="h-12"
+                  autoComplete={isSimulatorMode ? 'off' : 'family-name'}
+                  name={isSimulatorMode ? `lastName_sim_${Date.now()}` : 'lastName'}
                   required
                 />
               </div>
@@ -310,6 +317,8 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
                       mobileValidation.error && "border-destructive",
                       mobileValidation.isValid && "border-green-500"
                     )}
+                    autoComplete={isSimulatorMode ? 'off' : 'tel'}
+                    name={isSimulatorMode ? `mobile_sim_${Date.now()}` : 'mobile'}
                     required
                   />
                   
@@ -349,6 +358,8 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
                   value={formData.password}
                   onChange={(e) => updateField('password', e.target.value)}
                   className="h-12 pr-10"
+                  autoComplete={isSimulatorMode ? 'off' : 'new-password'}
+                  name={isSimulatorMode ? `password_sim_${Date.now()}` : 'password'}
                   required
                 />
                 <Button
@@ -373,6 +384,8 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
                   value={formData.confirmPassword}
                   onChange={(e) => updateField('confirmPassword', e.target.value)}
                   className="h-12 pr-10"
+                  autoComplete={isSimulatorMode ? 'off' : 'new-password'}
+                  name={isSimulatorMode ? `confirmPassword_sim_${Date.now()}` : 'confirmPassword'}
                   required
                 />
                 <Button
@@ -396,6 +409,8 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
                 onChange={(e) => updateField('dateOfBirth', e.target.value)}
                 max={new Date(new Date().setFullYear(new Date().getFullYear() - 18)).toISOString().split('T')[0]}
                 className="h-12"
+                autoComplete={isSimulatorMode ? 'off' : 'bday'}
+                name={isSimulatorMode ? `dateOfBirth_sim_${Date.now()}` : 'dateOfBirth'}
                 required
               />
               <p className="text-xs text-muted-foreground">
