@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useRef } from 'react';
+import { ReactNode, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useRole, UserRole } from '@/hooks/useRole';
@@ -25,6 +25,7 @@ export default function ProtectedRoute({
   const { hasRole, isLoading: roleLoading, isAdmin, isSuperAdmin } = useRole();
   const { userType, isLoading: typeLoading } = useUserType();
   const toastShownRef = useRef(false);
+  const [showTimeout, setShowTimeout] = useState(false);
 
   // Show access denied toast once when user lacks admin permissions
   useEffect(() => {
@@ -41,15 +42,54 @@ export default function ProtectedRoute({
     }
   }, [authState.isLoading, roleLoading, typeLoading, requiredRole, userType, isAdmin, isSuperAdmin, toast]);
 
-  // Show loading while checking authentication
-  if (authState.isLoading || roleLoading || typeLoading) {
+  // Watchdog timeout: if loading for >3 seconds, show re-auth prompt
+  useEffect(() => {
+    const isLoading = authState.isLoading || roleLoading || typeLoading;
+    
     if (import.meta.env.DEV) {
-      console.info('ProtectedRoute loading...', {
-        authLoading: authState.isLoading,
-        roleLoading,
-        typeLoading,
+      console.info('[ProtectedRoute] Loading states:', { 
+        authLoading: authState.isLoading, 
+        roleLoading, 
+        typeLoading 
       });
     }
+
+    if (isLoading) {
+      const timeoutId = setTimeout(() => {
+        console.warn('[ProtectedRoute] Watchdog triggered: loading state timeout');
+        setShowTimeout(true);
+      }, 3000);
+
+      return () => clearTimeout(timeoutId);
+    } else {
+      setShowTimeout(false);
+    }
+  }, [authState.isLoading, roleLoading, typeLoading]);
+
+  // Show loading while checking authentication (with timeout fallback)
+  if (authState.isLoading || roleLoading || typeLoading) {
+    if (showTimeout) {
+      // Timeout triggered - show re-auth prompt
+      const isAdminRoute = requiredRole === 'admin' || requiredRole === 'super_admin';
+      return (
+        <div className="min-h-screen bg-background flex items-center justify-center p-4">
+          <Card className="max-w-md w-full">
+            <CardContent className="pt-6 text-center">
+              <Lock className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+              <h2 className="text-xl font-semibold mb-2">Authentication Timeout</h2>
+              <p className="text-muted-foreground mb-6">
+                Session initialization took too long. Please log in again.
+              </p>
+              <Button onClick={() => navigate(isAdminRoute ? '/admin/login' : '/')}>
+                {isAdminRoute ? 'Admin Login' : 'Go to Login'}
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      );
+    }
+    
+    // Still loading - show spinner
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
