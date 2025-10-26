@@ -7,9 +7,31 @@ import {
   ToastTitle,
   ToastViewport,
 } from "@/components/ui/toast"
+import { useEffect, useRef } from "react"
 
 export function Toaster() {
-  const { toasts } = useToast()
+  const { toasts, dismiss } = useToast()
+  const viewportRef = useRef<HTMLOListElement>(null)
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (toasts.length === 0) return
+      
+      // Check if click is outside the viewport
+      if (viewportRef.current && !viewportRef.current.contains(event.target as Node)) {
+        // Dismiss all toasts
+        toasts.forEach(toast => dismiss(toast.id))
+      }
+    }
+
+    // Only add listener if there are active toasts
+    if (toasts.length > 0) {
+      document.addEventListener('mousedown', handleClickOutside)
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside)
+      }
+    }
+  }, [toasts, dismiss])
 
   return (
     <ToastProvider>
@@ -27,7 +49,7 @@ export function Toaster() {
           </Toast>
         )
       })}
-      <ToastViewport />
+      <ToastViewport ref={viewportRef} />
     </ToastProvider>
   )
 }
