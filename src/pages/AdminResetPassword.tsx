@@ -71,7 +71,7 @@ export default function AdminResetPassword() {
 
       // Update profile flags (team member profiles might be in team_profiles or profiles)
       const { error: profileError } = await supabase
-        .from('profiles')
+        .from('team_profiles')
         .update({
           must_change_password: false,
           temp_password_expires_at: null
