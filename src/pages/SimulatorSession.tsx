@@ -51,38 +51,36 @@ export default function SimulatorSession() {
 
         console.log('SimulatorSession - Clearing old auth data...');
         
-        // Clear any existing auth tokens to prevent stale session data
+        // Clear existing auth to prevent stale state (both storages)
+        sessionStorage.removeItem('simulator_auth_token');
+        sessionStorage.removeItem('simulator_user');
         localStorage.removeItem('looplly_auth_token');
         localStorage.removeItem('looplly_user');
         localStorage.removeItem('mockUser');
 
-        console.log('SimulatorSession - Storing custom auth...');
+        console.log('SimulatorSession - Storing simulator auth in sessionStorage...');
 
-        // Store custom auth in localStorage (same as production login)
-        localStorage.setItem('looplly_auth_token', customToken);
-        localStorage.setItem('looplly_user', JSON.stringify({
-          id: payload.sub,
-          mobile: payload.mobile
-        }));
+        // Store simulator auth in sessionStorage (isolated to iframe/tab)
+        sessionStorage.setItem('simulator_auth_token', customToken);
 
-        console.log('SimulatorSession - Verifying test account...');
+        console.log('SimulatorSession - Fetching test profile snapshot via function...');
 
-        // Verify this is a test account
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .select('is_test_account, user_type')
-          .eq('user_id', payload.sub)
-          .maybeSingle();
-
-        console.log('SimulatorSession - Profile check:', {
-          isTestAccount: profile?.is_test_account,
-          userType: profile?.user_type,
-          error: profileError?.message
+        const { data: snapshot, error: fnError } = await supabase.functions.invoke('simulator-get-profile', {
+          body: { custom_token: customToken }
         });
 
-        if (!profile?.is_test_account) {
+        if (fnError) {
+          throw new Error(fnError.message || 'Failed to verify simulator token');
+        }
+
+        console.log('SimulatorSession - Function snapshot:', snapshot);
+
+        if (!snapshot?.is_test_account) {
           throw new Error('Session is not for a test account');
         }
+
+        // Store snapshot for auth hook (used in simulator context)
+        sessionStorage.setItem('simulator_user', JSON.stringify(snapshot));
 
         console.log('SimulatorSession - Navigating to:', stage);
 

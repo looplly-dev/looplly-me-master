@@ -32,7 +32,7 @@ export default function SimulatorIframe({ sessionToken, stage, onReset }: Simula
         ts: Date.now().toString()
       });
 
-      return `${window.location.origin}/simulator-session?${params}`;
+      return `${window.location.origin}/simulator/session?${params}`;
     } catch (error) {
       console.error('Failed to parse session token:', error);
       return '';
@@ -52,6 +52,13 @@ export default function SimulatorIframe({ sessionToken, stage, onReset }: Simula
     setIsLoading(true);
     setIframeKey(prev => prev + 1);
   }, [sessionToken, stage]);
+
+  // Log iframe URL for diagnostics
+  useEffect(() => {
+    if (simulatorUrl) {
+      console.info('[SimulatorIframe] URL:', simulatorUrl);
+    }
+  }, [simulatorUrl, iframeKey]);
 
   return (
     <div className="space-y-4">

@@ -50,7 +50,58 @@ export const useAuthLogic = () => {
         path.startsWith('/simulator') ? 'simulatorClient' : 'mainClient');
     }
     
-    // 1. CHECK CUSTOM LOOPLLY JWT FIRST (Priority)
+    // 1. CHECK SIMULATOR JWT IN SESSION STORAGE (highest priority in simulator)
+    const inSimulator = window.location.pathname.startsWith('/simulator');
+    const simulatorToken = sessionStorage.getItem('simulator_auth_token');
+    const simulatorUser = sessionStorage.getItem('simulator_user');
+
+    if (inSimulator && simulatorToken && simulatorUser) {
+      try {
+        const payload = JSON.parse(atob(simulatorToken.split('.')[1]));
+        const now = Math.floor(Date.now() / 1000);
+
+        if (payload.exp < now) {
+          console.log('Simulator JWT expired, clearing...');
+          sessionStorage.removeItem('simulator_auth_token');
+          sessionStorage.removeItem('simulator_user');
+        } else {
+          const snap = JSON.parse(simulatorUser);
+          console.log('Using simulator snapshot without DB fetch');
+          setAuthState({
+            user: {
+              id: snap.user_id || snap.id,
+              mobile: snap.mobile,
+              countryCode: snap.country_code || '+1',
+              firstName: snap.first_name || snap.firstName || '',
+              lastName: snap.last_name || snap.lastName || '',
+              email: snap.email,
+              isVerified: snap.is_verified ?? false,
+              profileComplete: snap.profile_complete ?? false,
+              profile: {
+                sec: (snap.sec as 'A' | 'B' | 'C1' | 'C2' | 'D' | 'E') || 'B',
+                gender: (snap.gender as 'male' | 'female' | 'other') || 'other',
+                dateOfBirth: snap.date_of_birth ? new Date(snap.date_of_birth) : new Date('1990-01-01'),
+                address: snap.address || '',
+                gpsEnabled: snap.gps_enabled ?? true,
+                firstName: snap.first_name || snap.firstName || '',
+                lastName: snap.last_name || snap.lastName || '',
+                email: snap.email || ''
+              }
+            },
+            isAuthenticated: true,
+            isLoading: false,
+            step: snap.profile_complete ? 'dashboard' : 'profile-setup'
+          });
+          return;
+        }
+      } catch (error) {
+        console.error('Error parsing simulator JWT/snapshot:', error);
+        sessionStorage.removeItem('simulator_auth_token');
+        sessionStorage.removeItem('simulator_user');
+      }
+    }
+    
+    // 2. CHECK CUSTOM LOOPLLY JWT (localStorage)
     const loopllyToken = localStorage.getItem('looplly_auth_token');
     const loopllyUser = localStorage.getItem('looplly_user');
 
