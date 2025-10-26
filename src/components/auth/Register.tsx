@@ -101,9 +101,9 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
             });
           }
           
-          // Optionally pre-fill names (uncomment if desired for faster testing)
-          // if (snapshot.first_name) updateField('firstName', snapshot.first_name);
-          // if (snapshot.last_name) updateField('lastName', snapshot.last_name);
+          // Pre-fill names for consistent test user data
+          if (snapshot.first_name) updateField('firstName', snapshot.first_name);
+          if (snapshot.last_name) updateField('lastName', snapshot.last_name);
           
         } catch (error) {
           console.error('[Register] Failed to parse simulator snapshot:', error);
