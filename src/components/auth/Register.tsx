@@ -405,13 +405,6 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
               />
             </div>
 
-            <div className="flex items-center space-x-2 p-3 bg-muted/50 rounded-md">
-              <AlertCircle className="h-4 w-4 text-warning" />
-              <p className="text-sm text-muted-foreground">
-                You must be 18 years or older to join Looplly
-              </p>
-            </div>
-
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="terms"
