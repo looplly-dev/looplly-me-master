@@ -55,7 +55,7 @@ const adminNavItems = [
   { title: 'Content', url: '/admin/content', icon: Briefcase, minRole: 'admin' as UserRole },
   { title: 'Badges', url: '/admin/badges', icon: Award, minRole: 'admin' as UserRole },
   { title: 'Streak Config', url: '/admin/streak-config', icon: Flame, minRole: 'admin' as UserRole },
-  { title: 'Questions', url: '/admin/questions', icon: MessageSquare, minRole: 'admin' as UserRole },
+  { title: 'Profile Questions', url: '/admin/questions', icon: MessageSquare, minRole: 'admin' as UserRole },
   { title: 'Profile Decay', url: '/admin/profile-decay', icon: Clock, minRole: 'admin' as UserRole },
   { title: 'Country Blocklist', url: '/admin/country-blocklist', icon: Globe, minRole: 'admin' as UserRole },
   { title: 'Redemptions', url: '/admin/redemptions', icon: DollarSign, minRole: 'admin' as UserRole },
