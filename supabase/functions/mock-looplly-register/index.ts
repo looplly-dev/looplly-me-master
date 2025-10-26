@@ -35,10 +35,12 @@ serve(async (req) => {
     if (existing) {
       // Allow re-registration for test accounts (simulator)
       if (existing.is_test_account) {
-        console.log('[MOCK REGISTER] Re-registering test account:', normalizedMobile);
+    console.log('[MOCK REGISTER] Re-registering test account:', normalizedMobile);
         
-        // Hash the new password
-        const passwordHash = await bcrypt.hash(password);
+        // Hash the new password (using sync method for Deno Deploy compatibility)
+        console.log('[MOCK REGISTER] Using sync bcrypt for hashing');
+        const salt = bcrypt.genSaltSync(8);
+        const passwordHash = bcrypt.hashSync(password, salt);
         
         // Update the existing test account with new registration data
         const { error: updateError } = await supabase
@@ -91,8 +93,10 @@ serve(async (req) => {
       );
     }
     
-    // Hash password with bcrypt
-    const passwordHash = await bcrypt.hash(password);
+    // Hash password with bcrypt (using sync method for Deno Deploy compatibility)
+    console.log('[MOCK REGISTER] Using sync bcrypt for hashing');
+    const salt = bcrypt.genSaltSync(8);
+    const passwordHash = bcrypt.hashSync(password, salt);
     
     // Generate UUID for user_id
     const userId = crypto.randomUUID();

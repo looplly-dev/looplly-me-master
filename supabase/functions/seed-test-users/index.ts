@@ -82,8 +82,9 @@ Deno.serve(async (req) => {
       console.log(`Processing ${testUser.firstName} ${testUser.lastName} (${mobileNumber})...`);
 
       try {
-        // Hash password with bcrypt
-        const passwordHash = await bcrypt.hash('Test123!');
+        // Hash password with bcrypt (using sync method for Deno Deploy compatibility)
+        const salt = bcrypt.genSaltSync(8);
+        const passwordHash = bcrypt.hashSync('Test123!', salt);
 
         // Search for existing test user: first by email, then by name
         let existingProfile = null;

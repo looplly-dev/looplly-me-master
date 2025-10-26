@@ -53,8 +53,9 @@ serve(async (req) => {
       );
     }
     
-    // Verify password
-    const passwordValid = await bcrypt.compare(password, profile.password_hash);
+    // Verify password (using sync method for Deno Deploy compatibility)
+    console.log('[MOCK LOGIN] Using sync bcrypt for comparison');
+    const passwordValid = bcrypt.compareSync(password, profile.password_hash);
     
     if (!passwordValid) {
       return new Response(
