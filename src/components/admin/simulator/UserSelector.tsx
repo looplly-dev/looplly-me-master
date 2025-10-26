@@ -35,7 +35,7 @@ export default function UserSelector({ onUserSelect }: UserSelectorProps) {
         .select('user_id, email, first_name, last_name, is_test_account')
         .eq('is_test_account', true)
         .eq('user_type', 'looplly_user')
-        .order('email', { ascending: true });
+        .order('last_name', { ascending: true });
 
       if (error) throw error;
 
