@@ -487,58 +487,52 @@ export const useAuthLogic = () => {
         }
       }
       
-      // For admin/team users, try real Supabase authentication
-      const result = await loginUser({ email, password });
-      
-      if (result.success) {
-        // If expectedUserType is provided, validate after successful auth
-        if (expectedUserType) {
-          // Wait for session to be established
-          const { data: { session } } = await supabase.auth.getSession();
-          
-          if (session?.user) {
-            // Fetch user profile to check user_type
-            const { data: profile, error } = await supabase
-              .from('profiles')
-              .select('user_type')
-              .eq('user_id', session.user.id)
-              .single();
-            
-            if (error) {
-              console.error('Error fetching profile for user type check:', error);
-              setAuthState(prev => ({ ...prev, isLoading: false }));
-              return false;
-            }
-            
-            const actualUserType = profile?.user_type || 'looplly_user';
-            
-            // Check if user type matches expected
-            if (actualUserType !== expectedUserType) {
-              console.log('User type mismatch:', actualUserType, 'vs expected:', expectedUserType);
-              
-              // Log them out since they used wrong portal
-              await logoutUser();
-              
-              setAuthState(prev => ({ ...prev, isLoading: false }));
-              
-              // Return specific error based on mismatch
-              if (expectedUserType === 'looplly_team_user') {
-                throw new Error('Access denied. This portal is for team members only. Please use the main site to log in.');
-              } else if (expectedUserType === 'looplly_user') {
-                throw new Error('Please use the admin portal at /admin/login to access your team account.');
-              }
-              
-              return false;
-            }
-          }
-        }
-        
-        return true;
-      } else {
-        console.error('Login failed:', result.error);
+      // For admin/team users with EMAIL, use Supabase Auth
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: password
+      });
+
+      if (error) {
+        console.error('[useAuth] Supabase auth error:', error);
         setAuthState(prev => ({ ...prev, isLoading: false }));
         return false;
       }
+
+      if (!data.user) {
+        console.error('[useAuth] No user returned from Supabase');
+        setAuthState(prev => ({ ...prev, isLoading: false }));
+        return false;
+      }
+
+      // Validate user type if specified
+      if (expectedUserType) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('user_type')
+          .eq('user_id', data.user.id)
+          .single();
+
+        const actualUserType = profile?.user_type || 'looplly_user';
+
+        if (actualUserType !== expectedUserType) {
+          console.error('[useAuth] User type mismatch:', actualUserType, 'expected:', expectedUserType);
+          await supabase.auth.signOut();
+          setAuthState(prev => ({ ...prev, isLoading: false }));
+          
+          if (expectedUserType === 'looplly_team_user') {
+            throw new Error('Access denied. This portal is for team members only. Please use the main site to log in.');
+          } else if (expectedUserType === 'looplly_user') {
+            throw new Error('Please use the admin portal at /admin/login to access your team account.');
+          }
+          
+          return false;
+        }
+      }
+
+      // Auth state will be updated by onAuthStateChange listener
+      console.log('[useAuth] Supabase login successful, auth listener will handle state');
+      return true;
     } catch (error) {
       console.error('Login error:', error);
       setAuthState(prev => ({ ...prev, isLoading: false }));
