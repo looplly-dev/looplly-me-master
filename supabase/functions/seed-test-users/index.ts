@@ -98,10 +98,13 @@ Deno.serve(async (req) => {
             continue;
           }
 
-          // Update auth user metadata
+          // Update auth user with phone and metadata
           const { error: authUpdateError } = await supabaseAdmin.auth.admin.updateUserById(
             existingProfile.user_id,
             {
+              phone: mobileNumber,
+              phone_confirm: true,
+              password: 'Test123!', // Known password for test users
               user_metadata: {
                 first_name: testUser.firstName,
                 last_name: testUser.lastName,
@@ -112,8 +115,8 @@ Deno.serve(async (req) => {
           );
 
           if (authUpdateError) {
-            console.error(`Failed to update auth metadata for ${testUser.email}:`, authUpdateError);
-            errors.push({ email: testUser.email, error: 'Failed to update auth metadata' });
+            console.error(`Failed to update auth for ${testUser.email}:`, authUpdateError);
+            errors.push({ email: testUser.email, error: 'Failed to update auth' });
             continue;
           }
 
@@ -156,6 +159,9 @@ Deno.serve(async (req) => {
       const { data: authUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
         email: testUser.email,
         email_confirm: true,
+        phone: mobileNumber,
+        phone_confirm: true,
+        password: 'Test123!', // Known password for test users
         user_metadata: {
           first_name: testUser.firstName,
           last_name: testUser.lastName,

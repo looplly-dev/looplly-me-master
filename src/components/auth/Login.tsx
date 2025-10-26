@@ -4,10 +4,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { Eye, EyeOff, UserPlus } from 'lucide-react';
 import { analytics } from '@/utils/analytics';
+import { countries } from '@/data/countries';
+import { getCountryByDialCode, getDefaultCountry, formatCountryDisplay, formatCountryOption } from '@/utils/countries';
+import { validateAndNormalizeMobile } from '@/utils/mobileValidation';
 
 interface LoginProps {
   onForgotPassword: () => void;
@@ -15,9 +19,11 @@ interface LoginProps {
 }
 
 export default function Login({ onForgotPassword, onRegister }: LoginProps) {
+  const defaultCountry = getDefaultCountry();
   
   const [formData, setFormData] = useState({
-    email: '',
+    countryCode: defaultCountry.dialCode,
+    mobile: '',
     password: ''
   });
   const [showPassword, setShowPassword] = useState(false);
@@ -30,7 +36,7 @@ export default function Login({ onForgotPassword, onRegister }: LoginProps) {
     e.preventDefault();
     setShowSignupPrompt(false);
     
-    if (!formData.email || !formData.password) {
+    if (!formData.mobile || !formData.password) {
       toast({
         title: 'Error',
         description: 'Please fill in all fields',
@@ -39,35 +45,47 @@ export default function Login({ onForgotPassword, onRegister }: LoginProps) {
       return;
     }
 
+    // Validate mobile number
+    const mobileValidation = validateAndNormalizeMobile(formData.mobile, formData.countryCode);
+    if (!mobileValidation.isValid) {
+      toast({
+        title: 'Invalid Mobile Number',
+        description: mobileValidation.error || 'Please enter a valid mobile number',
+        variant: 'destructive'
+      });
+      return;
+    }
+
     // Track login attempt
-    analytics.trackLoginAttempt('email');
+    analytics.trackLoginAttempt('mobile');
 
     setIsSubmitting(true);
     
     try {
-      console.log('Attempting login with:', formData.email);
-      // Pass 'looplly_user' to enforce regular user login
-      const success = await login(formData.email, formData.password, 'looplly_user');
+      const normalizedMobile = mobileValidation.normalizedNumber!;
+      console.log('Attempting login with mobile:', normalizedMobile);
+      // Pass normalized mobile as the identifier
+      const success = await login(normalizedMobile, formData.password, 'looplly_user');
       
       if (!success) {
         // Track login failure
-        analytics.trackLogin('email', false);
+        analytics.trackLogin('mobile', false);
         
         toast({
           title: 'Login Failed',
-          description: 'Invalid email or password. Please try again or create an account.',
+          description: 'Invalid mobile number or password. Please try again or create an account.',
           variant: 'destructive'
         });
         setShowSignupPrompt(true);
       } else {
         // Track login success
-        analytics.trackLogin('email', true);
+        analytics.trackLogin('mobile', true);
       }
     } catch (error: any) {
       console.error('Login component error:', error);
       
       // Track login failure
-      analytics.trackLogin('email', false);
+      analytics.trackLogin('mobile', false);
       
       // Show more specific error message
       const errorMessage = error?.message || 'Something went wrong. Please try again.';
@@ -150,19 +168,40 @@ export default function Login({ onForgotPassword, onRegister }: LoginProps) {
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="email">Email Address</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="Enter your email"
-                value={formData.email}
-                onChange={(e) => {
-                  setFormData({...formData, email: e.target.value});
-                  setShowSignupPrompt(false);
-                }}
-                className="h-12"
-                required
-              />
+              <Label htmlFor="mobile">Mobile Number</Label>
+              <div className="flex gap-2">
+                <Select 
+                  value={formData.countryCode} 
+                  onValueChange={(value) => setFormData({...formData, countryCode: value})}
+                >
+                  <SelectTrigger className="w-24 h-12">
+                    <SelectValue>
+                      {formatCountryDisplay(getCountryByDialCode(formData.countryCode) || defaultCountry)}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent className="max-h-60">
+                    {countries.map((country) => (
+                      <SelectItem key={country.code} value={country.dialCode}>
+                        <span className="flex items-center gap-2">
+                          {formatCountryOption(country)}
+                        </span>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Input
+                  id="mobile"
+                  type="tel"
+                  placeholder="823093959"
+                  value={formData.mobile}
+                  onChange={(e) => {
+                    setFormData({...formData, mobile: e.target.value});
+                    setShowSignupPrompt(false);
+                  }}
+                  className="h-12 flex-1"
+                  required
+                />
+              </div>
             </div>
 
             <div className="space-y-2">

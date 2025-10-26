@@ -87,31 +87,37 @@ serve(async (req) => {
     // This bypasses OTP/magic link expiry issues
     console.log('Creating session tokens for test user...');
     
-    // Get the test user's auth record
-    const { data: authUser, error: getUserError } = await supabaseAdmin.auth.admin.getUserById(test_user_id);
-    
-    if (getUserError || !authUser.user) {
-      console.error('Failed to get auth user:', getUserError);
-      throw new Error('Could not retrieve test user');
+    // Ensure test user has phone set and confirmed
+    const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
+      test_user_id,
+      { 
+        phone: testUser.mobile,
+        phone_confirm: true
+      }
+    );
+
+    if (updateError) {
+      console.error('Failed to ensure phone confirmed:', updateError);
+      throw new Error('Could not prepare test user session');
     }
 
     // Generate a temporary password for sign-in
     const tempPassword = `sim_${Date.now()}_${Math.random().toString(36)}`;
     
     // Update user with temporary password
-    const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
+    const { error: passwordError } = await supabaseAdmin.auth.admin.updateUserById(
       test_user_id,
       { password: tempPassword }
     );
 
-    if (updateError) {
-      console.error('Failed to set temp password:', updateError);
+    if (passwordError) {
+      console.error('Failed to set temp password:', passwordError);
       throw new Error('Could not prepare test user session');
     }
 
-    // Sign in with the temporary password to get a session
+    // Sign in with PHONE and temporary password to get a session
     const { data: signInData, error: signInError } = await supabaseAdmin.auth.signInWithPassword({
-      email: testUser.email,
+      phone: testUser.mobile,
       password: tempPassword
     });
 

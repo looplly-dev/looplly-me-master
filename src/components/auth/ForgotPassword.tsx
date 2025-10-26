@@ -3,17 +3,25 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, Key, Eye, EyeOff } from 'lucide-react';
+import { countries } from '@/data/countries';
+import { getCountryByDialCode, getDefaultCountry, formatCountryDisplay, formatCountryOption } from '@/utils/countries';
+import { validateAndNormalizeMobile } from '@/utils/mobileValidation';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ForgotPasswordProps {
   onBack: () => void;
 }
 
 export default function ForgotPassword({ onBack }: ForgotPasswordProps) {
-  const [step, setStep] = useState<'email' | 'sent'>('email');
-  const [email, setEmail] = useState('');
+  const defaultCountry = getDefaultCountry();
+  
+  const [step, setStep] = useState<'mobile' | 'otp' | 'password'>('mobile');
+  const [countryCode, setCountryCode] = useState(defaultCountry.dialCode);
+  const [mobile, setMobile] = useState('');
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [passwords, setPasswords] = useState({
     password: '',
@@ -22,25 +30,44 @@ export default function ForgotPassword({ onBack }: ForgotPasswordProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { forgotPassword, resetPassword } = useAuth();
   const { toast } = useToast();
 
-  const handleEmailSubmit = async (e: React.FormEvent) => {
+  const handleMobileSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) return;
+    if (!mobile) return;
+
+    // Validate mobile number
+    const mobileValidation = validateAndNormalizeMobile(mobile, countryCode);
+    if (!mobileValidation.isValid) {
+      toast({
+        title: 'Invalid Mobile Number',
+        description: mobileValidation.error || 'Please enter a valid mobile number',
+        variant: 'destructive'
+      });
+      return;
+    }
 
     setIsSubmitting(true);
     try {
-      await forgotPassword(email);
-      toast({
-        title: 'Code Sent',
-        description: 'Reset code sent to your email address',
+      const normalizedMobile = mobileValidation.normalizedNumber!;
+      
+      // Send OTP to mobile
+      const { error } = await supabase.auth.signInWithOtp({
+        phone: normalizedMobile
       });
-      setStep('sent');
+
+      if (error) throw error;
+
+      toast({
+        title: 'OTP Sent',
+        description: 'Verification code sent to your mobile number',
+      });
+      setStep('otp');
     } catch (error) {
+      console.error('Send OTP error:', error);
       toast({
         title: 'Error',
-        description: 'Failed to send reset code',
+        description: 'Failed to send verification code',
         variant: 'destructive'
       });
     } finally {
@@ -66,14 +93,37 @@ export default function ForgotPassword({ onBack }: ForgotPasswordProps) {
     const otpCode = otp.join('');
     if (otpCode.length !== 6) return;
 
-    if (otpCode === '123456') {
-      setStep('sent');
-    } else {
+    // Validate mobile number
+    const mobileValidation = validateAndNormalizeMobile(mobile, countryCode);
+    if (!mobileValidation.isValid) return;
+
+    setIsSubmitting(true);
+    try {
+      const normalizedMobile = mobileValidation.normalizedNumber!;
+
+      // Verify OTP
+      const { error } = await supabase.auth.verifyOtp({
+        phone: normalizedMobile,
+        token: otpCode,
+        type: 'sms'
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: 'Verified',
+        description: 'Now set your new password',
+      });
+      setStep('password');
+    } catch (error) {
+      console.error('OTP verification error:', error);
       toast({
         title: 'Invalid Code',
         description: 'Please enter the correct verification code',
         variant: 'destructive'
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -91,13 +141,23 @@ export default function ForgotPassword({ onBack }: ForgotPasswordProps) {
 
     setIsSubmitting(true);
     try {
-      await resetPassword(email, otp.join(''), passwords.password);
+      // Update password using current session from OTP verification
+      const { error } = await supabase.auth.updateUser({
+        password: passwords.password
+      });
+
+      if (error) throw error;
+
       toast({
         title: 'Success',
         description: 'Password reset successfully! Please login.',
       });
+      
+      // Sign out to force re-login with new password
+      await supabase.auth.signOut();
       onBack();
     } catch (error) {
+      console.error('Password reset error:', error);
       toast({
         title: 'Error',
         description: 'Failed to reset password',
@@ -124,28 +184,51 @@ export default function ForgotPassword({ onBack }: ForgotPasswordProps) {
             <Key className="h-8 w-8 text-white" />
           </div>
           <CardTitle className="text-2xl font-bold text-primary">
-            {step === 'email' && 'Reset Password'}
-            {step === 'sent' && 'Check your email'}
+            {step === 'mobile' && 'Reset Password'}
+            {step === 'otp' && 'Enter Verification Code'}
+            {step === 'password' && 'Set New Password'}
           </CardTitle>
           <p className="text-muted-foreground">
-            {step === 'email' && 'Enter your email address to receive a reset link'}
-            {step === 'sent' && 'We sent a password reset link to your email. Open it to set a new password.'}
+            {step === 'mobile' && 'Enter your mobile number to receive an OTP'}
+            {step === 'otp' && 'Enter the 6-digit code sent to your mobile'}
+            {step === 'password' && 'Choose a strong password for your account'}
           </p>
         </CardHeader>
         <CardContent>
-          {step === 'email' && (
-            <form onSubmit={handleEmailSubmit} className="space-y-6">
+          {step === 'mobile' && (
+            <form onSubmit={handleMobileSubmit} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="email">Email Address</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="Enter your email address"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="h-12"
-                  required
-                />
+                <Label htmlFor="mobile">Mobile Number</Label>
+                <div className="flex gap-2">
+                  <Select 
+                    value={countryCode} 
+                    onValueChange={setCountryCode}
+                  >
+                    <SelectTrigger className="w-24 h-12">
+                      <SelectValue>
+                        {formatCountryDisplay(getCountryByDialCode(countryCode) || defaultCountry)}
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent className="max-h-60">
+                      {countries.map((country) => (
+                        <SelectItem key={country.code} value={country.dialCode}>
+                          <span className="flex items-center gap-2">
+                            {formatCountryOption(country)}
+                          </span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Input
+                    id="mobile"
+                    type="tel"
+                    placeholder="823093959"
+                    value={mobile}
+                    onChange={(e) => setMobile(e.target.value)}
+                    className="h-12 flex-1"
+                    required
+                  />
+                </div>
               </div>
               <Button 
                 type="submit" 
@@ -154,43 +237,111 @@ export default function ForgotPassword({ onBack }: ForgotPasswordProps) {
                 className="w-full"
                 disabled={isSubmitting}
               >
-                {isSubmitting ? 'Sending...' : 'Send Reset Code'}
+                {isSubmitting ? 'Sending...' : 'Send Verification Code'}
               </Button>
             </form>
           )}
 
-          {step === 'sent' && (
-            <div className="space-y-6 text-center">
+          {step === 'otp' && (
+            <form onSubmit={handleOtpSubmit} className="space-y-6">
+              <div className="space-y-2">
+                <Label>Enter 6-digit code</Label>
+                <div className="flex gap-2 justify-center">
+                  {otp.map((digit, index) => (
+                    <Input
+                      key={index}
+                      id={`reset-otp-${index}`}
+                      type="text"
+                      inputMode="numeric"
+                      maxLength={1}
+                      value={digit}
+                      onChange={(e) => handleOtpChange(index, e.target.value)}
+                      className="h-12 w-12 text-center text-lg font-semibold"
+                    />
+                  ))}
+                </div>
+              </div>
+              <Button 
+                type="submit" 
+                variant="mobile" 
+                size="mobile" 
+                className="w-full"
+                disabled={isSubmitting || otp.join('').length !== 6}
+              >
+                {isSubmitting ? 'Verifying...' : 'Verify Code'}
+              </Button>
               <Button 
                 type="button" 
+                variant="ghost" 
+                size="sm" 
+                className="w-full"
+                onClick={() => setStep('mobile')}
+              >
+                Change mobile number
+              </Button>
+            </form>
+          )}
+
+          {step === 'password' && (
+            <form onSubmit={handlePasswordReset} className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="password">New Password</Label>
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="Enter new password"
+                    value={passwords.password}
+                    onChange={(e) => setPasswords({...passwords, password: e.target.value})}
+                    className="h-12 pr-10"
+                    required
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-0 top-0 h-12 px-3"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </Button>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                <div className="relative">
+                  <Input
+                    id="confirmPassword"
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    placeholder="Confirm new password"
+                    value={passwords.confirmPassword}
+                    onChange={(e) => setPasswords({...passwords, confirmPassword: e.target.value})}
+                    className="h-12 pr-10"
+                    required
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-0 top-0 h-12 px-3"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  >
+                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </Button>
+                </div>
+              </div>
+
+              <Button 
+                type="submit" 
                 variant="mobile" 
                 size="mobile" 
                 className="w-full"
                 disabled={isSubmitting}
-                onClick={async () => {
-                  setIsSubmitting(true);
-                  try {
-                    await forgotPassword(email);
-                    toast({ title: 'Email sent', description: "If you don't see it, check your spam folder." });
-                  } catch (e) {
-                    toast({ title: 'Error', description: 'Failed to resend reset email', variant: 'destructive' });
-                  } finally {
-                    setIsSubmitting(false);
-                  }
-                }}
               >
-                Resend Reset Email
+                {isSubmitting ? 'Resetting...' : 'Reset Password'}
               </Button>
-              <Button 
-                type="button" 
-                variant="mobile" 
-                size="mobile" 
-                className="w-full"
-                onClick={() => window.location.assign('/')}
-              >
-                Back to Sign In
-              </Button>
-            </div>
+            </form>
           )}
         </CardContent>
       </Card>

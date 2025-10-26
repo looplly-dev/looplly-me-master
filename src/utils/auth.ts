@@ -29,7 +29,7 @@ export interface LoginParams {
 
 export const registerUser = async (params: RegistrationParams): Promise<{ success: boolean; error?: any }> => {
   try {
-    console.log('Registering user with email:', params.email);
+    console.log('Registering Looplly user with mobile:', params.mobile);
     
     // Check if country is blocked
     if (BLOCKED_COUNTRY_CODES.includes(params.countryCode)) {
@@ -51,13 +51,13 @@ export const registerUser = async (params: RegistrationParams): Promise<{ succes
     
     const normalizedMobile = mobileValidation.normalizedNumber!;
     
-    // Use email-based auth instead of phone
+    // Use phone-based auth for Looplly users
     const { error } = await supabase.auth.signUp({
-      email: params.email,
+      phone: normalizedMobile,
       password: params.password,
       options: {
-        emailRedirectTo: `${window.location.origin}/`,
         data: {
+          email: params.email || '',
           first_name: params.firstName || '',
           last_name: params.lastName || '',
           mobile: normalizedMobile,
@@ -81,23 +81,43 @@ export const registerUser = async (params: RegistrationParams): Promise<{ succes
 
 export const loginUser = async (params: LoginParams): Promise<{ success: boolean; error?: any }> => {
   try {
-    console.log('Logging in user with email:', params.email);
+    // Determine if this is mobile or email login
+    const isMobileLogin = params.email.startsWith('+');
     
-    // Use email-based login
-    const { error } = await supabase.auth.signInWithPassword({
-      email: params.email,
-      password: params.password
-    });
+    if (isMobileLogin) {
+      console.log('Logging in Looplly user with mobile:', params.email);
+      // Mobile login for Looplly users
+      const { error } = await supabase.auth.signInWithPassword({
+        phone: params.email, // params.email contains the mobile number for Looplly users
+        password: params.password
+      });
 
-    if (error) {
-      console.error('Login error:', error);
-      // Return more specific error messages
-      const errorMessage = error.message === 'Email not confirmed' 
-        ? 'Please verify your email before logging in' 
-        : error.message === 'Invalid login credentials'
-        ? 'Invalid email or password'
-        : error.message || 'Login failed';
-      return { success: false, error: { message: errorMessage } };
+      if (error) {
+        console.error('Login error:', error);
+        const errorMessage = error.message === 'Phone not confirmed' 
+          ? 'Please verify your mobile number before logging in' 
+          : error.message === 'Invalid login credentials'
+          ? 'Invalid mobile number or password'
+          : error.message || 'Login failed';
+        return { success: false, error: { message: errorMessage } };
+      }
+    } else {
+      console.log('Logging in admin user with email:', params.email);
+      // Email login for admin/team users
+      const { error } = await supabase.auth.signInWithPassword({
+        email: params.email,
+        password: params.password
+      });
+
+      if (error) {
+        console.error('Login error:', error);
+        const errorMessage = error.message === 'Email not confirmed' 
+          ? 'Please verify your email before logging in' 
+          : error.message === 'Invalid login credentials'
+          ? 'Invalid email or password'
+          : error.message || 'Login failed';
+        return { success: false, error: { message: errorMessage } };
+      }
     }
     
     console.log('Login successful');
