@@ -73,6 +73,7 @@ serve(async (req) => {
     // Reset user to the selected stage
     const { data: resetResult, error: resetError } = await supabaseAdmin
       .rpc('reset_user_journey', {
+        p_caller_user_id: user.id,
         p_target_user_id: test_user_id,
         p_stage: stage
       });

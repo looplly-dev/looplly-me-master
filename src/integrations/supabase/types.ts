@@ -2170,6 +2170,7 @@ export type Database = {
       }
       reset_user_journey: {
         Args: {
+          p_caller_user_id: string
           p_stage: Database["public"]["Enums"]["journey_stage"]
           p_target_user_id: string
         }
