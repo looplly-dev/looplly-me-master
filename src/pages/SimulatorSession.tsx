@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
+import { simulatorClient as supabase } from '@/integrations/supabase/simulatorClient';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, AlertCircle } from 'lucide-react';
 
@@ -61,15 +61,16 @@ export default function SimulatorSession() {
         console.log('SimulatorSession - Verifying test account...');
 
         // Verify this is a test account
-        const { data: profile } = await supabase
+        const { data: profile, error: profileError } = await supabase
           .from('profiles')
           .select('is_test_account, user_type')
           .eq('user_id', sessionData.session.user.id)
-          .single();
+          .maybeSingle();
 
         console.log('SimulatorSession - Profile check:', {
           isTestAccount: profile?.is_test_account,
-          userType: profile?.user_type
+          userType: profile?.user_type,
+          error: profileError?.message
         });
 
         if (!profile?.is_test_account) {

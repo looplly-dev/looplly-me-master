@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Routes, Route, Navigate, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { SimulatorProvider } from '@/contexts/SimulatorContext';
-import { supabase } from '@/integrations/supabase/client';
+import { simulatorClient as supabase } from '@/integrations/supabase/simulatorClient';
 import Login from '@/components/auth/Login';
 import Register from '@/components/auth/Register';
 import OTPVerification from '@/components/auth/OTPVerification';
