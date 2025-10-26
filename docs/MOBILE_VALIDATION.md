@@ -4,6 +4,17 @@
 
 Looplly implements country-aware mobile number validation to ensure accurate phone verification across global markets. This document explains the validation system, supported formats, and implementation details.
 
+## Mobile as Primary Recovery Method
+
+**Critical:** In Looplly's system, mobile number is the PRIMARY method for account recovery and verification.
+
+- **Email is optional** - Users may NOT provide an email during registration or Level 2 profiling
+- **Mobile is required** - Collected during registration (Level 1)
+- **Password recovery** - Uses mobile number + OTP (not email)
+- **Account verification** - Mobile OTP verification required before earning
+
+This design ensures every user has a verified, reliable recovery method regardless of whether they provide an email address.
+
 ## Core Principles
 
 ### 1. Country-Specific Validation
@@ -279,8 +290,30 @@ CREATE TRIGGER normalize_mobile_on_save
 
 ## OTP Verification
 
+### When OTP is Triggered
+
+**Important Timing:**
+- OTP verification happens AFTER Level 2 profile completion
+- NOT immediately after registration
+- User must complete Level 2 (6 required questions) first
+- Only then is mobile verification required
+
+**Flow:**
+1. User registers (Level 1) → Account created but not verified
+2. User completes Level 2 → Dashboard modal with 6 required questions
+3. Level 2 complete → Mobile verification modal appears
+4. User enters OTP → Account verified, earning unlocked
+
 ### SMS Provider Integration
 
+**Development (Current):**
+```typescript
+// Stub implementation for testing
+// Component: src/components/auth/MobileVerification.tsx
+// Accepts code: 12345
+```
+
+**Production (Planned):**
 ```typescript
 import { supabase } from '@/integrations/supabase/client';
 
@@ -291,7 +324,7 @@ async function sendOTP(mobile: string, countryCode: string) {
     throw new Error(validation.error);
   }
   
-  // Send OTP via Supabase Auth
+  // Send OTP via Notify API integration
   const { data, error } = await supabase.auth.signInWithOtp({
     phone: validation.normalized // +27712345678
   });
@@ -313,6 +346,8 @@ async function verifyOTP(mobile: string, otp: string) {
   return data;
 }
 ```
+
+See [Integrations Setup](INTEGRATIONS_SETUP.md) for Notify API configuration.
 
 ## Error Messages
 

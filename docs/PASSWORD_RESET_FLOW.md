@@ -1,10 +1,78 @@
 # Password Reset Flow
 
-Team member password management and reset flow documentation.
+Password management and recovery system documentation for both regular users and team members.
 
 ## Overview
 
-The password reset system ensures secure first-time access for team members and provides mechanisms for password recovery. Team members receive temporary passwords and must change them on first login.
+The password reset system provides secure password recovery mechanisms for all user types. **For regular users, mobile number is the PRIMARY recovery method** (not email, which is optional). Team members receive temporary passwords and must change them on first login.
+
+## User Password Recovery (Mobile-Based)
+
+### Why Mobile Over Email?
+
+**Design Decision:**
+- Email is **optional** in Looplly (not collected during registration, optional in Level 2)
+- Mobile number is **required** (collected during registration, verified before earning)
+- Mobile provides universal coverage for all users
+- More secure than email (harder to compromise)
+
+### Password Recovery Flow
+
+**Step 1: User Clicks "Forgot Password"**
+- Prompted for mobile number (not email)
+- System validates mobile number format
+- Checks if mobile exists in system
+
+**Step 2: OTP Sent**
+- 6-digit code sent via SMS to registered mobile
+- Code valid for 10 minutes
+- User can request resend (max 3 attempts per hour)
+
+**Step 3: Verify OTP**
+- User enters 6-digit code
+- System validates against Supabase Auth
+- On success: Redirect to password reset form
+
+**Step 4: Set New Password**
+- User enters new password (min 8 chars)
+- Confirm password field
+- Password updated in Supabase Auth
+- Automatic login with new credentials
+
+### Technical Implementation
+
+**Frontend Component:** `src/components/auth/ForgotPassword.tsx`
+
+```typescript
+// Validate mobile and send OTP
+const { data, error } = await supabase.auth.resetPasswordForEmail({
+  phone: normalizedMobile // Uses mobile, not email
+});
+
+// Verify OTP and reset
+const { error: verifyError } = await supabase.auth.verifyOtp({
+  phone: normalizedMobile,
+  token: otpCode,
+  type: 'sms'
+});
+```
+
+### Current vs Production
+
+**Development (Current):**
+- Stub OTP code: `12345`
+- No actual SMS sent
+- Testing purposes only
+
+**Production (Planned):**
+- Notify API integration
+- Real SMS delivery
+- Rate limiting (max 3 OTP per hour)
+- See [Mobile Validation](MOBILE_VALIDATION.md) for details
+
+## Team Member Password Reset
+
+Team member password management and reset flow for admin accounts.
 
 ## Team Member Invitation Flow
 

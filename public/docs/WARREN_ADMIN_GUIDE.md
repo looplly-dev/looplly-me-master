@@ -113,6 +113,30 @@ Click any user to view detailed information:
 
 ## Profile Question Management
 
+### Understanding Profile Levels
+
+⚠️ **Important: Level 1 vs Level 2 Distinction**
+
+**Level 1: Registration Fields (Super Admin Only)**
+- Captured during user registration
+- Fields: First Name, Last Name, DOB, Mobile, Password, GPS Toggle
+- Purpose: Identity verification and fraud prevention
+- **Locked from regular admins** - requires Super Admin approval to modify
+- Email and Gender removed from Level 1 (moved to Level 2)
+
+**Level 2: Pre-Earning Profiling (Admin Editable)**
+- Captured via dashboard modal after registration
+- 6 Required: Gender, Address, Ethnicity, Household Income (HHI), Personal Income (PHI), SEC
+- 1 Optional: Email (for newsletters only, NOT account recovery)
+- Purpose: Demographic profiling for survey targeting
+- Must be complete + mobile verified before user can earn
+
+**Level 3: Progressive Profiling (Admin Editable)**
+- Captured contextually during user journey
+- Categories: Technology, Media, Health, Finance, Travel, etc.
+- Purpose: Deep profiling for high-value survey matching
+- Optional - improves match quality but not required
+
 ### Question List
 
 Navigate to **Admin → Profile Questions**
@@ -141,6 +165,22 @@ Click **"Add Question"** to open the question builder.
 - Help text
 - Validation rules
 - Decay configuration
+
+**⚠️ Level 1 Questions:**
+- Do NOT create new Level 1 questions without Super Admin approval
+- Level 1 is tied to registration and identity verification
+- Changes affect fraud prevention and account creation flow
+- Consult technical team before modifications
+
+**Level 2 Questions:**
+- 6 required questions already defined (Gender, Address, Ethnicity, HHI, PHI, SEC)
+- Additional Level 2 questions require approval (changes pre-earning requirements)
+- Email remains optional in Level 2
+
+**Level 3 Questions:**
+- Freely add/edit Level 3 questions for progressive profiling
+- Organize by category for contextual presentation
+- Test with simulator before activating
 
 See [Question Builder Guide](PROFILING/QUESTION_BUILDER_GUIDE.md) for details.
 

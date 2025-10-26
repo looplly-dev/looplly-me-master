@@ -76,40 +76,54 @@ CREATE TABLE country_question_options (
 ### 2. Progressive Profiling Levels
 
 #### Level 1: Essential Profile (Required)
-- **Purpose**: Account activation
-- **Questions**: 5-8 basic demographic questions
+- **Purpose**: Account creation and identity verification
+- **Captured**: During registration form
+- **Questions**: 6 identity fields
 - **Time**: 2-3 minutes
-- **Completion Required**: Yes (blocks account activation)
+- **Completion Required**: Yes (registration cannot proceed without)
 
-**Typical Questions:**
-- Date of Birth
-- Gender
-- Country
-- City/Region
-- Mobile Number (verified via OTP)
+**Fields Captured:**
+- First Name
+- Last Name
+- Date of Birth (18+ validation)
+- Mobile Number (E.164 normalized)
+- Password
+- GPS Toggle (optional)
 
-**Reputation Reward**: +50 points (automatic)
+**Reputation Reward**: 0 points (no reward for registration)
 
-#### Level 2: Standard Profile (Recommended)
-- **Purpose**: Targeted survey matching
-- **Questions**: 15-25 lifestyle/preference questions
-- **Time**: 5-10 minutes
-- **Completion Required**: No (but strongly encouraged)
+**Note:** Email and Gender removed from Level 1 and moved to Level 2
 
-**Categories:**
-- Employment & Income
-- Education
-- Household Composition
-- Interests & Hobbies
-- Brand Preferences
-- Shopping Behavior
+#### Level 2: Standard Profile (Required for Earning)
+- **Purpose**: Demographic profiling for survey targeting
+- **Captured**: Via dashboard modal after registration
+- **Questions**: 6 required + 1 optional
+- **Time**: 5-7 minutes
+- **Completion Required**: Yes (gates access to earning opportunities)
+
+**Required Questions:**
+- Gender (moved from Level 1)
+- Address (location targeting)
+- Ethnicity (demographics)
+- Household Income (HHI - total household)
+- Personal Income (PHI - individual income, separate from HHI)
+- Socioeconomic Classification (SEC)
+
+**Optional Questions:**
+- Email Address (for newsletters/updates only, NOT account recovery)
 
 **Reputation Reward**: +150 points
 
-**Unlocks:**
-- Access to 70% of surveys
+**Unlocks (after mobile verification):**
+- Access to surveys
+- Earning opportunities
 - Referral program
 - Community features
+
+**Important Notes:**
+- Mobile verification required AFTER Level 2 completion
+- Email is optional (mobile is primary recovery method)
+- PHI captures individual income separately from household income
 
 #### Level 3: Premium Profile (Optional)
 - **Purpose**: High-value survey targeting
@@ -244,16 +258,22 @@ async function getQuestionOptions(
 
 ## Data Flow
 
-### 1. User Registration
+### 1. User Registration & Onboarding
 
 ```mermaid
 graph TD
-    A[User Starts Registration] --> B[Enter Email/Password]
-    B --> C[Verify Mobile via OTP]
-    C --> D[Level 1 Profiling]
-    D --> E[Account Activated]
-    E --> F[Redirect to Dashboard]
-    F --> G[Prompt: Complete Level 2]
+    A[User Starts Registration] --> B[Enter Name, DOB, Mobile, Password]
+    B --> C[Enable GPS Toggle - Optional]
+    C --> D[Account Created - Level 1 Complete]
+    D --> E[Redirect to Dashboard]
+    E --> F[Level 2 Modal Appears]
+    F --> G[Complete 6 Required Questions]
+    G --> H[Optional: Add Email]
+    H --> I[Level 2 Complete]
+    I --> J[Mobile Verification Modal]
+    J --> K[Enter OTP Code]
+    K --> L[Mobile Verified]
+    L --> M[Earning Unlocked - Surveys Appear]
 ```
 
 ### 2. Profile Completion

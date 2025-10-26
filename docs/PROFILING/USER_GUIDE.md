@@ -15,39 +15,47 @@ Your profile is the key to unlocking earning opportunities on Looplly. The more 
 ## Profile Levels
 
 ### Level 1: Essential Profile (Required)
-Complete during registration to activate your account.
+Complete during registration to create your account.
 
 **Questions Include:**
+- First Name
+- Last Name
 - Date of Birth
-- Gender
-- Location (City/Region)
+- Mobile Number
+- Password
+- GPS Location Sharing (optional)
 
 **Time to Complete:** 2-3 minutes
 
 **Benefits:**
-- Activate your account
-- Access basic surveys
-- Start earning immediately
+- Create your account
+- Access to dashboard
+- GPS helps match location-based surveys (optional)
 
-### Level 2: Standard Profile (Recommended)
-Unlock targeted surveys and increase earnings.
+### Level 2: Standard Profile (Required for Earning)
+Complete via dashboard modal to unlock earning opportunities.
 
 **Questions Include:**
-- Employment Status
-- Industry
-- Education Level
-- Household Income
+- Gender
+- Address
+- Ethnicity
+- Household Income (HHI)
+- Personal Income (PHI - separate from HHI)
 - Socioeconomic Classification (SEC)
-- Interests & Hobbies
-- Brand Preferences
+- Email Address (optional - for newsletters only)
 
-**Time to Complete:** 5-10 minutes
+**Time to Complete:** 5-7 minutes
 
 **Benefits:**
-- Access to 70% of available surveys
+- Required to unlock earning opportunities (after mobile verification)
 - +150 reputation points
 - Unlock referral program
 - Access community features
+
+**Important Notes:**
+- Email is optional and used ONLY for newsletter/updates
+- Mobile number is your primary account recovery method
+- Personal Income (PHI) is separate from Household Income (HHI)
 
 ### Level 3: Premium Profile (Optional)
 Maximize earning potential with detailed profiling.
@@ -72,18 +80,30 @@ Maximize earning potential with detailed profiling.
 
 ## How to Complete Your Profile
 
-### From Dashboard
-1. Navigate to the **Profile** tab
-2. You'll see categories organized by level
-3. Click any category to expand and answer questions
-4. Green checkmarks indicate completed questions
-5. Yellow indicators show stale data that needs refreshing
+### Level 1 (Registration)
+1. Fill in the registration form with your name, date of birth, and mobile number
+2. Create a secure password
+3. Optionally enable GPS for location-based survey matching
+4. Your account is created immediately
+
+### Level 2 (Dashboard Modal)
+After registration, you'll see a modal prompting you to complete Level 2:
+1. Answer 6 required questions (Gender, Address, Ethnicity, HHI, PHI, SEC)
+2. Optionally add your email address for newsletters
+3. Track your progress: "X of 6 required questions complete"
+4. You can dismiss the modal but it will reappear until complete
+
+### Mobile Verification
+After completing Level 2:
+1. You'll be prompted to verify your mobile number
+2. Enter the OTP code sent to your phone
+3. Once verified, earning opportunities unlock
 
 ### Tips for Success
 - **Be Honest** - Accurate data ensures better matches
-- **Take Your Time** - Quality matters more than speed
-- **Update Regularly** - Refresh stale data to maintain profile quality
-- **Complete Fully** - Partial profiles limit opportunities
+- **Complete Level 2 First** - Required before you can start earning
+- **Verify Your Mobile** - Final step to unlock surveys
+- **Update Regularly** - Refresh stale data to maintain profile quality (Level 3+)
 
 ## Profile Decay & Freshness
 
@@ -117,7 +137,7 @@ Some profile data becomes "stale" over time and needs updating:
 ## Frequently Asked Questions
 
 **Q: Do I have to answer every question?**
-A: Only Level 1 is required. Level 2 and 3 are optional but highly recommended for maximizing earnings.
+A: Level 1 (registration) and Level 2 (6 required questions) are both required to start earning. Email in Level 2 is optional. Level 3 is optional but recommended for maximizing earnings.
 
 **Q: Can I skip questions?**
 A: Yes, but incomplete profiles limit survey opportunities.
