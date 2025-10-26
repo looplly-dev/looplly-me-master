@@ -153,8 +153,8 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
   const handleMobileChange = (value: string) => {
     updateField('mobile', value);
     
-    // Real-time validation
-    if (value.length >= 3) {
+    // Real-time validation on every keystroke
+    if (value.length >= 1) {
       const result = validateAndNormalizeMobile(value, formData.countryCode);
       setMobileValidation({
         isValid: result.isValid,
@@ -163,14 +163,15 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
         error: result.error
       });
     } else {
-      setMobileValidation({ isValid: false });
+      // Reset when empty
+      setMobileValidation({ isValid: false, error: undefined, normalized: undefined });
     }
   };
 
   const handleCountryChange = (value: string) => {
     updateField('countryCode', value);
-    // Re-validate mobile number with new country code
-    if (formData.mobile && formData.mobile.length >= 3) {
+    // Re-validate mobile number with new country code immediately
+    if (formData.mobile && formData.mobile.length >= 1) {
       const result = validateAndNormalizeMobile(formData.mobile, value);
       setMobileValidation({
         isValid: result.isValid,
@@ -178,6 +179,9 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
         normalized: result.normalizedNumber,
         error: result.error
       });
+    } else {
+      // Reset when empty
+      setMobileValidation({ isValid: false, error: undefined, normalized: undefined });
     }
   };
 
