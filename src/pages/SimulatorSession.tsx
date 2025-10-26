@@ -49,6 +49,13 @@ export default function SimulatorSession() {
           throw new Error('Session token has expired');
         }
 
+        console.log('SimulatorSession - Clearing old auth data...');
+        
+        // Clear any existing auth tokens to prevent stale session data
+        localStorage.removeItem('looplly_auth_token');
+        localStorage.removeItem('looplly_user');
+        localStorage.removeItem('mockUser');
+
         console.log('SimulatorSession - Storing custom auth...');
 
         // Store custom auth in localStorage (same as production login)
