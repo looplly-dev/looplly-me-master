@@ -108,7 +108,7 @@ function AdminQuestionsContent() {
       <Tabs defaultValue="1" className="w-full">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="1">Level 1 (Registration)</TabsTrigger>
-          <TabsTrigger value="2">Level 2 (Required)</TabsTrigger>
+          <TabsTrigger value="2">Level 2 (Dashboard Modal)</TabsTrigger>
           <TabsTrigger value="3">Level 3 (Progressive)</TabsTrigger>
         </TabsList>
 
@@ -136,8 +136,8 @@ function AdminQuestionsContent() {
               : "text-blue-800 dark:text-blue-200"
             }>
               {isSuperAdmin() 
-                ? "You can edit Level 1 identity and security fields. Use caution—these fields are tied to fraud prevention logic and affect all users."
-                : "Level 1 contains identity and security fields (name, mobile, address). These are immutable and tied to fraud prevention logic. Contact a Super Admin if changes are required."
+                ? "You can edit Level 1 registration fields (First Name, Last Name, DOB, Mobile, Password, GPS). Use caution—these fields are tied to account creation and fraud prevention logic."
+                : "Level 1 contains registration fields captured during sign-up (First Name, Last Name, DOB, Mobile, Password, GPS). These are locked and require Super Admin approval. Contact a Super Admin if changes are needed."
               }
             </AlertDescription>
           </Alert>
@@ -179,14 +179,18 @@ function AdminQuestionsContent() {
           <Alert className="border-yellow-500 bg-yellow-50 dark:bg-yellow-950">
             <AlertTriangle className="h-4 w-4 text-yellow-600" />
             <AlertTitle className="text-yellow-900 dark:text-yellow-100">
-              Level 2: Pre-Earning Requirements
+              Level 2: Dashboard Modal (Pre-Earning Profiling)
             </AlertTitle>
             <AlertDescription className="text-yellow-800 dark:text-yellow-200">
-              Level 2 questions are demographic/socio-economic data required for earning opportunities.
+              Level 2 questions are captured via dashboard modal after registration. Users must complete Level 2 + mobile verification before accessing surveys.
+              <br /><br />
+              <strong>Current Required Questions (6):</strong> Gender, Address, Ethnicity, HHI, PHI, SEC
+              <br />
+              <strong>Optional:</strong> Email (for newsletters only, NOT account recovery)
               <br /><br />
               <strong>⚠️ Important:</strong>
               <ul className="list-disc list-inside mt-2 space-y-1">
-                <li>Changes affect all users' ability to access surveys</li>
+                <li>Changes affect all users' ability to access earning opportunities</li>
                 <li>SEC questions with scoring logic require dev team involvement</li>
                 <li>Use <strong>Draft Mode</strong> to test changes before publishing</li>
               </ul>
