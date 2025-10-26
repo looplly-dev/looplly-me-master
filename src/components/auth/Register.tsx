@@ -37,7 +37,8 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
     formData,
     errors,
     updateField,
-    validate
+    validate,
+    reset
   } = useFormValidation<RegistrationData>({
     initialData: {
       countryCode: defaultCountry.dialCode,
@@ -65,7 +66,17 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
   const { toast } = useToast();
 
   // Pre-populate existing profile data for simulator (Stage 2: OTP Verified)
+  // BUT skip prefill if we're in fresh_signup stage
   useEffect(() => {
+    const simulatorStage = sessionStorage.getItem('simulator_stage');
+    const isFreshSignup = isSimulatorMode && simulatorStage === 'fresh_signup';
+    
+    if (isFreshSignup) {
+      console.log('[Register] Simulator fresh_signup detected - resetting form to blank state');
+      reset();
+      return;
+    }
+    
     const loadExistingProfile = async () => {
       if (!authState.user?.id) return;
       
@@ -118,7 +129,7 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
     };
     
     loadExistingProfile();
-  }, [authState.user?.id]);
+  }, [authState.user?.id, isSimulatorMode, reset]);
 
   const handleMobileChange = (value: string) => {
     updateField('mobile', value);
@@ -251,7 +262,16 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
           <p className="text-muted-foreground">Join Looplly and start earning</p>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form 
+            onSubmit={handleSubmit} 
+            className="space-y-6"
+            autoComplete={isSimulatorMode ? 'off' : 'on'}
+            spellCheck={false}
+            autoCapitalize="none"
+            autoCorrect="off"
+            data-lpignore={isSimulatorMode ? 'true' : undefined}
+            data-1p-ignore={isSimulatorMode ? 'true' : undefined}
+          >
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="firstName">First Name *</Label>

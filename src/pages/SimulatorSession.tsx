@@ -100,9 +100,13 @@ export default function SimulatorSession() {
         // Store snapshot for auth hook (used in simulator context)
         sessionStorage.setItem('simulator_user', JSON.stringify(snapshot));
         
+        // Store stage for Register.tsx to detect fresh_signup
+        sessionStorage.setItem('simulator_stage', stage);
+        
         console.log('SimulatorSession - Stored in sessionStorage:', {
           simulator_auth_token: customToken.substring(0, 20) + '...',
-          simulator_user_mobile: snapshot.mobile
+          simulator_user_mobile: snapshot.mobile,
+          simulator_stage: stage
         });
 
         console.log('SimulatorSession - Navigating to:', stage);
