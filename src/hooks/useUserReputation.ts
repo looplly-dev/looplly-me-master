@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { getSupabaseClient } from '@/integrations/supabase/activeClient';
 import { useAuth } from './useAuth';
 import { useToast } from './use-toast';
 
@@ -49,6 +49,7 @@ export const useUserReputation = () => {
     queryFn: async () => {
       if (!authState.user?.id) return null;
 
+      const supabase = getSupabaseClient();
       const { data, error } = await supabase
         .from('user_reputation')
         .select('*')
@@ -128,6 +129,7 @@ export const useUserReputation = () => {
         ...reputation.history
       ].slice(0, 50); // Keep last 50 entries
 
+      const supabase = getSupabaseClient();
       const { error } = await supabase
         .from('user_reputation')
         .update({
@@ -165,6 +167,7 @@ export const useUserReputation = () => {
     mutationFn: async (metrics: QualityMetrics) => {
       if (!authState.user?.id) return;
 
+      const supabase = getSupabaseClient();
       const { error } = await supabase
         .from('user_reputation')
         .update({ quality_metrics: metrics as any })

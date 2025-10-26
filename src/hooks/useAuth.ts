@@ -1,6 +1,6 @@
 import { useState, useEffect, createContext, useContext } from 'react';
 import { User as SupabaseUser, Session } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
+import { getSupabaseClient } from '@/integrations/supabase/activeClient';
 import { User, AuthState } from '@/types/auth';
 import { registerUser, loginUser, logoutUser, resetUserPassword } from '@/utils/auth';
 import { updateUserProfile, fetchUserProfile } from '@/utils/profile';
@@ -41,6 +41,14 @@ export const useAuthLogic = () => {
 
   useEffect(() => {
     let mounted = true;
+    const supabase = getSupabaseClient();
+    
+    // Diagnostic logging (dev only)
+    if (import.meta.env.DEV) {
+      const path = window.location.pathname;
+      console.info('[useAuth] Active client for path:', path, 'is', 
+        path.startsWith('/simulator') ? 'simulatorClient' : 'mainClient');
+    }
     
     // SECURITY: Validate mock user has proper structure and security tokens
     // Mock users should only be used for demo purposes, never for production
@@ -88,7 +96,8 @@ export const useAuthLogic = () => {
             try {
               // Fetch user profile from our profiles table
               console.log('Fetching profile for user:', session.user.id);
-              const { data: profile, error } = await supabase
+              const activeSupabase = getSupabaseClient();
+              const { data: profile, error } = await activeSupabase
                 .from('profiles')
                 .select('*')
                 .eq('user_id', session.user.id)
@@ -264,6 +273,8 @@ export const useAuthLogic = () => {
     setAuthState(prev => ({ ...prev, isLoading: true }));
     
     try {
+    const supabase = getSupabaseClient();
+      
       // Check for demo/mock login
       if (email === 'demo@looplly.com' && password === 'demo123') {
         console.log('Using mock login for demo user');
@@ -364,6 +375,7 @@ export const useAuthLogic = () => {
 
   const verifyOTP = async (code: string): Promise<boolean> => {
     console.log('Verifying OTP:', code);
+    const supabase = getSupabaseClient();
     // Demo OTP: accept exactly "12345"
     if (code === '12345') {
       // Update profiles.is_verified = true
@@ -389,6 +401,7 @@ export const useAuthLogic = () => {
   
   const refreshUserProfile = async () => {
     if (!authState.user?.id) return;
+    const supabase = getSupabaseClient();
     
     const { data: profile } = await supabase
       .from('profiles')
@@ -425,6 +438,7 @@ export const useAuthLogic = () => {
 
   const completeProfile = async (profileData: any): Promise<boolean> => {
     console.log('Completing profile:', profileData);
+    const supabase = getSupabaseClient();
     
     if (!authState.user?.id) {
       return false;
@@ -481,6 +495,7 @@ export const useAuthLogic = () => {
 
   const updateCommunicationPreferences = async (preferences: any): Promise<boolean> => {
     console.log('Updating communication preferences:', preferences);
+    const supabase = getSupabaseClient();
     
     if (!authState.user?.id) {
       return false;

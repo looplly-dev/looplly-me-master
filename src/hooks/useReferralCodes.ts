@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { getSupabaseClient } from '@/integrations/supabase/activeClient';
 import { useAuth } from './useAuth';
 
 export interface ReferralCode {
@@ -28,6 +28,7 @@ export const useReferralCodes = () => {
     }
 
     try {
+      const supabase = getSupabaseClient();
       const { data, error } = await supabase
         .from('referral_codes' as any)
         .select('*')
@@ -64,6 +65,7 @@ export const useReferralCodes = () => {
     if (!authState.user?.id) return null;
 
     try {
+      const supabase = getSupabaseClient();
       // Generate a unique code based on user ID and timestamp
       const timestamp = Date.now().toString(36);
       const userId = authState.user.id.slice(-6).toUpperCase();
@@ -99,6 +101,7 @@ export const useReferralCodes = () => {
 
   const deactivateCode = async (codeId: string): Promise<boolean> => {
     try {
+      const supabase = getSupabaseClient();
       const { error } = await supabase
         .from('referral_codes' as any)
         .update({ is_active: false } as any)
@@ -120,6 +123,7 @@ export const useReferralCodes = () => {
 
   const incrementCodeUsage = async (code: string): Promise<boolean> => {
     try {
+      const supabase = getSupabaseClient();
       const { data, error } = await supabase
         .from('referral_codes' as any)
         .select('*')

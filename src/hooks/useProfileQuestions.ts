@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { getSupabaseClient } from '@/integrations/supabase/activeClient';
 import { useAuth } from '@/hooks/useAuth';
 
 export interface ProfileQuestion {
@@ -55,6 +55,8 @@ export const useProfileQuestions = () => {
     queryFn: async () => {
       if (!userId) throw new Error('User not authenticated');
 
+      const supabase = getSupabaseClient();
+      
       // Check if user is a team member - they don't need profile questions
       const { data: profile, error: profileError } = await supabase
         .from('profiles')

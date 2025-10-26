@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { getSupabaseClient } from '@/integrations/supabase/activeClient';
 import { useAuth } from './useAuth';
 
 export interface Transaction {
@@ -29,6 +29,7 @@ export const useTransactions = () => {
     }
 
     try {
+      const supabase = getSupabaseClient();
       const { data, error } = await supabase
         .from('transactions')
         .select('*')
@@ -54,6 +55,7 @@ export const useTransactions = () => {
     if (!authState.user?.id) return false;
 
     try {
+      const supabase = getSupabaseClient();
       const { error } = await supabase
         .from('transactions')
         .insert({
@@ -83,6 +85,7 @@ export const useTransactions = () => {
   useEffect(() => {
     if (!authState.user?.id) return;
 
+    const supabase = getSupabaseClient();
     const channel = supabase
       .channel('transaction-changes')
       .on(

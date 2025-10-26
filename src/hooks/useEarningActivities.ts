@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { getSupabaseClient } from '@/integrations/supabase/activeClient';
 import { useAuth } from './useAuth';
 
 export interface EarningActivity {
@@ -32,6 +32,7 @@ export const useEarningActivities = () => {
     }
 
     try {
+      const supabase = getSupabaseClient();
       const { data, error } = await supabase
         .from('earning_activities')
         .select('*')
@@ -61,6 +62,7 @@ export const useEarningActivities = () => {
     if (!authState.user?.id) return false;
 
     try {
+      const supabase = getSupabaseClient();
       const updateData: any = { status };
       if (status === 'completed') {
         updateData.completed_at = new Date().toISOString();
@@ -90,6 +92,7 @@ export const useEarningActivities = () => {
     if (!authState.user?.id) return false;
 
     try {
+      const supabase = getSupabaseClient();
       const { error } = await supabase
         .from('earning_activities')
         .insert({

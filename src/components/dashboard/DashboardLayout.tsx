@@ -21,9 +21,10 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const { isDarkMode, toggleDarkMode } = useDarkMode();
   const isMobile = useIsMobile();
 
-  // Redirect team members away from regular user routes
+  // Redirect team members away from regular user routes (skip in simulator)
   useEffect(() => {
-    if (isTeamMember() && !location.pathname.startsWith('/admin') && !location.pathname.startsWith('/knowledge')) {
+    const isSimulator = location.pathname.startsWith('/simulator');
+    if (!isSimulator && isTeamMember() && !location.pathname.startsWith('/admin') && !location.pathname.startsWith('/knowledge')) {
       console.log('Team member accessing regular user route, redirecting to /admin');
       navigate('/admin', { replace: true });
     }

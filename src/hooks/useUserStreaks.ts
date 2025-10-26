@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { getSupabaseClient } from '@/integrations/supabase/activeClient';
 import { useAuth } from './useAuth';
 import { useToast } from './use-toast';
 
@@ -37,6 +37,7 @@ export const useUserStreaks = () => {
     queryFn: async () => {
       if (!authState.user?.id) return null;
 
+      const supabase = getSupabaseClient();
       const { data, error } = await supabase
         .from('user_streaks')
         .select('*')
@@ -179,6 +180,7 @@ export const useUserStreaks = () => {
         toastMessage = 'You earned the Week Warrior badge! 7 day milestone achieved!';
       }
 
+      const supabase = getSupabaseClient();
       const { error } = await supabase
         .from('user_streaks')
         .update({
@@ -218,6 +220,7 @@ export const useUserStreaks = () => {
     mutationFn: async (milestones: UserStreak['milestones']) => {
       if (!authState.user?.id) return;
 
+      const supabase = getSupabaseClient();
       const { error } = await supabase
         .from('user_streaks')
         .update({ milestones })

@@ -1,5 +1,5 @@
 // Profile-related utilities
-import { supabase } from '@/integrations/supabase/client';
+import { getSupabaseClient } from '@/integrations/supabase/activeClient';
 
 export interface ProfileUpdateData {
   first_name?: string;
@@ -33,6 +33,7 @@ export const formatProfileForDatabase = (profile: any): ProfileUpdateData => {
 export const updateUserProfile = async (userId: string, profileData: any): Promise<boolean> => {
   try {
     console.log('Updating profile for user:', userId, 'with data:', profileData);
+    const supabase = getSupabaseClient();
     
     const formattedData = formatProfileForDatabase(profileData);
     
@@ -56,6 +57,7 @@ export const updateUserProfile = async (userId: string, profileData: any): Promi
 
 export const fetchUserProfile = async (userId: string) => {
   try {
+    const supabase = getSupabaseClient();
     const { data: profile, error } = await supabase
       .from('profiles')
       .select('*')
@@ -77,6 +79,7 @@ export const fetchUserProfile = async (userId: string) => {
 export const createUserProfile = async (userId: string, profileData: any, mobile: string, countryCode: string): Promise<boolean> => {
   try {
     console.log('Creating profile for user:', userId);
+    const supabase = getSupabaseClient();
     
     const formattedData = formatProfileForDatabase(profileData);
     

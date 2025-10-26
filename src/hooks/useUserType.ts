@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { getSupabaseClient } from '@/integrations/supabase/activeClient';
 import { useAuth } from '@/hooks/useAuth';
 
 export type UserType = 'looplly_user' | 'looplly_team_user' | 'client_user' | null;
@@ -29,6 +29,7 @@ export function useUserType() {
 
     const fetchUserType = async () => {
       try {
+        const supabase = getSupabaseClient();
         // SECURITY: Check team_members table first (most secure, super_admin only visibility)
         const { data: teamMember } = await supabase
           .from('team_members')

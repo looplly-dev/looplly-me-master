@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { getSupabaseClient } from '@/integrations/supabase/activeClient';
 import { useAuth } from './useAuth';
 
 export interface UserBalance {
@@ -22,6 +22,7 @@ export const useBalance = () => {
     }
 
     try {
+      const supabase = getSupabaseClient();
       const { data, error } = await supabase
         .from('user_balances')
         .select('*')
@@ -64,6 +65,7 @@ export const useBalance = () => {
   useEffect(() => {
     if (!authState.user?.id) return;
 
+    const supabase = getSupabaseClient();
     const channel = supabase
       .channel('balance-changes')
       .on(

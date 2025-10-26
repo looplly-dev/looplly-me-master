@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { getSupabaseClient } from '@/integrations/supabase/activeClient';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import type { AddressComponents } from '@/services/googlePlacesService';
@@ -22,6 +22,8 @@ export const useProfileAnswers = () => {
     }) => {
       if (!userId) throw new Error('User not authenticated');
 
+      const supabase = getSupabaseClient();
+      
       // Normalize value for targeting
       const normalizedValue = typeof value === 'string' 
         ? value 
@@ -84,6 +86,8 @@ export const useProfileAnswers = () => {
     mutationFn: async (addressData: AddressComponents) => {
       if (!userId) throw new Error('User not authenticated');
 
+      const supabase = getSupabaseClient();
+      
       // Save to address_components table
       const { error: addressError } = await supabase
         .from('address_components')

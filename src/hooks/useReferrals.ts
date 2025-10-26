@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { getSupabaseClient } from '@/integrations/supabase/activeClient';
 import { useAuth } from './useAuth';
 import { useTransactions } from './useTransactions';
 import { useToast } from '@/hooks/use-toast';
@@ -49,6 +49,7 @@ export const useReferrals = () => {
     }
 
     try {
+      const supabase = getSupabaseClient();
       const { data, error } = await supabase
         .from('referrals' as any)
         .select('*')
@@ -87,6 +88,7 @@ export const useReferrals = () => {
     if (!authState.user?.id) return false;
 
     try {
+      const supabase = getSupabaseClient();
       const { error } = await supabase
         .from('referrals' as any)
         .insert({
@@ -115,6 +117,7 @@ export const useReferrals = () => {
 
   const updateRefereeEarnings = async (referralId: string, newEarnings: number) => {
     try {
+      const supabase = getSupabaseClient();
       // Check if referee has met minimum earnings for qualification ($0.35)
       const qualification_met = newEarnings >= 0.35;
       let updates: any = {
@@ -155,6 +158,7 @@ export const useReferrals = () => {
   // Simulate AI accountant verification process
   const simulateAIAccountantVerification = async (referralId: string) => {
     try {
+      const supabase = getSupabaseClient();
       // Step 1: Verifying funds (simulate 2-5 seconds)
       setTimeout(async () => {
         await supabase
@@ -185,6 +189,7 @@ export const useReferrals = () => {
 
   const processReferralPayout = async (referralId: string) => {
     try {
+      const supabase = getSupabaseClient();
       const { data: referral, error: fetchError } = await supabase
         .from('referrals' as any)
         .select('*')
@@ -242,6 +247,7 @@ export const useReferrals = () => {
   useEffect(() => {
     if (!authState.user?.id) return;
 
+    const supabase = getSupabaseClient();
     const channel = supabase
       .channel('referral-changes')
       .on(
