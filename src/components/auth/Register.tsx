@@ -60,6 +60,7 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
   const [mobileValidation, setMobileValidation] = useState<{
     isValid: boolean;
     preview?: string;
+    normalized?: string;
     error?: string;
   }>({ isValid: false });
   const { register, authState } = useAuth();
@@ -131,6 +132,7 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
           setMobileValidation({
             isValid: result.isValid,
             preview: result.nationalFormat,
+            normalized: result.normalizedNumber,
             error: result.error
           });
         }
@@ -157,6 +159,7 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
       setMobileValidation({
         isValid: result.isValid,
         preview: result.nationalFormat,
+        normalized: result.normalizedNumber,
         error: result.error
       });
     } else {
@@ -172,6 +175,7 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
       setMobileValidation({
         isValid: result.isValid,
         preview: result.nationalFormat,
+        normalized: result.normalizedNumber,
         error: result.error
       });
     }
@@ -360,17 +364,17 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
                   />
                   
                   {/* Real-time feedback */}
-                  {formData.mobile && mobileValidation.preview && (
-                    <div className="flex items-center gap-1 text-xs">
-                      <span className="text-green-600">✓</span>
-                      <span className="text-muted-foreground">
-                        Will be saved as: {mobileValidation.preview}
+                  {formData.mobile && mobileValidation.isValid && mobileValidation.normalized && (
+                    <div className="flex items-center gap-1.5 text-xs" role="status" aria-live="polite">
+                      <span className="text-green-600 dark:text-green-500" aria-hidden="true">✓</span>
+                      <span className="text-foreground/70">
+                        Will be saved as: <code className="font-mono text-foreground/90 bg-muted/50 px-1 py-0.5 rounded">{mobileValidation.normalized}</code>
                       </span>
                     </div>
                   )}
                   
-                  {mobileValidation.error && (
-                    <p className="text-xs text-destructive">
+                  {formData.mobile && mobileValidation.error && (
+                    <p className="text-xs text-destructive" role="alert">
                       {mobileValidation.error}
                     </p>
                   )}
