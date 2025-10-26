@@ -56,7 +56,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Define test users
+    // Define test users with valid SA mobile numbers (10 digits after +27)
     const testUsers = [
       { email: 'test1@looplly-testing.internal', firstName: 'Alex', lastName: 'Johnson' },
       { email: 'test2@looplly-testing.internal', firstName: 'Morgan', lastName: 'Smith' },
@@ -75,6 +75,7 @@ Deno.serve(async (req) => {
     // Process test users - Create directly in profiles (NOT auth.users)
     for (let i = 0; i < testUsers.length; i++) {
       const testUser = testUsers[i];
+      // Valid SA mobile: 10 digits after +27 (e.g., +27823093950 to +27823093955)
       const mobileNumber = `+2782309395${i}`;
       const userId = crypto.randomUUID(); // Generate our own UUID
 
