@@ -197,13 +197,29 @@ Enable badge preview mode to see profiling UI as users see it:
 4. Navigate to user-facing Profile tab
 
 ### Test with Simulator
-Use the Simulator to test profiling at different stages:
 
+The Simulator provides an isolated testing environment with its own authentication context.
+
+**How it Works:**
+- Simulator runs in dedicated iframe with isolated session storage
+- Test users authenticated independently from your admin session
+- No risk of logging out your admin account during testing
+- Sessions persist only within the simulator tab
+
+**Usage:**
 1. Navigate to **Admin → Simulator**
 2. Create or select test user
 3. Reset journey to specific stage
 4. Complete profile questions
 5. Verify data storage and decay logic
+
+**Technical Note:** The simulator uses a separate Supabase client with sessionStorage isolation. This ensures:
+- Your admin session remains active in the parent portal
+- Test user data is completely isolated
+- Hard refresh of simulator persists test session
+- Closing simulator destroys test session automatically
+
+See [Simulator Architecture](../SIMULATOR_ARCHITECTURE.md) for technical details.
 
 ## Best Practices
 

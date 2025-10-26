@@ -410,6 +410,15 @@ Navigate to **Admin → Integrations**
 3. Monitor edge function performance
 4. Check CDN status
 
+**Simulator Logs Out Admin:**
+1. Verify session isolation architecture is intact
+2. Check browser console for path detection logs
+3. Confirm `activeClient.ts` returns correct client
+4. Test with hard refresh during simulation
+5. Review browser DevTools → Storage (localStorage vs sessionStorage)
+
+See [Simulator Architecture](SIMULATOR_ARCHITECTURE.md) for technical details.
+
 ### Getting Help
 
 **Internal Resources:**

@@ -88,7 +88,35 @@ VITE_SUPABASE_PROJECT_ID=your_project_id
 - Access to same variables automatically
 - No additional API keys currently required
 
-### 6. Secrets Management
+### 6. Session Isolation Architecture (CRITICAL)
+
+**Lovable Cloud Implementation:**
+The platform uses a **dual Supabase client architecture** to isolate simulator sessions from admin/user sessions:
+
+- **Main Client** (`src/integrations/supabase/client.ts`)
+  - Storage: localStorage
+  - Key: 'admin_auth' (admin) or 'auth' (users)
+  - Used by: Admin portal, user portal
+
+- **Simulator Client** (`src/integrations/supabase/simulatorClient.ts`)
+  - Storage: sessionStorage (ephemeral, iframe-only)
+  - Key: 'simulator'
+  - Used by: Simulator iframe only
+
+- **Active Client Selector** (`src/integrations/supabase/activeClient.ts`)
+  - Dynamically returns correct client based on path
+  - Used by: Most hooks and utilities
+
+**Migration Requirements:**
+1. ✅ Preserve all three client files exactly as-is
+2. ✅ Maintain path-detection logic in activeClient.ts
+3. ✅ Do NOT consolidate to single client (breaks isolation)
+4. ✅ Verify simulator session isolation post-migration
+5. ✅ Test admin login persists during simulation
+
+See [Simulator Architecture](SIMULATOR_ARCHITECTURE.md) for complete technical details.
+
+### 7. Secrets Management
 **Current Secrets:**
 - Review what secrets are configured
 - Document any API keys used by edge functions
@@ -256,6 +284,19 @@ supabase gen types typescript --local > src/integrations/supabase/types.ts
 # Or from linked project
 supabase gen types typescript --linked > src/integrations/supabase/types.ts
 ```
+
+#### 6.4 Validate Session Isolation
+```bash
+# After updating environment variables, test session isolation
+1. Log in to admin portal
+2. Navigate to /admin/simulator
+3. Start a simulation
+4. Verify admin session remains active (no logout)
+5. Hard refresh simulator iframe
+6. Verify test user session persists in iframe
+```
+
+See [Simulator Architecture](SIMULATOR_ARCHITECTURE.md) for troubleshooting.
 
 ### Phase 7: GitHub Integration
 
