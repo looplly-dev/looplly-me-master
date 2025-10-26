@@ -28,11 +28,60 @@ serve(async (req) => {
     // Check if mobile already exists
     const { data: existing } = await supabase
       .from('profiles')
-      .select('user_id')
+      .select('user_id, is_test_account')
       .eq('mobile', normalizedMobile)
       .maybeSingle();
     
     if (existing) {
+      // Allow re-registration for test accounts (simulator)
+      if (existing.is_test_account) {
+        console.log('[MOCK REGISTER] Re-registering test account:', normalizedMobile);
+        
+        // Hash the new password
+        const passwordHash = await bcrypt.hash(password);
+        
+        // Update the existing test account with new registration data
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({
+            password_hash: passwordHash,
+            first_name: firstName,
+            last_name: lastName,
+            date_of_birth: dateOfBirth,
+            gps_enabled: gpsEnabled,
+            profile_level: 1,
+            profile_completeness_score: 40,
+            is_verified: false,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('user_id', existing.user_id);
+        
+        if (updateError) {
+          console.error('[MOCK REGISTER] Update error:', updateError);
+          return new Response(
+            JSON.stringify({ error: updateError.message }), 
+            {
+              status: 500,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+            }
+          );
+        }
+        
+        console.log('[NOTIFY STUB] Would send registration OTP to', normalizedMobile);
+        
+        return new Response(
+          JSON.stringify({
+            success: true,
+            user_id: existing.user_id,
+            message: 'Registration successful. Use OTP: 12345 to verify (dev stub)'
+          }), 
+          {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          }
+        );
+      }
+      
+      // Not a test account - reject duplicate registration
       return new Response(
         JSON.stringify({ error: 'Mobile number already registered' }), 
         {
