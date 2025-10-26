@@ -74,18 +74,22 @@ export default function AdminLogin() {
           navigate('/admin');
         }, 500);
       } else {
+        // Authentication failed - wrong email or password
         toast({
-          title: 'Access Denied',
-          description: 'Invalid credentials or insufficient permissions',
+          title: 'Login Failed',
+          description: 'Invalid email or password',
           variant: 'destructive'
         });
       }
     } catch (error: any) {
       console.error('Admin login error:', error);
       
+      // User type mismatch or other permission errors
+      const errorMessage = error?.message || 'Something went wrong. Please try again.';
+      
       toast({
-        title: 'Login Error',
-        description: error?.message || 'Something went wrong. Please try again.',
+        title: 'Access Denied',
+        description: errorMessage,
         variant: 'destructive'
       });
     } finally {
