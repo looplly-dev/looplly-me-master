@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -66,6 +66,13 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
   const { register, authState } = useAuth();
   const { toast } = useToast();
 
+  // Stable token to prevent input 'name' changing every render in simulator
+  const antiFillToken = useMemo(() => `${Date.now()}_${Math.random().toString(36).slice(2,8)}`, []);
+
+  // Guard to ensure simulator fresh_signup init runs once per session
+  const freshSignupHandledRef = useRef(false);
+
+
   // Pre-populate existing profile data for simulator (Stage 2: OTP Verified)
   // For fresh_signup, pre-fill ONLY mobile/name from snapshot (not from DB)
   useEffect(() => {
@@ -73,22 +80,29 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
     const isFreshSignup = isSimulatorMode && simulatorStage === 'fresh_signup';
     
     if (isFreshSignup) {
-      console.log('[Register] Simulator fresh_signup - mobile prefill disabled');
-      
-      const snapshotData = sessionStorage.getItem('simulator_user');
-      if (snapshotData) {
-        try {
-          const snapshot = JSON.parse(snapshotData);
-          
-          // Pre-fill names for consistent test user data
-          if (snapshot.first_name) updateField('firstName', snapshot.first_name);
-          if (snapshot.last_name) updateField('lastName', snapshot.last_name);
-          
-          // Reset mobile validation to ensure no preview/error shows
-          setMobileValidation({ isValid: false });
-          
-        } catch (error) {
-          console.error('[Register] Failed to parse simulator snapshot:', error);
+      if (!freshSignupHandledRef.current) {
+        console.log('[Register] Simulator fresh_signup - mobile prefill disabled');
+        
+        const snapshotData = sessionStorage.getItem('simulator_user');
+        if (snapshotData) {
+          try {
+            const snapshot = JSON.parse(snapshotData);
+            
+            // Pre-fill names for consistent test user data
+            if (snapshot.first_name) updateField('firstName', snapshot.first_name);
+            if (snapshot.last_name) updateField('lastName', snapshot.last_name);
+            
+            // Reset mobile validation to ensure no preview/error shows
+            setMobileValidation({ isValid: false });
+
+            // Mark handled to avoid repeated resets on re-renders
+            freshSignupHandledRef.current = true;
+          } catch (error) {
+            console.error('[Register] Failed to parse simulator snapshot:', error);
+          }
+        } else {
+          // Even without snapshot, ensure we only handle once
+          freshSignupHandledRef.current = true;
         }
       }
       
@@ -148,7 +162,7 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
     };
     
     loadExistingProfile();
-  }, [authState.user?.id, isSimulatorMode, reset]);
+  }, [authState.user?.id, isSimulatorMode]);
 
   const handleMobileChange = (value: string) => {
     updateField('mobile', value);
@@ -308,7 +322,7 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
                   onChange={(e) => updateField('firstName', e.target.value)}
                   className="h-12"
                   autoComplete={isSimulatorMode ? 'off' : 'given-name'}
-                  name={isSimulatorMode ? `firstName_sim_${Date.now()}` : 'firstName'}
+                  name={isSimulatorMode ? `firstName_sim_${antiFillToken}` : 'firstName'}
                   required
                 />
               </div>
@@ -322,7 +336,7 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
                   onChange={(e) => updateField('lastName', e.target.value)}
                   className="h-12"
                   autoComplete={isSimulatorMode ? 'off' : 'family-name'}
-                  name={isSimulatorMode ? `lastName_sim_${Date.now()}` : 'lastName'}
+                  name={isSimulatorMode ? `lastName_sim_${antiFillToken}` : 'lastName'}
                   required
                 />
               </div>
@@ -363,7 +377,7 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
                       mobileValidation.isValid && "border-green-500"
                     )}
                     autoComplete={isSimulatorMode ? 'off' : 'tel'}
-                    name={isSimulatorMode ? `mobile_sim_${Date.now()}` : 'mobile'}
+                    name={isSimulatorMode ? `mobile_sim_${antiFillToken}` : 'mobile'}
                     required
                   />
                   
@@ -404,7 +418,7 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
                   onChange={(e) => updateField('password', e.target.value)}
                   className="h-12 pr-10"
                   autoComplete={isSimulatorMode ? 'off' : 'new-password'}
-                  name={isSimulatorMode ? `password_sim_${Date.now()}` : 'password'}
+                  name={isSimulatorMode ? `password_sim_${antiFillToken}` : 'password'}
                   required
                 />
                 <Button
@@ -430,7 +444,7 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
                   onChange={(e) => updateField('confirmPassword', e.target.value)}
                   className="h-12 pr-10"
                   autoComplete={isSimulatorMode ? 'off' : 'new-password'}
-                  name={isSimulatorMode ? `confirmPassword_sim_${Date.now()}` : 'confirmPassword'}
+                  name={isSimulatorMode ? `confirmPassword_sim_${antiFillToken}` : 'confirmPassword'}
                   required
                 />
                 <Button
@@ -455,7 +469,7 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
                 max={new Date(new Date().setFullYear(new Date().getFullYear() - 18)).toISOString().split('T')[0]}
                 className="h-12"
                 autoComplete={isSimulatorMode ? 'off' : 'bday'}
-                name={isSimulatorMode ? `dateOfBirth_sim_${Date.now()}` : 'dateOfBirth'}
+                name={isSimulatorMode ? `dateOfBirth_sim_${antiFillToken}` : 'dateOfBirth'}
                 required
               />
               <p className="text-xs text-muted-foreground">
