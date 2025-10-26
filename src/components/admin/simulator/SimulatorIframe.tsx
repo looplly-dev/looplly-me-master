@@ -26,9 +26,10 @@ export default function SimulatorIframe({ sessionToken, stage, onReset }: Simula
       }
 
       const params = new URLSearchParams({
-        custom_token: encodeURIComponent(customToken),
+        custom_token: customToken,
         stage: stage,
-        key: iframeKey.toString()
+        key: iframeKey.toString(),
+        ts: Date.now().toString()
       });
 
       return `${window.location.origin}/simulator-session?${params}`;
@@ -49,6 +50,7 @@ export default function SimulatorIframe({ sessionToken, stage, onReset }: Simula
 
   useEffect(() => {
     setIsLoading(true);
+    setIframeKey(prev => prev + 1);
   }, [sessionToken, stage]);
 
   return (
