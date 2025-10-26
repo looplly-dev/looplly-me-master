@@ -17,8 +17,14 @@ export default function SeedTestUsersButton() {
       if (error) throw error;
 
       if (data.success) {
+        const parts = [];
+        if (data.created > 0) parts.push(`Created: ${data.created}`);
+        if (data.updated > 0) parts.push(`Updated: ${data.updated}`);
+        if (data.already_correct > 0) parts.push(`Already correct: ${data.already_correct}`);
+        if (data.failed > 0) parts.push(`Failed: ${data.failed}`);
+        
         toast.success(`Test users seeded successfully!`, {
-          description: `Created: ${data.created}, Already existed: ${data.existing}${data.failed > 0 ? `, Failed: ${data.failed}` : ''}`,
+          description: parts.join(', '),
         });
       } else {
         throw new Error('Seeding failed');

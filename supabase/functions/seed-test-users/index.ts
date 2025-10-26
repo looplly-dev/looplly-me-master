@@ -75,12 +75,63 @@ Deno.serve(async (req) => {
       // Check if user already exists by email
       const { data: existingProfile } = await supabaseAdmin
         .from('profiles')
-        .select('user_id')
+        .select('user_id, mobile, email')
         .eq('email', testUser.email)
         .maybeSingle();
 
       if (existingProfile) {
-        results.push({ email: testUser.email, status: 'already_exists', user_id: existingProfile.user_id });
+        // Repair existing test user if mobile is incorrect
+        if (existingProfile.mobile !== mobileNumber) {
+          // Update profile
+          const { error: profileUpdateError } = await supabaseAdmin
+            .from('profiles')
+            .update({
+              mobile: mobileNumber,
+              country_code: '+27',
+              is_test_account: true,
+            })
+            .eq('user_id', existingProfile.user_id);
+
+          if (profileUpdateError) {
+            console.error(`Failed to update profile for ${testUser.email}:`, profileUpdateError);
+            errors.push({ email: testUser.email, error: 'Failed to update profile mobile' });
+            continue;
+          }
+
+          // Update auth user metadata
+          const { error: authUpdateError } = await supabaseAdmin.auth.admin.updateUserById(
+            existingProfile.user_id,
+            {
+              user_metadata: {
+                first_name: testUser.firstName,
+                last_name: testUser.lastName,
+                mobile: mobileNumber,
+                country_code: '+27',
+              },
+            }
+          );
+
+          if (authUpdateError) {
+            console.error(`Failed to update auth metadata for ${testUser.email}:`, authUpdateError);
+            errors.push({ email: testUser.email, error: 'Failed to update auth metadata' });
+            continue;
+          }
+
+          results.push({
+            email: testUser.email,
+            status: 'updated',
+            user_id: existingProfile.user_id,
+            old_mobile: existingProfile.mobile,
+            new_mobile: mobileNumber,
+          });
+        } else {
+          results.push({
+            email: testUser.email,
+            status: 'already_correct',
+            user_id: existingProfile.user_id,
+            mobile: mobileNumber,
+          });
+        }
         continue;
       }
 
@@ -146,7 +197,8 @@ Deno.serve(async (req) => {
       JSON.stringify({
         success: true,
         created: results.filter(r => r.status === 'created').length,
-        existing: results.filter(r => r.status === 'already_exists').length,
+        updated: results.filter(r => r.status === 'updated').length,
+        already_correct: results.filter(r => r.status === 'already_correct').length,
         failed: errors.length,
         results,
         errors: errors.length > 0 ? errors : undefined,
