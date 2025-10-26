@@ -65,17 +65,17 @@ export default function SimulatorSession() {
 
         console.log('SimulatorSession - Navigating to:', stage);
 
-        // Route based on stage
+        // Route based on stage - all routes use /simulator/* paths
         const stageRoutes: Record<string, string> = {
-          'fresh_signup': '/register',
-          'otp_verified': '/profile',
-          'basic_profile': '/profile',
-          'full_profile': '/dashboard',
-          'first_survey': '/dashboard',
-          'established_user': '/dashboard'
+          'fresh_signup': '/simulator/register',
+          'otp_verified': '/simulator/profile',
+          'basic_profile': '/simulator/profile',
+          'full_profile': '/simulator/dashboard',
+          'first_survey': '/simulator/dashboard',
+          'established_user': '/simulator/dashboard'
         };
 
-        const targetRoute = stageRoutes[stage] || '/dashboard';
+        const targetRoute = stageRoutes[stage] || '/simulator/dashboard';
         
         setTimeout(() => {
           navigate(targetRoute, { replace: true });

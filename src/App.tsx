@@ -29,6 +29,7 @@ import AdminKnowledgeEdit from "./pages/AdminKnowledgeEdit";
 import AdminCountryBlocklist from "./pages/AdminCountryBlocklist";
 import AdminSimulator from "./pages/AdminSimulator";
 import SimulatorSession from "./pages/SimulatorSession";
+import SimulatorApp from "./pages/SimulatorApp";
 import ResetPassword from "./components/auth/ResetPassword";
 import ResetPasswordRequired from "./pages/ResetPasswordRequired";
 import AdminLogin from "./components/auth/AdminLogin";
@@ -70,8 +71,9 @@ const AppContent = () => {
               <Route path="/admin/knowledge/edit/:docId" element={<AdminKnowledgeEdit />} />
               <Route path="/admin/country-blocklist" element={<AdminCountryBlocklist />} />
               
-              {/* Simulator Session Route */}
-              <Route path="/simulator-session" element={<SimulatorSession />} />
+              {/* Simulator Routes - No ProtectedRoute wrappers */}
+              <Route path="/simulator/session" element={<SimulatorSession />} />
+              <Route path="/simulator/*" element={<SimulatorApp />} />
               
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/reset-password-required" element={<ResetPasswordRequired />} />
