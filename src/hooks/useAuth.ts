@@ -530,7 +530,65 @@ export const useAuthLogic = () => {
         }
       }
 
-      // Auth state will be updated by onAuthStateChange listener
+      // Fast-path: set auth state immediately so UI doesn't spin
+      try {
+        const { data: sessionData } = await supabase.auth.getSession();
+        const session = sessionData.session;
+        if (session?.user) {
+          // Fetch profile non-blocking (allow no row)
+          const { data: profile, error: profileErr } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('user_id', session.user.id)
+            .maybeSingle();
+
+          if (profileErr && (profileErr as any).code !== 'PGRST116') {
+            console.warn('[useAuth] Fast-path profile fetch error:', profileErr);
+          }
+
+          const fastUser: User = {
+            id: session.user.id,
+            mobile: profile?.mobile || session.user.phone || '',
+            countryCode: profile?.country_code || '+1',
+            email: session.user.email || undefined,
+            firstName: profile?.first_name || '',
+            lastName: profile?.last_name || '',
+            isVerified: session.user.email_confirmed_at !== null,
+            profileComplete: profile?.profile_complete || false,
+            mustChangePassword: (profile as any)?.must_change_password || false,
+            profile: profile
+              ? {
+                  sec: (profile.sec as 'A' | 'B' | 'C1' | 'C2' | 'D' | 'E') || 'B',
+                  gender: (profile.gender as 'male' | 'female' | 'other') || 'other',
+                  dateOfBirth: profile.date_of_birth ? new Date(profile.date_of_birth) : new Date(),
+                  address: profile.address || '',
+                  gpsEnabled: profile.gps_enabled || false,
+                  firstName: profile.first_name || '',
+                  lastName: profile.last_name || '',
+                  email: profile.email || session.user.email || '',
+                  country_code: profile.country_code,
+                  country_iso: profile.country_iso
+                }
+              : undefined
+          };
+
+          setAuthState({
+            user: fastUser,
+            isAuthenticated: true,
+            isLoading: false,
+            step: profile?.profile_complete ? 'dashboard' : 'profile-setup'
+          });
+          console.info('[useAuth] Fast-path auth state set after email login');
+        } else {
+          // No session yet; still stop spinner
+          setAuthState(prev => ({ ...prev, isAuthenticated: true, isLoading: false }));
+        }
+      } catch (e) {
+        console.warn('[useAuth] Fast-path set failed, falling back to listener:', e);
+        setAuthState(prev => ({ ...prev, isAuthenticated: true, isLoading: false }));
+      }
+
+      // Auth state will also be updated by onAuthStateChange listener
       console.log('[useAuth] Supabase login successful, auth listener will handle state');
       return true;
     } catch (error) {

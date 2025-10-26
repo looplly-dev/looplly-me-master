@@ -43,6 +43,13 @@ export default function ProtectedRoute({
 
   // Show loading while checking authentication
   if (authState.isLoading || roleLoading || typeLoading) {
+    if (import.meta.env.DEV) {
+      console.info('ProtectedRoute loading...', {
+        authLoading: authState.isLoading,
+        roleLoading,
+        typeLoading,
+      });
+    }
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>

@@ -33,11 +33,14 @@ export function useRole() {
     const fetchUserRole = async () => {
       try {
         const supabase = getSupabaseClient();
-        const { data, error } = await supabase
+        const query = supabase
           .from('user_roles')
           .select('role')
-          .eq('user_id', authState.user!.id)
-          .single();
+          .eq('user_id', authState.user!.id);
+
+        const { data, error } = (query as any).maybeSingle
+          ? await (query as any).maybeSingle()
+          : await (query as any).single();
 
         if (error) {
           console.error('Error fetching user role:', error);
