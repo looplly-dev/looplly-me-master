@@ -74,6 +74,13 @@ export default function SimulatorApp() {
       <SimulatorProvider>
         <SimulatorBanner />
         <Routes>
+          <Route path="/register" element={
+            <Register
+              onBack={() => window.history.back()}
+              onSuccess={() => {}}
+              onOTPRequired={() => {}}
+            />
+          } />
           <Route path="/dashboard" element={<Earn />} />
           <Route path="/wallet" element={<Wallet />} />
           <Route path="/profile" element={<Profile />} />
