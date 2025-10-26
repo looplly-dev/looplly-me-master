@@ -424,7 +424,70 @@ export const useAuthLogic = () => {
         return true;
       }
       
-      // For other emails, try real Supabase authentication
+      // Determine if this is mobile login (Looplly custom auth)
+      const isMobileLogin = email.startsWith('+');
+      
+      // For Looplly mobile users, use custom auth
+      if (isMobileLogin) {
+        const result = await loginUser({ email, password });
+        
+        if (result.success) {
+          // Custom JWT is now stored in localStorage
+          // Manually fetch profile and set auth state
+          const loopllyUser = localStorage.getItem('looplly_user');
+          if (loopllyUser) {
+            const user = JSON.parse(loopllyUser);
+            
+            // Fetch fresh profile data
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('user_id', user.id)
+              .single();
+            
+            if (profile) {
+              setAuthState({
+                user: {
+                  id: profile.user_id,
+                  mobile: profile.mobile,
+                  countryCode: profile.country_code,
+                  firstName: profile.first_name,
+                  lastName: profile.last_name,
+                  email: profile.email,
+                  isVerified: profile.is_verified,
+                  profileComplete: profile.profile_complete,
+                  profile: {
+                    sec: (profile.sec as 'A' | 'B' | 'C1' | 'C2' | 'D' | 'E') || 'B',
+                    gender: (profile.gender as 'male' | 'female' | 'other') || 'other',
+                    dateOfBirth: profile.date_of_birth ? new Date(profile.date_of_birth) : new Date(),
+                    address: profile.address || '',
+                    gpsEnabled: profile.gps_enabled || false,
+                    firstName: profile.first_name || '',
+                    lastName: profile.last_name || '',
+                    email: profile.email || '',
+                    country_code: profile.country_code,
+                    country_iso: profile.country_iso
+                  }
+                },
+                isAuthenticated: true,
+                isLoading: false,
+                step: 'dashboard'
+              });
+              
+              return true;
+            }
+          }
+          
+          setAuthState(prev => ({ ...prev, isLoading: false }));
+          return false;
+        } else {
+          console.error('Mobile login failed:', result.error);
+          setAuthState(prev => ({ ...prev, isLoading: false }));
+          return false;
+        }
+      }
+      
+      // For admin/team users, try real Supabase authentication
       const result = await loginUser({ email, password });
       
       if (result.success) {
