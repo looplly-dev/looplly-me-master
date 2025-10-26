@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { Info, ExternalLink, RefreshCw } from 'lucide-react';
+import { Info, ExternalLink, RefreshCw, AlertTriangle } from 'lucide-react';
 import UserSelector from './UserSelector';
 import StageSelector from './StageSelector';
 import SimulatorIframe from './SimulatorIframe';
@@ -18,6 +18,10 @@ export default function SimulatorDashboard() {
   const [sessionToken, setSessionToken] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [selectedUserInfo, setSelectedUserInfo] = useState<{
+    name: string;
+    mobile: string;
+  } | null>(null);
   const { toast } = useToast();
 
   const handleStartSimulation = async () => {
@@ -51,10 +55,16 @@ export default function SimulatorDashboard() {
       // Pass tokens directly to avoid JSON encoding issues
       setSessionToken(JSON.stringify(data.session));
       setRefreshKey(prev => prev + 1);
+      
+      // Store selected user info for visual confirmation
+      setSelectedUserInfo({
+        name: data.test_user.name,
+        mobile: data.test_user.mobile
+      });
 
       toast({
         title: 'Simulation Started',
-        description: `Viewing ${data.test_user.name} at ${data.stage_info.description}`,
+        description: `Viewing ${data.test_user.name} (${data.test_user.mobile}) at ${data.stage_info.description}`,
       });
 
     } catch (error: any) {
@@ -72,6 +82,7 @@ export default function SimulatorDashboard() {
   const handleResetSimulation = () => {
     setSessionToken('');
     setSelectedStage('');
+    setSelectedUserInfo(null);
     setRefreshKey(prev => prev + 1);
   };
 
@@ -113,6 +124,17 @@ export default function SimulatorDashboard() {
           Test users are marked with <code>is_test_account = true</code> and cannot be accidentally modified.
         </AlertDescription>
       </Alert>
+
+      {selectedUserInfo && sessionToken && (
+        <Alert className="border-primary/50 bg-primary/5">
+          <AlertTriangle className="h-4 w-4 text-primary" />
+          <AlertDescription className="flex items-center justify-between">
+            <span>
+              <strong>Simulating as:</strong> {selectedUserInfo.name} <code className="ml-2 px-2 py-1 bg-background rounded text-xs">{selectedUserInfo.mobile}</code>
+            </span>
+          </AlertDescription>
+        </Alert>
+      )}
 
       <div className="grid gap-4 md:grid-cols-2">
         <UserSelector onUserSelect={setSelectedUserId} />

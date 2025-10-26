@@ -66,6 +66,8 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
     const loadExistingProfile = async () => {
       if (!authState.user?.id) return;
       
+      console.log('[Register] Loading profile for user:', authState.user.id);
+      
       const supabase = getSupabaseClient();
       const { data: profile } = await supabase
         .from('profiles')
@@ -73,12 +75,25 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
         .eq('user_id', authState.user.id)
         .single();
       
+      console.log('[Register] Profile data fetched:', {
+        user_id: authState.user.id,
+        name: profile ? `${profile.first_name} ${profile.last_name}` : 'N/A',
+        mobile: profile?.mobile,
+        country_code: profile?.country_code
+      });
+      
       if (profile) {
         // Pre-populate mobile number (strip dial code for input field)
         if (profile.mobile && profile.country_code) {
           const mobileWithoutCode = profile.mobile.replace(profile.country_code, '');
           updateField('mobile', mobileWithoutCode);
           updateField('countryCode', profile.country_code);
+          
+          console.log('[Register] Pre-filling mobile:', {
+            full_mobile: profile.mobile,
+            country_code: profile.country_code,
+            mobile_input: mobileWithoutCode
+          });
           
           // Trigger validation preview
           const result = validateAndNormalizeMobile(mobileWithoutCode, profile.country_code);

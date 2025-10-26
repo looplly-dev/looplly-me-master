@@ -49,14 +49,25 @@ export default function SimulatorSession() {
           throw new Error('Session token has expired');
         }
 
-        console.log('SimulatorSession - Clearing old auth data...');
+        console.log('SimulatorSession - Force clearing ALL auth data...');
         
-        // Clear existing auth to prevent stale state (both storages)
-        sessionStorage.removeItem('simulator_auth_token');
-        sessionStorage.removeItem('simulator_user');
-        localStorage.removeItem('looplly_auth_token');
-        localStorage.removeItem('looplly_user');
-        localStorage.removeItem('mockUser');
+        // Force clear ALL possible auth keys to prevent any stale data
+        const authKeys = [
+          'simulator_auth_token',
+          'simulator_user',
+          'looplly_auth_token',
+          'looplly_user',
+          'mockUser',
+          'admin_auth_token',
+          'admin_user'
+        ];
+        
+        authKeys.forEach(key => {
+          sessionStorage.removeItem(key);
+          localStorage.removeItem(key);
+        });
+        
+        console.log('SimulatorSession - All auth storage cleared');
 
         console.log('SimulatorSession - Storing simulator auth in sessionStorage...');
 
@@ -79,8 +90,20 @@ export default function SimulatorSession() {
           throw new Error('Session is not for a test account');
         }
 
+        console.log('SimulatorSession - Test user identity confirmed:', {
+          user_id: snapshot.user_id,
+          name: `${snapshot.first_name} ${snapshot.last_name}`,
+          mobile: snapshot.mobile,
+          country_code: snapshot.country_code
+        });
+
         // Store snapshot for auth hook (used in simulator context)
         sessionStorage.setItem('simulator_user', JSON.stringify(snapshot));
+        
+        console.log('SimulatorSession - Stored in sessionStorage:', {
+          simulator_auth_token: customToken.substring(0, 20) + '...',
+          simulator_user_mobile: snapshot.mobile
+        });
 
         console.log('SimulatorSession - Navigating to:', stage);
 

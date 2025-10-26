@@ -67,6 +67,13 @@ serve(async (req) => {
       .eq('user_id', test_user_id)
       .single();
 
+    console.log('[create-simulator-session] Selected test user:', {
+      user_id: test_user_id,
+      name: `${testUser?.first_name} ${testUser?.last_name}`,
+      mobile: testUser?.mobile,
+      email: testUser?.email
+    });
+
     if (!testUser?.is_test_account) {
       throw new Error('Target user is not a test account. Only test accounts can be used in simulator');
     }
@@ -87,7 +94,7 @@ serve(async (req) => {
     // Create a session using custom JWT for test user
     console.log('Generating custom JWT for test user...');
 
-    // Fetch test user profile
+    // Fetch test user profile AFTER reset (to get post-reset data)
     const { data: testUserProfile } = await supabaseAdmin
       .from('profiles')
       .select('user_id, mobile, first_name, last_name, is_verified, profile_complete')
@@ -97,6 +104,14 @@ serve(async (req) => {
     if (!testUserProfile) {
       throw new Error('Test user profile not found');
     }
+
+    console.log('[create-simulator-session] Post-reset profile:', {
+      user_id: testUserProfile.user_id,
+      mobile: testUserProfile.mobile,
+      name: `${testUserProfile.first_name} ${testUserProfile.last_name}`,
+      is_verified: testUserProfile.is_verified,
+      profile_complete: testUserProfile.profile_complete
+    });
 
     // Generate custom JWT token (same as login flow)
     const JWT_SECRET = Deno.env.get('LOOPLLY_JWT_SECRET') || 'dev-secret-change-in-production';

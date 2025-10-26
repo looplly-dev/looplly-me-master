@@ -108,6 +108,13 @@ serve(async (req) => {
       is_test_account: profile.is_test_account,
     };
 
+    console.log('[simulator-get-profile] Returning snapshot:', {
+      user_id: snapshot.user_id,
+      name: `${snapshot.first_name} ${snapshot.last_name}`,
+      mobile: snapshot.mobile,
+      country_code: snapshot.country_code
+    });
+
     return new Response(JSON.stringify(snapshot), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
