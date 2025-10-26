@@ -486,6 +486,132 @@ VITE_SUPABASE_PROJECT_ID=[project-id]
 
 Both clients use the same backend, only session management differs.
 
+## Data Seeding Strategy
+
+### Stage-by-Stage Data Flow
+
+The simulator properly seeds data to match the current system architecture:
+
+| Stage | Control Fields (profiles) | User Data (profile_answers) | Activities | Reputation |
+|-------|---------------------------|------------------------------|-----------|------------|
+| 1: Fresh Signup | `is_verified=false`, `profile_level=1` | ❌ None | ❌ None | 0 (Bronze Novice) |
+| 2: OTP Verified | `is_verified=true` | ❌ None | ❌ None | 0 (Bronze Novice) |
+| 3: Basic Profile | `profile_level=1`, `completeness=40` | ✅ Level 1: gender, DOB | ❌ None | 0 (Bronze Novice) |
+| 4: Full Profile | `profile_complete=true`, `profile_level=2`, `completeness=100` | ✅ Level 1 + 2: SEC, address, income | ❌ None | 0 (Bronze Novice) |
+| 5: First Survey | (same) | (same) | ✅ 1 survey | 150 (Bronze Elite) |
+| 6: Established | (same) | (same) | ✅ 5 surveys | 850 (Silver Elite) |
+
+### Pre-Population Behavior
+
+The simulator pre-fills forms to allow admins to see the actual UX without re-entering data:
+
+- **Stage 1 (Fresh Signup)**: All fields empty (new user experience)
+- **Stage 2 (OTP Verified)**: Mobile, first name, last name pre-populated from `profiles` table
+- **Stage 3+ (Basic/Full Profile)**: All profile questions pre-populated from `profile_answers` table
+- Fields remain **editable** to test validation and submission flows
+- This mirrors the real user experience (returning users see their data)
+
+### Data Architecture
+
+**Control Fields (profiles table):**
+- `is_verified` - OTP verification status
+- `profile_complete` - Whether user finished Level 2
+- `profile_level` - Current profile level (1 or 2)
+- `profile_completeness_score` - Percentage completion (0-100)
+
+**Identity Fields (profiles table):**
+- `email`, `mobile`, `first_name`, `last_name`, `country_code`
+- Pre-populated during test user creation
+- Persist across all stages
+
+**Profile Answers (profile_answers table):**
+- All Level 1 questions (gender, date_of_birth, etc.)
+- All Level 2 questions (SEC, address, household_income, etc.)
+- Dynamically queried by `question_key` during reset
+- Properly indexed with `answer_normalized` for targeting
+
+**Legacy Columns (profiles table - DEPRECATED):**
+- `date_of_birth`, `gender`, `sec`, `address`, `household_income`, `ethnicity`
+- **NOT used by simulator** - cleared during fresh_signup reset
+- Maintained for backward compatibility only
+
+### Reset Function Behavior
+
+When you select a stage in the simulator:
+
+**Stage 1 (Fresh Signup):**
+```sql
+-- Clears everything
+DELETE FROM profile_answers WHERE user_id = test_user_id;
+DELETE FROM earning_activities WHERE user_id = test_user_id;
+DELETE FROM user_badges WHERE user_id = test_user_id;
+UPDATE profiles SET profile_complete = false, is_verified = false WHERE user_id = test_user_id;
+UPDATE user_reputation SET score = 0 WHERE user_id = test_user_id;
+```
+
+**Stage 3 (Basic Profile):**
+```sql
+-- Seeds to profile_answers, NOT profiles columns
+INSERT INTO profile_answers (user_id, question_id, answer_value)
+SELECT test_user_id, id, 'male'
+FROM profile_questions WHERE question_key = 'gender';
+
+INSERT INTO profile_answers (user_id, question_id, answer_value)
+SELECT test_user_id, id, '1990-01-15'
+FROM profile_questions WHERE question_key = 'date_of_birth';
+
+-- Only updates control fields in profiles
+UPDATE profiles SET profile_level = 1, profile_completeness_score = 40
+WHERE user_id = test_user_id;
+```
+
+**Stage 4 (Full Profile):**
+```sql
+-- Adds Level 2 answers to profile_answers
+INSERT INTO profile_answers (user_id, question_id, answer_value)
+SELECT test_user_id, id, 'C1'
+FROM profile_questions WHERE question_key = 'sec';
+-- (plus address, household_income)
+
+-- Updates control fields
+UPDATE profiles SET profile_complete = true, profile_level = 2
+WHERE user_id = test_user_id;
+```
+
+### Form Pre-Population Implementation
+
+**Registration Form (Stage 2):**
+```typescript
+// src/components/auth/Register.tsx
+useEffect(() => {
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('mobile, country_code, first_name, last_name')
+    .eq('user_id', authState.user.id)
+    .single();
+  
+  if (profile?.mobile) {
+    setFormData({ 
+      mobile: profile.mobile.replace(profile.country_code, ''),
+      firstName: profile.first_name,
+      lastName: profile.last_name,
+      countryCode: profile.country_code 
+    });
+  }
+}, [authState.user?.id]);
+```
+
+**Profile Questions (Stages 3-4):**
+```typescript
+// src/components/dashboard/profile/QuestionRenderer.tsx
+const [value, setValue] = useState<any>(
+  question.user_answer?.answer_json || 
+  question.user_answer?.answer_value || 
+  ''
+);
+// Automatically pre-fills from profile_answers via useProfileQuestions hook
+```
+
 ## Security Considerations
 
 ### Session Isolation Security
@@ -498,6 +624,7 @@ Both clients use the same backend, only session management differs.
 
 **Limitations:**
 - Test users must have appropriate database records
+- Pre-population only works for simulator sessions (requires auth context)
 - RLS policies must account for test user IDs
 - Simulator should not expose sensitive admin data
 

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -18,6 +18,7 @@ import { validateAndNormalizeMobile } from '@/utils/mobileValidation';
 import { validateAndNormalizeEmail } from '@/utils/emailValidation';
 import { cn } from '@/lib/utils';
 import { Check, X } from 'lucide-react';
+import { getSupabaseClient } from '@/integrations/supabase/activeClient';
 
 interface RegisterProps {
   onBack: () => void;
@@ -61,8 +62,57 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
     error?: string;
     warning?: string;
   }>({ isValid: false });
-  const { register } = useAuth();
+  const { register, authState } = useAuth();
   const { toast } = useToast();
+
+  // Pre-populate existing profile data for simulator (Stage 2: OTP Verified)
+  useEffect(() => {
+    const loadExistingProfile = async () => {
+      if (!authState.user?.id) return;
+      
+      const supabase = getSupabaseClient();
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('mobile, country_code, first_name, last_name, email')
+        .eq('user_id', authState.user.id)
+        .single();
+      
+      if (profile) {
+        // Pre-populate mobile number (strip dial code for input field)
+        if (profile.mobile && profile.country_code) {
+          const mobileWithoutCode = profile.mobile.replace(profile.country_code, '');
+          updateField('mobile', mobileWithoutCode);
+          updateField('countryCode', profile.country_code);
+          
+          // Trigger validation preview
+          const result = validateAndNormalizeMobile(mobileWithoutCode, profile.country_code);
+          setMobileValidation({
+            isValid: result.isValid,
+            preview: result.nationalFormat,
+            error: result.error
+          });
+        }
+        
+        // Pre-populate names
+        if (profile.first_name) updateField('firstName', profile.first_name);
+        if (profile.last_name) updateField('lastName', profile.last_name);
+        
+        // Pre-populate email if exists
+        if (profile.email) {
+          updateField('email', profile.email);
+          const emailResult = validateAndNormalizeEmail(profile.email);
+          setEmailValidation({
+            isValid: emailResult.isValid,
+            normalizedEmail: emailResult.normalizedEmail,
+            error: emailResult.error,
+            warning: emailResult.warning
+          });
+        }
+      }
+    };
+    
+    loadExistingProfile();
+  }, [authState.user?.id]);
 
   const handleMobileChange = (value: string) => {
     updateField('mobile', value);
