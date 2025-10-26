@@ -1,4 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import * as bcrypt from 'https://deno.land/x/bcrypt@v0.4.1/mod.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -67,126 +68,90 @@ Deno.serve(async (req) => {
 
     const results = [];
     const errors = [];
+    let created = 0;
+    let updated = 0;
+    let failed = 0;
 
+    // Process test users - Create directly in profiles (NOT auth.users)
     for (let i = 0; i < testUsers.length; i++) {
       const testUser = testUsers[i];
       const mobileNumber = `+2782309395${i}`;
-      
-      // Check if user already exists by email
-      const { data: existingProfile } = await supabaseAdmin
-        .from('profiles')
-        .select('user_id, mobile, email')
-        .eq('email', testUser.email)
-        .maybeSingle();
+      const userId = crypto.randomUUID(); // Generate our own UUID
 
-      if (existingProfile) {
-        // Repair existing test user if mobile is incorrect
-        if (existingProfile.mobile !== mobileNumber) {
-          // Update profile
-          const { error: profileUpdateError } = await supabaseAdmin
+      console.log(`Processing ${testUser.firstName} (${mobileNumber})...`);
+
+      try {
+        // Hash password with bcrypt
+        const passwordHash = await bcrypt.hash('Test123!');
+
+        // Check if user already exists by mobile (NOT email)
+        const { data: existingProfile } = await supabaseAdmin
+          .from('profiles')
+          .select('user_id, mobile')
+          .eq('mobile', mobileNumber)
+          .maybeSingle();
+
+        if (existingProfile) {
+          // Update password hash for existing test user
+          const { error: updateError } = await supabaseAdmin
             .from('profiles')
-            .update({
-              mobile: mobileNumber,
-              country_code: '+27',
+            .update({ 
+              password_hash: passwordHash,
               is_test_account: true,
+              first_name: testUser.firstName,
+              last_name: testUser.lastName,
+              email: testUser.email // Keep for reference
             })
             .eq('user_id', existingProfile.user_id);
 
-          if (profileUpdateError) {
-            console.error(`Failed to update profile for ${testUser.email}:`, profileUpdateError);
-            errors.push({ email: testUser.email, error: 'Failed to update profile mobile' });
-            continue;
+          if (updateError) {
+            errors.push({ mobile: mobileNumber, error: updateError.message });
+            failed++;
+          } else {
+            results.push({
+              mobile: mobileNumber,
+              status: 'updated',
+              user_id: existingProfile.user_id,
+            });
+            updated++;
           }
-
-          // Update auth user with phone and metadata
-          const { error: authUpdateError } = await supabaseAdmin.auth.admin.updateUserById(
-            existingProfile.user_id,
-            {
-              phone: mobileNumber,
-              phone_confirm: true,
-              password: 'Test123!', // Known password for test users
-              user_metadata: {
-                first_name: testUser.firstName,
-                last_name: testUser.lastName,
-                mobile: mobileNumber,
-                country_code: '+27',
-              },
-            }
-          );
-
-          if (authUpdateError) {
-            console.error(`Failed to update auth for ${testUser.email}:`, authUpdateError);
-            errors.push({ email: testUser.email, error: 'Failed to update auth' });
-            continue;
-          }
-
-          results.push({
-            email: testUser.email,
-            status: 'updated',
-            user_id: existingProfile.user_id,
-            old_mobile: existingProfile.mobile,
-            new_mobile: mobileNumber,
-          });
-        } else {
-          results.push({
-            email: testUser.email,
-            status: 'already_correct',
-            user_id: existingProfile.user_id,
-            mobile: mobileNumber,
-          });
+          continue;
         }
-        continue;
-      }
 
-      // Check if mobile number already exists
-      const { data: existingMobile } = await supabaseAdmin
-        .from('profiles')
-        .select('user_id, email')
-        .eq('mobile', mobileNumber)
-        .maybeSingle();
+        // Create NEW user directly in profiles (NOT auth.users)
+        const { error: insertError } = await supabaseAdmin
+          .from('profiles')
+          .insert({
+            user_id: userId,
+            mobile: mobileNumber,
+            country_code: '+27',
+            password_hash: passwordHash,
+            first_name: testUser.firstName,
+            last_name: testUser.lastName,
+            email: testUser.email,
+            is_test_account: true,
+            profile_level: 1,
+            profile_completeness_score: 0,
+            is_verified: false,
+            created_at: new Date().toISOString()
+          });
 
-      if (existingMobile) {
-        results.push({ 
-          email: testUser.email, 
-          status: 'mobile_conflict', 
-          user_id: existingMobile.user_id,
-          conflicting_email: existingMobile.email
-        });
-        continue;
-      }
-
-      // Create user in auth.users
-      const { data: authUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
-        email: testUser.email,
-        email_confirm: true,
-        phone: mobileNumber,
-        phone_confirm: true,
-        password: 'Test123!', // Known password for test users
-        user_metadata: {
-          first_name: testUser.firstName,
-          last_name: testUser.lastName,
-          mobile: mobileNumber,
-          country_code: '+27',
-        },
-      });
-
-      if (createError) {
-        console.error(`Failed to create ${testUser.email}:`, createError);
-        errors.push({ email: testUser.email, error: createError.message });
-        continue;
-      }
-
-      // Update profile to mark as test account
-      const { error: updateError } = await supabaseAdmin
-        .from('profiles')
-        .update({ is_test_account: true })
-        .eq('user_id', authUser.user.id);
-
-      if (updateError) {
-        console.error(`Failed to mark ${testUser.email} as test:`, updateError);
-        errors.push({ email: testUser.email, error: 'Created but failed to mark as test' });
-      } else {
-        results.push({ email: testUser.email, status: 'created', user_id: authUser.user.id });
+        if (insertError) {
+          console.error(`Failed to create ${testUser.firstName}:`, insertError);
+          errors.push({ mobile: mobileNumber, error: insertError.message });
+          failed++;
+        } else {
+          results.push({ 
+            mobile: mobileNumber, 
+            status: 'created', 
+            user_id: userId 
+          });
+          created++;
+        }
+      } catch (userError) {
+        console.error(`Error processing ${testUser.firstName}:`, userError);
+        errors.push({ mobile: mobileNumber, error: userError instanceof Error ? userError.message : 'Unknown error' });
+        failed++;
       }
     }
 
@@ -202,10 +167,10 @@ Deno.serve(async (req) => {
     return new Response(
       JSON.stringify({
         success: true,
-        created: results.filter(r => r.status === 'created').length,
-        updated: results.filter(r => r.status === 'updated').length,
+        created,
+        updated,
         already_correct: results.filter(r => r.status === 'already_correct').length,
-        failed: errors.length,
+        failed,
         results,
         errors: errors.length > 0 ? errors : undefined,
       }),

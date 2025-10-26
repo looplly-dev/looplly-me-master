@@ -491,6 +491,54 @@ Returns custom JWT token for test users:
 }
 ```
 
+---
+
+## Production Migration Guide
+
+### Current State: Mock Authentication
+
+The system currently uses **mock edge functions** with a hardcoded OTP (`12345`) for development and testing. This allows full end-to-end testing without requiring real SMS delivery.
+
+**Why Mock System?**
+- Faster development iteration
+- No SMS costs during development
+- Easier testing and debugging
+- Same authentication flow as production
+
+### Migration to Production
+
+See **`docs/PRODUCTION_READINESS.md`** for the complete production migration checklist.
+
+**Quick Summary**:
+1. Add `NOTIFY_API_KEY` and `NOTIFY_BASE_URL` secrets to Supabase
+2. Update `mock-looplly-register` to call real Notify API for sending OTP
+3. Update `mock-looplly-verify-otp` to call real Notify API for verifying OTP
+4. Remove hardcoded `12345` OTP check
+5. Test with real mobile numbers in staging environment
+6. Deploy to production during low-traffic window
+7. Monitor OTP delivery rates and authentication metrics
+
+**Critical**: Do not skip staging testing with real mobile numbers! Test from multiple countries to verify Notify API coverage.
+
+### Simulator Special Case
+
+The simulator will continue to use mock OTP logic even in production:
+- Test users should not receive real SMS messages (cost savings)
+- Simulator sessions should use a special `is_simulator: true` flag in JWT
+- Consider adding a separate `mock-looplly-verify-otp-simulator` edge function if needed
+- Or add conditional logic: `if (payload.is_simulator) { accept '12345' }`
+
+### Production Monitoring
+
+Once deployed, monitor these key metrics:
+- OTP delivery success rate (target: >95%)
+- OTP delivery time (target: <30 seconds)
+- Authentication error rate (target: <2%)
+- Failed verification attempts per user
+- Notify API costs vs. projections
+
+---
+
 ## Notify Microservice Integration (Future)
 
 ### API Endpoints (Placeholder)

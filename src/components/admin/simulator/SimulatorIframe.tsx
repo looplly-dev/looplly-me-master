@@ -14,9 +14,29 @@ export default function SimulatorIframe({ sessionToken, stage, onReset }: Simula
   const [iframeKey, setIframeKey] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Parse session and pass tokens as separate URL params to avoid encoding issues
-  const session = JSON.parse(sessionToken);
-  const simulatorUrl = `${window.location.origin}/simulator/session?access_token=${encodeURIComponent(session.access_token)}&refresh_token=${encodeURIComponent(session.refresh_token)}&stage=${stage}&key=${iframeKey}`;
+  // Parse session and construct URL with custom JWT token
+  const simulatorUrl = (() => {
+    try {
+      const session = JSON.parse(sessionToken);
+      const customToken = session.custom_token; // NEW: expect custom_token
+
+      if (!customToken) {
+        console.error('No custom_token in session object:', session);
+        return '';
+      }
+
+      const params = new URLSearchParams({
+        custom_token: encodeURIComponent(customToken),
+        stage: stage,
+        key: iframeKey.toString()
+      });
+
+      return `${window.location.origin}/simulator-session?${params}`;
+    } catch (error) {
+      console.error('Failed to parse session token:', error);
+      return '';
+    }
+  })();
 
   const handleRefresh = () => {
     setIsLoading(true);

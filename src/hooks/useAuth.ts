@@ -50,7 +50,50 @@ export const useAuthLogic = () => {
         path.startsWith('/simulator') ? 'simulatorClient' : 'mainClient');
     }
     
-    // SECURITY: Validate mock user has proper structure and security tokens
+    // 1. CHECK CUSTOM LOOPLLY JWT FIRST (Priority)
+    const loopllyToken = localStorage.getItem('looplly_auth_token');
+    const loopllyUser = localStorage.getItem('looplly_user');
+
+    if (loopllyToken && loopllyUser) {
+      try {
+        const payload = JSON.parse(atob(loopllyToken.split('.')[1]));
+        const now = Math.floor(Date.now() / 1000);
+
+        if (payload.exp < now) {
+          console.log('Looplly JWT expired, clearing...');
+          localStorage.removeItem('looplly_auth_token');
+          localStorage.removeItem('looplly_user');
+        } else {
+          console.log('Found valid Looplly JWT, fetching profile...');
+          const user = JSON.parse(loopllyUser);
+
+          setTimeout(async () => {
+            if (!mounted) return;
+            const { data: profile } = await supabase.from('profiles').select('*').eq('user_id', user.id).single();
+            if (profile && mounted) {
+              setAuthState({
+                user: {
+                  id: profile.user_id, mobile: profile.mobile, countryCode: profile.country_code,
+                  firstName: profile.first_name, lastName: profile.last_name, email: profile.email,
+                  dateOfBirth: profile.date_of_birth, gender: profile.gender, isVerified: profile.is_verified,
+                  profileComplete: profile.profile_complete, profileLevel: profile.profile_level,
+                  level2Complete: profile.level_2_complete, isTestAccount: profile.is_test_account,
+                  userType: profile.user_type, profile: { completenessScore: profile.profile_completeness_score, lastUpdate: profile.last_profile_update }
+                },
+                isAuthenticated: true, isLoading: false, step: 'dashboard'
+              });
+            }
+          }, 0);
+          return;
+        }
+      } catch (error) {
+        console.error('Error parsing Looplly JWT:', error);
+        localStorage.removeItem('looplly_auth_token');
+        localStorage.removeItem('looplly_user');
+      }
+    }
+    
+    // 2. SECURITY: Validate mock user has proper structure and security tokens
     // Mock users should only be used for demo purposes, never for production
     const mockUser = localStorage.getItem('mockUser');
     if (mockUser) {

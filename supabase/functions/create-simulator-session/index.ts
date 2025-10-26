@@ -1,5 +1,6 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
+import { create } from 'https://deno.land/x/djwt@v2.8/mod.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -83,52 +84,45 @@ serve(async (req) => {
       throw new Error(`Failed to reset user journey: ${resetError.message}`);
     }
 
-    // Create a session using service role to sign in as the test user
-    // This bypasses OTP/magic link expiry issues
-    console.log('Creating session tokens for test user...');
-    
-    // Ensure test user has phone set and confirmed
-    const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
-      test_user_id,
-      { 
-        phone: testUser.mobile,
-        phone_confirm: true
-      }
+    // Create a session using custom JWT for test user
+    console.log('Generating custom JWT for test user...');
+
+    // Fetch test user profile
+    const { data: testUserProfile } = await supabaseAdmin
+      .from('profiles')
+      .select('user_id, mobile, first_name, last_name, is_verified, profile_complete')
+      .eq('user_id', test_user_id)
+      .single();
+
+    if (!testUserProfile) {
+      throw new Error('Test user profile not found');
+    }
+
+    // Generate custom JWT token (same as login flow)
+    const JWT_SECRET = Deno.env.get('LOOPLLY_JWT_SECRET') || 'dev-secret-change-in-production';
+    const key = await crypto.subtle.importKey(
+      'raw',
+      new TextEncoder().encode(JWT_SECRET),
+      { name: 'HMAC', hash: 'SHA-256' },
+      false,
+      ['sign']
     );
 
-    if (updateError) {
-      console.error('Failed to ensure phone confirmed:', updateError);
-      throw new Error('Could not prepare test user session');
-    }
+    const payload = {
+      sub: testUserProfile.user_id,
+      mobile: testUserProfile.mobile,
+      iat: Math.floor(Date.now() / 1000),
+      exp: Math.floor(Date.now() / 1000) + 3600, // 1 hour for simulator
+      user_type: 'looplly_user',
+      is_simulator: true // Mark as simulator session
+    };
 
-    // Generate a temporary password for sign-in
-    const tempPassword = `sim_${Date.now()}_${Math.random().toString(36)}`;
-    
-    // Update user with temporary password
-    const { error: passwordError } = await supabaseAdmin.auth.admin.updateUserById(
-      test_user_id,
-      { password: tempPassword }
-    );
+    const customToken = await create({ alg: 'HS256', typ: 'JWT' }, payload, key);
 
-    if (passwordError) {
-      console.error('Failed to set temp password:', passwordError);
-      throw new Error('Could not prepare test user session');
-    }
-
-    // Sign in with PHONE and temporary password to get a session
-    const { data: signInData, error: signInError } = await supabaseAdmin.auth.signInWithPassword({
-      phone: testUser.mobile,
-      password: tempPassword
-    });
-
-    if (signInError || !signInData.session) {
-      console.error('Failed to sign in:', signInError);
-      throw new Error('Could not create test user session');
-    }
+    console.log('Custom JWT created successfully for test user');
 
     const sessionObject = {
-      access_token: signInData.session.access_token,
-      refresh_token: signInData.session.refresh_token
+      custom_token: customToken // NEW: Return custom JWT instead of Supabase tokens
     };
 
     console.log('Session created successfully for test user');

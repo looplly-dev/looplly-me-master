@@ -26,37 +26,37 @@ export default function SimulatorSession() {
   useEffect(() => {
     const authenticateSimulator = async () => {
       try {
-        const accessToken = searchParams.get('access_token');
-        const refreshToken = searchParams.get('refresh_token');
+        const customToken = searchParams.get('custom_token');
         const stage = searchParams.get('stage');
 
         console.log('SimulatorSession - Received params:', {
-          hasAccessToken: !!accessToken,
-          hasRefreshToken: !!refreshToken,
+          hasCustomToken: !!customToken,
           stage
         });
 
-        if (!accessToken || !refreshToken || !stage) {
+        if (!customToken || !stage) {
           throw new Error('Missing authentication parameters');
         }
 
-        console.log('SimulatorSession - Setting session...');
+        console.log('SimulatorSession - Decoding custom JWT...');
 
-        // Decode tokens and sign in
-        const { data: sessionData, error: authError } = await supabase.auth.setSession({
-          access_token: decodeURIComponent(accessToken),
-          refresh_token: decodeURIComponent(refreshToken)
-        });
+        // Decode JWT to get user info
+        const payload = JSON.parse(atob(customToken.split('.')[1]));
 
-        console.log('SimulatorSession - setSession result:', {
-          hasSession: !!sessionData?.session,
-          hasUser: !!sessionData?.user,
-          error: authError?.message
-        });
-
-        if (authError || !sessionData.session) {
-          throw new Error(`Authentication failed: ${authError?.message || 'No session returned'}`);
+        // Verify token is not expired
+        const now = Math.floor(Date.now() / 1000);
+        if (payload.exp < now) {
+          throw new Error('Session token has expired');
         }
+
+        console.log('SimulatorSession - Storing custom auth...');
+
+        // Store custom auth in localStorage (same as production login)
+        localStorage.setItem('looplly_auth_token', customToken);
+        localStorage.setItem('looplly_user', JSON.stringify({
+          id: payload.sub,
+          mobile: payload.mobile
+        }));
 
         console.log('SimulatorSession - Verifying test account...');
 
@@ -64,7 +64,7 @@ export default function SimulatorSession() {
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
           .select('is_test_account, user_type')
-          .eq('user_id', sessionData.session.user.id)
+          .eq('user_id', payload.sub)
           .maybeSingle();
 
         console.log('SimulatorSession - Profile check:', {
@@ -75,14 +75,6 @@ export default function SimulatorSession() {
 
         if (!profile?.is_test_account) {
           throw new Error('Session is not for a test account');
-        }
-
-        console.log('SimulatorSession - Waiting for session to initialize...');
-
-        // Wait for session to be available
-        const sessionReady = await waitForSession();
-        if (!sessionReady) {
-          throw new Error('Authentication did not initialize in time. Please restart the simulation.');
         }
 
         console.log('SimulatorSession - Navigating to:', stage);
