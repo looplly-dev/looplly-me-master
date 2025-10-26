@@ -71,17 +71,33 @@ export const useAuthLogic = () => {
             if (!mounted) return;
             const { data: profile } = await supabase.from('profiles').select('*').eq('user_id', user.id).single();
             if (profile && mounted) {
-              setAuthState({
-                user: {
-                  id: profile.user_id, mobile: profile.mobile, countryCode: profile.country_code,
-                  firstName: profile.first_name, lastName: profile.last_name, email: profile.email,
-                  dateOfBirth: profile.date_of_birth, gender: profile.gender, isVerified: profile.is_verified,
-                  profileComplete: profile.profile_complete, profileLevel: profile.profile_level,
-                  level2Complete: profile.level_2_complete, isTestAccount: profile.is_test_account,
-                  userType: profile.user_type, profile: { completenessScore: profile.profile_completeness_score, lastUpdate: profile.last_profile_update }
-                },
-                isAuthenticated: true, isLoading: false, step: 'dashboard'
-              });
+            setAuthState({
+              user: {
+                id: profile.user_id,
+                mobile: profile.mobile,
+                countryCode: profile.country_code,
+                firstName: profile.first_name,
+                lastName: profile.last_name,
+                email: profile.email,
+                isVerified: profile.is_verified,
+                profileComplete: profile.profile_complete,
+                profile: profile ? {
+                  sec: (profile.sec as 'A' | 'B' | 'C1' | 'C2' | 'D' | 'E') || 'B',
+                  gender: (profile.gender as 'male' | 'female' | 'other') || 'other',
+                  dateOfBirth: profile.date_of_birth ? new Date(profile.date_of_birth) : new Date(),
+                  address: profile.address || '',
+                  gpsEnabled: profile.gps_enabled || false,
+                  firstName: profile.first_name || '',
+                  lastName: profile.last_name || '',
+                  email: profile.email || '',
+                  country_code: profile.country_code,
+                  country_iso: profile.country_iso
+                } : undefined
+              },
+              isAuthenticated: true,
+              isLoading: false,
+              step: 'dashboard'
+            });
             }
           }, 0);
           return;
