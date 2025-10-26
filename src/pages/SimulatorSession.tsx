@@ -4,6 +4,19 @@ import { supabase } from '@/integrations/supabase/client';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, AlertCircle } from 'lucide-react';
 
+// Helper to poll for session readiness
+const waitForSession = async (maxTries = 15, delayMs = 200): Promise<boolean> => {
+  for (let i = 0; i < maxTries; i++) {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      console.log('SimulatorSession - Session confirmed after', i + 1, 'attempts');
+      return true;
+    }
+    await new Promise(resolve => setTimeout(resolve, delayMs));
+  }
+  return false;
+};
+
 export default function SimulatorSession() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -63,6 +76,14 @@ export default function SimulatorSession() {
           throw new Error('Session is not for a test account');
         }
 
+        console.log('SimulatorSession - Waiting for session to initialize...');
+
+        // Wait for session to be available
+        const sessionReady = await waitForSession();
+        if (!sessionReady) {
+          throw new Error('Authentication did not initialize in time. Please restart the simulation.');
+        }
+
         console.log('SimulatorSession - Navigating to:', stage);
 
         // Route based on stage - all routes use /simulator/* paths
@@ -76,10 +97,7 @@ export default function SimulatorSession() {
         };
 
         const targetRoute = stageRoutes[stage] || '/simulator/dashboard';
-        
-        setTimeout(() => {
-          navigate(targetRoute, { replace: true });
-        }, 500);
+        navigate(targetRoute, { replace: true });
 
       } catch (error: any) {
         console.error('Simulator session error:', error);

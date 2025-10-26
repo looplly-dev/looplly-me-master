@@ -1,7 +1,8 @@
-import { useState } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Routes, Route, Navigate, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { SimulatorProvider } from '@/contexts/SimulatorContext';
+import { supabase } from '@/integrations/supabase/client';
 import Login from '@/components/auth/Login';
 import Register from '@/components/auth/Register';
 import OTPVerification from '@/components/auth/OTPVerification';
@@ -17,7 +18,8 @@ import Rep from '@/pages/Rep';
 import Settings from '@/pages/Settings';
 import Support from '@/pages/Support';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 /**
  * SimulatorApp - Isolated routing for test user sessions
@@ -114,39 +116,12 @@ export default function SimulatorApp() {
     );
   }
 
-  // Auth screens
-  if (authFlow === 'register') {
-    console.log('SimulatorApp - Showing register form');
-    return (
-      <SimulatorProvider>
-        <SimulatorBanner />
-        <Register
-          onBack={() => setAuthFlow('login')}
-          onSuccess={() => setAuthFlow('login')}
-          onOTPRequired={() => setAuthFlow('login')}
-        />
-      </SimulatorProvider>
-    );
-  }
-
-  if (authFlow === 'forgot') {
-    console.log('SimulatorApp - Showing forgot password');
-    return (
-      <SimulatorProvider>
-        <SimulatorBanner />
-        <ForgotPassword onBack={() => setAuthFlow('login')} />
-      </SimulatorProvider>
-    );
-  }
-
-  console.log('SimulatorApp - Showing login form');
+  // Wait for simulator session instead of showing login
+  console.log('SimulatorApp - Waiting for session');
   return (
     <SimulatorProvider>
       <SimulatorBanner />
-      <Login
-        onForgotPassword={() => setAuthFlow('forgot')}
-        onRegister={() => setAuthFlow('register')}
-      />
+      <SessionAwaiter />
     </SimulatorProvider>
   );
 }
@@ -163,6 +138,72 @@ function SimulatorBanner() {
           <strong>SIMULATOR MODE:</strong> You are testing as a simulated user. All actions affect test data only.
         </AlertDescription>
       </Alert>
+    </div>
+  );
+}
+
+/**
+ * Component to wait for simulator session initialization
+ * Polls for session instead of showing login form
+ */
+function SessionAwaiter() {
+  const [status, setStatus] = useState<'waiting' | 'timeout'>('waiting');
+
+  useEffect(() => {
+    let mounted = true;
+    const timeout = setTimeout(() => {
+      if (mounted) setStatus('timeout');
+    }, 3000);
+
+    const checkSession = async () => {
+      for (let i = 0; i < 15; i++) {
+        if (!mounted) break;
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          console.log('SessionAwaiter - Session found, auth will handle redirect');
+          return;
+        }
+        await new Promise(resolve => setTimeout(resolve, 200));
+      }
+    };
+
+    checkSession();
+
+    return () => {
+      mounted = false;
+      clearTimeout(timeout);
+    };
+  }, []);
+
+  if (status === 'timeout') {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4 pt-20">
+        <Alert variant="destructive" className="max-w-md">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            <strong>Session Timeout:</strong> Couldn't initialize the simulator session.
+            <div className="mt-4">
+              <Button asChild variant="outline">
+                <Link to="/admin/simulator">Return to Admin Simulator</Link>
+              </Button>
+            </div>
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen flex items-center justify-center pt-20">
+      <div className="text-center space-y-4">
+        <Loader2 className="h-12 w-12 animate-spin mx-auto text-primary" />
+        <div className="space-y-2">
+          <h2 className="text-xl font-semibold">Waiting for simulator session...</h2>
+          <p className="text-sm text-muted-foreground">
+            Initializing test user authentication
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
