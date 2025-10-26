@@ -3,14 +3,35 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { getSupabaseClient } from '@/integrations/supabase/activeClient';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
+import { useUserType } from '@/hooks/useUserType';
 import type { AddressComponents } from '@/services/googlePlacesService';
 
 export const useProfileAnswers = () => {
   const { authState } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { userType, isLoading: typeLoading } = useUserType();
   const userId = authState.user?.id;
   const [errors, setErrors] = useState<Record<string, string>>({});
+  
+  // Team members don't have profile answers - early return
+  if (typeLoading) {
+    return { 
+      saveAnswer: async () => {}, 
+      saveAddress: async () => {}, 
+      isSaving: true, 
+      errors: {} 
+    };
+  }
+  
+  if (userType === 'looplly_team_user') {
+    return { 
+      saveAnswer: async () => {}, 
+      saveAddress: async () => {}, 
+      isSaving: false, 
+      errors: {} 
+    };
+  }
 
   const saveAnswerMutation = useMutation({
     mutationFn: async ({ 

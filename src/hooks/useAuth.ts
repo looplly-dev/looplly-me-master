@@ -204,34 +204,98 @@ export const useAuthLogic = () => {
             if (!mounted) return;
             
             try {
-              // Fetch user profile from our profiles table
-              console.log('Fetching profile for user:', session.user.id);
+              // SMART TABLE DETECTION: Check which table this user belongs to
+              console.log('Fetching user data for:', session.user.id);
               const activeSupabase = getSupabaseClient();
-              const { data: profile, error } = await activeSupabase
+              
+              let profile = null;
+              let teamProfile = null;
+              let isTeamMember = false;
+
+              // Try profiles table first (most users are regular users)
+              const { data: profileData, error: profileError } = await activeSupabase
                 .from('profiles')
                 .select('*')
                 .eq('user_id', session.user.id)
-                .single();
+                .maybeSingle();
 
-              if (error && error.code !== 'PGRST116') {
-                console.error('Error fetching profile:', error);
+              if (profileData) {
+                profile = profileData;
+                console.log('[useAuth] User found in profiles table:', profile.email);
+              } else if (profileError && profileError.code !== 'PGRST116') {
+                console.error('[useAuth] Error fetching profile:', profileError);
               }
 
-              console.log('Profile fetched:', profile);
+              // If not in profiles, check team_profiles
+              if (!profile) {
+                const { data: teamData, error: teamError } = await activeSupabase
+                  .from('team_profiles')
+                  .select('*')
+                  .eq('user_id', session.user.id)
+                  .maybeSingle();
+                
+                if (teamData) {
+                  teamProfile = teamData;
+                  isTeamMember = true;
+                  console.log('[useAuth] User found in team_profiles table:', teamProfile.email);
+                } else if (teamError && teamError.code !== 'PGRST116') {
+                  console.error('[useAuth] Error fetching team profile:', teamError);
+                }
+              }
 
               if (!mounted) return;
 
-              // Check if user must change password (team member invitation flow)
-              if (profile?.must_change_password) {
-                // Check if temp password expired
-                if (profile.temp_password_expires_at && 
-                    new Date(profile.temp_password_expires_at) < new Date()) {
-                  console.log('Temporary password expired');
-                  await logoutUser();
+              // If user not in either table, this is a problem
+              if (!profile && !teamProfile) {
+                console.error('[useAuth] User not found in profiles OR team_profiles');
+                setAuthState({
+                  user: null,
+                  isAuthenticated: false,
+                  isLoading: false,
+                  step: 'login'
+                });
+                return;
+              }
+
+              // ==========================================
+              // TEAM MEMBER FLOW (looplly_team_user)
+              // ==========================================
+              if (isTeamMember && teamProfile) {
+                // Check must_change_password for team members
+                if (teamProfile.must_change_password) {
+                  // Check if temp password expired
+                  if (teamProfile.temp_password_expires_at && 
+                      new Date(teamProfile.temp_password_expires_at) < new Date()) {
+                    console.log('[useAuth] Temporary password expired for team member');
+                    await logoutUser();
+                    if (mounted) {
+                      setAuthState({
+                        user: null,
+                        isAuthenticated: false,
+                        isLoading: false,
+                        step: 'login'
+                      });
+                    }
+                    return;
+                  }
+                  
+                  console.log('[useAuth] Team member must change password');
                   if (mounted) {
+                    const teamUser: User = {
+                      id: session.user.id,
+                      mobile: '',
+                      countryCode: '',
+                      email: session.user.email || teamProfile.email || '',
+                      firstName: teamProfile.first_name || '',
+                      lastName: teamProfile.last_name || '',
+                      isVerified: true,
+                      profileComplete: true,
+                      mustChangePassword: true
+                    };
+                    
                     setAuthState({
-                      user: null,
-                      isAuthenticated: false,
+                      user: teamUser,
+                      isAuthenticated: true,
                       isLoading: false,
                       step: 'login'
                     });
@@ -239,78 +303,100 @@ export const useAuthLogic = () => {
                   return;
                 }
                 
-                console.log('User must change password - redirecting to reset page');
+                // Normal team member - direct to dashboard
+                console.log('[useAuth] Team member authenticated');
                 if (mounted) {
+                  const teamUser: User = {
+                    id: session.user.id,
+                    mobile: '',
+                    countryCode: '',
+                    email: session.user.email || teamProfile.email || '',
+                    firstName: teamProfile.first_name || '',
+                    lastName: teamProfile.last_name || '',
+                    isVerified: true,
+                    profileComplete: true,
+                    mustChangePassword: false
+                  };
+                  
                   setAuthState({
-                    user: {
-                      id: session.user.id,
-                      mobile: profile?.mobile || session.user.phone || '',
-                      countryCode: profile?.country_code || '+1',
-                      email: session.user.email,
-                      firstName: profile?.first_name,
-                      lastName: profile?.last_name,
-                      isVerified: profile?.is_verified || false,
-                      profileComplete: profile?.profile_complete || false,
-                      mustChangePassword: true,
-                      profile: profile ? {
-                        sec: (profile.sec as 'A' | 'B' | 'C1' | 'C2' | 'D' | 'E') || 'B',
-                        gender: (profile.gender as 'male' | 'female' | 'other') || 'other',
-                        dateOfBirth: profile.date_of_birth ? new Date(profile.date_of_birth) : new Date(),
-                        address: profile.address || '',
-                        gpsEnabled: profile.gps_enabled || false,
-                        firstName: profile.first_name || '',
-                        lastName: profile.last_name || '',
-                        email: profile.email || session.user.email || '',
-                        country_code: profile.country_code,
-                        country_iso: profile.country_iso,
-                        must_change_password: true
-                      } : undefined
-                    },
+                    user: teamUser,
                     isAuthenticated: true,
                     isLoading: false,
-                    step: 'login' // Will be redirected by route guard
+                    step: 'dashboard'
                   });
+                  
+                  // Audit log for team member login
+                  if (event === 'SIGNED_IN') {
+                    setTimeout(() => {
+                      auditActions.login(session.user.id, { 
+                        method: 'email_password',
+                        user_type: 'looplly_team_user',
+                        email: teamProfile.email
+                      }).catch(console.error);
+                    }, 0);
+                  }
                 }
-                return;
+                return; // Exit early for team members
               }
 
-              const user: User = {
-                id: session.user.id,
-                mobile: profile?.mobile || session.user.phone || '',
-                countryCode: profile?.country_code || '+1',
-                email: session.user.email || undefined,
-                firstName: profile?.first_name || '',
-                lastName: profile?.last_name || '',
-                isVerified: session.user.email_confirmed_at !== null,
-                profileComplete: profile?.profile_complete || false,
-                profile: profile ? {
-                  sec: (profile.sec as 'A' | 'B' | 'C1' | 'C2' | 'D' | 'E') || 'B',
-                  gender: (profile.gender as 'male' | 'female' | 'other') || 'other',
-                  dateOfBirth: profile.date_of_birth ? new Date(profile.date_of_birth) : new Date(),
-                  address: profile.address || '',
-                  gpsEnabled: true,
-                  firstName: profile.first_name || '',
-                  lastName: profile.last_name || '',
-                  email: session.user.email || ''
-                } : undefined
-              };
+              // ==========================================
+              // REGULAR USER FLOW (looplly_user)
+              // ==========================================
+              if (profile) {
+                // TEST ACCOUNT CHECK: Only allow in simulator context
+                if (profile.is_test_account && !window.location.pathname.startsWith('/simulator')) {
+                  console.warn('[useAuth] Test account attempted access outside simulator:', profile.email);
+                  await logoutUser();
+                  if (mounted) {
+                    setAuthState({ user: null, isAuthenticated: false, isLoading: false, step: 'login' });
+                  }
+                  return;
+                }
+                
+                const user: User = {
+                  id: session.user.id,
+                  mobile: profile?.mobile || session.user.phone || '',
+                  countryCode: profile?.country_code || '+1',
+                  email: session.user.email || undefined,
+                  firstName: profile?.first_name || '',
+                  lastName: profile?.last_name || '',
+                  isVerified: session.user.email_confirmed_at !== null,
+                  profileComplete: profile?.profile_complete || false,
+                  profile: {
+                    sec: (profile.sec as 'A' | 'B' | 'C1' | 'C2' | 'D' | 'E') || 'B',
+                    gender: (profile.gender as 'male' | 'female' | 'other') || 'other',
+                    dateOfBirth: profile.date_of_birth ? new Date(profile.date_of_birth) : new Date(),
+                    address: profile.address || '',
+                    gpsEnabled: profile.gps_enabled || false,
+                    firstName: profile.first_name || '',
+                    lastName: profile.last_name || '',
+                    email: profile.email || session.user.email || '',
+                    country_code: profile.country_code,
+                    country_iso: profile.country_iso
+                  }
+                };
 
-              console.log('Setting auth state with user:', user);
-              setAuthState({
-                user,
-                isAuthenticated: true,
-                isLoading: false,
-                step: !profile?.profile_complete ? 'profile-setup' : 'dashboard'
-              });
-              
-              // Audit log successful login (non-blocking)
-              if (event === 'SIGNED_IN') {
-                setTimeout(() => {
-                  auditActions.login(session.user.id, { 
-                    method: 'email_password',
-                    profile_complete: profile?.profile_complete || false
-                  }).catch(console.error);
-                }, 0);
+                console.log('[useAuth] Regular user authenticated');
+                if (mounted) {
+                  setAuthState({
+                    user,
+                    isAuthenticated: true,
+                    isLoading: false,
+                    step: !profile?.profile_complete ? 'profile-setup' : 'dashboard'
+                  });
+                  
+                  // Audit log for regular user login
+                  if (event === 'SIGNED_IN') {
+                    setTimeout(() => {
+                      auditActions.login(session.user.id, { 
+                        method: 'email_password',
+                        profile_complete: profile?.profile_complete || false,
+                        user_type: 'looplly_user',
+                        is_test_account: profile?.is_test_account || false
+                      }).catch(console.error);
+                    }, 0);
+                  }
+                }
               }
             } catch (error) {
               console.error('Error processing auth state:', error);
@@ -534,57 +620,93 @@ export const useAuthLogic = () => {
       try {
         const { data: sessionData } = await supabase.auth.getSession();
         const session = sessionData.session;
+        
         if (session?.user) {
-          // Fetch profile non-blocking (allow no row)
-          const { data: profile, error: profileErr } = await supabase
+          // SMART TABLE DETECTION: Check which table this user belongs to
+          let profile = null;
+          let teamProfile = null;
+          let isTeamMember = false;
+          
+          // Try profiles first (most users are regular users)
+          const { data: profileData } = await supabase
             .from('profiles')
             .select('*')
             .eq('user_id', session.user.id)
             .maybeSingle();
-
-          if (profileErr && (profileErr as any).code !== 'PGRST116') {
-            console.warn('[useAuth] Fast-path profile fetch error:', profileErr);
+          
+          if (profileData) {
+            profile = profileData;
+          } else {
+            // Try team_profiles
+            const { data: teamData } = await supabase
+              .from('team_profiles')
+              .select('*')
+              .eq('user_id', session.user.id)
+              .maybeSingle();
+            
+            if (teamData) {
+              teamProfile = teamData;
+              isTeamMember = true;
+            }
           }
-
-          const fastUser: User = {
-            id: session.user.id,
-            mobile: profile?.mobile || session.user.phone || '',
-            countryCode: profile?.country_code || '+1',
-            email: session.user.email || undefined,
-            firstName: profile?.first_name || '',
-            lastName: profile?.last_name || '',
-            isVerified: session.user.email_confirmed_at !== null,
-            profileComplete: profile?.profile_complete || false,
-            mustChangePassword: (profile as any)?.must_change_password || false,
-            profile: profile
-              ? {
-                  sec: (profile.sec as 'A' | 'B' | 'C1' | 'C2' | 'D' | 'E') || 'B',
-                  gender: (profile.gender as 'male' | 'female' | 'other') || 'other',
-                  dateOfBirth: profile.date_of_birth ? new Date(profile.date_of_birth) : new Date(),
-                  address: profile.address || '',
-                  gpsEnabled: profile.gps_enabled || false,
-                  firstName: profile.first_name || '',
-                  lastName: profile.last_name || '',
-                  email: profile.email || session.user.email || '',
-                  country_code: profile.country_code,
-                  country_iso: profile.country_iso
-                }
-              : undefined
-          };
-
+          
+          // Build user object based on type
+          const fastUser: User = isTeamMember
+            ? {
+                id: session.user.id,
+                mobile: '',
+                countryCode: '',
+                email: session.user.email || teamProfile?.email || '',
+                firstName: teamProfile?.first_name || '',
+                lastName: teamProfile?.last_name || '',
+                isVerified: true,
+                profileComplete: true,
+                mustChangePassword: teamProfile?.must_change_password || false
+              }
+            : {
+                id: session.user.id,
+                mobile: profile?.mobile || session.user.phone || '',
+                countryCode: profile?.country_code || '+1',
+                email: session.user.email || profile?.email || undefined,
+                firstName: profile?.first_name || '',
+                lastName: profile?.last_name || '',
+                isVerified: session.user.email_confirmed_at !== null,
+                profileComplete: profile?.profile_complete || false,
+                mustChangePassword: profile?.must_change_password || false,
+                profile: profile
+                  ? {
+                      sec: (profile.sec as 'A' | 'B' | 'C1' | 'C2' | 'D' | 'E') || 'B',
+                      gender: (profile.gender as 'male' | 'female' | 'other') || 'other',
+                      dateOfBirth: profile.date_of_birth ? new Date(profile.date_of_birth) : new Date(),
+                      address: profile.address || '',
+                      gpsEnabled: profile.gps_enabled || false,
+                      firstName: profile.first_name || '',
+                      lastName: profile.last_name || '',
+                      email: profile.email || session.user.email || '',
+                      country_code: profile.country_code,
+                      country_iso: profile.country_iso
+                    }
+                  : undefined
+              };
+          
+          // Determine step
+          const fastStep = isTeamMember 
+            ? 'dashboard' 
+            : (profile?.profile_complete ? 'dashboard' : 'profile-setup');
+          
           setAuthState({
             user: fastUser,
             isAuthenticated: true,
             isLoading: false,
-            step: profile?.profile_complete ? 'dashboard' : 'profile-setup'
+            step: fastStep
           });
-          console.info('[useAuth] Fast-path auth state set after email login');
+          
+          console.info('[useAuth] Fast-path set:', isTeamMember ? 'team member' : 'regular user');
         } else {
-          // No session yet; still stop spinner
           setAuthState(prev => ({ ...prev, isAuthenticated: true, isLoading: false }));
         }
       } catch (e) {
-        console.warn('[useAuth] Fast-path set failed, falling back to listener:', e);
+        console.warn('[useAuth] Fast-path failed, listener will handle:', e);
         setAuthState(prev => ({ ...prev, isAuthenticated: true, isLoading: false }));
       }
 

@@ -220,6 +220,17 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
       return;
     }
 
+    // Block test account mobile numbers (test accounts use specific pattern)
+    const normalizedMobile = `${formData.countryCode}${formData.mobile.replace(/^0+/, '')}`;
+    if (normalizedMobile.includes('555000') || formData.mobile.includes('test-user')) {
+      toast({
+        title: 'Invalid Mobile Number',
+        description: 'Test account mobile numbers are reserved for the Journey Simulator.',
+        variant: 'destructive'
+      });
+      return;
+    }
+
     // Track signup start
     analytics.trackSignupStart('email');
 

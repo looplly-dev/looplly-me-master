@@ -10,19 +10,18 @@ export const useProfile = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const { authState } = useAuth();
-  const { isTeamMember } = useUserType();
+  const { userType, isLoading: typeLoading } = useUserType();
+  
+  // Team members don't have profiles - early return
+  if (typeLoading) {
+    return { completeProfile: async () => false, isSubmitting: true };
+  }
+  
+  if (userType === 'looplly_team_user') {
+    return { completeProfile: async () => false, isSubmitting: false };
+  }
 
   const completeProfile = async (profileData: ProfileData): Promise<boolean> => {
-    // Team members don't complete profiles
-    if (isTeamMember()) {
-      toast({
-        title: "Not Applicable",
-        description: "Team members don't require profile completion.",
-        variant: "default",
-      });
-      return false;
-    }
-
     if (!authState.user?.id) {
       toast({
         title: "Error",

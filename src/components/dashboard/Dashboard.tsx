@@ -1,11 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/hooks/useAuth';
 import { useRole } from '@/hooks/useRole';
 import { useDarkMode } from '@/hooks/useDarkMode';
 import { Coins, Wallet, User, Users, Trophy, MessageSquare, LogOut, Settings, HelpCircle, Shield, Moon, Sun } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { getSupabaseClient } from '@/integrations/supabase/activeClient';
 import SimplifiedEarnTab from './SimplifiedEarnTab';
 import WalletTab from './WalletTab';
 import ProfileTab from './ProfileTab';
@@ -40,6 +41,36 @@ export default function Dashboard({ triggerOnboarding = false }: DashboardProps)
   const { showOnboarding, completeOnboarding, skipOnboarding } = useOnboarding(triggerOnboarding);
   const { level2Complete, level2Categories } = useProfileQuestions();
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const supabase = getSupabaseClient();
+  
+  // Prevent test accounts from accessing dashboard outside simulator
+  useEffect(() => {
+    const checkTestAccount = async () => {
+      if (!authState.user?.id) return;
+      
+      // Only check if NOT in simulator
+      if (window.location.pathname.startsWith('/simulator')) return;
+      
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('is_test_account')
+        .eq('user_id', authState.user.id)
+        .maybeSingle();
+      
+      if (profile?.is_test_account) {
+        console.warn('[Dashboard] Test account blocked from production dashboard');
+        toast({
+          title: 'Access Denied',
+          description: 'Test accounts can only be used in the Journey Simulator',
+          variant: 'destructive'
+        });
+        navigate('/');
+      }
+    };
+    
+    checkTestAccount();
+  }, [authState.user, navigate, supabase, toast]);
   
   const isVerified = authState.user?.profile?.is_verified ?? false;
   

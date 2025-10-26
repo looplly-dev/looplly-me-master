@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getSupabaseClient } from '@/integrations/supabase/activeClient';
 import { useAuth } from './useAuth';
 import { useToast } from './use-toast';
+import { useUserType } from './useUserType';
 
 export interface ReputationHistory {
   transaction_id: string; // UUID for admin lookup
@@ -43,6 +44,26 @@ export const useUserReputation = () => {
   const { authState } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { userType, isLoading: typeLoading } = useUserType();
+  
+  // Team members don't have reputation - early return
+  if (typeLoading) {
+    return { 
+      reputation: null, 
+      isLoading: true, 
+      addReputationPoints: () => {}, 
+      updateQualityMetrics: () => {} 
+    };
+  }
+  
+  if (userType === 'looplly_team_user') {
+    return { 
+      reputation: null, 
+      isLoading: false, 
+      addReputationPoints: () => {}, 
+      updateQualityMetrics: () => {} 
+    };
+  }
 
   const { data: reputation, isLoading } = useQuery({
     queryKey: ['user-reputation', authState.user?.id],
