@@ -3,7 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Lightbulb, BookOpen, FileText, Sparkles, CheckCircle2, Clock } from 'lucide-react';
+import { Lightbulb, BookOpen, FileText, Sparkles, CheckCircle2, Clock, Loader2 } from 'lucide-react';
 import DocumentationSearch from './DocumentationSearch';
 import QuickReference from './QuickReference';
 import SeedDocumentationButton from './SeedDocumentationButton';
@@ -11,10 +11,11 @@ import QuickStartGuides from './QuickStartGuides';
 import RecommendationsPanel from './RecommendationsPanel';
 import KeyboardShortcutsHelp from './KeyboardShortcutsHelp';
 import CategoryCard from './CategoryCard';
-import { documentationIndex } from '@/data/documentationIndex';
 import { useRole } from '@/hooks/useRole';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { useSearchHistory } from '@/hooks/useSearchHistory';
+import { useDocumentationStats } from '@/hooks/useDocumentationStats';
+import { supabase } from '@/integrations/supabase/client';
 
 export default function KnowledgeDashboard() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -22,25 +23,16 @@ export default function KnowledgeDashboard() {
   const [showShortcutsHelp, setShowShortcutsHelp] = useState(false);
   const { isAdmin } = useRole();
   const { addSearch } = useSearchHistory();
+  const { data: stats, isLoading } = useDocumentationStats();
 
   useKeyboardShortcuts([
     { key: '?', callback: () => setShowShortcutsHelp(true) },
     { key: '/', callback: () => document.querySelector<HTMLInputElement>('input[type="text"]')?.focus() }
   ]);
 
-  const categories = Array.from(new Set(documentationIndex.map(doc => doc.category)));
-  const categoryCounts = categories.map(cat => {
-    const categoryDocs = documentationIndex.filter(doc => doc.category === cat);
-    return {
-      category: cat,
-      total: categoryDocs.length,
-      published: categoryDocs.filter(doc => doc.status === 'published').length,
-      comingSoon: categoryDocs.filter(doc => doc.status === 'coming_soon').length
-    };
-  });
-
-  const totalPublished = documentationIndex.filter(doc => doc.status === 'published').length;
-  const totalComingSoon = documentationIndex.filter(doc => doc.status === 'coming_soon').length;
+  const totalPublished = stats?.published || 0;
+  const totalComingSoon = stats?.comingSoon || 0;
+  const categoryCounts = stats?.categoryStats || [];
 
   const categoryIcons: Record<string, any> = {
     'Core Systems': Sparkles,
@@ -49,6 +41,14 @@ export default function KnowledgeDashboard() {
     'Technical Reference': FileText,
     'Profiling': BookOpen
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8 max-w-6xl mx-auto">
@@ -74,7 +74,7 @@ export default function KnowledgeDashboard() {
       <Tabs defaultValue="all" onValueChange={(value) => setStatusFilter(value as any)}>
         <TabsList className="grid w-full max-w-md mx-auto grid-cols-3">
           <TabsTrigger value="all">
-            All ({documentationIndex.length})
+            All ({stats?.total || 0})
           </TabsTrigger>
           <TabsTrigger value="published">
             Live ({totalPublished})
@@ -103,9 +103,6 @@ export default function KnowledgeDashboard() {
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
               {categoryCounts.map(({ category, total, published, comingSoon }) => {
                 const IconComponent = categoryIcons[category] || FileText;
-                const topDocs = documentationIndex
-                  .filter(d => d.category === category && d.status === 'published')
-                  .slice(0, 3);
                 return (
                   <CategoryCard
                     key={category}
@@ -114,7 +111,7 @@ export default function KnowledgeDashboard() {
                     published={published}
                     comingSoon={comingSoon}
                     icon={IconComponent}
-                    topDocs={topDocs}
+                    topDocs={[]}
                     onClick={() => {
                       setSearchQuery(category);
                       addSearch(category);

@@ -9,8 +9,10 @@ export interface DocumentationItem {
   status?: 'draft' | 'published' | 'coming_soon';
 }
 
-// NOTE: Documentation content is now stored securely in the database.
-// Content is only accessible to authenticated users via the documentation table.
+// NOTE: Documentation content is now stored in the database.
+// This array is DEPRECATED and kept only for TypeScript type definitions.
+// The Knowledge Centre reads from the database via useDocumentationStats hook.
+// DO NOT UPDATE THIS ARRAY - it is no longer the source of truth.
 
 export const documentationIndex: DocumentationItem[] = [
   // Wave 1 - Core Systems (Published)
