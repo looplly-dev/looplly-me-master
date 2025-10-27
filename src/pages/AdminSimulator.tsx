@@ -4,7 +4,7 @@ import SimulatorDashboard from '@/components/admin/simulator/SimulatorDashboard'
 
 export default function AdminSimulator() {
   return (
-    <ProtectedRoute requiredRole="tester" requireExactRole={true}>
+    <ProtectedRoute requiredRole="tester">
       <AdminLayout>
         <SimulatorDashboard />
       </AdminLayout>

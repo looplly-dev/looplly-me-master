@@ -8,7 +8,7 @@ export interface TeamMember {
   last_name: string | null;
   company_name: string | null;
   company_role: string | null;
-  role: 'super_admin' | 'admin';
+  role: 'super_admin' | 'admin' | 'tester';
   created_at: string;
   is_active: boolean;
 }
@@ -45,18 +45,35 @@ export function useAdminTeam(searchQuery: string = '') {
       const { data: profiles, error: profileError } = await profileQuery;
       if (profileError) throw profileError;
 
-      // Step 2: Fetch user roles for admin/super_admin only
+      // Step 2: Fetch user roles for admin/super_admin/tester
       const { data: roles, error: rolesError } = await supabase
         .from('user_roles')
         .select('user_id, role')
-        .in('role', ['super_admin', 'admin']);
+        .in('role', ['super_admin', 'admin', 'tester']);
 
       if (rolesError) throw rolesError;
 
-      // Step 3: Create a role lookup map
-      const roleMap = new Map(roles?.map(r => [r.user_id, r.role]) || []);
+      // Step 3: Build role map with highest role resolution
+      const roleHierarchy = { super_admin: 3, admin: 2, tester: 1 };
+      const userRolesMap = new Map<string, string[]>();
+      
+      roles?.forEach(r => {
+        if (!userRolesMap.has(r.user_id)) {
+          userRolesMap.set(r.user_id, []);
+        }
+        userRolesMap.get(r.user_id)!.push(r.role);
+      });
 
-      // Step 4: Merge profiles with roles, filtering out non-admin users
+      const roleMap = new Map<string, 'super_admin' | 'admin' | 'tester'>();
+      userRolesMap.forEach((userRoles, userId) => {
+        const highest = userRoles.sort((a, b) => 
+          (roleHierarchy[b as keyof typeof roleHierarchy] || 0) - 
+          (roleHierarchy[a as keyof typeof roleHierarchy] || 0)
+        )[0];
+        roleMap.set(userId, highest as 'super_admin' | 'admin' | 'tester');
+      });
+
+      // Step 4: Merge profiles with roles, filtering out non-staff users
       const members: TeamMember[] = (profiles || [])
         .filter(profile => roleMap.has(profile.user_id))
         .map(profile => ({
@@ -67,7 +84,7 @@ export function useAdminTeam(searchQuery: string = '') {
           company_name: profile.company_name,
           company_role: profile.company_role,
           is_active: profile.is_active,
-          role: roleMap.get(profile.user_id) as 'super_admin' | 'admin',
+          role: roleMap.get(profile.user_id) as 'super_admin' | 'admin' | 'tester',
           created_at: profile.created_at,
         }));
 

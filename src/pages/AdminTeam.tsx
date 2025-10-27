@@ -49,7 +49,7 @@ function AdminTeamContent() {
           )}
         </div>
         <p className="text-muted-foreground mt-2">
-          Manage Looplly staff members (super admins and admins) ({selectedRoles.length > 0 
+          Manage Looplly staff members (super admins, admins, and testers) ({selectedRoles.length > 0 
             ? `${filteredTeamMembers.length} of ${teamMembers.length} members`
             : `${teamMembers.length} ${teamMembers.length === 1 ? 'member' : 'members'}`
           })
@@ -86,6 +86,10 @@ function AdminTeamContent() {
               <ToggleGroupItem value="admin" size="sm" className="gap-1.5">
                 <Badge variant="default" className="h-4 px-1.5 text-xs">A</Badge>
                 <span className="text-sm">Admin</span>
+              </ToggleGroupItem>
+              <ToggleGroupItem value="tester" size="sm" className="gap-1.5">
+                <Badge variant="secondary" className="h-4 px-1.5 text-xs">T</Badge>
+                <span className="text-sm">Tester</span>
               </ToggleGroupItem>
             </ToggleGroup>
             {selectedRoles.length > 0 && (

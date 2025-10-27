@@ -54,7 +54,7 @@ export function TeamActionsMenu({ member, onUpdate }: TeamActionsMenuProps) {
   const [tempPassword, setTempPassword] = useState<string>('');
   const [passwordExpiry, setPasswordExpiry] = useState<string>('');
   const [showPassword, setShowPassword] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<'super_admin' | 'admin'>(member.role);
+  const [selectedRole, setSelectedRole] = useState<'super_admin' | 'admin' | 'tester'>(member.role);
   const [editFormData, setEditFormData] = useState({
     first_name: member.first_name || '',
     last_name: member.last_name || '',
@@ -275,18 +275,19 @@ export function TeamActionsMenu({ member, onUpdate }: TeamActionsMenuProps) {
               <Label htmlFor="role">Role</Label>
               <Select 
                 value={selectedRole} 
-                onValueChange={(value) => setSelectedRole(value as 'super_admin' | 'admin')}
+                onValueChange={(value) => setSelectedRole(value as 'super_admin' | 'admin' | 'tester')}
               >
                 <SelectTrigger id="role">
                   <SelectValue placeholder="Select a role" />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="tester">Tester</SelectItem>
                   <SelectItem value="admin">Admin</SelectItem>
                   <SelectItem value="super_admin">Super Admin</SelectItem>
                 </SelectContent>
               </Select>
               <p className="text-sm text-muted-foreground">
-                Super Admins have full system access. Admins can manage users but cannot edit Level 1 questions or manage other admins.
+                Super Admins have full system access. Admins have extensive rights (except managing roles). Testers can access testing tools like the Journey Simulator.
               </p>
             </div>
           </div>

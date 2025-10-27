@@ -69,7 +69,7 @@ const adminNavItems = [
 function AdminSidebar() {
   const { state } = useSidebar();
   const location = useLocation();
-  const { hasRole, hasExactRole } = useRole();
+  const { hasRole } = useRole();
 
   const isActive = (url: string, exact?: boolean) => {
     if (exact) {
@@ -82,9 +82,9 @@ function AdminSidebar() {
   
   // Filter nav items based on user's role
   const visibleNavItems = adminNavItems.filter(item => {
-    // Journey Simulator: tester-only (exact match)
+    // Journey Simulator: tester or higher (hierarchical)
     if (item.url === '/admin/simulator') {
-      return hasExactRole('tester');
+      return hasRole('tester');
     }
     
     // All other admin routes: hierarchical (super_admin can access admin features)
