@@ -1,4 +1,30 @@
+---
+title: "User Classification System"
+slug: "user-classification"
+category: "authentication"
+tags: ["user-types", "authentication", "data-isolation", "admin", "test-users"]
+author: "Nadia Gaspari"
+technical_content: "AI-Generated with Human Review"
+version: 2.0
+status: "published"
+last_updated: "2025-10-27"
+change_summary: "Added test user authentication section, simulator JWT details, session isolation architecture, security considerations, and comprehensive authentication flow diagrams."
+previous_version: 1.0
+---
+
 # User Classification System
+
+## Overview
+
+Looplly has 3 distinct user types, each with different authentication methods, purposes, and access levels. This document explains the data architecture, authentication flows, and security model for each user type.
+
+## Quick Reference
+
+| User Type | Authentication | Storage | Routes | Purpose |
+|-----------|---------------|---------|--------|---------|
+| **looplly_user** | Supabase Auth | `localStorage['auth']` | `/dashboard/*`, `/profile/*` | Regular users earning rewards |
+| **looplly_team_user** | Supabase Auth | `localStorage['admin_auth']` | `/admin/*` | Staff managing platform |
+| **Test Users** | JWT (Custom) | `sessionStorage['simulator']` | `/simulator/*` | Testing user journeys |
 
 ## Database Architecture
 
@@ -227,6 +253,173 @@ Forced to change password on first login
 
 ---
 
+## 4. Test Users (Simulator Accounts)
+**Purpose:** Isolated test accounts for admin users to test user journeys without affecting production data or their own sessions.
+
+**Authentication Method:** JWT (Custom)
+
+**Characteristics:**
+- Created via `seed-test-users` edge function
+- Flag: `is_test_account = true` in profiles
+- JWT-based authentication (NOT standard Supabase Auth)
+- Session stored in `sessionStorage['simulator']`
+- Route-restricted to `/simulator/*` only
+- Cannot access `/admin/*` or regular `/dashboard/*`
+- Data completely isolated from production users
+
+**Profile Fields:**
+- `user_type = 'looplly_user'` (same type as regular users)
+- `is_test_account = true` (critical flag for isolation)
+- Pre-populated test data (names like "Test User Bronze", "Test User Silver")
+- Email: `@looplly-testing.internal` domain
+
+**Authentication Flow:**
+```mermaid
+sequenceDiagram
+    participant Admin as Admin Portal
+    participant API as create-simulator-session
+    participant Iframe as Simulator Iframe
+    participant SC as simulatorClient
+    participant DB as Database
+    
+    Admin->>API: POST /create-simulator-session<br/>{user_id, stage}
+    API->>DB: Query test user profile
+    API->>API: Sign JWT token (user_id, is_test_account=true)
+    API-->>Admin: {session: {...}, jwt: "..."}
+    Admin->>Iframe: Load /simulator with session params
+    Iframe->>SC: Parse session from URL
+    SC->>SC: setSession() → sessionStorage['simulator']
+    SC->>DB: Query profile with JWT auth
+    DB-->>SC: Test user data (is_test_account=true)
+    SC-->>Iframe: Authenticated as test user
+```
+
+**Session Isolation:**
+- **Storage:** `sessionStorage['simulator']` (NOT localStorage)
+- **Scope:** Iframe-only, not shared with parent window
+- **Persistence:** Destroyed when iframe closes or tab refreshes
+- **Client:** Uses `simulatorClient` (separate Supabase client instance)
+
+**Why sessionStorage?**
+1. **Iframe Isolation** - Not accessible by parent admin window
+2. **Tab Isolation** - Each simulator tab independent
+3. **Ephemeral** - Automatically cleaned up on close
+4. **No Contamination** - Cannot interfere with admin or user sessions in localStorage
+
+**Journey Stages:**
+Test users can be reset to any stage of the user journey:
+- `fresh_signup` - Brand new account, no data
+- `basic_profile` - Level 1 registration complete
+- `full_profile` - Level 2 complete (all demographics)
+- `first_survey` - Mobile verified + 1 survey completed
+- `established_user` - 5+ surveys completed
+
+**Security Considerations:**
+- Test accounts cannot access production routes
+- JWT tokens signed with server secret (`LOOPLLY_JWT_SECRET`)
+- RLS policies enforce `is_test_account = true` isolation
+- Data queries filtered to prevent production contamination
+- Admin session completely separate in `localStorage['admin_auth']`
+
+**Implementation Details:**
+```typescript
+// Simulator client configuration
+// File: src/integrations/supabase/simulatorClient.ts
+export const simulatorClient = createClient(SUPABASE_URL, SUPABASE_KEY, {
+  auth: {
+    storage: sessionStorage,       // Ephemeral, iframe-only
+    storageKey: 'simulator',       // Unique namespace
+    persistSession: true,          // Within session only
+    autoRefreshToken: true,
+  }
+});
+
+// Active client selector
+// File: src/integrations/supabase/activeClient.ts
+export function getSupabaseClient() {
+  const pathname = window.location.pathname;
+  const isSimulator = pathname.startsWith('/simulator');
+  
+  if (isSimulator) {
+    return simulatorClient;  // Uses sessionStorage
+  }
+  
+  return supabase;  // Uses localStorage
+}
+```
+
+**RLS Policies:**
+```sql
+-- Test users can only access their own test data
+CREATE POLICY "test_users_isolated"
+  ON profiles FOR ALL
+  USING (
+    auth.uid() = user_id 
+    AND is_test_account = true
+  );
+
+-- Ensure test users can't see production data
+CREATE POLICY "production_users_hidden_from_tests"
+  ON profiles FOR SELECT
+  USING (
+    CASE 
+      WHEN (SELECT is_test_account FROM profiles WHERE user_id = auth.uid())
+      THEN is_test_account = true  -- Test users see only test data
+      ELSE is_test_account = false -- Production users see only production data
+    END
+  );
+```
+
+**Edge Functions:**
+- `create-simulator-session` - Creates test user session with JWT
+- `seed-test-users` - Generates test accounts across all journey stages
+- `reset-user-journey` - Resets test user to specific stage (RPC function)
+
+**Troubleshooting:**
+- If admin gets logged out → Check `activeClient` is routing correctly
+- If test session doesn't persist → Verify `sessionStorage['simulator']` exists
+- If seeing wrong user data → Ensure hook uses `activeClient`, not `supabase` directly
+
+See [Simulator Architecture](SIMULATOR_ARCHITECTURE.md) for complete technical details.
+
+---
+
+## Authentication Architecture Summary
+
+### Storage Strategy
+
+| User Type | Storage Type | Storage Key | Scope | Persistence |
+|-----------|-------------|-------------|-------|-------------|
+| looplly_user | localStorage | `auth` | Domain-wide | Survives refresh |
+| looplly_team_user | localStorage | `admin_auth` | Domain-wide | Survives refresh |
+| Test Users | sessionStorage | `simulator` | Iframe-only | Ephemeral |
+
+**Result:** Three completely isolated authentication namespaces with zero session overlap.
+
+### Client Architecture
+
+```mermaid
+graph TD
+    A[Request] --> B{Path Check}
+    B -->|/simulator/*| C[simulatorClient]
+    B -->|/admin/*| D[supabase client]
+    B -->|Other| D
+    
+    C --> E[sessionStorage 'simulator']
+    C --> F[JWT Authentication]
+    C --> G[Test User Data]
+    
+    D --> H{Path: /admin/?}
+    H -->|Yes| I[localStorage 'admin_auth']
+    H -->|No| J[localStorage 'auth']
+    D --> K[Supabase Auth]
+    
+    I --> L[Admin User Data]
+    J --> M[Regular User Data]
+```
+
+---
+
 ## Migration History
 
 **Previous Terminology (DEPRECATED):**
@@ -244,10 +437,16 @@ Forced to change password on first login
 
 ---
 
-## Related Files
+## Related Documentation
 
+- [Authentication Architecture](AUTHENTICATION_ARCHITECTURE.md) - Complete authentication system documentation
+- [Simulator Architecture](SIMULATOR_ARCHITECTURE.md) - Technical details of simulator system
+- [User Type Management](USER_TYPE_MANAGEMENT.md) - Managing user types and roles
+- [Testing Simulator Guide](TESTING_SIMULATOR_GUIDE.md) - How to use the simulator
+- [Table Architecture](TABLE_ARCHITECTURE.md) - Database schema details
 - Database migration: `supabase/migrations/*_fix_user_type_classification.sql`
 - Edge function: `supabase/functions/create-team-member/index.ts`
+- Edge function: `supabase/functions/create-simulator-session/index.ts`
 - UI component: `src/components/admin/team/AddTeamMemberModal.tsx`
 - Hook: `src/hooks/useUserType.ts`
 - Type definitions: `src/types/auth.ts`

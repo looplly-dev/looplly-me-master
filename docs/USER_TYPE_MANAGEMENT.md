@@ -1,8 +1,22 @@
+---
+title: "User Type Management"
+slug: "user-type-management"
+category: "authentication"
+tags: ["user-types", "authentication", "roles", "admin", "rls-policies"]
+author: "Nadia Gaspari"
+technical_content: "AI-Generated with Human Review"
+version: 2.0
+status: "published"
+last_updated: "2025-10-27"
+change_summary: "Removed all deprecated 'office_user' terminology, replaced with current 'looplly_team_user', added test user authentication section, JWT vs Supabase Auth comparison, authentication flow diagrams, and updated RLS policy examples with actual implementation."
+previous_version: 1.0
+---
+
 # User Type Management
 
 ## Overview
 
-Looplly supports two distinct user types with different access patterns and permissions: **Looplly Users** (B2C consumers) and **Office Users** (B2B team members).
+Looplly supports **three distinct user types** with different authentication methods, access patterns, and permissions: **Looplly Users** (consumers), **Looplly Team Users** (staff), and **Test Users** (simulator accounts).
 
 ## User Types
 
@@ -31,21 +45,28 @@ profiles.user_type = 'looplly_user'
 - Community
 - Referrals
 
-### Office Users (B2B)
+### Looplly Team Users (Staff)
 
-**Definition**: Business users who access the platform on behalf of an organization (admin, support, content managers).
+**Definition**: Internal team members who manage, build, and operate the Looplly platform (admins, support, developers).
 
 **Characteristics:**
-- Created by admin (not self-registration)
-- Minimal profile requirements (name, email, role)
+- Created by super_admin (not self-registration)
+- Email must use `@looplly.me` domain
+- Minimal profile requirements (name, email, company role)
 - No reputation points or earnings
 - Cannot refer users
 - Access admin/management features
+- Temporary password on creation, forced reset on first login
 
 **Database Identifier:**
 ```sql
-profiles.user_type = 'office_user'
+profiles.user_type = 'looplly_team_user'
 ```
+
+**Authentication:**
+- **Method:** Supabase Auth
+- **Storage:** `localStorage['admin_auth']`
+- **Routes:** `/admin/*`
 
 **Access:**
 - Admin portal
@@ -53,12 +74,12 @@ profiles.user_type = 'office_user'
 - Content management
 - Analytics & reporting
 - System configuration
+- Simulator tool
 
 **Roles Available:**
-- Super Admin
-- Content Admin
-- Support Admin
-- Analytics Admin
+- Super Admin (full access, can create other team members)
+- Admin (manage users, content, settings)
+- Tester (limited admin access for QA)
 
 ## Database Schema
 
