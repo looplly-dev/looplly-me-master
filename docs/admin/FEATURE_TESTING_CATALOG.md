@@ -106,7 +106,7 @@ describe('FeatureName', () => {
 ---
 
 #### Role-Based Access Control
-**Purpose**: Control access based on user roles (super_admin, admin, tester, team_member)  
+**Purpose**: Control access based on user roles (super_admin, admin, tester, user)  
 **Components**: `ProtectedRoute.tsx`, `useRole` hook, `useAuth` hook  
 **Database**: `user_roles`, `roles` tables  
 **Tests**: ❌ **No tests**
@@ -116,9 +116,11 @@ describe('FeatureName', () => {
 **Needed Tests**:
 - ❌ Role assignment and verification
 - ❌ Permission checking for different roles
-- ❌ Protected route access control
+- ❌ Protected route access control (hierarchical: super_admin > admin > tester)
 - ❌ Role-based UI rendering
 - ❌ Admin-only action restrictions
+- ❌ Server-side enforcement via RLS policies (security boundary)
+- ❌ Client-side role checks (UI display only, not security)
 
 ---
 
@@ -478,7 +480,7 @@ describe('FeatureName', () => {
 ---
 
 #### Simulator System
-**Purpose**: Test user flows in controlled environment  
+**Purpose**: Test user flows in controlled environment with hierarchical role access (tester, admin, super_admin)  
 **Components**: `SimulatorDashboard.tsx`, `SimulatorSession.tsx`  
 **Edge Functions**: `create-simulator-session`, `seed-test-users`  
 **Tests**: ❌ **No tests**
@@ -486,11 +488,13 @@ describe('FeatureName', () => {
 **Coverage**: 🔴 **None**  
 **Priority**: 🟡 **Medium** - Testing tool  
 **Needed Tests**:
-- ❌ Session creation
+- ❌ Session creation (with role validation)
 - ❌ Test user seeding
 - ❌ State inspection
 - ❌ Checkpoint navigation
 - ❌ Session cleanup
+- ❌ Hierarchical access control (tester-or-higher)
+- ❌ Server-side role validation in edge functions
 
 ---
 

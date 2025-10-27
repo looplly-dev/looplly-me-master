@@ -10,7 +10,37 @@ The Simulator provides a safe, isolated testing environment for admin users to t
 - **Journey Testing** - Reset users to any stage
 - **Real-time Debugging** - See exactly what users experience
 
-## Session Isolation Architecture
+## Access Control
+
+**Who Can Access the Simulator?**
+- ✅ **Super Admin** - Full access (Level 3)
+- ✅ **Admin** - Full access (Level 2)
+- ✅ **Tester** - Full access (Level 1.5)
+- ❌ Regular users - No access
+
+**Security Model:**
+- **Frontend Check:** `hasRole('tester')` controls sidebar visibility (UI only)
+- **Route Protection:** `ProtectedRoute requiredRole="tester"` blocks direct navigation
+- **Backend Enforcement:** Edge function validates role via database query
+- **RLS Policies:** Test account data isolated via `is_test_account` flag
+
+**⚠️ Security Principle:**
+Frontend role checks are for **UI display only**. The actual security enforcement happens server-side:
+1. Edge function `create-simulator-session` validates tester-or-higher role via database
+2. RLS policies on test account data check `is_test_account = true`
+3. Even if user bypasses frontend checks, backend blocks unauthorized access
+
+**Role-Based Routing:**
+The simulator uses **hierarchical role checking**:
+- Minimum role required: `tester`
+- Higher roles (`admin`, `super_admin`) automatically inherit access
+- Implemented via `hasRole('tester')` in `useRole` hook (UI) + RLS policies (security)
+
+**Visibility Control:**
+- Sidebar item "Journey Simulator" appears for tester-or-higher roles
+- Direct navigation to `/admin/simulator` allowed for tester-or-higher
+- Route protection via `ProtectedRoute` with `requiredRole="tester"` (hierarchical)
+- Edge function auth validates role via `has_role()` database function
 
 ### The Problem
 

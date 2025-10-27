@@ -82,10 +82,11 @@ The Admin Portal provides comprehensive tools for managing users, content, integ
 - View earning history
 
 #### **Simulator**
-- Test user journeys
-- Create test accounts
-- Simulate survey flows
-- Debug user experience
+- **Access:** Tester, Admin, Super Admin roles (hierarchical access)
+- **Security:** Role validated server-side via database queries
+- **Purpose:** Test user journeys, create test accounts, simulate survey flows
+- **Isolation:** Test accounts flagged with `is_test_account = true`, separate from production data
+- Debug user experience without affecting real users
 
 ### System Management
 
@@ -173,7 +174,7 @@ The Admin Portal provides comprehensive tools for managing users, content, integ
 | Badges | Reward system | Create, award |
 | Integrations | External APIs | Configure, test |
 | Analytics | Platform metrics | View, export |
-| Simulator | Testing | Create test users |
+| Simulator | Testing & QA | Test user journeys | Tester, Admin, Super Admin |
 
 ## Additional Resources
 

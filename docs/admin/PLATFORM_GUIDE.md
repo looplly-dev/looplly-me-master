@@ -20,10 +20,9 @@ Navigate to `/admin/login` and authenticate with admin credentials.
 
 | Role | Access Level | Capabilities |
 |------|-------------|--------------|
-| Super Admin | Full access | All features + user management |
-| Content Admin | Content only | Manage questions, docs, badges |
-| Support Admin | User management | View/edit users, reset passwords |
-| Analytics Admin | Read-only | View reports and analytics |
+| Super Admin | Full access | All features + role management + Journey Simulator |
+| Admin | Extensive | All features (except role assignment) + Journey Simulator |
+| Tester | Testing tools | Journey Simulator, test data, documentation |
 
 ## Dashboard Overview
 

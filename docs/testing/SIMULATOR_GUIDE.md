@@ -33,6 +33,21 @@ The **Simulator** is a powerful testing tool that allows admin users to experien
 - ✅ **Quick iteration** - Reset and retry flows instantly
 - ✅ **Safe environment** - Test data separate from production
 
+**Who Can Use the Simulator?**
+- ✅ **Super Admins** - Full access to all testing features
+- ✅ **Admins** - Can test user flows and validate features
+- ✅ **Testers** - Primary users for QA and testing workflows
+- Requires admin portal access and minimum `tester` role
+
+**Access Validation:**
+- **UI Layer:** Role checked via `useRole` hook (controls sidebar visibility)
+- **Route Layer:** `ProtectedRoute` blocks direct navigation for non-authorized roles
+- **API Layer:** Edge function validates role via database query before creating session
+- **Data Layer:** RLS policies isolate test account data from production
+
+**Security Note:**
+All role checks are enforced server-side via database queries. Frontend role checks only control UI visibility (showing/hiding the simulator link). Even if a user bypasses the frontend, the backend will block unauthorized access.
+
 ### Common Use Cases
 
 **1. Testing User Flows**

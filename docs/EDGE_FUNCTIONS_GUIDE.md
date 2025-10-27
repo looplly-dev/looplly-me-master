@@ -395,7 +395,7 @@ if (!error) {
 **Purpose**: Create test user sessions for simulator.
 
 **Method**: POST  
-**Authentication**: Requires Admin/Tester role  
+**Authentication**: Requires Tester role or higher (Tester, Admin, Super Admin)  
 **Public**: No
 
 **Input Schema**:
@@ -408,7 +408,7 @@ if (!error) {
 ```
 
 **Process**:
-1. Validates admin/tester permission
+1. Validates tester-or-higher role (tester, admin, super_admin)
 2. Selects or creates test user for stage
 3. Seeds appropriate data for stage
 4. Generates JWT token (1h expiry)

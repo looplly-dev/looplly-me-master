@@ -248,6 +248,138 @@ CREATE POLICY "admins_manage_users"
   USING (has_role(auth.uid(), 'admin'));
 ```
 
+## Security-First Role Enforcement
+
+⚠️ **CRITICAL PRINCIPLE**: All role checks MUST happen server-side via database queries, not client-side code.
+
+### Why Server-Side Role Checks Matter
+
+**The Problem with Client-Side Security:**
+- ❌ JavaScript can be modified by attackers (browser DevTools, proxies)
+- ❌ localStorage/sessionStorage can be manipulated
+- ❌ Client-side checks provide zero security guarantees
+- ❌ Attacker can fake admin role and bypass UI restrictions
+
+**The Solution: Database-Enforced RLS Policies:**
+- ✅ RLS policies run in Postgres (cannot be bypassed)
+- ✅ `has_role()` security definer function queries `user_roles` table directly
+- ✅ Even if attacker modifies frontend, database rejects unauthorized queries
+- ✅ Defense in depth: Frontend for UX, database for security
+
+### Implementation Pattern
+
+**Client-Side (Display Only):**
+```typescript
+// ✅ CORRECT: For UI visibility only
+import { useRole } from '@/hooks/useRole';
+
+function AdminSidebar() {
+  const { hasRole } = useRole();
+  
+  // This controls what the user SEES, not what they can ACCESS
+  return (
+    <>
+      {hasRole('admin') && <AdminButton />}
+      {hasRole('tester') && <SimulatorLink />}
+    </>
+  );
+}
+```
+
+**Server-Side (Security Enforcement):**
+```sql
+-- ✅ CORRECT: Database-level security
+CREATE POLICY "admins_view_all_users"
+  ON profiles FOR SELECT
+  USING (public.has_role(auth.uid(), 'admin'));
+
+-- This is the ACTUAL security boundary
+-- Even if attacker fakes admin role in UI, this policy blocks them
+```
+
+### Security Definer Function (Prevents RLS Recursion)
+
+**Why `SECURITY DEFINER`?**
+- Without it: RLS policies on `user_roles` table cause infinite recursion
+- With it: Function executes with owner's privileges, bypassing RLS on `user_roles`
+- Result: Clean, non-recursive role checks in RLS policies
+
+```sql
+CREATE OR REPLACE FUNCTION public.has_role(_user_id UUID, _role app_role)
+RETURNS BOOLEAN
+LANGUAGE SQL
+STABLE                    -- Can be used in RLS policies & indexes
+SECURITY DEFINER          -- Bypasses RLS to prevent recursion
+SET search_path = public  -- Prevents schema injection
+AS $$
+  SELECT EXISTS (
+    SELECT 1
+    FROM public.user_roles
+    WHERE user_id = _user_id
+      AND role = _role
+  )
+$$;
+```
+
+### Testing Server-Side Enforcement
+
+**Test 1: Fake Admin Role in Client**
+```javascript
+// 1. Open browser DevTools
+localStorage.setItem('fake_admin_role', 'admin');
+
+// 2. Try to query admin-only data
+const { data, error } = await supabase
+  .from('profiles')
+  .select('*');  // Should return ONLY your own profile, not all users
+
+// Expected: RLS policy blocks query, returns only your data
+// Why: Database checks `user_roles` table, not localStorage
+```
+
+**Test 2: Direct API Manipulation**
+```javascript
+// Attacker tries to insert admin role for themselves
+const { data, error } = await supabase
+  .from('user_roles')
+  .insert({ user_id: myUserId, role: 'admin' });
+
+// Expected: "new row violates row-level security policy"
+// Why: RLS policy requires caller to be super_admin to insert roles
+```
+
+### Audit Trail
+
+**Track Role Assignments:**
+```sql
+ALTER TABLE public.user_roles
+  ADD COLUMN assigned_at TIMESTAMPTZ DEFAULT now(),
+  ADD COLUMN assigned_by UUID REFERENCES auth.users(id);
+
+-- Log who assigned which role and when
+CREATE POLICY "log_role_assignments"
+  ON public.user_roles FOR INSERT
+  WITH CHECK (
+    public.has_role(auth.uid(), 'super_admin')
+    AND NEW.assigned_by = auth.uid()
+  );
+```
+
+**Query Audit Log:**
+```sql
+-- See all role assignments in last 30 days
+SELECT 
+  ur.role,
+  p1.email AS assigned_to,
+  p2.email AS assigned_by,
+  ur.assigned_at
+FROM user_roles ur
+JOIN profiles p1 ON p1.user_id = ur.user_id
+LEFT JOIN profiles p2 ON p2.user_id = ur.assigned_by
+WHERE ur.assigned_at > now() - interval '30 days'
+ORDER BY ur.assigned_at DESC;
+```
+
 ## Testing RLS Policies
 
 ### Manual Testing

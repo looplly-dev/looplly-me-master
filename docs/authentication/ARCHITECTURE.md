@@ -377,9 +377,12 @@ export function useProfile() {
 - Route-based access control
 
 **Layer 3: Role-Based Access (Admin Only)**
-- `user_roles` table
-- `has_role()` security definer function
-- RLS policy enforcement
+- **Storage:** Separate `user_roles` table (never on profiles or auth.users)
+- **Enforcement:** `has_role()` security definer function
+- **RLS Integration:** All admin policies use `public.has_role(auth.uid(), 'role')`
+- **Client-Side Hook:** `useRole` for UI display only (NOT security boundary)
+- **Security Principle:** All role checks happen server-side via database queries (client-side checks are for UX only)
+- **Attack Prevention:** Even if attacker modifies frontend code, database RLS policies prevent unauthorized access
 
 **Layer 4: Data Isolation**
 - Test accounts flagged (`is_test_account = true`)
@@ -441,6 +444,44 @@ CREATE POLICY "test_users_isolated"
 - Session isolated in `sessionStorage`
 - JWT tokens signed with server secret
 - Test data flagged and filtered
+
+### Role Security Architecture
+
+**Critical Design Principle:**
+All role checks are enforced server-side via RLS policies. Frontend role checks (`useRole` hook) are for **UI display only** and provide zero security.
+
+**Why This Design?**
+- Client-side JavaScript can be modified by attackers (DevTools, proxies)
+- localStorage and sessionStorage are user-controlled and untrusted
+- Database RLS policies run in Postgres and cannot be bypassed
+- JWT tokens do NOT contain role information (roles fetched from database on each query)
+
+**Data Flow:**
+```
+User Action → UI Check (useRole) → Show/Hide UI Element → User Clicks Button 
+→ Supabase Query with JWT → Database RLS Policy Check → has_role() check
+→ Query Succeeds (if authorized) OR Query Blocked by RLS (if unauthorized)
+```
+
+**Attack Scenario: Faked Admin Role**
+1. Attacker modifies localStorage: `localStorage.setItem('user_role', 'admin')`
+2. Frontend shows admin UI elements (buttons, sidebar items)
+3. Attacker clicks "View All Users"
+4. Supabase client sends query with user's JWT (does NOT contain role)
+5. Database executes RLS policy: `has_role(auth.uid(), 'admin')`
+6. Function queries `user_roles` table: Returns FALSE (user not admin)
+7. RLS policy blocks query: "new row violates row-level security policy"
+8. Result: Attacker sees admin UI but cannot access any admin data
+
+**Implementation Best Practices:**
+- ✅ Store roles in separate `user_roles` table
+- ✅ Use `has_role()` security definer function in all RLS policies
+- ✅ Frontend `useRole` hook only for UI visibility (hide/show buttons)
+- ✅ Never trust client-side role checks for security decisions
+- ✅ Test by manually faking roles in localStorage (should fail to access data)
+- ❌ Never store roles in JWT claims (makes tokens large, hard to revoke)
+- ❌ Never store roles in profiles table (privilege escalation risk)
+- ❌ Never bypass RLS by using service role key in frontend
 
 ## Authentication Flow Diagrams
 

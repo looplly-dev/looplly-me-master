@@ -284,13 +284,23 @@ const documentationIndex = [
   },
   {
     id: 'role-architecture',
-    title: 'Role Architecture',
+    title: 'Role Architecture (Security-First Design)',
     category: 'Technical Reference',
-    description: 'Dual-table roles and user types system',
+    description: 'Security-first RBAC system with server-side role enforcement',
     audience: 'developer',
-    tags: ['roles', 'security', 'architecture'],
+    tags: ['roles', 'security', 'architecture', 'rbac', 'rls'],
     path: '/docs/ROLE_ARCHITECTURE.md',
-    status: 'coming_soon'
+    status: 'published'
+  },
+  {
+    id: 'role-security-migration',
+    title: 'Role Security Migration Guide',
+    category: 'Technical Reference',
+    description: 'Migrate from insecure role storage to database-enforced role architecture',
+    audience: 'developer',
+    tags: ['security', 'roles', 'migration', 'rls', 'database'],
+    path: '/docs/ROLE_SECURITY_MIGRATION.md',
+    status: 'published'
   },
   {
     id: 'table-architecture',
