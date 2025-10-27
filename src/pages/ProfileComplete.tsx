@@ -8,6 +8,7 @@ import { useProfileQuestions } from '@/hooks/useProfileQuestions';
 import { supabase } from '@/integrations/supabase/client';
 import { ArrowLeft, ArrowRight, CheckCircle } from 'lucide-react';
 import { QuestionRenderer } from '@/components/dashboard/profile/QuestionRenderer';
+import { getCurrentUserId } from '@/utils/authHelper';
 
 export default function ProfileComplete() {
   const navigate = useNavigate();
@@ -28,14 +29,14 @@ export default function ProfileComplete() {
     setIsSubmitting(true);
     
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
+      const userId = await getCurrentUserId();
+      if (!userId) throw new Error('Not authenticated');
 
       // Save answer
       const { error } = await supabase
         .from('profile_answers')
         .upsert({
-          user_id: user.id,
+          user_id: userId,
           question_id: questionId,
           answer_value: typeof answer === 'string' ? answer : null,
           answer_json: typeof answer === 'object' ? answer : null,
@@ -58,7 +59,7 @@ export default function ProfileComplete() {
             profile_completeness_score: 100,
             last_profile_update: new Date().toISOString()
           })
-          .eq('user_id', user.id);
+          .eq('user_id', userId);
 
         if (profileError) throw profileError;
 

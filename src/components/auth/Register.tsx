@@ -256,9 +256,19 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
         const loginSuccess = await login(normalizedMobile, formData.password);
         
       if (loginSuccess) {
-        // Set flag to show onboarding tour
+        console.log('Registration + Login successful, showing onboarding');
         sessionStorage.setItem('show_onboarding_tour', 'true');
-        navigate('/');
+        
+        // Detect if we're in simulator mode
+        const isSimulatorMode = window.location.pathname.startsWith('/simulator');
+        
+        if (isSimulatorMode) {
+          // Mark that we've completed registration in simulator
+          sessionStorage.setItem('simulator_stage', 'registered');
+          navigate('/simulator/dashboard');
+        } else {
+          navigate('/');
+        }
       }
       } else {
         // Track signup failure

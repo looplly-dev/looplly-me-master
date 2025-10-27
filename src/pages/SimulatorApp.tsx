@@ -54,6 +54,16 @@ export default function SimulatorApp() {
 
   // If user is authenticated, handle post-login flow
   if (authState.isAuthenticated) {
+    // GUARD: Prevent authenticated users from seeing /simulator/register
+    if (window.location.pathname === '/simulator/register') {
+      console.log('SimulatorApp - Redirecting authenticated user from /register to /dashboard');
+      return (
+        <SimulatorProvider>
+          <SimulatorBanner />
+          <Navigate to="/simulator/dashboard" replace />
+        </SimulatorProvider>
+      );
+    }
     
     // Profile setup now happens in-dashboard via Level2ProfileModal
     // Skip profile-setup step and go directly to dashboard
@@ -64,13 +74,6 @@ export default function SimulatorApp() {
       <SimulatorProvider>
         <SimulatorBanner />
         <Routes>
-          <Route path="/register" element={
-            <Register
-              onBack={() => window.history.back()}
-              onSuccess={() => {}}
-              onOTPRequired={() => {}}
-            />
-          } />
           <Route path="/dashboard" element={<Earn />} />
           <Route path="/wallet" element={<Wallet />} />
           <Route path="/profile" element={<Profile />} />

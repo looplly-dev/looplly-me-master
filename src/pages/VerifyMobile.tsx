@@ -6,6 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Shield, Check } from 'lucide-react';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
+import { getCurrentUserId, getCurrentUserMobile } from '@/utils/authHelper';
 
 export default function VerifyMobile() {
   const navigate = useNavigate();
@@ -20,17 +21,9 @@ export default function VerifyMobile() {
   // Fetch mobile number from profile
   useEffect(() => {
     const fetchMobile = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('mobile')
-          .eq('user_id', user.id)
-          .single();
-        
-        if (profile?.mobile) {
-          setMobile(profile.mobile);
-        }
+      const mobile = await getCurrentUserMobile();
+      if (mobile) {
+        setMobile(mobile);
       }
     };
     fetchMobile();
@@ -51,14 +44,14 @@ export default function VerifyMobile() {
     try {
       // Demo: Accept 12345 as valid code
       if (otp === DEMO_CODE) {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) throw new Error('Not authenticated');
+        const userId = await getCurrentUserId();
+        if (!userId) throw new Error('Not authenticated');
 
         // Mark as verified
         const { error } = await supabase
           .from('profiles')
           .update({ is_verified: true })
-          .eq('user_id', user.id);
+          .eq('user_id', userId);
 
         if (error) throw error;
 
