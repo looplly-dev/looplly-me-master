@@ -54,15 +54,25 @@ export default function SimulatorApp() {
 
   // If user is authenticated, handle post-login flow
   if (authState.isAuthenticated) {
+    // Check if we should show registration form for this stage
+    const simulatorStage = sessionStorage.getItem('simulator_stage');
+    const shouldShowRegistration = simulatorStage === 'fresh_signup' || simulatorStage === 'basic_profile';
+    
     // GUARD: Prevent authenticated users from seeing /simulator/register
+    // UNLESS they're in a stage that requires the registration UI
     if (window.location.pathname === '/simulator/register') {
-      console.log('SimulatorApp - Redirecting authenticated user from /register to /dashboard');
-      return (
-        <SimulatorProvider>
-          <SimulatorBanner />
-          <Navigate to="/simulator/dashboard" replace />
-        </SimulatorProvider>
-      );
+      if (!shouldShowRegistration) {
+        console.log('SimulatorApp - Redirecting authenticated user from /register to /dashboard (stage does not require registration UI)');
+        return (
+          <SimulatorProvider>
+            <SimulatorBanner />
+            <Navigate to="/simulator/dashboard" replace />
+          </SimulatorProvider>
+        );
+      } else {
+        console.log('SimulatorApp - Allowing access to registration form (stage requires registration UI)');
+        // Fall through to render the registration route below
+      }
     }
     
     // Profile setup now happens in-dashboard via Level2ProfileModal
@@ -74,6 +84,13 @@ export default function SimulatorApp() {
       <SimulatorProvider>
         <SimulatorBanner />
         <Routes>
+          <Route path="/register" element={
+            <Register
+              onBack={() => window.location.href = '/admin/simulator'}
+              onSuccess={() => window.location.href = '/simulator/dashboard'}
+              onOTPRequired={() => {}} 
+            />
+          } />
           <Route path="/dashboard" element={<Earn />} />
           <Route path="/wallet" element={<Wallet />} />
           <Route path="/profile" element={<Profile />} />
