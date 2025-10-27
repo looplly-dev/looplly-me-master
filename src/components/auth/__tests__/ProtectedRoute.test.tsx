@@ -78,7 +78,7 @@ describe('ProtectedRoute', () => {
       });
     });
 
-    it('should show "Insufficient Permissions" for team members without admin role', async () => {
+    it('should allow team members without admin role (team membership is sufficient)', async () => {
       mockUseAuth.mockReturnValue({
         authState: {
           user: { id: 'user-1', profile: {} },
@@ -102,11 +102,7 @@ describe('ProtectedRoute', () => {
       renderProtectedRoute('admin');
 
       await waitFor(() => {
-        expect(screen.getByText('Insufficient Permissions')).toBeInTheDocument();
-        expect(
-          screen.getByText(/You don't have permission to access this admin area/)
-        ).toBeInTheDocument();
-        expect(screen.getByText(/Required role:/)).toBeInTheDocument();
+        expect(screen.getByText('Protected Content')).toBeInTheDocument();
       });
     });
 

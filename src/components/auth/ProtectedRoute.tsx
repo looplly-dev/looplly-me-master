@@ -27,11 +27,11 @@ export default function ProtectedRoute({
   const toastShownRef = useRef(false);
   const [showTimeout, setShowTimeout] = useState(false);
 
-  // Show access denied toast once when user lacks admin permissions
+  // Show access denied toast only for non-team users trying to access admin
   useEffect(() => {
     if (!authState.isLoading && !roleLoading && !typeLoading && 
         requiredRole && (requiredRole === 'admin' || requiredRole === 'super_admin') &&
-        (userType !== 'looplly_team_user' || (!isAdmin() && !isSuperAdmin())) &&
+        userType !== 'looplly_team_user' &&
         !toastShownRef.current) {
       toast({
         title: 'Access Denied',
@@ -40,7 +40,7 @@ export default function ProtectedRoute({
       });
       toastShownRef.current = true;
     }
-  }, [authState.isLoading, roleLoading, typeLoading, requiredRole, userType, isAdmin, isSuperAdmin, toast]);
+  }, [authState.isLoading, roleLoading, typeLoading, requiredRole, userType, toast]);
 
   // Watchdog timeout: if loading for >3 seconds, show re-auth prompt
   useEffect(() => {
@@ -139,9 +139,9 @@ export default function ProtectedRoute({
     }
   }
 
-  // Check if this is an admin route (requires both team member status AND admin role)
+  // Check if this is an admin route (being a team member is sufficient)
+  // Individual admin pages can implement granular role checks if needed
   if (requiredRole && (requiredRole === 'admin' || requiredRole === 'super_admin')) {
-    // Not a team member at all
     if (userType !== 'looplly_team_user') {
       return fallback || (
         <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -160,29 +160,7 @@ export default function ProtectedRoute({
         </div>
       );
     }
-    
-    // Team member but insufficient role
-    if (!isAdmin() && !isSuperAdmin()) {
-      return fallback || (
-        <div className="min-h-screen bg-background flex items-center justify-center p-4">
-          <Card className="max-w-md w-full">
-            <CardContent className="pt-6 text-center">
-              <Shield className="h-12 w-12 text-destructive mx-auto mb-4" />
-              <h2 className="text-xl font-semibold mb-2">Insufficient Permissions</h2>
-              <p className="text-muted-foreground mb-2">
-                You don't have permission to access this admin area.
-              </p>
-              <p className="text-sm text-muted-foreground mb-6">
-                Required role: <span className="font-mono">admin</span>
-              </p>
-              <Button variant="secondary" onClick={() => navigate('/dashboard')}>
-                Go to Dashboard
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      );
-    }
+    // Team member verified - allow access to admin portal
   }
 
   // Insufficient permissions (using hierarchical role check)
