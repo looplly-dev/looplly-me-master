@@ -5,7 +5,7 @@ import { SimulatorProvider } from '@/contexts/SimulatorContext';
 import { simulatorClient as supabase } from '@/integrations/supabase/simulatorClient';
 import Login from '@/components/auth/Login';
 import Register from '@/components/auth/Register';
-import OTPVerification from '@/components/auth/OTPVerification';
+
 import CommunicationPreferences from '@/components/auth/CommunicationPreferences';
 import ForgotPassword from '@/components/auth/ForgotPassword';
 import Earn from '@/pages/Earn';
@@ -54,16 +54,6 @@ export default function SimulatorApp() {
 
   // If user is authenticated, handle post-login flow
   if (authState.isAuthenticated) {
-    // Check if user needs OTP verification after login
-    if (authState.step === 'otp-verification') {
-      console.log('SimulatorApp - Showing OTP verification');
-      return (
-        <SimulatorProvider>
-          <SimulatorBanner />
-          <OTPVerification onBack={() => {}} onSuccess={() => {}} />
-        </SimulatorProvider>
-      );
-    }
     
     // Profile setup now happens in-dashboard via Level2ProfileModal
     // Skip profile-setup step and go directly to dashboard

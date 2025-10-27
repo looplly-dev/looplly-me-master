@@ -53,7 +53,7 @@ import { useStaleProfileCheck } from '@/hooks/useStaleProfileCheck';
 import { ProfileUpdateModal } from '@/components/dashboard/ProfileUpdateModal';
 import { useNavigate } from 'react-router-dom';
 import { analytics } from '@/utils/analytics';
-import OTPVerification from '@/components/auth/OTPVerification';
+
 
 export default function SimplifiedEarnTab() {
   const navigate = useNavigate();
@@ -70,7 +70,7 @@ export default function SimplifiedEarnTab() {
   const { hasStaleData, staleQuestions, staleCount } = useStaleProfileCheck();
   const [checkInDone, setCheckInDone] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(true);
-  const [showOTPModal, setShowOTPModal] = useState(false);
+  
   const [dataOptIns, setDataOptIns] = useState({
     shopping: false,
     appUsage: false,
@@ -1438,22 +1438,6 @@ export default function SimplifiedEarnTab() {
          </div>
        </CollapsibleSection>
      </div>
-     
-     {/* OTP Modal */}
-     {showOTPModal && (
-       <OTPVerification 
-         onBack={() => setShowOTPModal(false)}
-         onSuccess={() => {
-           setShowOTPModal(false);
-           toast({
-             title: 'Mobile Verified!',
-             description: 'You can now start earning',
-           });
-           // Refresh page to update verification status
-           window.location.reload();
-         }}
-       />
-     )}
-    </TooltipProvider>
+     </TooltipProvider>
   );
 }

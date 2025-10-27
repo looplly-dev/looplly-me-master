@@ -3,7 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import Login from './auth/Login';
 import Register from './auth/Register';
-import OTPVerification from './auth/OTPVerification';
+
 import CommunicationPreferences from './auth/CommunicationPreferences';
 import ForgotPassword from './auth/ForgotPassword';
 import Earn from '@/pages/Earn';
@@ -35,11 +35,6 @@ export default function LoopllyApp() {
 
   // If user is authenticated, handle post-login flow
   if (authState.isAuthenticated) {
-    // Check if user needs OTP verification after login
-    if (authState.step === 'otp-verification') {
-      console.log('LoopllyApp - Showing OTP verification');
-      return <OTPVerification onBack={() => {}} onSuccess={() => {}} />;
-    }
     
     // Profile setup now happens in-dashboard via Level2ProfileModal
     // Skip profile-setup step and go directly to dashboard
