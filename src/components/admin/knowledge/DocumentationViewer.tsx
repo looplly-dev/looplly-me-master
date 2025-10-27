@@ -147,16 +147,20 @@ export default function DocumentationViewer({ onBack }: DocumentationViewerProps
             <Clock className="h-4 w-4 mr-2" />
             History
           </Button>
-          {(hasRole('admin') || hasRole('super_admin')) && (
+          {/* TEMPORARILY HIDDEN - Edit button */}
+          {false && (hasRole('admin') || hasRole('super_admin')) && (
             <Button variant="outline" onClick={() => navigate(`/admin/knowledge/edit/${documentId}`)}>
               <Edit className="h-4 w-4 mr-2" />
               Edit
             </Button>
           )}
-          <Button variant="outline" onClick={handlePrint}>
-            <Printer className="h-4 w-4 mr-2" />
-            Print
-          </Button>
+          {/* TEMPORARILY HIDDEN - Print button */}
+          {false && (
+            <Button variant="outline" onClick={handlePrint}>
+              <Printer className="h-4 w-4 mr-2" />
+              Print
+            </Button>
+          )}
         </div>
       </div>
 
