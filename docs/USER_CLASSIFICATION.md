@@ -2,14 +2,14 @@
 title: "User Classification System"
 slug: "user-classification"
 category: "authentication"
-tags: ["user-types", "authentication", "data-isolation", "admin", "test-users"]
+tags: ["user-types", "authentication", "custom-jwt", "database-architecture", "security"]
 author: "Nadia Gaspari"
 technical_content: "AI-Generated with Human Review"
-version: 2.0
+version: 3.0
 status: "published"
 last_updated: "2025-10-27"
-change_summary: "Added test user authentication section, simulator JWT details, session isolation architecture, security considerations, and comprehensive authentication flow diagrams."
-previous_version: 1.0
+change_summary: "MAJOR CORRECTION: Regular users use Custom JWT via edge functions, not Supabase Auth. Updated all diagrams and tables."
+previous_version: 2.0
 ---
 
 # User Classification System
@@ -22,7 +22,7 @@ Looplly has 3 distinct user types, each with different authentication methods, p
 
 | User Type | Authentication | Storage | Routes | Purpose |
 |-----------|---------------|---------|--------|---------|
-| **looplly_user** | Supabase Auth | `localStorage['auth']` | `/dashboard/*`, `/profile/*` | Regular users earning rewards |
+| **looplly_user** | **Custom JWT (Edge Functions)** | `localStorage['looplly_auth_token']` | `/dashboard/*`, `/profile/*` | Regular users earning rewards |
 | **looplly_team_user** | Supabase Auth | `localStorage['admin_auth']` | `/admin/*` | Staff managing platform |
 | **Test Users** | JWT (Custom) | `sessionStorage['simulator']` | `/simulator/*` | Testing user journeys |
 

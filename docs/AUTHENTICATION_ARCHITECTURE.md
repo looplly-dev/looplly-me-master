@@ -2,13 +2,14 @@
 title: "Authentication Architecture"
 slug: "authentication-architecture"
 category: "authentication"
-tags: ["authentication", "jwt", "supabase-auth", "security", "user-types", "session-isolation"]
+tags: ["authentication", "jwt", "custom-auth", "edge-functions", "supabase-auth", "security", "user-types"]
 author: "Nadia Gaspari"
 technical_content: "AI-Generated with Human Review"
-version: 1.0
+version: 3.0
 status: "published"
 last_updated: "2025-10-27"
-change_summary: "Initial comprehensive authentication architecture documentation covering all 3 user types (admin/regular/test), JWT vs Supabase Auth, session isolation, and security model."
+change_summary: "MAJOR CORRECTION: Regular users use Custom JWT (edge functions), NOT Supabase Auth. Updated all flows, diagrams, token structures, and code examples."
+previous_version: 1.0
 ---
 
 # Authentication Architecture
@@ -23,9 +24,9 @@ Looplly implements a **dual authentication architecture** to support three disti
 
 | Feature | Admin Portal | User Portal | Simulator (Test Users) |
 |---------|-------------|-------------|----------------------|
-| **Auth Method** | Supabase Auth | Supabase Auth | JWT (Custom) |
+| **Auth Method** | Supabase Auth | **Custom JWT (Edge Functions)** | JWT (Custom) |
 | **Storage** | localStorage | localStorage | sessionStorage |
-| **Storage Key** | `admin_auth` | `auth` | `simulator` |
+| **Storage Key** | `admin_auth` | `looplly_auth_token` + `looplly_user` | `simulator_auth_token` |
 | **Persistence** | Multi-tab, survives refresh | Multi-tab, survives refresh | Iframe-only, ephemeral |
 | **User Type** | looplly_team_user | looplly_user | looplly_user (test accounts) |
 | **Routes** | `/admin/*` | `/`, `/dashboard/*`, `/profile/*` | `/simulator/*` |
