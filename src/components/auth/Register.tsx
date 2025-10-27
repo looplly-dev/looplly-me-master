@@ -7,7 +7,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { countries } from '@/data/countries';
-import { getCountryByDialCode, getDefaultCountry, formatCountryDisplay, formatCountryOption } from '@/utils/countries';
+import { getCountryByDialCode, getDefaultCountry, formatCountryOption } from '@/utils/countries';
+import { CountryFlag } from '@/components/ui/country-flag';
 import { useFormValidation } from '@/hooks/useFormValidation';
 import { validateRegistration, RegistrationData } from '@/utils/validation';
 import { useAuth } from '@/hooks/useAuth';
@@ -387,16 +388,18 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
                   value={formData.countryCode} 
                   onValueChange={handleCountryChange}
                 >
-                  <SelectTrigger className="w-24 h-12">
-                     <SelectValue>
-                       {selectedCountry ? formatCountryDisplay(selectedCountry) : '🇿🇦 +27'}
-                     </SelectValue>
+                  <SelectTrigger className="w-28 h-12">
+                    <span className="flex items-center gap-1.5">
+                      <CountryFlag iso={selectedCountry?.code || 'ZA'} />
+                      <span className="font-medium">{selectedCountry?.dialCode || '+27'}</span>
+                    </span>
+                    <SelectValue className="sr-only" />
                   </SelectTrigger>
                   <SelectContent className="max-h-60">
                      {countries.map((country) => (
                         <SelectItem key={country.code} value={country.dialCode}>
                           <span className="flex items-center gap-2">
-                            <span className="text-lg">{country.flag}</span>
+                            <CountryFlag iso={country.code} />
                             <span className="font-medium">{country.dialCode}</span>
                             <span className="text-muted-foreground">{country.name}</span>
                           </span>
