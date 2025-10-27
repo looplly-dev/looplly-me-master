@@ -1765,6 +1765,44 @@ export type Database = {
           },
         ]
       }
+      question_audit_log: {
+        Row: {
+          change_type: string
+          changed_at: string | null
+          changed_by: string | null
+          id: string
+          new_values: Json | null
+          old_values: Json | null
+          question_id: string | null
+        }
+        Insert: {
+          change_type: string
+          changed_at?: string | null
+          changed_by?: string | null
+          id?: string
+          new_values?: Json | null
+          old_values?: Json | null
+          question_id?: string | null
+        }
+        Update: {
+          change_type?: string
+          changed_at?: string | null
+          changed_by?: string | null
+          id?: string
+          new_values?: Json | null
+          old_values?: Json | null
+          question_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "question_audit_log_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "profile_questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       streak_unlock_config: {
         Row: {
           config_key: string

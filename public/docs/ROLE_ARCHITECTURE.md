@@ -101,12 +101,65 @@ if (useRole().isAdmin()) {
 | Assign Roles | ✅ | ❌ | ❌ | ❌ |
 | User Management | ✅ | ✅ | ❌ | ❌ |
 | Team Management | ✅ | ✅ | ❌ | ❌ |
-| Profile Questions | ✅ | ✅ | ❌ | ❌ |
+| Profile Questions | ✅ | ✅* | ❌ | ❌ |
 | Badges & Content | ✅ | ✅ | ❌ | ❌ |
 | Integrations | ✅ | ✅ | ❌ | ❌ |
 | Analytics Dashboard | ✅ | ✅ | ❌ | ❌ |
 | Knowledge Centre | ✅ | ✅ | ✅ | ❌ |
 | View Own Profile | ✅ | ✅ | ✅ | ✅ |
+
+**\* Admin Profile Question Access is Level-Restricted:** See [Profile Question Management Permissions](#profile-question-management-permissions) below.
+
+---
+
+## Profile Question Management Permissions
+
+Profile questions are organized into three security levels, with different permission requirements:
+
+| Action | Super Admin | Admin | Tester | User |
+|--------|-------------|-------|--------|------|
+| View All Questions | ✅ | ✅ | ❌ | ❌ |
+| Edit Level 1 Questions | ✅ | ❌ | ❌ | ❌ |
+| Edit Level 2 Questions | ✅ | ✅ | ❌ | ❌ |
+| Edit Level 3 Questions | ✅ | ✅ | ❌ | ❌ |
+| Create Questions | ✅ | ✅ | ❌ | ❌ |
+| Delete Questions | ✅ | ❌ | ❌ | ❌ |
+
+### Why Level 1 is Super Admin Only
+
+**Level 1 questions** are immutable identity fields captured during registration (First Name, Last Name, Date of Birth, Mobile Number, Password, GPS Consent). These fields are critical because they are tied to:
+
+- **Authentication systems:** Mobile verification, password reset flows
+- **Fraud prevention:** Age verification, duplicate account detection
+- **KYC compliance:** Legal identity validation, regulatory reporting
+- **Data isolation:** Country-based access control and targeting
+
+Modifying Level 1 questions can:
+- Break authentication flows (e.g., mobile verification stops working)
+- Cause regulatory compliance violations (e.g., age gate bypassed)
+- Compromise fraud detection (e.g., duplicate accounts undetected)
+- Corrupt data isolation boundaries (e.g., wrong country targeting)
+
+**Only Super Admins** with full system understanding and audit oversight can modify Level 1 questions.
+
+### Security Enforcement
+
+**Frontend Protection:**
+- UI edit buttons are disabled for regular admins on Level 1 questions
+- Question Builder restricts level selection based on role
+- Settings dialogs prevent Level 1 modifications by admins
+
+**Backend Protection (Critical):**
+- **Database RLS policies** enforce level-based access control
+- Super Admins: Full access to all question levels (1, 2, 3)
+- Regular Admins: Blocked from Level 1 operations at database level
+- Even if frontend is bypassed (dev tools, API calls), database rejects unauthorized changes
+
+**Audit Trail:**
+- All Level 1 question modifications are logged in `question_audit_log` table
+- Tracks: who changed what, when, old values, new values
+- Only Super Admins can view audit logs
+- Provides compliance reporting and investigation capabilities
 
 **Hierarchical Access:**
 - `super_admin` can do everything `admin` can do, plus role management
