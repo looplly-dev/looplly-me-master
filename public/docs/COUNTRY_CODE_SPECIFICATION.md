@@ -1,3 +1,13 @@
+---
+id: "country-codes"
+title: "Country Code Specification"
+category: "Core Systems"
+description: "ISO country code standards and usage throughout the platform"
+audience: "all"
+tags: ["country", "codes", "iso", "localization"]
+status: "published"
+---
+
 # Country Code Specification
 
 ## Overview

@@ -1,3 +1,13 @@
+---
+id: "profiling-ai-generation"
+title: "AI Generation Prompts"
+category: "Admin Guides"
+description: "AI prompt templates for generating profile questions"
+audience: "admin"
+tags: ["profiling", "ai", "generation", "prompts"]
+status: "published"
+---
+
 # AI Generation Prompts
 
 ## Overview

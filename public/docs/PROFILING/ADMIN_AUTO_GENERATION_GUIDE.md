@@ -1,3 +1,13 @@
+---
+id: "profiling-admin-auto-generation"
+title: "Admin Auto-Generation Guide"
+category: "Admin Guides"
+description: "Guide for auto-generating profile questions with AI"
+audience: "admin"
+tags: ["profiling", "ai", "auto-generation", "admin"]
+status: "published"
+---
+
 # Admin Auto-Generation Guide
 
 ## Overview

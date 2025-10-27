@@ -1,3 +1,13 @@
+---
+id: "streak-reputation"
+title: "Streak & Reputation System"
+category: "Core Systems"
+description: "Daily streak tracking and reputation integration"
+audience: "all"
+tags: ["streak", "reputation", "engagement", "rewards"]
+status: "published"
+---
+
 # Streak & Reputation System
 
 ## Overview

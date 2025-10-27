@@ -1,3 +1,13 @@
+---
+id: "password-reset-flow"
+title: "Password Reset Flow"
+category: "Technical Reference"
+description: "Password reset flow and implementation"
+audience: "developer"
+tags: ["password", "reset", "security"]
+status: "published"
+---
+
 # Password Reset Flow
 
 Team member password management and reset flow documentation.

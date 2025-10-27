@@ -462,13 +462,7 @@ Deno.serve(async (req) => {
       // No JSON body provided - continue with default behavior
     }
 
-    // If the caller is asking for the index, return it so the frontend can fetch files client-side
-    if (requestAction === 'get-index') {
-      return new Response(
-        JSON.stringify({ index: documentationIndex }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
-      );
-    }
+    console.log(`📥 Seeding request received. Action: ${requestAction || 'default'}, Docs provided: ${inputDocs?.length || 0}`);
 
     // Use service role key for actual seeding operations
     const supabase = createClient(supabaseUrl, supabaseServiceKey);

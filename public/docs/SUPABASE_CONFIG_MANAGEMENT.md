@@ -1,3 +1,13 @@
+---
+id: "supabase-config"
+title: "Supabase Configuration Management"
+category: "Technical Reference"
+description: "Backend configuration and Supabase management guide"
+audience: "super_admin"
+tags: ["supabase", "config", "backend", "database"]
+status: "published"
+---
+
 # Supabase Configuration Management
 
 ## Overview

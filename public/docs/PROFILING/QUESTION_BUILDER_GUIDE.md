@@ -1,3 +1,13 @@
+---
+id: "profiling-question-builder"
+title: "Question Builder Guide"
+category: "Admin Guides"
+description: "Guide to using the question builder interface"
+audience: "admin"
+tags: ["profiling", "questions", "builder", "tool"]
+status: "published"
+---
+
 # Question Builder Guide
 
 ## Overview

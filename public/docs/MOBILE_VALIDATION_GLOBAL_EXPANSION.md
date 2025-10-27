@@ -1,3 +1,13 @@
+---
+id: "mobile-validation-global"
+title: "Mobile Validation Documentation Guide"
+category: "Core Systems"
+description: "Guide for documenting mobile validation patterns for new countries"
+audience: "admin"
+tags: ["validation", "mobile", "documentation", "patterns"]
+status: "published"
+---
+
 # Mobile Validation Documentation Guide
 
 ## Overview

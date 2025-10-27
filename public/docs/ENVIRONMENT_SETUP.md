@@ -1,3 +1,13 @@
+---
+id: "environment-setup"
+title: "Environment Setup"
+category: "Technical Reference"
+description: "Environment variable configuration guide"
+audience: "developer"
+tags: ["setup", "environment", "configuration"]
+status: "published"
+---
+
 # Environment Setup
 
 ## Overview

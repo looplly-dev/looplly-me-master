@@ -1,3 +1,13 @@
+---
+id: "documentation-version-control"
+title: "Documentation Version Control"
+category: "Technical Reference"
+description: "Version control system for documentation"
+audience: "admin"
+tags: ["version-control", "documentation", "history"]
+status: "published"
+---
+
 # Documentation Version Control
 
 ## Overview

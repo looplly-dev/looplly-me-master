@@ -1,3 +1,13 @@
+---
+id: "knowledge-centre"
+title: "Knowledge Centre Guide"
+category: "Admin Guides"
+description: "Complete guide to using the Knowledge Centre for documentation"
+audience: "all"
+tags: ["documentation", "knowledge", "search", "version-control"]
+status: "published"
+---
+
 # Knowledge Centre
 
 ## Overview

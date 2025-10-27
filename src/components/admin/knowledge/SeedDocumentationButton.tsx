@@ -20,24 +20,54 @@ export default function SeedDocumentationButton() {
     setResult(null);
 
     try {
-      // 1) Ask backend for the documentation index (ids + metadata + paths)
-      const { data: indexResp, error: indexErr } = await supabase.functions.invoke('seed-documentation', {
-        body: { action: 'get-index' }
-      });
-      if (indexErr) throw indexErr;
+      // Dynamic discovery: use Vite's import.meta.glob to find all .md files
+      const modules = import.meta.glob('/public/docs/**/*.md', { as: 'raw', eager: false });
+      const paths = Object.keys(modules);
+      
+      console.log(`📁 Discovered ${paths.length} documentation files`);
 
-      const index = Array.isArray(indexResp?.index) ? indexResp.index : [];
-
-      // 2) Fetch markdown files from the app (public/docs) in parallel
+      // Fetch and parse all markdown files in parallel
       const fetched = await Promise.all(
-        index.map(async (doc: any) => {
+        paths.map(async (path) => {
           try {
-            const res = await fetch(doc.path);
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            const content = await res.text();
-            return { ...doc, content };
+            const loadContent = modules[path];
+            const content = await loadContent();
+            
+            // Extract metadata from filename and path
+            const filename = path.split('/').pop()?.replace('.md', '') || '';
+            const id = filename.toLowerCase().replace(/_/g, '-');
+            
+            // Parse basic frontmatter if present (simple parser for now)
+            const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---\n/);
+            let metadata: any = {};
+            
+            if (frontmatterMatch) {
+              const yamlContent = frontmatterMatch[1];
+              const lines = yamlContent.split('\n');
+              lines.forEach(line => {
+                const match = line.match(/^(\w+):\s*(.+)$/);
+                if (match) {
+                  const [, key, value] = match;
+                  metadata[key] = value.replace(/^["']|["']$/g, '');
+                }
+              });
+            }
+            
+            // Build document object
+            return {
+              id: metadata.id || id,
+              title: metadata.title || filename.replace(/_/g, ' '),
+              content: content,
+              category: metadata.category || 'Core Systems',
+              tags: metadata.tags ? metadata.tags.split(',').map((t: string) => t.trim()) : [],
+              description: metadata.description || '',
+              audience: metadata.audience || 'all',
+              status: metadata.status || 'published',
+              path: path.replace('/public', '')
+            };
           } catch (e: any) {
-            return { ...doc, __error: `File not found: ${doc.path}` };
+            console.error(`Failed to load ${path}:`, e);
+            return { __error: `Failed to load: ${path}` };
           }
         })
       );
@@ -45,19 +75,21 @@ export default function SeedDocumentationButton() {
       const docs = fetched.filter((d: any) => !d.__error);
       const fileErrors = fetched.filter((d: any) => d.__error).map((d: any) => d.__error as string);
 
-      // 3) Send docs to backend for secure upsert
+      console.log(`✅ Parsed ${docs.length} documents successfully`);
+
+      // Send to edge function for seeding
       const { data, error } = await supabase.functions.invoke('seed-documentation', {
-        body: { docs }
+        body: { docs, action: 'manual-seed' }
       });
 
       if (error) throw error;
 
-      // Merge fileErrors into response for full visibility
+      // Merge errors
       const merged = {
         ...data,
         errors: [...(data?.errors || []), ...fileErrors],
         stats: {
-          total: index.length,
+          total: paths.length,
           success: data?.stats?.success || 0,
           failed: (data?.stats?.failed || 0) + fileErrors.length
         }
@@ -94,7 +126,7 @@ export default function SeedDocumentationButton() {
               Seed Documentation Database
             </CardTitle>
             <CardDescription className="mt-1">
-              Populate the database with all documentation files (40 total)
+              Automatically discover and seed all documentation files
             </CardDescription>
           </div>
           <Button 

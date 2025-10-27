@@ -1,3 +1,13 @@
+---
+id: "profiling-admin-guide"
+title: "Profiling Admin Guide"
+category: "Admin Guides"
+description: "Admin guide for managing profiling questions"
+audience: "admin"
+tags: ["profiling", "admin", "management", "questions"]
+status: "published"
+---
+
 # Admin Profiling Management Guide
 
 ## Overview

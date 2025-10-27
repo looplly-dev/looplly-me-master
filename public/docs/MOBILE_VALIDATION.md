@@ -1,3 +1,13 @@
+---
+id: "mobile-validation"
+title: "Mobile Number Validation"
+category: "Core Systems"
+description: "Global mobile validation system supporting 193 countries using E.164 format"
+audience: "all"
+tags: ["validation", "mobile", "international", "e164"]
+status: "published"
+---
+
 # Mobile Number Validation
 
 ## Overview

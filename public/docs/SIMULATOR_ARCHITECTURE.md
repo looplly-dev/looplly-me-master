@@ -1,3 +1,13 @@
+---
+id: "simulator-architecture"
+title: "Simulator Architecture"
+category: "Technical Reference"
+description: "Testing simulator architecture and implementation"
+audience: "developer"
+tags: ["simulator", "testing", "architecture"]
+status: "published"
+---
+
 # Simulator Architecture
 
 ## Overview

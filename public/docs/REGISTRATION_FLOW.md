@@ -1,3 +1,13 @@
+---
+id: "registration-flow"
+title: "Registration & Onboarding Flow"
+category: "Technical Reference"
+description: "Complete registration and onboarding flow documentation"
+audience: "developer"
+tags: ["registration", "onboarding", "authentication", "flow"]
+status: "published"
+---
+
 # Registration & Onboarding Flow
 
 ## Overview

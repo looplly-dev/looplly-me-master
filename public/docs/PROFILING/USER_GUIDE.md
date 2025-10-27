@@ -1,3 +1,13 @@
+---
+id: "profiling-user-guide"
+title: "Profiling User Guide"
+category: "Admin Guides"
+description: "End-user guide for completing profiles"
+audience: "all"
+tags: ["profiling", "user-guide", "how-to"]
+status: "published"
+---
+
 # User Profiling Guide
 
 ## Introduction

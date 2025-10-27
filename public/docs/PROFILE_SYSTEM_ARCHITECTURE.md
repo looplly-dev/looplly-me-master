@@ -1,3 +1,13 @@
+---
+id: "profile-system"
+title: "Profile System Architecture"
+category: "Core Systems"
+description: "Complete architecture for the user profile system"
+audience: "all"
+tags: ["profile", "architecture", "database", "schema"]
+status: "published"
+---
+
 # Profile System Architecture
 
 ## Overview

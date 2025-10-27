@@ -1,3 +1,13 @@
+---
+id: "supabase-migration"
+title: "Supabase Migration Guide"
+category: "Technical Reference"
+description: "Migrating from Lovable Cloud to self-hosted Supabase"
+audience: "super_admin"
+tags: ["supabase", "migration", "deployment"]
+status: "published"
+---
+
 # Supabase Migration Guide: From Lovable Cloud to Self-Hosted
 
 ## Overview

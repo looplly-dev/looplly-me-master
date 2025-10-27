@@ -1,3 +1,13 @@
+---
+id: "email-validation"
+title: "Email Validation System"
+category: "Technical Reference"
+description: "Email validation and verification system"
+audience: "developer"
+tags: ["email", "validation", "verification"]
+status: "published"
+---
+
 # Email Validation System
 
 ## Overview

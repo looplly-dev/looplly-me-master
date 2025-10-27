@@ -1,3 +1,13 @@
+---
+id: "recent-changes"
+title: "Recent Changes"
+category: "Admin Guides"
+description: "Latest platform updates and changes"
+audience: "all"
+tags: ["updates", "changelog", "recent"]
+status: "published"
+---
+
 # Recent Changes
 
 Latest updates, bug fixes, and improvements to the Looplly platform.

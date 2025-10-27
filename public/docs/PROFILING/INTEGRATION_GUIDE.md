@@ -1,3 +1,13 @@
+---
+id: "profiling-integration"
+title: "Profiling Integration Guide"
+category: "Technical Reference"
+description: "Technical integration guide for profiling system"
+audience: "admin"
+tags: ["profiling", "integration", "api", "technical"]
+status: "published"
+---
+
 # Profiling Integration Guide
 
 ## Overview

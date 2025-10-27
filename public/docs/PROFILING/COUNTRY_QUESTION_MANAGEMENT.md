@@ -1,3 +1,13 @@
+---
+id: "profiling-country-questions"
+title: "Country Question Management"
+category: "Admin Guides"
+description: "Managing country-specific profile questions"
+audience: "admin"
+tags: ["profiling", "country", "localization", "questions"]
+status: "published"
+---
+
 # Country-Specific Question Management
 
 ## Overview

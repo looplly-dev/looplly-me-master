@@ -1,3 +1,13 @@
+---
+id: "profiling-architecture"
+title: "Profiling Architecture"
+category: "Technical Reference"
+description: "Technical architecture of the profiling system"
+audience: "admin"
+tags: ["profiling", "architecture", "technical", "database"]
+status: "published"
+---
+
 # Profiling System Architecture
 
 ## Overview

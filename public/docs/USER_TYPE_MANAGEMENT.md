@@ -1,3 +1,13 @@
+---
+id: "user-type-management"
+title: "User Type Management"
+category: "Admin Guides"
+description: "Managing office users vs Looplly users"
+audience: "admin"
+tags: ["user-types", "management", "admin"]
+status: "published"
+---
+
 # User Type Management
 
 ## Overview

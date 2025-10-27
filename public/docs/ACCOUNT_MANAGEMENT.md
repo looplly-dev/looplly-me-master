@@ -1,3 +1,13 @@
+---
+id: "account-management"
+title: "Account Management"
+category: "Admin Guides"
+description: "Managing user and team member accounts"
+audience: "admin"
+tags: ["accounts", "deletion", "team-management"]
+status: "published"
+---
+
 # Account Management
 
 ## Overview

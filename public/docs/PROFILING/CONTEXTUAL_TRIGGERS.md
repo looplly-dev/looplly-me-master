@@ -1,3 +1,13 @@
+---
+id: "profiling-contextual-triggers"
+title: "Contextual Triggers"
+category: "Technical Reference"
+description: "Contextual triggers for smart question delivery"
+audience: "admin"
+tags: ["profiling", "triggers", "context", "automation"]
+status: "published"
+---
+
 # Contextual Triggers
 
 ## Overview

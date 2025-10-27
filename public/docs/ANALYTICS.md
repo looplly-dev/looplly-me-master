@@ -1,3 +1,13 @@
+---
+id: "analytics"
+title: "Analytics Implementation"
+category: "Technical Reference"
+description: "Google Analytics tracking implementation guide"
+audience: "developer"
+tags: ["analytics", "tracking", "gtag"]
+status: "published"
+---
+
 # Analytics Implementation
 
 ## Overview

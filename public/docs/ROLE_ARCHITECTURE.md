@@ -1,3 +1,13 @@
+---
+id: "role-architecture"
+title: "Role Architecture (Security-First Design)"
+category: "Technical Reference"
+description: "Security-first RBAC system with server-side role enforcement"
+audience: "developer"
+tags: ["roles", "security", "architecture", "rbac", "rls"]
+status: "published"
+---
+
 # Role Architecture
 
 ## Overview

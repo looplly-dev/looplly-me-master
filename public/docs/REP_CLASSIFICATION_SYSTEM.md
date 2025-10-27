@@ -1,3 +1,13 @@
+---
+id: "reputation-system"
+title: "Reputation Classification System"
+category: "Core Systems"
+description: "User reputation and classification system rules"
+audience: "all"
+tags: ["reputation", "classification", "points", "levels"]
+status: "published"
+---
+
 # Reputation Classification System
 
 ## Overview

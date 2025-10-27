@@ -1,3 +1,13 @@
+---
+id: "profiling-readme"
+title: "Profiling System Overview"
+category: "Core Systems"
+description: "Complete overview of the user profiling system and documentation structure"
+audience: "all"
+tags: ["profiling", "overview", "architecture"]
+status: "published"
+---
+
 # Profiling System Documentation
 
 ## Overview

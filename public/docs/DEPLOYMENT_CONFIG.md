@@ -1,3 +1,13 @@
+---
+id: "deployment-config"
+title: "Deployment Configuration"
+category: "Technical Reference"
+description: "Production deployment configuration and best practices"
+audience: "developer"
+tags: ["deployment", "config", "production"]
+status: "published"
+---
+
 # Deployment Configuration
 
 ## Overview

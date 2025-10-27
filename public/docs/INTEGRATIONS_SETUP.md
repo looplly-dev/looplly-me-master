@@ -1,3 +1,13 @@
+---
+id: "integrations-setup"
+title: "Integrations Setup"
+category: "Technical Reference"
+description: "Setting up external integrations and API connections"
+audience: "developer"
+tags: ["integrations", "setup", "configuration"]
+status: "published"
+---
+
 # Integrations Setup
 
 Setting up Google Places API and AI Provider integrations with secure secret storage.

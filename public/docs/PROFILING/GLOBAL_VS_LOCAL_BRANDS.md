@@ -1,3 +1,13 @@
+---
+id: "profiling-global-vs-local"
+title: "Global vs Local Brands"
+category: "Strategy"
+description: "Strategy for global vs local brand questions"
+audience: "admin"
+tags: ["profiling", "brands", "global", "local"]
+status: "published"
+---
+
 # Global vs Local Brands Strategy
 
 ## Overview

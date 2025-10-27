@@ -1,3 +1,13 @@
+---
+id: "profiling-auto-scaling"
+title: "Auto-Scaling System"
+category: "Technical Reference"
+description: "Auto-scaling system for profile question delivery"
+audience: "admin"
+tags: ["profiling", "scaling", "performance", "optimization"]
+status: "published"
+---
+
 # Auto-Scaling System
 
 ## Overview

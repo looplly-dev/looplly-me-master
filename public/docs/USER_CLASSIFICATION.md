@@ -1,3 +1,13 @@
+---
+id: "user-classification"
+title: "User Classification System"
+category: "Technical Reference"
+description: "User type classification and management"
+audience: "developer"
+tags: ["users", "classification", "types"]
+status: "published"
+---
+
 # User Classification System
 
 ## Database Architecture

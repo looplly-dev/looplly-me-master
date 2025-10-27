@@ -1,3 +1,13 @@
+---
+id: "profiling-decay-system"
+title: "Profile Decay System"
+category: "Core Systems"
+description: "Profile data decay and freshness system"
+audience: "admin"
+tags: ["profiling", "decay", "freshness", "updates"]
+status: "published"
+---
+
 # Profile Decay System
 
 ## Overview

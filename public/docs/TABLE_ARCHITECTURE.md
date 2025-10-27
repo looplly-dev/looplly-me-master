@@ -1,3 +1,13 @@
+---
+id: "table-architecture"
+title: "Table Architecture"
+category: "Technical Reference"
+description: "Database table architecture and user type separation"
+audience: "developer"
+tags: ["database", "architecture", "tables"]
+status: "published"
+---
+
 # Table Architecture - User Type Separation
 
 ## Overview

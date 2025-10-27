@@ -1,3 +1,13 @@
+---
+id: "profiling-earning-rules"
+title: "Profile Earning Rules"
+category: "Core Systems"
+description: "Earning rules for profile completion"
+audience: "all"
+tags: ["profiling", "earning", "rewards", "points"]
+status: "published"
+---
+
 # Profile Completion & Earning Rules
 
 ## Overview

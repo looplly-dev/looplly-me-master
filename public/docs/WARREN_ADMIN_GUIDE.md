@@ -1,3 +1,13 @@
+---
+id: "warren-admin"
+title: "Warren Admin Guide"
+category: "Admin Guides"
+description: "Admin guide for Warren"
+audience: "admin"
+tags: ["warren", "admin", "guide"]
+status: "published"
+---
+
 # Warren Admin Platform Guide
 
 ## Overview

@@ -1,3 +1,13 @@
+---
+id: "admin-portal-guide"
+title: "Admin Portal Guide"
+category: "Admin Guides"
+description: "Complete guide to the Admin Portal features and sections"
+audience: "admin"
+tags: ["admin", "portal", "guide", "management"]
+status: "published"
+---
+
 # Admin Portal Guide
 
 Complete guide to all admin portal features and sections.

@@ -1,3 +1,13 @@
+---
+id: "profiling-level-strategy"
+title: "Level Strategy"
+category: "Core Systems"
+description: "User progression and level strategy"
+audience: "admin"
+tags: ["profiling", "levels", "progression", "strategy"]
+status: "published"
+---
+
 # Progressive Profiling Level Strategy
 
 ## Philosophy
