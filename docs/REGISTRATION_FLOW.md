@@ -80,10 +80,13 @@ Registration collects essential identity information:
 - GPS toggle stored in `profiles.gps_enabled`
 
 **Backend:**
-- Supabase Auth creates user in `auth.users`
-- Trigger `handle_new_user()` creates profile record
+- Edge function `mock-looplly-register` handles registration
+- Password hashed with bcrypt (12 rounds)
+- Profile created directly in `profiles` table
+- JWT token generated and returned
 - Mobile stored in normalized E.164 format
 - Reputation record auto-created with 0 points
+- **Note:** `auth.users` bypassed for regular users (Custom JWT auth)
 
 **Database Tables:**
 ```sql
