@@ -8,8 +8,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, Key, Eye, EyeOff } from 'lucide-react';
 import { countries } from '@/data/countries';
-import { getCountryByDialCode, getDefaultCountry, formatCountryOption } from '@/utils/countries';
-import { CountryFlag } from '@/components/ui/country-flag';
+import { getCountryByDialCode, getDefaultCountry, formatCountryDisplay, formatCountryOption } from '@/utils/countries';
 import { validateAndNormalizeMobile } from '@/utils/mobileValidation';
 import { getMobileFormatInfo } from '@/utils/mobileFormatExamples';
 import { supabase } from '@/integrations/supabase/client';
@@ -206,18 +205,16 @@ export default function ForgotPassword({ onBack }: ForgotPasswordProps) {
                     value={countryCode} 
                     onValueChange={setCountryCode}
                   >
-                    <SelectTrigger className="w-28 h-12">
-                      <span className="flex items-center gap-1.5">
-                        <CountryFlag iso={(getCountryByDialCode(countryCode) || defaultCountry).code} />
-                        <span className="font-medium">{(getCountryByDialCode(countryCode) || defaultCountry).dialCode}</span>
-                      </span>
-                      <SelectValue className="sr-only" />
+                    <SelectTrigger className="w-24 h-12">
+                      <SelectValue>
+                        {formatCountryDisplay(getCountryByDialCode(countryCode) || defaultCountry)}
+                      </SelectValue>
                     </SelectTrigger>
                     <SelectContent className="max-h-60">
                       {countries.map((country) => (
                          <SelectItem key={country.code} value={country.dialCode}>
                            <span className="flex items-center gap-2">
-                             <CountryFlag iso={country.code} />
+                             <span className="text-lg">{country.flag}</span>
                              <span className="font-medium">{country.dialCode}</span>
                              <span className="text-muted-foreground">{country.name}</span>
                            </span>

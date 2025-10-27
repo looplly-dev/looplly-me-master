@@ -7,8 +7,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { countries } from '@/data/countries';
-import { getCountryByDialCode, getDefaultCountry, formatCountryOption } from '@/utils/countries';
-import { CountryFlag } from '@/components/ui/country-flag';
+import { getCountryByDialCode, getDefaultCountry, formatCountryDisplay, formatCountryOption } from '@/utils/countries';
 import { useFormValidation } from '@/hooks/useFormValidation';
 import { validateRegistration, RegistrationData } from '@/utils/validation';
 import { useAuth } from '@/hooks/useAuth';
@@ -388,18 +387,16 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
                   value={formData.countryCode} 
                   onValueChange={handleCountryChange}
                 >
-                  <SelectTrigger className="w-28 h-12">
-                    <span className="flex items-center gap-1.5">
-                      <CountryFlag iso={selectedCountry?.code || 'ZA'} />
-                      <span className="font-medium">{selectedCountry?.dialCode || '+27'}</span>
-                    </span>
-                    <SelectValue className="sr-only" />
+                  <SelectTrigger className="w-24 h-12">
+                     <SelectValue>
+                       {selectedCountry ? formatCountryDisplay(selectedCountry) : '🇿🇦 +27'}
+                     </SelectValue>
                   </SelectTrigger>
                   <SelectContent className="max-h-60">
                      {countries.map((country) => (
                         <SelectItem key={country.code} value={country.dialCode}>
                           <span className="flex items-center gap-2">
-                            <CountryFlag iso={country.code} />
+                            <span className="text-lg">{country.flag}</span>
                             <span className="font-medium">{country.dialCode}</span>
                             <span className="text-muted-foreground">{country.name}</span>
                           </span>
@@ -441,11 +438,19 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
                   )}
                   
                   {/* Helper text */}
-                  {!formData.mobile && (
-                    <p className="text-xs text-muted-foreground">
-                      {getMobileFormatInfo(formData.countryCode).hint}
-                    </p>
-                  )}
+                {!formData.mobile && selectedCountry && (
+                  <p className="text-xs text-muted-foreground flex items-center gap-1.5 flex-wrap">
+                    <span className="text-base leading-none">{selectedCountry.flag}</span>
+                    <span className="font-medium">{selectedCountry.name}</span>
+                    <span>format:</span>
+                    <code className="font-mono bg-muted px-1.5 py-0.5 rounded text-foreground/80 text-[11px]">
+                      {getMobileFormatInfo(formData.countryCode).example}
+                    </code>
+                    <span className="text-muted-foreground/70">
+                      • {getMobileFormatInfo(formData.countryCode).hint}
+                    </span>
+                  </p>
+                )}
                 </div>
               </div>
             </div>
