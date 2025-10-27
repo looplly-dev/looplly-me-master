@@ -438,11 +438,19 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
                   )}
                   
                   {/* Helper text */}
-                  {!formData.mobile && (
-                    <p className="text-xs text-muted-foreground">
-                      {getMobileFormatInfo(formData.countryCode).hint}
-                    </p>
-                  )}
+                {!formData.mobile && selectedCountry && (
+                  <p className="text-xs text-muted-foreground flex items-center gap-1.5 flex-wrap">
+                    <span className="text-base leading-none">{selectedCountry.flag}</span>
+                    <span className="font-medium">{selectedCountry.name}</span>
+                    <span>format:</span>
+                    <code className="font-mono bg-muted px-1.5 py-0.5 rounded text-foreground/80 text-[11px]">
+                      {getMobileFormatInfo(formData.countryCode).example}
+                    </code>
+                    <span className="text-muted-foreground/70">
+                      • {getMobileFormatInfo(formData.countryCode).hint}
+                    </span>
+                  </p>
+                )}
                 </div>
               </div>
             </div>
