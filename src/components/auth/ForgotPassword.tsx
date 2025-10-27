@@ -10,6 +10,7 @@ import { ArrowLeft, Key, Eye, EyeOff } from 'lucide-react';
 import { countries } from '@/data/countries';
 import { getCountryByDialCode, getDefaultCountry, formatCountryDisplay, formatCountryOption } from '@/utils/countries';
 import { validateAndNormalizeMobile } from '@/utils/mobileValidation';
+import { getMobileFormatInfo } from '@/utils/mobileFormatExamples';
 import { supabase } from '@/integrations/supabase/client';
 
 interface ForgotPasswordProps {
@@ -219,15 +220,22 @@ export default function ForgotPassword({ onBack }: ForgotPasswordProps) {
                       ))}
                     </SelectContent>
                   </Select>
-                  <Input
-                    id="mobile"
-                    type="tel"
-                    placeholder="823093959"
-                    value={mobile}
-                    onChange={(e) => setMobile(e.target.value)}
-                    className="h-12 flex-1"
-                    required
-                  />
+                  <div className="flex-1 space-y-1">
+                    <Input
+                      id="mobile"
+                      type="tel"
+                      placeholder={getMobileFormatInfo(countryCode).example}
+                      value={mobile}
+                      onChange={(e) => setMobile(e.target.value)}
+                      className="h-12"
+                      required
+                    />
+                    {!mobile && (
+                      <p className="text-xs text-muted-foreground">
+                        {getMobileFormatInfo(countryCode).hint}
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
               <Button 

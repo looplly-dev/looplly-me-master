@@ -18,6 +18,7 @@ import { Switch } from '@/components/ui/switch';
 import { analytics } from '@/utils/analytics';
 import { validateAndNormalizeMobile } from '@/utils/mobileValidation';
 import { validateAndNormalizeEmail } from '@/utils/emailValidation';
+import { getMobileFormatInfo } from '@/utils/mobileFormatExamples';
 import { cn } from '@/lib/utils';
 import { Check, X } from 'lucide-react';
 import { getSupabaseClient } from '@/integrations/supabase/activeClient';
@@ -405,7 +406,7 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
                   <Input
                     id="mobile"
                     type="tel"
-                    placeholder="823093959 or 0823093959"
+                    placeholder={getMobileFormatInfo(formData.countryCode).example}
                     value={formData.mobile}
                     onChange={(e) => handleMobileChange(e.target.value)}
                     className={cn(
@@ -437,7 +438,7 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
                   {/* Helper text */}
                   {!formData.mobile && (
                     <p className="text-xs text-muted-foreground">
-                      Enter without country code (leading 0 is okay)
+                      {getMobileFormatInfo(formData.countryCode).hint}
                     </p>
                   )}
                 </div>

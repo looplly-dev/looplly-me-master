@@ -12,6 +12,7 @@ import { analytics } from '@/utils/analytics';
 import { countries } from '@/data/countries';
 import { getCountryByDialCode, getDefaultCountry, formatCountryDisplay, formatCountryOption } from '@/utils/countries';
 import { validateAndNormalizeMobile } from '@/utils/mobileValidation';
+import { getMobileFormatInfo } from '@/utils/mobileFormatExamples';
 
 interface LoginProps {
   onForgotPassword: () => void;
@@ -189,18 +190,25 @@ export default function Login({ onForgotPassword, onRegister }: LoginProps) {
                     ))}
                   </SelectContent>
                 </Select>
-                <Input
-                  id="mobile"
-                  type="tel"
-                  placeholder="823093959"
-                  value={formData.mobile}
-                  onChange={(e) => {
-                    setFormData({...formData, mobile: e.target.value});
-                    setShowSignupPrompt(false);
-                  }}
-                  className="h-12 flex-1"
-                  required
-                />
+                <div className="flex-1 space-y-1">
+                  <Input
+                    id="mobile"
+                    type="tel"
+                    placeholder={getMobileFormatInfo(formData.countryCode).example}
+                    value={formData.mobile}
+                    onChange={(e) => {
+                      setFormData({...formData, mobile: e.target.value});
+                      setShowSignupPrompt(false);
+                    }}
+                    className="h-12"
+                    required
+                  />
+                  {!formData.mobile && (
+                    <p className="text-xs text-muted-foreground">
+                      {getMobileFormatInfo(formData.countryCode).hint}
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
 
