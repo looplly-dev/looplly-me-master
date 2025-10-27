@@ -5,70 +5,212 @@ export interface MobileFormatInfo {
 
 export const getMobileFormatInfo = (dialCode: string): MobileFormatInfo => {
   const formats: Record<string, MobileFormatInfo> = {
-    '+27': {
-      example: '0712345678',
-      hint: 'Enter with or without leading 0'
-    },
-    '+234': {
-      example: '08012345678',
-      hint: 'Enter with or without leading 0'
-    },
-    '+254': {
-      example: '0712345678',
-      hint: 'Enter with or without leading 0'
-    },
-    '+44': {
-      example: '07700900123',
-      hint: 'Enter with or without leading 0'
-    },
-    '+91': {
-      example: '9876543210',
-      hint: 'Enter without leading 0'
-    },
-    '+65': {
-      example: '82309359',
-      hint: 'Enter without leading 0'
-    },
-    '+1': {
-      example: '2025551234',
-      hint: '10 digits, no leading 0'
-    },
-    '+61': {
-      example: '0412345678',
-      hint: 'Enter with or without leading 0'
-    },
-    '+81': {
-      example: '09012345678',
-      hint: 'Enter with or without leading 0'
-    },
-    '+86': {
-      example: '13800138000',
-      hint: 'Enter without leading 0'
-    },
-    '+33': {
-      example: '0612345678',
-      hint: 'Enter with or without leading 0'
-    },
-    '+49': {
-      example: '01512345678',
-      hint: 'Enter with or without leading 0'
-    },
-    '+971': {
-      example: '0501234567',
-      hint: 'Enter with or without leading 0'
-    },
-    '+966': {
-      example: '0501234567',
-      hint: 'Enter with or without leading 0'
-    },
-    '+20': {
-      example: '01012345678',
-      hint: 'Enter with or without leading 0'
-    },
+    // AFRICA
+    '+27': { example: '0823093959', hint: 'Enter with or without leading 0' },
+    '+234': { example: '08012345678', hint: 'Enter with or without leading 0' },
+    '+254': { example: '0712345678', hint: 'Enter with or without leading 0' },
+    '+233': { example: '0241234567', hint: 'Enter with or without leading 0' },
+    '+255': { example: '0712345678', hint: 'Enter with or without leading 0' },
+    '+256': { example: '0701234567', hint: 'Enter with or without leading 0' },
+    '+260': { example: '0971234567', hint: 'Enter with or without leading 0' },
+    '+263': { example: '0712345678', hint: 'Enter with or without leading 0' },
+    '+265': { example: '0991234567', hint: 'Enter with or without leading 0' },
+    '+267': { example: '71234567', hint: '8 digits, no leading 0' },
+    '+223': { example: '70123456', hint: '8 digits, no leading 0' },
+    '+221': { example: '771234567', hint: '9 digits, no leading 0' },
+    '+237': { example: '671234567', hint: '9 digits, no leading 0' },
+    '+225': { example: '0712345678', hint: 'Enter with or without leading 0' },
+    '+226': { example: '70123456', hint: '8 digits, no leading 0' },
+    '+227': { example: '93123456', hint: '8 digits, no leading 0' },
+    '+228': { example: '90123456', hint: '8 digits, no leading 0' },
+    '+229': { example: '97123456', hint: '8 digits, no leading 0' },
+    '+230': { example: '52512345', hint: '8 digits, no leading 0' },
+    '+231': { example: '770123456', hint: '9 digits, no leading 0' },
+    '+232': { example: '76123456', hint: '8 digits, no leading 0' },
+    '+235': { example: '63123456', hint: '8 digits, no leading 0' },
+    '+236': { example: '70123456', hint: '8 digits, no leading 0' },
+    '+238': { example: '9912345', hint: '7 digits, no leading 0' },
+    '+239': { example: '9812345', hint: '7 digits, no leading 0' },
+    '+240': { example: '222123456', hint: '9 digits, no leading 0' },
+    '+241': { example: '06123456', hint: 'Enter with or without leading 0' },
+    '+242': { example: '061234567', hint: 'Enter with or without leading 0' },
+    '+243': { example: '0991234567', hint: 'Enter with or without leading 0' },
+    '+244': { example: '923123456', hint: '9 digits, no leading 0' },
+    '+245': { example: '5551234', hint: '7 digits, no leading 0' },
+    '+246': { example: '2501234', hint: '7 digits, no leading 0' },
+    '+248': { example: '2512345', hint: '7 digits, no leading 0' },
+    '+249': { example: '0912345678', hint: 'Enter with or without leading 0' },
+    '+250': { example: '0781234567', hint: 'Enter with or without leading 0' },
+    '+251': { example: '0911234567', hint: 'Enter with or without leading 0' },
+    '+252': { example: '907123456', hint: '9 digits, no leading 0' },
+    '+253': { example: '77123456', hint: '8 digits, no leading 0' },
+    '+257': { example: '79123456', hint: '8 digits, no leading 0' },
+    '+258': { example: '821234567', hint: '9 digits, no leading 0' },
+    '+261': { example: '0321234567', hint: 'Enter with or without leading 0' },
+    '+262': { example: '0692123456', hint: 'Enter with or without leading 0' },
+    '+264': { example: '0811234567', hint: 'Enter with or without leading 0' },
+    '+266': { example: '50123456', hint: '8 digits, no leading 0' },
+    '+268': { example: '76123456', hint: '8 digits, no leading 0' },
+    '+269': { example: '3212345', hint: '7 digits, no leading 0' },
+    '+20': { example: '01012345678', hint: 'Enter with or without leading 0' },
+    '+211': { example: '0911234567', hint: 'Enter with or without leading 0' },
+    '+212': { example: '0612345678', hint: 'Enter with or without leading 0' },
+    '+213': { example: '0551234567', hint: 'Enter with or without leading 0' },
+    '+216': { example: '20123456', hint: '8 digits, no leading 0' },
+    '+218': { example: '0912345678', hint: 'Enter with or without leading 0' },
+    '+220': { example: '3012345', hint: '7 digits, no leading 0' },
+    '+222': { example: '22123456', hint: '8 digits, no leading 0' },
+    '+224': { example: '601123456', hint: '9 digits, no leading 0' },
+    
+    // ASIA
+    '+91': { example: '9876543210', hint: '10 digits, no leading 0' },
+    '+86': { example: '13800138000', hint: '11 digits, no leading 0' },
+    '+81': { example: '09012345678', hint: 'Enter with or without leading 0' },
+    '+65': { example: '82309359', hint: '8 digits, no leading 0' },
+    '+66': { example: '0812345678', hint: 'Enter with or without leading 0' },
+    '+84': { example: '0912345678', hint: 'Enter with or without leading 0' },
+    '+60': { example: '0123456789', hint: 'Enter with or without leading 0' },
+    '+63': { example: '09171234567', hint: 'Enter with or without leading 0' },
+    '+62': { example: '08123456789', hint: 'Enter with or without leading 0' },
+    '+82': { example: '01012345678', hint: 'Enter with or without leading 0' },
+    '+886': { example: '0912345678', hint: 'Enter with or without leading 0' },
+    '+852': { example: '51234567', hint: '8 digits, no leading 0' },
+    '+853': { example: '66123456', hint: '8 digits, no leading 0' },
+    '+855': { example: '012345678', hint: 'Enter with or without leading 0' },
+    '+856': { example: '2023456789', hint: '10 digits, no leading 0' },
+    '+880': { example: '01712345678', hint: 'Enter with or without leading 0' },
+    '+92': { example: '03001234567', hint: 'Enter with or without leading 0' },
+    '+93': { example: '0701234567', hint: 'Enter with or without leading 0' },
+    '+94': { example: '0712345678', hint: 'Enter with or without leading 0' },
+    '+95': { example: '09250123456', hint: 'Enter with or without leading 0' },
+    '+98': { example: '09123456789', hint: 'Enter with or without leading 0' },
+    '+960': { example: '7912345', hint: '7 digits, no leading 0' },
+    '+975': { example: '17123456', hint: '8 digits, no leading 0' },
+    '+976': { example: '88123456', hint: '8 digits, no leading 0' },
+    '+977': { example: '9841234567', hint: '10 digits, no leading 0' },
+    '+992': { example: '917123456', hint: '9 digits, no leading 0' },
+    '+993': { example: '65123456', hint: '8 digits, no leading 0' },
+    '+994': { example: '0501234567', hint: 'Enter with or without leading 0' },
+    '+995': { example: '0555123456', hint: 'Enter with or without leading 0' },
+    '+996': { example: '0700123456', hint: 'Enter with or without leading 0' },
+    '+998': { example: '901234567', hint: '9 digits, no leading 0' },
+    
+    // MIDDLE EAST
+    '+971': { example: '0501234567', hint: 'Enter with or without leading 0' },
+    '+966': { example: '0501234567', hint: 'Enter with or without leading 0' },
+    '+965': { example: '50012345', hint: '8 digits, no leading 0' },
+    '+968': { example: '92123456', hint: '8 digits, no leading 0' },
+    '+974': { example: '33123456', hint: '8 digits, no leading 0' },
+    '+973': { example: '36123456', hint: '8 digits, no leading 0' },
+    '+962': { example: '0790123456', hint: 'Enter with or without leading 0' },
+    '+961': { example: '03123456', hint: 'Enter with or without leading 0' },
+    '+964': { example: '07901234567', hint: 'Enter with or without leading 0' },
+    '+967': { example: '0712345678', hint: 'Enter with or without leading 0' },
+    '+972': { example: '0501234567', hint: 'Enter with or without leading 0' },
+    '+970': { example: '0599123456', hint: 'Enter with or without leading 0' },
+    '+963': { example: '0944123456', hint: 'Enter with or without leading 0' },
+    
+    // EUROPE
+    '+44': { example: '07700900123', hint: 'Enter with or without leading 0' },
+    '+33': { example: '0612345678', hint: 'Enter with or without leading 0' },
+    '+49': { example: '01512345678', hint: 'Enter with or without leading 0' },
+    '+39': { example: '3123456789', hint: '10 digits, no leading 0' },
+    '+34': { example: '612345678', hint: '9 digits, no leading 0' },
+    '+31': { example: '0612345678', hint: 'Enter with or without leading 0' },
+    '+32': { example: '0470123456', hint: 'Enter with or without leading 0' },
+    '+41': { example: '0791234567', hint: 'Enter with or without leading 0' },
+    '+43': { example: '0664123456', hint: 'Enter with or without leading 0' },
+    '+45': { example: '20123456', hint: '8 digits, no leading 0' },
+    '+46': { example: '0701234567', hint: 'Enter with or without leading 0' },
+    '+47': { example: '40612345', hint: '8 digits, no leading 0' },
+    '+48': { example: '501234567', hint: '9 digits, no leading 0' },
+    '+351': { example: '912345678', hint: '9 digits, no leading 0' },
+    '+352': { example: '628123456', hint: '9 digits, no leading 0' },
+    '+353': { example: '0851234567', hint: 'Enter with or without leading 0' },
+    '+354': { example: '6111234', hint: '7 digits, no leading 0' },
+    '+355': { example: '0661234567', hint: 'Enter with or without leading 0' },
+    '+356': { example: '99123456', hint: '8 digits, no leading 0' },
+    '+357': { example: '99123456', hint: '8 digits, no leading 0' },
+    '+358': { example: '0401234567', hint: 'Enter with or without leading 0' },
+    '+359': { example: '0897123456', hint: 'Enter with or without leading 0' },
+    '+36': { example: '0201234567', hint: 'Enter with or without leading 0' },
+    '+370': { example: '06 123 4567', hint: 'Enter with or without leading 0' },
+    '+371': { example: '21234567', hint: '8 digits, no leading 0' },
+    '+372': { example: '51234567', hint: '8 digits, no leading 0' },
+    '+373': { example: '0621234567', hint: 'Enter with or without leading 0' },
+    '+374': { example: '77123456', hint: '8 digits, no leading 0' },
+    '+375': { example: '0291234567', hint: 'Enter with or without leading 0' },
+    '+376': { example: '312345', hint: '6 digits, no leading 0' },
+    '+377': { example: '612345678', hint: '9 digits, no leading 0' },
+    '+378': { example: '66661212', hint: '8 digits, no leading 0' },
+    '+379': { example: '3312345678', hint: '10 digits, no leading 0' },
+    '+380': { example: '0501234567', hint: 'Enter with or without leading 0' },
+    '+381': { example: '0601234567', hint: 'Enter with or without leading 0' },
+    '+382': { example: '067123456', hint: 'Enter with or without leading 0' },
+    '+383': { example: '044123456', hint: 'Enter with or without leading 0' },
+    '+385': { example: '0921234567', hint: 'Enter with or without leading 0' },
+    '+386': { example: '031234567', hint: 'Enter with or without leading 0' },
+    '+387': { example: '061123456', hint: 'Enter with or without leading 0' },
+    '+389': { example: '070123456', hint: 'Enter with or without leading 0' },
+    '+40': { example: '0712345678', hint: 'Enter with or without leading 0' },
+    '+420': { example: '601123456', hint: '9 digits, no leading 0' },
+    '+421': { example: '0912123456', hint: 'Enter with or without leading 0' },
+    '+423': { example: '660123456', hint: '9 digits, no leading 0' },
+    '+7': { example: '9161234567', hint: '10 digits, no leading 0' },
+    
+    // AMERICAS - NORTH AMERICA
+    '+1': { example: '2025551234', hint: '10 digits, no leading 0' },
+    
+    // AMERICAS - CENTRAL & CARIBBEAN
+    '+52': { example: '5512345678', hint: '10 digits, no leading 0' },
+    '+53': { example: '51234567', hint: '8 digits, no leading 0' },
+    '+502': { example: '51234567', hint: '8 digits, no leading 0' },
+    '+503': { example: '70123456', hint: '8 digits, no leading 0' },
+    '+504': { example: '91234567', hint: '8 digits, no leading 0' },
+    '+505': { example: '81234567', hint: '8 digits, no leading 0' },
+    '+506': { example: '83123456', hint: '8 digits, no leading 0' },
+    '+507': { example: '61234567', hint: '8 digits, no leading 0' },
+    '+509': { example: '34101234', hint: '8 digits, no leading 0' },
+    
+    // AMERICAS - SOUTH AMERICA
+    '+54': { example: '91123456789', hint: '10-11 digits, no leading 0' },
+    '+55': { example: '011987654321', hint: 'Enter with or without leading 0' },
+    '+56': { example: '912345678', hint: '9 digits, no leading 0' },
+    '+57': { example: '3001234567', hint: '10 digits, no leading 0' },
+    '+58': { example: '04121234567', hint: 'Enter with or without leading 0' },
+    '+591': { example: '71234567', hint: '8 digits, no leading 0' },
+    '+592': { example: '6091234', hint: '7 digits, no leading 0' },
+    '+593': { example: '0991234567', hint: 'Enter with or without leading 0' },
+    '+594': { example: '0694201234', hint: 'Enter with or without leading 0' },
+    '+595': { example: '0961234567', hint: 'Enter with or without leading 0' },
+    '+596': { example: '0696201234', hint: 'Enter with or without leading 0' },
+    '+597': { example: '7412345', hint: '7 digits, no leading 0' },
+    '+598': { example: '094123456', hint: 'Enter with or without leading 0' },
+    
+    // OCEANIA
+    '+61': { example: '0412345678', hint: 'Enter with or without leading 0' },
+    '+64': { example: '021234567', hint: 'Enter with or without leading 0' },
+    '+675': { example: '70123456', hint: '8 digits, no leading 0' },
+    '+676': { example: '7712345', hint: '7 digits, no leading 0' },
+    '+677': { example: '7412345', hint: '7 digits, no leading 0' },
+    '+678': { example: '5912345', hint: '7 digits, no leading 0' },
+    '+679': { example: '7012345', hint: '7 digits, no leading 0' },
+    '+680': { example: '6201234', hint: '7 digits, no leading 0' },
+    '+681': { example: '821234', hint: '6 digits, no leading 0' },
+    '+682': { example: '71234', hint: '5 digits, no leading 0' },
+    '+683': { example: '4012', hint: '4 digits, no leading 0' },
+    '+685': { example: '7212345', hint: '7 digits, no leading 0' },
+    '+686': { example: '72001234', hint: '8 digits, no leading 0' },
+    '+687': { example: '751234', hint: '6 digits, no leading 0' },
+    '+688': { example: '901234', hint: '6 digits, no leading 0' },
+    '+689': { example: '87123456', hint: '8 digits, no leading 0' },
+    '+690': { example: '1234', hint: '4 digits, no leading 0' },
+    '+691': { example: '3501234', hint: '7 digits, no leading 0' },
+    '+692': { example: '2351234', hint: '7 digits, no leading 0' },
   };
   
   return formats[dialCode] || {
-    example: '1234567890',
-    hint: 'Enter without country code (leading 0 is okay)'
+    example: '9123456789',
+    hint: 'Enter mobile number without country code'
   };
 };
