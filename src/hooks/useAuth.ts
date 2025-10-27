@@ -101,11 +101,13 @@ export const useAuthLogic = () => {
       }
     }
     
-    // 2. CHECK CUSTOM LOOPLLY JWT (localStorage)
+    // 2. CHECK CUSTOM LOOPLLY JWT (localStorage) - BUT NOT ON ADMIN ROUTES
+    const isAdminRoute = window.location.pathname.startsWith('/admin');
     const loopllyToken = localStorage.getItem('looplly_auth_token');
     const loopllyUser = localStorage.getItem('looplly_user');
 
-    if (loopllyToken && loopllyUser) {
+    // Skip Looplly JWT on admin routes to prevent regular user context from hijacking
+    if (!isAdminRoute && loopllyToken && loopllyUser) {
       try {
         const payload = JSON.parse(atob(loopllyToken.split('.')[1]));
         const now = Math.floor(Date.now() / 1000);
@@ -115,43 +117,62 @@ export const useAuthLogic = () => {
           localStorage.removeItem('looplly_auth_token');
           localStorage.removeItem('looplly_user');
         } else {
-          console.log('Found valid Looplly JWT, fetching profile...');
+          console.log('Found valid Looplly JWT, setting initial state...');
           const user = JSON.parse(loopllyUser);
 
+          // Set initial state but DON'T return - we need to attach the listener
+          setAuthState({
+            user: {
+              id: user.id,
+              mobile: user.mobile,
+              countryCode: user.country_code || '+1',
+              firstName: user.first_name || user.firstName || '',
+              lastName: user.last_name || user.lastName || '',
+              email: user.email,
+              isVerified: user.is_verified ?? false,
+              profileComplete: user.profile_complete ?? false,
+              profile: user.profile
+            },
+            isAuthenticated: true,
+            isLoading: false,
+            step: 'dashboard'
+          });
+
+          // Fetch fresh profile in background but don't block
           setTimeout(async () => {
             if (!mounted) return;
             const { data: profile } = await supabase.from('profiles').select('*').eq('user_id', user.id).single();
             if (profile && mounted) {
-            setAuthState({
-              user: {
-                id: profile.user_id,
-                mobile: profile.mobile,
-                countryCode: profile.country_code,
-                firstName: profile.first_name,
-                lastName: profile.last_name,
-                email: profile.email,
-                isVerified: profile.is_verified,
-                profileComplete: profile.profile_complete,
-                profile: profile ? {
-                  sec: (profile.sec as 'A' | 'B' | 'C1' | 'C2' | 'D' | 'E') || 'B',
-                  gender: (profile.gender as 'male' | 'female' | 'other') || 'other',
-                  dateOfBirth: profile.date_of_birth ? new Date(profile.date_of_birth) : new Date(),
-                  address: profile.address || '',
-                  gpsEnabled: profile.gps_enabled || false,
-                  firstName: profile.first_name || '',
-                  lastName: profile.last_name || '',
-                  email: profile.email || '',
-                  country_code: profile.country_code,
-                  country_iso: profile.country_iso
-                } : undefined
-              },
-              isAuthenticated: true,
-              isLoading: false,
-              step: 'dashboard'
-            });
+              setAuthState({
+                user: {
+                  id: profile.user_id,
+                  mobile: profile.mobile,
+                  countryCode: profile.country_code,
+                  firstName: profile.first_name,
+                  lastName: profile.last_name,
+                  email: profile.email,
+                  isVerified: profile.is_verified,
+                  profileComplete: profile.profile_complete,
+                  profile: profile ? {
+                    sec: (profile.sec as 'A' | 'B' | 'C1' | 'C2' | 'D' | 'E') || 'B',
+                    gender: (profile.gender as 'male' | 'female' | 'other') || 'other',
+                    dateOfBirth: profile.date_of_birth ? new Date(profile.date_of_birth) : new Date(),
+                    address: profile.address || '',
+                    gpsEnabled: profile.gps_enabled || false,
+                    firstName: profile.first_name || '',
+                    lastName: profile.last_name || '',
+                    email: profile.email || '',
+                    country_code: profile.country_code,
+                    country_iso: profile.country_iso
+                  } : undefined
+                },
+                isAuthenticated: true,
+                isLoading: false,
+                step: 'dashboard'
+              });
             }
           }, 0);
-          return;
+          // Continue to attach listener below - don't return!
         }
       } catch (error) {
         console.error('Error parsing Looplly JWT:', error);

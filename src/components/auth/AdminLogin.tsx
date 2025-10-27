@@ -9,7 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Eye, EyeOff, Shield, ArrowLeft } from 'lucide-react';
 import { useRole } from '@/hooks/useRole';
 import { useUserType } from '@/hooks/useUserType';
-import { supabase } from '@/integrations/supabase/client';
+import { getSupabaseClient } from '@/integrations/supabase/activeClient';
 
 export default function AdminLogin() {
   const navigate = useNavigate();
@@ -46,6 +46,13 @@ export default function AdminLogin() {
     setIsSubmitting(true);
     
     try {
+      // Use path-aware client for admin context
+      const supabase = getSupabaseClient();
+      
+      // Clear any conflicting regular user tokens before login
+      localStorage.removeItem('looplly_auth_token');
+      localStorage.removeItem('looplly_user');
+      
       // Pass 'looplly_team_user' to enforce team member login
       const success = await login(formData.email, formData.password, 'looplly_team_user');
       

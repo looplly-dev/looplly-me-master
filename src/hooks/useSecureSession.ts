@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { getSupabaseClient } from '@/integrations/supabase/activeClient';
 import { useAuth } from '@/hooks/useAuth';
 
 export function useSecureSession() {
@@ -18,6 +18,7 @@ export function useSecureSession() {
 
     const checkSession = async () => {
       try {
+        const supabase = getSupabaseClient();
         const { data: { session }, error } = await supabase.auth.getSession();
         
         if (error || !session) {
@@ -68,6 +69,7 @@ export function useSecureSession() {
 
   const refreshSession = async () => {
     try {
+      const supabase = getSupabaseClient();
       const { error } = await supabase.auth.refreshSession();
       if (error) {
         console.error('Session refresh error:', error);
