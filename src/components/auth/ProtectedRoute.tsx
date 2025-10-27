@@ -141,7 +141,8 @@ export default function ProtectedRoute({
 
   // Check if this is an admin route (being a team member is sufficient)
   // Individual admin pages can implement granular role checks if needed
-  if (requiredRole && (requiredRole === 'admin' || requiredRole === 'super_admin')) {
+  // Admin portal access: any verified team member can access
+  if (requiredRole === 'admin') {
     if (userType !== 'looplly_team_user') {
       return fallback || (
         <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -160,8 +161,13 @@ export default function ProtectedRoute({
         </div>
       );
     }
-    // Team member verified - allow access to admin portal
+    if (import.meta.env.DEV) {
+      console.info('[ProtectedRoute] Admin short-circuit: team member verified, granting access');
+    }
+    return <>{children}</>;
   }
+
+  // Super admin routes still require explicit role
 
   // Insufficient permissions (using hierarchical role check)
   if (requiredRole && !hasRole(requiredRole)) {
