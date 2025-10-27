@@ -6,7 +6,7 @@ This section contains documentation for administrators managing the Looplly plat
 ## Documents in this Category
 
 - **[PORTAL_GUIDE.md](./PORTAL_GUIDE.md)** - Complete admin portal navigation and features guide
-- **[WARREN_GUIDE.md](./WARREN_GUIDE.md)** - Warren-specific administrative procedures and access
+- **[PLATFORM_GUIDE.md](./PLATFORM_GUIDE.md)** - Admin platform guide and administrative procedures
 - **[FEATURE_TESTING_CATALOG.md](./FEATURE_TESTING_CATALOG.md)** - Feature testing procedures and test case catalog
 
 ## Quick Start
@@ -14,7 +14,7 @@ This section contains documentation for administrators managing the Looplly plat
 ### For New Administrators
 1. Start with [PORTAL_GUIDE.md](./PORTAL_GUIDE.md) for portal overview
 2. Review [FEATURE_TESTING_CATALOG.md](./FEATURE_TESTING_CATALOG.md) for testing workflows
-3. Check [WARREN_GUIDE.md](./WARREN_GUIDE.md) if you're Warren
+3. Check [PLATFORM_GUIDE.md](./PLATFORM_GUIDE.md) for platform administration
 
 ### For Testing Teams
 1. Begin with [FEATURE_TESTING_CATALOG.md](./FEATURE_TESTING_CATALOG.md)

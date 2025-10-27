@@ -1,4 +1,4 @@
-# Warren Admin Platform Guide
+# Admin Platform Guide
 
 ## Overview
 
@@ -142,7 +142,7 @@ Click **"Add Question"** to open the question builder.
 - Validation rules
 - Decay configuration
 
-See [Question Builder Guide](PROFILING/QUESTION_BUILDER_GUIDE.md) for details.
+See [Question Builder Guide](../features/profiling/QUESTION_BUILDER_GUIDE.md) for details.
 
 ### Country-Specific Options
 
@@ -162,7 +162,7 @@ For brand/provider questions:
 4. Edit if needed
 5. Approve and save
 
-See [Admin Auto-Generation Guide](PROFILING/ADMIN_AUTO_GENERATION_GUIDE.md).
+See [Admin Auto-Generation Guide](../features/profiling/ADMIN_AUTO_GENERATION_GUIDE.md).
 
 ### Bulk Operations
 
@@ -215,7 +215,7 @@ Navigate to **Admin → Knowledge Centre**
 - Internal linking
 - SEO optimization
 
-See [Knowledge Centre Guide](KNOWLEDGE_CENTRE.md).
+See [Knowledge Centre Guide](../features/knowledge-centre/KNOWLEDGE_CENTRE.md).
 
 ## Team & Permissions
 
@@ -344,7 +344,7 @@ Configure staleness intervals:
 }
 ```
 
-See [Profile Decay System](PROFILE_DECAY_SYSTEM.md).
+See [Profile Decay System](../features/profiling/PROFILE_DECAY_SYSTEM.md).
 
 ### Reputation Configuration
 
@@ -362,7 +362,7 @@ Navigate to **Admin → Reputation Config**
 - Referral rewards
 - Streak milestones
 
-See [Reputation System](REP_CLASSIFICATION_SYSTEM.md).
+See [Reputation System](../features/reputation/REP_CLASSIFICATION_SYSTEM.md).
 
 ### Integration Management
 
@@ -417,7 +417,7 @@ Navigate to **Admin → Integrations**
 4. Test with hard refresh during simulation
 5. Review browser DevTools → Storage (localStorage vs sessionStorage)
 
-See [Simulator Architecture](SIMULATOR_ARCHITECTURE.md) for technical details.
+See [Simulator Architecture](../testing/SIMULATOR_ARCHITECTURE.md) for technical details.
 
 ### Getting Help
 
@@ -456,8 +456,8 @@ See [Simulator Architecture](SIMULATOR_ARCHITECTURE.md) for technical details.
 
 ## Related Documentation
 
-- [User Management](ACCOUNT_MANAGEMENT.md)
-- [Profile Questions](PROFILING/ADMIN_GUIDE.md)
-- [Knowledge Centre](KNOWLEDGE_CENTRE.md)
-- [Analytics](ANALYTICS.md)
-- [Role Architecture](ROLE_ARCHITECTURE.md)
+- [User Management](../users/ACCOUNT_MANAGEMENT.md)
+- [Profile Questions](../features/profiling/ADMIN_GUIDE.md)
+- [Knowledge Centre](../features/knowledge-centre/KNOWLEDGE_CENTRE.md)
+- [Analytics](../reference/ANALYTICS.md)
+- [Role Architecture](../users/ROLE_ARCHITECTURE.md)

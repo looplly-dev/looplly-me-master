@@ -461,6 +461,6 @@ ORDER BY last_activity DESC;
 ## Related Documentation
 
 - [Role Architecture](ROLE_ARCHITECTURE.md)
-- [Admin Guide](WARREN_ADMIN_GUIDE.md)
+- [Admin Guide](../admin/PLATFORM_GUIDE.md)
 - [Account Management](ACCOUNT_MANAGEMENT.md)
 - [Data Isolation](DATA_ISOLATION_QUICK_REFERENCE.md)

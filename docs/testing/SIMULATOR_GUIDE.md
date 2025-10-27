@@ -662,7 +662,7 @@ lifetime_earnings: 50.00
 ## Related Documentation
 
 - [Simulator Architecture](SIMULATOR_ARCHITECTURE.md) - Technical implementation details
-- [Authentication Architecture](AUTHENTICATION_ARCHITECTURE.md) - Session isolation explained
-- [User Classification](USER_CLASSIFICATION.md) - Test user vs regular user differences
-- [Registration Flow](REGISTRATION_FLOW.md) - Understanding user journey stages
-- [Warren Admin Guide](WARREN_ADMIN_GUIDE.md) - General admin portal usage
+- [Authentication Architecture](../authentication/ARCHITECTURE.md) - Session isolation explained
+- [User Classification](../users/CLASSIFICATION.md) - Test user vs regular user differences
+- [Registration Flow](../authentication/REGISTRATION_FLOW.md) - Understanding user journey stages
+- [Admin Platform Guide](../admin/PLATFORM_GUIDE.md) - General admin portal usage

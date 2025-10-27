@@ -42,4 +42,4 @@ CREATE TABLE office_user_roles (
 
 ## Related Documentation
 - [User Type Management](USER_TYPE_MANAGEMENT.md)
-- [Admin Guide](WARREN_ADMIN_GUIDE.md)
+- [Admin Guide](../admin/PLATFORM_GUIDE.md)

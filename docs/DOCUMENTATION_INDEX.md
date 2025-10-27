@@ -58,8 +58,8 @@ Welcome to the Looplly Knowledge Centre. This index provides categorized access 
 ### 🛡️ Admin Portal (4 documents)
 
 **Admin Guides**
-- **[Warren's Admin Guide](WARREN_ADMIN_GUIDE.md)** (v2.0) - Plain-English admin guide covering authentication, team management, and portal features
-- **[Admin Portal Guide](ADMIN_PORTAL_GUIDE.md)** (v2.0) - Complete admin portal documentation including authentication, authorization, and feature navigation
+   - **[Admin Platform Guide](admin/PLATFORM_GUIDE.md)** (v2.0) - Plain-English admin guide covering authentication, team management, and portal features
+   - **[Admin Portal Guide](admin/PORTAL_GUIDE.md)** (v2.0) - Complete admin portal documentation including authentication, authorization, and feature navigation
 - **[Role Architecture](ROLE_ARCHITECTURE.md)** (v2.0) - Role system implementation with permissions matrix and security functions
 
 **Configuration**
@@ -163,8 +163,8 @@ Welcome to the Looplly Knowledge Centre. This index provides categorized access 
 ## 🎯 Getting Started Paths
 
 ### For Administrators
-1. Start with [Warren's Admin Guide](WARREN_ADMIN_GUIDE.md) for plain-English overview
-2. Read [Admin Portal Guide](ADMIN_PORTAL_GUIDE.md) for feature navigation
+1. Start with [Admin Platform Guide](admin/PLATFORM_GUIDE.md) for plain-English overview
+2. Read [Admin Portal Guide](admin/PORTAL_GUIDE.md) for feature navigation
 3. Review [Role Architecture](ROLE_ARCHITECTURE.md) to understand permissions
 4. Use [Simulator Architecture](SIMULATOR_ARCHITECTURE.md) for testing
 
@@ -200,7 +200,7 @@ Welcome to the Looplly Knowledge Centre. This index provides categorized access 
 
 **Finding Admin Information:**
 - Search: "admin", "role", "permissions", "portal"
-- Key docs: WARREN_ADMIN_GUIDE, ADMIN_PORTAL_GUIDE, ROLE_ARCHITECTURE
+- Key docs: PLATFORM_GUIDE, PORTAL_GUIDE, ROLE_ARCHITECTURE
 
 **Finding Testing Information:**
 - Search: "simulator", "testing", "test user", "stage"
@@ -259,7 +259,7 @@ Welcome to the Looplly Knowledge Centre. This index provides categorized access 
 ---
 
 ## Related Documentation
-- [Recent Changes](RECENT_CHANGES.md) - Latest platform updates
-- [Warren's Admin Guide](WARREN_ADMIN_GUIDE.md) - Admin quick start
+- [Recent Changes](reference/RECENT_CHANGES.md) - Latest platform updates
+- [Admin Platform Guide](admin/PLATFORM_GUIDE.md) - Admin quick start
 - [Authentication Architecture](AUTHENTICATION_ARCHITECTURE.md) - Core auth concepts
 - [User Classification](USER_CLASSIFICATION.md) - User types overview

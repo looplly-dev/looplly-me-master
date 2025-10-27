@@ -49,4 +49,4 @@ CREATE TABLE documentation_versions (
 
 ## Related Documentation
 - [Knowledge Centre](KNOWLEDGE_CENTRE.md)
-- [Admin Guide](WARREN_ADMIN_GUIDE.md)
+- [Admin Platform Guide](../../admin/PLATFORM_GUIDE.md)

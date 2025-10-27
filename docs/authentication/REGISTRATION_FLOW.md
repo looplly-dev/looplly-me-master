@@ -488,10 +488,10 @@ CREATE POLICY "Users manage own answers"
 
 ## Related Documentation
 
-- [Profile System Architecture](PROFILE_SYSTEM_ARCHITECTURE.md) - Database schema and profiling levels
-- [User Profiling Guide](PROFILING/USER_GUIDE.md) - User-facing documentation
-- [Mobile Validation](MOBILE_VALIDATION.md) - Mobile number validation system
+- [Profile System Architecture](../technical/PROFILE_SYSTEM_ARCHITECTURE.md) - Database schema and profiling levels
+- [User Profiling Guide](../features/profiling/USER_GUIDE.md) - User-facing documentation
+- [Mobile Validation](../features/mobile/VALIDATION.md) - Mobile number validation system
 - [Password Reset Flow](PASSWORD_RESET_FLOW.md) - Mobile-based password recovery
-- [Warren Admin Guide](WARREN_ADMIN_GUIDE.md) - Admin management of users and questions
-- [Simulator Architecture](SIMULATOR_ARCHITECTURE.md) - Testing different user states
-- [Country Code Specification](COUNTRY_CODE_SPECIFICATION.md) - Country validation rules
+- [Admin Platform Guide](../admin/PLATFORM_GUIDE.md) - Admin management of users and questions
+- [Simulator Architecture](../testing/SIMULATOR_ARCHITECTURE.md) - Testing different user states
+- [Country Code Specification](../technical/COUNTRY_CODE_SPECIFICATION.md) - Country validation rules

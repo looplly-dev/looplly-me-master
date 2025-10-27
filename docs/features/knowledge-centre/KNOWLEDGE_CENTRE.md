@@ -559,6 +559,6 @@ async function exportAllDocumentation() {
 
 ## Related Documentation
 
-- [Admin Guide](WARREN_ADMIN_GUIDE.md)
+- [Admin Guide](../../admin/PLATFORM_GUIDE.md)
 - [Documentation Version Control](DOCUMENTATION_VERSION_CONTROL.md)
 - [Content Management Best Practices](docs/CONTENT_BEST_PRACTICES.md)

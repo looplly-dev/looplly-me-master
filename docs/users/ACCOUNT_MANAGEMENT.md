@@ -610,5 +610,5 @@ CREATE INDEX idx_audit_log_created ON audit_log(created_at DESC);
 
 - [User Type Management](USER_TYPE_MANAGEMENT.md)
 - [Role Architecture](ROLE_ARCHITECTURE.md)
-- [Admin Guide](WARREN_ADMIN_GUIDE.md)
+- [Admin Guide](../admin/PLATFORM_GUIDE.md)
 - [Data Isolation](DATA_ISOLATION_QUICK_REFERENCE.md)

@@ -734,7 +734,7 @@ const [value, setValue] = useState<any>(
 
 ## Related Documentation
 
-- [Admin Portal Guide](WARREN_ADMIN_GUIDE.md) - General admin usage
+- [Admin Portal Guide](../admin/PLATFORM_GUIDE.md) - General admin usage
 - [Profiling Admin Guide](PROFILING/ADMIN_GUIDE.md) - Testing profile questions
 - [Supabase Migration Guide](SUPABASE_MIGRATION_GUIDE.md) - Migration considerations
 - [Supabase Configuration](SUPABASE_CONFIG_MANAGEMENT.md) - Backend setup

@@ -40,4 +40,4 @@ export function useAnalytics() {
 ```
 
 ## Related Documentation
-- [Admin Guide](WARREN_ADMIN_GUIDE.md)
+- [Admin Platform Guide](../admin/PLATFORM_GUIDE.md)
