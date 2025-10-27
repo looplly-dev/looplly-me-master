@@ -35,7 +35,10 @@ Welcome to the Looplly Knowledge Centre. This index provides categorized access 
 **User Management**
 - **[User Classification](USER_CLASSIFICATION.md)** (v3.0) - Database architecture and characteristics of looplly_user, looplly_team_user, and future client_user types
 - **[User Type Management](USER_TYPE_MANAGEMENT.md)** (v2.5) - Managing different user types with authentication flows, access control, and security rules
-- **[Role Architecture](ROLE_ARCHITECTURE.md)** (v2.0) - Role-based access control system with granular permissions, implementation details, and RLS examples
+- **[Role Architecture](ROLE_ARCHITECTURE.md)** (v3.0) - Security-first role-based access control system with server-side enforcement, permissions matrix, and attack mitigation
+
+**Role Security**
+- **[Role Security Migration Guide](ROLE_SECURITY_MIGRATION.md)** (v1.0) - Step-by-step guide for migrating from insecure role storage to database-enforced role architecture
 
 **Password Management**
 - **[Password Reset Flow](PASSWORD_RESET_FLOW.md)** (v1.5) - Password reset and management flows for both regular users (Custom JWT) and team members (Supabase Auth)
@@ -60,7 +63,7 @@ Welcome to the Looplly Knowledge Centre. This index provides categorized access 
 **Admin Guides**
    - **[Admin Platform Guide](admin/PLATFORM_GUIDE.md)** (v2.0) - Plain-English admin guide covering authentication, team management, and portal features
    - **[Admin Portal Guide](admin/PORTAL_GUIDE.md)** (v2.0) - Complete admin portal documentation including authentication, authorization, and feature navigation
-- **[Role Architecture](ROLE_ARCHITECTURE.md)** (v2.0) - Role system implementation with permissions matrix and security functions
+- **[Role Architecture](ROLE_ARCHITECTURE.md)** (v3.0) - Security-first role system with hierarchical permissions and server-side enforcement
 
 **Configuration**
 - **[Country Blocklist Management](docs/AdminCountryBlocklist.md)** - Managing restricted countries and blocklist rules
@@ -156,7 +159,7 @@ Welcome to the Looplly Knowledge Centre. This index provides categorized access 
 
 - **[Data Isolation Quick Reference](DATA_ISOLATION_QUICK_REFERENCE.md)** - Quick guide to RLS policies
 - **[Country Code Specification](COUNTRY_CODE_SPECIFICATION.md)** - Country codes and dial codes reference
-- **[Recent Changes](RECENT_CHANGES.md)** - Latest platform changes and updates
+- **[Recent Changes](RECENT_CHANGES.md)** (v1.1) - Latest platform changes and updates (last updated: 2025-10-27)
 
 ---
 
@@ -218,8 +221,8 @@ Welcome to the Looplly Knowledge Centre. This index provides categorized access 
 
 ## 📊 Documentation Statistics
 
-**Total Documents:** 48+
-- Authentication & Security: 7
+**Total Documents:** 49+
+- Authentication & Security: 8 (added Role Security Migration Guide)
 - User Management: 5
 - Admin Portal: 4
 - Testing & Simulation: 3
@@ -230,15 +233,15 @@ Welcome to the Looplly Knowledge Centre. This index provides categorized access 
 - Quick Reference: 3
 
 **Documentation Versions:**
-- v3.0 (Major overhaul): 2 documents
+- v3.0 (Major security overhaul): 3 documents (ROLE_ARCHITECTURE, USER_CLASSIFICATION, AUTHENTICATION_ARCHITECTURE)
 - v2.0+ (Major update): 10 documents
 - v1.5 (Significant update): 4 documents
 - v1.3 (Minor update): 10+ documents
-- v1.0 (Initial): 20+ documents
+- v1.0 (Initial): 21+ documents
 
 **Primary Author:** Nadia Gaspari
 **Technical Content:** AI-Generated with Human Review
-**Last Updated:** 2025-01-27
+**Last Updated:** 2025-10-27
 
 ---
 
