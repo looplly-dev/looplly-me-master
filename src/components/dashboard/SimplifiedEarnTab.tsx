@@ -320,7 +320,7 @@ export default function SimplifiedEarnTab() {
   const totalAvailable = surveyCount + videoCount + taskCount + dataCount;
 
 
-  // Check if Level 2 is complete
+  // Gate 1: Check if Level 2 is complete
   if (!level2Complete) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[500px] p-8 space-y-6 bg-gradient-to-b from-warning/5 to-transparent">
@@ -331,10 +331,10 @@ export default function SimplifiedEarnTab() {
         <div className="text-center space-y-3">
           <h2 className="text-3xl font-bold text-foreground">Complete Your Profile to Start Earning</h2>
           <p className="text-lg text-muted-foreground max-w-md">
-            <span className="font-semibold text-warning">Level 2:</span> Demographics, Income, SEC/SEM
+            Answer 6 quick questions to unlock surveys
           </p>
           <p className="text-sm text-muted-foreground">
-            → Blocks Earn tab access (no surveys until complete)
+            Takes less than 2 minutes
           </p>
         </div>
         <Card className="max-w-md border-warning/30 bg-card">
@@ -362,10 +362,50 @@ export default function SimplifiedEarnTab() {
         </Card>
         <Button onClick={() => {
           analytics.trackProfileComplete();
-          navigate('/profile');
+          navigate('/profile/complete');
         }} size="lg" className="text-lg px-8 py-6">
           <ArrowRight className="h-5 w-5 mr-2" />
           Complete Profile Now
+        </Button>
+      </div>
+    );
+  }
+
+  // Gate 2: Check if mobile is verified
+  if (!isVerified) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[500px] p-8 space-y-6 bg-gradient-to-b from-amber-500/5 to-transparent">
+        <div className="relative">
+          <Shield className="h-20 w-20 text-amber-600 mx-auto animate-pulse" />
+          <div className="absolute inset-0 h-20 w-20 mx-auto rounded-full bg-amber-500/20 animate-ping" />
+        </div>
+        <div className="text-center space-y-3">
+          <h2 className="text-3xl font-bold text-foreground">Verify Your Mobile to Start Earning</h2>
+          <p className="text-lg text-muted-foreground max-w-md">
+            We need to verify your mobile number before you can access surveys
+          </p>
+        </div>
+        <Card className="max-w-md border-amber-500/30 bg-card">
+          <CardContent className="p-6 space-y-4">
+            <ul className="space-y-2 text-sm text-muted-foreground">
+              <li className="flex items-start gap-2">
+                <CheckCircle className="h-4 w-4 text-success mt-0.5 flex-shrink-0" />
+                <span>Quick 5-digit code verification</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <CheckCircle className="h-4 w-4 text-success mt-0.5 flex-shrink-0" />
+                <span>Protects your account and earnings</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <CheckCircle className="h-4 w-4 text-success mt-0.5 flex-shrink-0" />
+                <span>Required for payment processing</span>
+              </li>
+            </ul>
+          </CardContent>
+        </Card>
+        <Button onClick={() => navigate('/verify-mobile')} size="lg" className="text-lg px-8 py-6">
+          <Shield className="h-5 w-5 mr-2" />
+          Verify Mobile Now
         </Button>
       </div>
     );
@@ -393,26 +433,7 @@ export default function SimplifiedEarnTab() {
       
       {/* Normal Earn content renders underneath */}
       <div className="pt-0 pb-24 md:pb-20 lg:pb-8 px-0 md:px-6 lg:px-8 space-y-3">
-        {/* Verification Banner */}
-        {!isVerified && (
-          <Alert className="mx-4 border-amber-500 bg-amber-500/10">
-            <Shield className="h-5 w-5 text-amber-600" />
-            <AlertTitle className="text-amber-700 font-bold">
-              Mobile Verification Required
-            </AlertTitle>
-            <AlertDescription className="text-sm text-muted-foreground">
-              Verify your mobile number to unlock earning opportunities.
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="mt-2 border-amber-500 text-amber-700 hover:bg-amber-500 hover:text-white"
-                onClick={() => setShowOTPModal(true)}
-              >
-                Verify Now →
-              </Button>
-            </AlertDescription>
-          </Alert>
-        )}
+        {/* Verification banner removed - now handled by gate above */}
         
         {/* Enhanced Balance Card with Progress */}
         <Card className="bg-card border-0 shadow-lg">

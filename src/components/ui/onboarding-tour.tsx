@@ -1,14 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { 
   ArrowRight, 
   X, 
   Coins, 
-  Star, 
-  Wallet,
-  User,
-  Target
+  Sparkles,
+  Trophy,
+  CheckCircle
 } from 'lucide-react';
 
 interface TourStep {
@@ -17,7 +16,6 @@ interface TourStep {
   description: string;
   icon: React.ReactNode;
   targetElement?: string;
-  position?: 'top' | 'bottom' | 'left' | 'right';
 }
 
 interface OnboardingTourProps {
@@ -28,40 +26,29 @@ interface OnboardingTourProps {
 
 const tourSteps: TourStep[] = [
   {
-    id: 'welcome',
-    title: 'Welcome to Looplly! 🎉',
-    description: 'Start earning money in minutes! Let me show you how.',
-    icon: <Star className="h-6 w-6 text-warning" />
+    id: "welcome",
+    title: "Welcome to Looplly! 🎉",
+    description: "You're now part of a community that earns by sharing insights. Let's show you around!",
+    icon: <Sparkles className="h-8 w-8" />,
   },
   {
-    id: 'balance',
-    title: 'Your Balance',
-    description: 'This shows your current earnings and progress to your first cashout at $5.',
-    icon: <Coins className="h-6 w-6 text-primary" />
+    id: "earn-tab",
+    title: "This is Your Earn Tab",
+    description: "Surveys, videos, and tasks will appear here. This is where you'll make money!",
+    icon: <Coins className="h-8 w-8" />,
+    targetElement: "tab-earn"
   },
   {
-    id: 'daily-checkin',
-    title: 'Free Daily Bonus',
-    description: 'Tap here every day for instant $0.50! Build your streak for bonus rewards.',
-    icon: <Target className="h-6 w-6 text-success" />
+    id: "complete-profile",
+    title: "Complete Your Profile First",
+    description: "To unlock earning opportunities, you'll need to complete your profile. It only takes 2 minutes!",
+    icon: <Trophy className="h-8 w-8" />,
   },
   {
-    id: 'earn-tasks',
-    title: 'Start Earning',
-    description: 'Complete simple tasks like surveys and videos. Most take just 2-5 minutes!',
-    icon: <Star className="h-6 w-6 text-accent" />
-  },
-  {
-    id: 'wallet',
-    title: 'Cash Out Options',
-    description: 'Withdraw to M-Pesa, PayPal, or buy airtime. Low minimums, fast payments!',
-    icon: <Wallet className="h-6 w-6 text-success" />
-  },
-  {
-    id: 'level2-importance',
-    title: 'Why Complete Your Profile?',
-    description: 'Your basic info helps us match you with the best surveys and opportunities. Plus, it unlocks withdrawals! Takes just 2 minutes.',
-    icon: <User className="h-6 w-6 text-primary" />
+    id: "get-started",
+    title: "Let's Get Started! 🚀",
+    description: "Complete your profile now to start earning. You're just a few questions away!",
+    icon: <CheckCircle className="h-8 w-8" />,
   }
 ];
 

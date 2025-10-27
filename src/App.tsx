@@ -35,6 +35,8 @@ import ResetPasswordRequired from "./pages/ResetPasswordRequired";
 import AdminLogin from "./components/auth/AdminLogin";
 import AdminResetPassword from "./pages/AdminResetPassword";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
+import ProfileComplete from "./pages/ProfileComplete";
+import VerifyMobile from "./pages/VerifyMobile";
 
 const queryClient = new QueryClient();
 
@@ -77,6 +79,11 @@ const AppContent = () => {
               
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/reset-password-required" element={<ResetPasswordRequired />} />
+              
+              {/* Profile & Verification Routes */}
+              <Route path="/profile/complete" element={<ProtectedRoute><ProfileComplete /></ProtectedRoute>} />
+              <Route path="/verify-mobile" element={<ProtectedRoute><VerifyMobile /></ProtectedRoute>} />
+              
               <Route path="/*" element={<LoopllyApp />} />
             </Routes>
   );

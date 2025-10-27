@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/hooks/useAuth';
 import { useRole } from '@/hooks/useRole';
 import { useDarkMode } from '@/hooks/useDarkMode';
-import { Coins, Wallet, User, Users, Trophy, MessageSquare, LogOut, Settings, HelpCircle, Shield, Moon, Sun } from 'lucide-react';
+import { Coins, Wallet, User, Trophy, LogOut, Settings, HelpCircle, Moon, Sun, Shield, Users, MessageSquare } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { getSupabaseClient } from '@/integrations/supabase/activeClient';
 import SimplifiedEarnTab from './SimplifiedEarnTab';
@@ -16,13 +16,7 @@ import RepTab from './RepTab';
 import CommunityTab from './CommunityTab';
 import SimplifiedSupportTab from './SimplifiedSupportTab';
 import { OnboardingTour } from '@/components/ui/onboarding-tour';
-import { useOnboarding } from '@/hooks/useOnboarding';
 import { useProfileQuestions } from '@/hooks/useProfileQuestions';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { AlertCircle } from 'lucide-react';
-import OTPVerification from '@/components/auth/OTPVerification';
-import MobileVerification from '@/components/auth/MobileVerification';
-import Level2ProfileModal from './Level2ProfileModal';
 import { useToast } from '@/hooks/use-toast';
 
 interface DashboardProps {
@@ -30,19 +24,26 @@ interface DashboardProps {
 }
 
 export default function Dashboard({ triggerOnboarding = false }: DashboardProps) {
+  const [showOnboardingTour, setShowOnboardingTour] = useState(false);
   const [activeTab, setActiveTab] = useState('earn');
   const [showSettings, setShowSettings] = useState(false);
   const [showSupport, setShowSupport] = useState(false);
-  const [showOTPModal, setShowOTPModal] = useState(false);
-  const [showLevel2Modal, setShowLevel2Modal] = useState(false);
   const { authState, logout } = useAuth();
   const { isAdmin } = useRole();
   const { isDarkMode, toggleDarkMode } = useDarkMode();
-  const { showOnboarding, completeOnboarding, skipOnboarding } = useOnboarding(triggerOnboarding);
   const { level2Complete, level2Categories } = useProfileQuestions();
   const { toast } = useToast();
   const navigate = useNavigate();
   const supabase = getSupabaseClient();
+
+  // Check for onboarding tour flag on mount
+  useEffect(() => {
+    const shouldShowTour = sessionStorage.getItem('show_onboarding_tour');
+    if (shouldShowTour === 'true') {
+      setShowOnboardingTour(true);
+      sessionStorage.removeItem('show_onboarding_tour');
+    }
+  }, []);
   
   // Prevent test accounts from accessing dashboard outside simulator
   useEffect(() => {
@@ -225,45 +226,7 @@ export default function Dashboard({ triggerOnboarding = false }: DashboardProps)
 
       {/* Main Content */}
       <div className="max-w-md md:max-w-2xl lg:max-w-5xl mx-auto">
-        {/* Level 2 Incomplete Alert (highest priority) */}
-        {!level2Complete && (
-          <Alert className="mx-4 mt-4 border-warning bg-warning/10">
-            <AlertCircle className="h-5 w-5 text-warning" />
-            <AlertTitle className="text-warning font-bold">Complete Your Profile to Start Earning</AlertTitle>
-            <AlertDescription className="text-sm text-muted-foreground">
-              You're {Math.round(level2Percentage)}% done! Finish your basic info to unlock surveys and earning opportunities.
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="mt-2 border-warning text-warning hover:bg-warning hover:text-warning-foreground"
-                onClick={() => setShowLevel2Modal(true)}
-              >
-                Complete Now →
-              </Button>
-            </AlertDescription>
-          </Alert>
-        )}
-        
-        {/* Verification Banner (only show if Level 2 is complete) */}
-        {level2Complete && !isVerified && (
-          <Alert className="mx-4 mt-4 border-green-500 bg-green-50 dark:bg-green-950">
-            <Shield className="h-5 w-5 text-green-600" />
-            <AlertTitle className="text-green-700 font-bold">
-              One Last Step!
-            </AlertTitle>
-            <AlertDescription className="text-sm text-muted-foreground">
-              Verify your mobile number to start earning.
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="mt-2 border-green-500 text-green-700 hover:bg-green-500 hover:text-white"
-                onClick={() => setShowOTPModal(true)}
-              >
-                Verify Now →
-              </Button>
-            </AlertDescription>
-          </Alert>
-        )}
+        {/* Alerts removed - gates now handled in SimplifiedEarnTab */}
         
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsContent value="earn" className="mt-0">
@@ -343,53 +306,14 @@ export default function Dashboard({ triggerOnboarding = false }: DashboardProps)
         </Tabs>
       </div>
 
-      {/* Onboarding Tour */}
-      <OnboardingTour
-        isVisible={showOnboarding}
-        onComplete={() => {
-          completeOnboarding();
-          // After tour, if Level 2 incomplete, auto-open modal
-          if (!level2Complete) {
-            setShowLevel2Modal(true);
-          }
-        }}
-        onSkip={() => {
-          skipOnboarding();
-          // Even if skipped, still prompt for Level 2
-          if (!level2Complete) {
-            setShowLevel2Modal(true);
-          }
-        }}
-      />
-      
-      {/* Level 2 Profile Modal */}
-      <Level2ProfileModal
-        open={showLevel2Modal}
-        onClose={() => setShowLevel2Modal(false)}
-        onComplete={() => {
-          setShowLevel2Modal(false);
-          toast({
-            title: 'Profile Complete!',
-            description: 'Now let\'s verify your mobile number!',
-          });
-          // Auto-open OTP modal instead of reloading
-          setShowOTPModal(true);
-        }}
-      />
-      
-      {/* Mobile Verification Modal */}
-      <MobileVerification
-        open={showOTPModal}
-        onClose={() => setShowOTPModal(false)}
-        onSuccess={() => {
-          setShowOTPModal(false);
-          toast({
-            title: 'Mobile Verified!',
-            description: 'You can now start earning',
-          });
-          window.location.reload();
-        }}
-      />
+      {/* Onboarding Tour - Shows after registration */}
+      {showOnboardingTour && (
+        <OnboardingTour 
+          isVisible={showOnboardingTour}
+          onComplete={() => setShowOnboardingTour(false)}
+          onSkip={() => setShowOnboardingTour(false)}
+        />
+      )}
     </div>
   );
 }

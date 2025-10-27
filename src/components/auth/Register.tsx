@@ -255,11 +255,11 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
         const normalizedMobile = `${formData.countryCode}${formData.mobile.replace(/^0+/, '')}`;
         const loginSuccess = await login(normalizedMobile, formData.password);
         
-        if (loginSuccess) {
-          // Mark as just registered for onboarding trigger
-          sessionStorage.setItem('just_registered', 'true');
-          navigate('/');
-        }
+      if (loginSuccess) {
+        // Set flag to show onboarding tour
+        sessionStorage.setItem('show_onboarding_tour', 'true');
+        navigate('/');
+      }
       } else {
         // Track signup failure
         analytics.trackSignup('email', false);
