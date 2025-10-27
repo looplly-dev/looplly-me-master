@@ -7,13 +7,26 @@ import { Lightbulb, BookOpen, FileText, Sparkles, CheckCircle2, Clock } from 'lu
 import DocumentationSearch from './DocumentationSearch';
 import QuickReference from './QuickReference';
 import SeedDocumentationButton from './SeedDocumentationButton';
+import QuickStartGuides from './QuickStartGuides';
+import RecommendationsPanel from './RecommendationsPanel';
+import KeyboardShortcutsHelp from './KeyboardShortcutsHelp';
+import CategoryCard from './CategoryCard';
 import { documentationIndex } from '@/data/documentationIndex';
 import { useRole } from '@/hooks/useRole';
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
+import { useSearchHistory } from '@/hooks/useSearchHistory';
 
 export default function KnowledgeDashboard() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'published' | 'coming_soon'>('all');
+  const [showShortcutsHelp, setShowShortcutsHelp] = useState(false);
   const { isAdmin } = useRole();
+  const { addSearch } = useSearchHistory();
+
+  useKeyboardShortcuts([
+    { key: '?', callback: () => setShowShortcutsHelp(true) },
+    { key: '/', callback: () => document.querySelector<HTMLInputElement>('input[type="text"]')?.focus() }
+  ]);
 
   const categories = Array.from(new Set(documentationIndex.map(doc => doc.category)));
   const categoryCounts = categories.map(cat => {
@@ -79,41 +92,35 @@ export default function KnowledgeDashboard() {
             statusFilter="all"
           />
 
+          {/* Quick Start Guides */}
+          {!searchQuery && <QuickStartGuides />}
+
+          {/* Recommendations */}
+          {!searchQuery && <RecommendationsPanel />}
+
           {/* Categories Grid */}
           {!searchQuery && (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
               {categoryCounts.map(({ category, total, published, comingSoon }) => {
                 const IconComponent = categoryIcons[category] || FileText;
+                const topDocs = documentationIndex
+                  .filter(d => d.category === category && d.status === 'published')
+                  .slice(0, 3);
                 return (
-                  <Card 
-                    key={category} 
-                    className="hover:shadow-lg transition-all cursor-pointer group"
+                  <CategoryCard
+                    key={category}
+                    category={category}
+                    total={total}
+                    published={published}
+                    comingSoon={comingSoon}
+                    icon={IconComponent}
+                    topDocs={topDocs}
                     onClick={() => {
                       setSearchQuery(category);
+                      addSearch(category);
                       window.scrollTo({ top: 0, behavior: 'smooth' });
                     }}
-                  >
-                    <CardContent className="pt-6 text-center space-y-3">
-                      <IconComponent className="h-12 w-12 mx-auto text-primary group-hover:scale-110 transition-transform" />
-                      <div>
-                        <h3 className="font-semibold text-lg">{category}</h3>
-                        <div className="flex justify-center gap-2 mt-2 text-xs text-muted-foreground">
-                          {published > 0 && (
-                            <span className="flex items-center gap-1">
-                              <CheckCircle2 className="h-3 w-3 text-green-600" />
-                              {published}
-                            </span>
-                          )}
-                          {comingSoon > 0 && (
-                            <span className="flex items-center gap-1">
-                              <Clock className="h-3 w-3 text-yellow-600" />
-                              {comingSoon}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                  />
                 );
               })}
             </div>
@@ -173,6 +180,8 @@ export default function KnowledgeDashboard() {
           </Button>
         </CardContent>
       </Card>
+
+      <KeyboardShortcutsHelp open={showShortcutsHelp} onClose={() => setShowShortcutsHelp(false)} />
     </div>
   );
 }

@@ -889,9 +889,11 @@ export type Database = {
         Row: {
           accessed_at: string | null
           action: string
+          clicked_result_id: string | null
           document_id: string | null
           id: string
           ip_address: unknown
+          result_count: number | null
           search_query: string | null
           user_agent: string | null
           user_id: string | null
@@ -899,9 +901,11 @@ export type Database = {
         Insert: {
           accessed_at?: string | null
           action: string
+          clicked_result_id?: string | null
           document_id?: string | null
           id?: string
           ip_address?: unknown
+          result_count?: number | null
           search_query?: string | null
           user_agent?: string | null
           user_id?: string | null
@@ -909,12 +913,79 @@ export type Database = {
         Update: {
           accessed_at?: string | null
           action?: string
+          clicked_result_id?: string | null
           document_id?: string | null
           id?: string
           ip_address?: unknown
+          result_count?: number | null
           search_query?: string | null
           user_agent?: string | null
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      documentation_answers: {
+        Row: {
+          answer: string
+          created_at: string | null
+          id: string
+          is_accepted: boolean | null
+          question_id: string
+          upvotes: number | null
+          user_id: string
+        }
+        Insert: {
+          answer: string
+          created_at?: string | null
+          id?: string
+          is_accepted?: boolean | null
+          question_id: string
+          upvotes?: number | null
+          user_id: string
+        }
+        Update: {
+          answer?: string
+          created_at?: string | null
+          id?: string
+          is_accepted?: boolean | null
+          question_id?: string
+          upvotes?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "documentation_answers_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "documentation_questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      documentation_feedback: {
+        Row: {
+          comment: string | null
+          created_at: string | null
+          document_id: string
+          id: string
+          rating: number | null
+          user_id: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string | null
+          document_id: string
+          id?: string
+          rating?: number | null
+          user_id: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string | null
+          document_id?: string
+          id?: string
+          rating?: number | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -963,6 +1034,60 @@ export type Database = {
           tags?: string[]
           title?: string
           version?: number
+        }
+        Relationships: []
+      }
+      documentation_questions: {
+        Row: {
+          created_at: string | null
+          document_id: string
+          id: string
+          question: string
+          section: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          document_id: string
+          id?: string
+          question: string
+          section?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          document_id?: string
+          id?: string
+          question?: string
+          section?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      documentation_reading_progress: {
+        Row: {
+          document_id: string
+          id: string
+          last_position: string | null
+          progress_percent: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          document_id: string
+          id?: string
+          last_position?: string | null
+          progress_percent?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          document_id?: string
+          id?: string
+          last_position?: string | null
+          progress_percent?: number | null
+          updated_at?: string | null
+          user_id?: string
         }
         Relationships: []
       }

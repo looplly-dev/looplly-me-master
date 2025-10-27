@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Printer, Copy, Check, Clock, Edit } from 'lucide-react';
+import { ArrowLeft, Printer, Copy, Check, Clock, Edit, BookOpen } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
@@ -14,6 +14,14 @@ import { supabase } from '@/integrations/supabase/client';
 import { useRole } from '@/hooks/useRole';
 import { useAuth } from '@/hooks/useAuth';
 import VersionHistory from './VersionHistory';
+import Breadcrumbs from './Breadcrumbs';
+import FeedbackWidget from './FeedbackWidget';
+import RelatedDocuments from './RelatedDocuments';
+import TableOfContents from './TableOfContents';
+import ProgressBar from './ProgressBar';
+import { calculateReadTime } from '@/utils/readTime';
+import { extractHeadings } from '@/utils/extractHeadings';
+import { useReadingProgress } from '@/hooks/useReadingProgress';
 
 interface DocumentationViewerProps {
   onBack?: () => void;
@@ -28,10 +36,13 @@ export default function DocumentationViewer({ onBack }: DocumentationViewerProps
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const [version, setVersion] = useState<number>(1);
   const [showVersionHistory, setShowVersionHistory] = useState(false);
+  const [headings, setHeadings] = useState<any[]>([]);
   const { hasRole } = useRole();
   const { authState } = useAuth();
+  const { progress, updateProgress } = useReadingProgress(documentId);
 
   const doc = documentationIndex.find(d => d.id === documentId);
+  const readTime = content ? calculateReadTime(content) : 0;
 
   // SECURITY: Audit log document views
   useEffect(() => {
@@ -69,6 +80,7 @@ export default function DocumentationViewer({ onBack }: DocumentationViewerProps
           const docData = data as any;
           setContent(docData.content);
           setVersion(docData.version || 1);
+          setHeadings(extractHeadings(docData.content));
         } else {
           setContent('# Document Not Found\n\nThis document has not been seeded into the database yet. Please use the "Seed Documentation" button in the Knowledge Centre to populate the database with all documentation files.');
         }
@@ -117,9 +129,15 @@ export default function DocumentationViewer({ onBack }: DocumentationViewerProps
   }
 
   return (
-    <div className="space-y-4">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+    <>
+      <ProgressBar progress={progress} />
+      <div className="flex gap-6">
+        <div className="flex-1 space-y-4">
+          {/* Breadcrumbs */}
+          <Breadcrumbs items={[{ label: doc.category }, { label: doc.title }]} />
+
+          {/* Header */}
+          <div className="flex items-center justify-between">
         <Button variant="ghost" onClick={handleBack}>
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Knowledge Centre
@@ -147,9 +165,15 @@ export default function DocumentationViewer({ onBack }: DocumentationViewerProps
         <CardHeader>
           <div className="flex items-start justify-between gap-4">
             <div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <CardTitle className="text-2xl">{doc.title}</CardTitle>
                 <Badge variant="outline">v{version}</Badge>
+                {readTime > 0 && (
+                  <Badge variant="secondary" className="gap-1">
+                    <Clock className="h-3 w-3" />
+                    {readTime} min read
+                  </Badge>
+                )}
               </div>
               <p className="text-muted-foreground mt-2">{doc.description}</p>
             </div>
@@ -219,6 +243,19 @@ export default function DocumentationViewer({ onBack }: DocumentationViewerProps
         </CardContent>
       </Card>
 
+      {/* Feedback & Related Docs */}
+      <div className="grid gap-4 md:grid-cols-2">
+        <FeedbackWidget documentId={documentId} />
+        <RelatedDocuments documentId={documentId} />
+      </div>
+    </div>
+
+    {/* Table of Contents Sidebar */}
+    <div className="w-64">
+      <TableOfContents headings={headings} />
+    </div>
+  </div>
+
       <VersionHistory
         docId={documentId}
         currentVersion={version}
@@ -247,6 +284,6 @@ export default function DocumentationViewer({ onBack }: DocumentationViewerProps
           loadDocument();
         }}
       />
-    </div>
+    </>
   );
 }
