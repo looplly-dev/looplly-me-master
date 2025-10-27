@@ -26,12 +26,10 @@ export default function AdminLogin() {
 
   // Redirect if already logged in as team member
   useEffect(() => {
-    if (authState.isAuthenticated && 
-        userType === 'looplly_team_user' && 
-        (isAdmin() || isSuperAdmin())) {
+    if (authState.isAuthenticated && userType === 'looplly_team_user') {
       navigate('/admin');
     }
-  }, [authState.isAuthenticated, userType, isAdmin, isSuperAdmin, navigate]);
+  }, [authState.isAuthenticated, userType, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -31,16 +31,20 @@ export function useUserType() {
       try {
         const supabase = getSupabaseClient();
         
-        // Step 1: Check team_profiles first (team members ONLY exist here after table separation)
-        const { data: teamProfile, error: teamError } = await supabase
-          .from('team_profiles')
-          .select('user_id, is_active')
-          .eq('user_id', authState.user!.id)
-          .maybeSingle();
+        // Step 1: Check team membership via secure RPC (bypasses RLS)
+        const { data: isTeamMemberResult, error: teamCheckError } = await supabase
+          .rpc('is_team_member', { _user_id: authState.user!.id });
 
-        if (teamProfile?.is_active) {
+        if (teamCheckError) {
+          console.error('[useUserType] Error checking team membership via RPC:', teamCheckError);
+        }
+
+        if (isTeamMemberResult) {
           setUserType('looplly_team_user');
           setIsLoading(false);
+          if (import.meta.env.DEV) {
+            console.info('[useUserType] Team membership verified via RPC');
+          }
           return;
         }
 
