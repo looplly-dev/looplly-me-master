@@ -394,11 +394,13 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
                   </SelectTrigger>
                   <SelectContent className="max-h-60">
                      {countries.map((country) => (
-                       <SelectItem key={country.code} value={country.dialCode}>
-                         <span className="flex items-center gap-2">
-                           {formatCountryOption(country)}
-                         </span>
-                       </SelectItem>
+                        <SelectItem key={country.code} value={country.dialCode}>
+                          <span className="flex items-center gap-2">
+                            <span className="text-lg">{country.flag}</span>
+                            <span className="font-medium">{country.dialCode}</span>
+                            <span className="text-muted-foreground">{country.name}</span>
+                          </span>
+                        </SelectItem>
                      ))}
                   </SelectContent>
                 </Select>
