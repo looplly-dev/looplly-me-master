@@ -37,28 +37,44 @@ serve(async (req) => {
       throw new Error('Unauthorized');
     }
 
-    // Check if caller is team member with tester role
-    const { data: callerProfile } = await supabaseAdmin
-      .from('profiles')
-      .select('user_type')
-      .eq('user_id', user.id)
-      .single();
+    // Check if caller is a team member using the is_team_member RPC
+    console.log('[create-simulator-session] Verifying team membership for:', user.id);
 
-    if (callerProfile?.user_type !== 'looplly_team_user') {
+    const { data: isTeam, error: teamErr } = await supabaseAdmin
+      .rpc('is_team_member', { _user_id: user.id });
+
+    if (teamErr) {
+      console.error('[create-simulator-session] Team membership check failed:', teamErr);
+      throw new Error('Failed to verify team membership');
+    }
+
+    console.log('[create-simulator-session] Is team member:', isTeam);
+
+    if (!isTeam) {
       throw new Error('Only team members can create simulator sessions');
     }
 
-    const { data: callerRole } = await supabaseAdmin
+    console.log('[create-simulator-session] Checking role permissions...');
+
+    const { data: callerRole, error: roleErr } = await supabaseAdmin
       .from('user_roles')
       .select('role')
       .eq('user_id', user.id)
       .single();
 
-    if (!['super_admin', 'admin', 'tester'].includes(callerRole?.role)) {
+    if (roleErr) {
+      console.error('[create-simulator-session] Role check failed:', roleErr);
+    }
+
+    const role = callerRole?.role ?? 'user';
+    console.log('[create-simulator-session] User role:', role);
+
+    if (!['super_admin', 'admin', 'tester'].includes(role)) {
       throw new Error('Insufficient permissions. Requires tester role or higher');
     }
 
     const { test_user_id, stage }: CreateSimulatorSessionRequest = await req.json();
+    console.log('[create-simulator-session] Request:', { test_user_id, stage });
 
     // Verify target is a test account
     const { data: testUser } = await supabaseAdmin
@@ -91,8 +107,10 @@ serve(async (req) => {
       throw new Error(`Failed to reset user journey: ${resetError.message}`);
     }
 
+    console.log('[create-simulator-session] Reset result:', resetResult);
+
     // Create a session using custom JWT for test user
-    console.log('Generating custom JWT for test user...');
+    console.log('[create-simulator-session] Generating custom JWT for test user...');
 
     // Fetch test user profile AFTER reset (to get post-reset data)
     const { data: testUserProfile } = await supabaseAdmin
