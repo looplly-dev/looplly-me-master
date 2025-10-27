@@ -69,7 +69,7 @@ const adminNavItems = [
 function AdminSidebar() {
   const { state } = useSidebar();
   const location = useLocation();
-  const { hasRole } = useRole();
+  const { hasRole, hasExactRole } = useRole();
 
   const isActive = (url: string, exact?: boolean) => {
     if (exact) {
@@ -81,9 +81,15 @@ function AdminSidebar() {
   const isCollapsed = state === 'collapsed';
   
   // Filter nav items based on user's role
-  const visibleNavItems = adminNavItems.filter(item => 
-    hasRole(item.minRole)
-  );
+  const visibleNavItems = adminNavItems.filter(item => {
+    // Journey Simulator: tester-only (exact match)
+    if (item.url === '/admin/simulator') {
+      return hasExactRole('tester');
+    }
+    
+    // All other admin routes: hierarchical (super_admin can access admin features)
+    return hasRole(item.minRole);
+  });
 
   return (
     <Sidebar className={isCollapsed ? 'w-14' : 'w-60'} collapsible="icon">

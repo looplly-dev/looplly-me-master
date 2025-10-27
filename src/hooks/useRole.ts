@@ -34,47 +34,37 @@ export function useRole() {
       try {
         const supabase = getSupabaseClient();
         
-        // First try user_roles table
-        const query = supabase
+        // Fetch ALL roles from user_roles table (no fallback to team_profiles)
+        const { data, error } = await supabase
           .from('user_roles')
           .select('role')
           .eq('user_id', authState.user!.id);
 
-        const { data, error } = (query as any).maybeSingle
-          ? await (query as any).maybeSingle()
-          : await (query as any).single();
+        if (error) {
+          console.error('Error fetching user roles:', error);
+          setRole('user');
+          setIsLoading(false);
+          return;
+        }
 
-        let resolvedRole: UserRole = (data?.role as UserRole) || 'user';
+        // Extract all roles
+        const allRoles = (data || []).map(r => r.role as UserRole);
 
-        // If no user_roles entry found, check team_profiles for company_role fallback
-        if (!data || resolvedRole === 'user') {
-          const { data: teamProfile } = await supabase
-            .from('team_profiles')
-            .select('company_role')
-            .eq('user_id', authState.user!.id)
-            .maybeSingle();
-
-          if (teamProfile?.company_role) {
-            // Map company_role to UserRole
-            switch (teamProfile.company_role) {
-              case 'owner':
-                resolvedRole = 'super_admin';
-                break;
-              case 'admin':
-                resolvedRole = 'admin';
-                break;
-              case 'tester':
-                resolvedRole = 'tester';
-                break;
-              default:
-                resolvedRole = 'user';
-            }
-          }
+        // Resolve highest role based on hierarchy
+        let resolvedRole: UserRole = 'user';
+        if (allRoles.includes('super_admin')) {
+          resolvedRole = 'super_admin';
+        } else if (allRoles.includes('admin')) {
+          resolvedRole = 'admin';
+        } else if (allRoles.includes('tester')) {
+          resolvedRole = 'tester';
+        } else if (allRoles.length > 0) {
+          resolvedRole = allRoles[0];
         }
 
         setRole(resolvedRole);
       } catch (error) {
-        console.error('Error fetching user role:', error);
+        console.error('Error in fetchUserRole:', error);
         setRole('user');
       } finally {
         setIsLoading(false);
@@ -86,7 +76,7 @@ export function useRole() {
 
   /**
    * Check if user has the required role or higher in the hierarchy
-   * super_admin > admin > user
+   * super_admin > admin > tester > user
    */
   const hasRole = (requiredRole: UserRole): boolean => {
     if (!role || !requiredRole) return false;
@@ -95,6 +85,14 @@ export function useRole() {
     const requiredLevel = ROLE_HIERARCHY[requiredRole] || 0;
     
     return userLevel >= requiredLevel;
+  };
+
+  /**
+   * Check if user has exact role (non-hierarchical)
+   * Use for features that should be role-exclusive (e.g., Journey Simulator for tester only)
+   */
+  const hasExactRole = (exactRole: UserRole): boolean => {
+    return role === exactRole;
   };
 
   /**
@@ -129,6 +127,7 @@ export function useRole() {
     role,
     isLoading,
     hasRole,
+    hasExactRole,
     isAdmin,
     isSuperAdmin,
     isTester,
