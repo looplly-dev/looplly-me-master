@@ -19,7 +19,7 @@ const JOURNEY_STAGES = [
   {
     id: 'basic_profile',
     name: 'Stage 2: Registered (Level 1)',
-    description: 'Has Name, DOB, Mobile, GPS - needs Level 2',
+    description: 'Shows Level 1 form (Name/Mobile pre-filled from test account)',
     icon: ClipboardList,
     level: 2
   },

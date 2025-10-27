@@ -19,6 +19,7 @@ export default function SimulatorIframe({ sessionToken, stage, onReset }: Simula
     try {
       const session = JSON.parse(sessionToken);
       const customToken = session.custom_token; // NEW: expect custom_token
+      const showUI = session.show_ui; // Extract show_ui flag
 
       if (!customToken) {
         console.error('No custom_token in session object:', session);
@@ -31,6 +32,11 @@ export default function SimulatorIframe({ sessionToken, stage, onReset }: Simula
         key: iframeKey.toString(),
         ts: Date.now().toString()
       });
+
+      // Add show_ui if present
+      if (showUI) {
+        params.set('show_ui', showUI);
+      }
 
       return `${window.location.origin}/simulator/session?${params}`;
     } catch (error) {

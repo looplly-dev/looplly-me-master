@@ -109,6 +109,9 @@ serve(async (req) => {
 
     console.log('[create-simulator-session] Reset result:', resetResult);
 
+    // Extract show_ui flag if present
+    const showUI = resetResult?.show_ui || null;
+
     // Create a session using custom JWT for test user
     console.log('[create-simulator-session] Generating custom JWT for test user...');
 
@@ -155,7 +158,8 @@ serve(async (req) => {
     console.log('Custom JWT created successfully for test user');
 
     const sessionObject = {
-      custom_token: customToken // NEW: Return custom JWT instead of Supabase tokens
+      custom_token: customToken, // NEW: Return custom JWT instead of Supabase tokens
+      show_ui: showUI // Pass show_ui flag from reset_user_journey
     };
 
     console.log('Session created successfully for test user');

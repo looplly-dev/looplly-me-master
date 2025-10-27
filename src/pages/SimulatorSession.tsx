@@ -109,20 +109,19 @@ export default function SimulatorSession() {
           simulator_stage: stage
         });
 
-        console.log('SimulatorSession - Navigating to:', stage);
+        // Check for show_ui parameter
+        const showUI = searchParams.get('show_ui');
 
-        // Route based on stage - all routes use /simulator/* paths
-        const stageRoutes: Record<string, string> = {
-          'fresh_signup': '/simulator/register',
-          'otp_verified': '/simulator/dashboard',
-          'basic_profile': '/simulator/dashboard',
-          'full_profile': '/simulator/dashboard',
-          'first_survey': '/simulator/dashboard',
-          'established_user': '/simulator/dashboard'
-        };
+        console.log('SimulatorSession - Navigating to:', { stage, showUI });
 
-        const targetRoute = stageRoutes[stage] || '/simulator/dashboard';
-        navigate(targetRoute, { replace: true });
+        // Route based on show_ui flag or stage
+        if (showUI === 'registration_form' || stage === 'fresh_signup') {
+          // Show Level 1 registration form
+          navigate('/simulator/register', { replace: true });
+        } else {
+          // Default: go to dashboard
+          navigate('/simulator/dashboard', { replace: true });
+        }
 
       } catch (error: any) {
         console.error('Simulator session error:', error);
