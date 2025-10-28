@@ -486,25 +486,33 @@ Deno.serve(async (req) => {
     // Try to parse request body for alternate modes
     let inputDocs: any[] | null = null;
     let requestAction: string | null = null;
+    let baseUrl: string | null = null;
     try {
       const body = await req.json();
       if (Array.isArray(body?.docs)) inputDocs = body.docs;
       if (typeof body?.action === 'string') requestAction = body.action;
+      if (typeof body?.baseUrl === 'string') baseUrl = body.baseUrl;
     } catch (_) {
       // No JSON body provided - continue with default behavior
     }
 
-    console.log(`📥 Seeding request received. Action: ${requestAction || 'default'}, Docs provided: ${inputDocs?.length || 0}`);
+    console.log(`📥 Seeding request received. Action: ${requestAction || 'default'}, Docs provided: ${inputDocs?.length || 0}, BaseURL: ${baseUrl || 'none'}`);
 
     // Use service role key for actual seeding operations
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
+    let receivedCount = 0;
+    let fetchedCount = 0;
     let successCount = 0;
     let errorCount = 0;
     const errors: string[] = [];
+    const seededIds = new Set<string>();
 
-    // If docs were provided in the request body, upsert them directly (preferred - avoids filesystem access in edge runtime)
+    // Step 1: If docs were provided in the request body, upsert them directly
     if (inputDocs && inputDocs.length > 0) {
+      receivedCount = inputDocs.length;
+      console.log(`📦 Processing ${receivedCount} documents from request body...`);
+      
       for (const doc of inputDocs) {
         try {
           const { error: insertError } = await supabase
@@ -530,6 +538,7 @@ Deno.serve(async (req) => {
           } else {
             console.log(`✓ Seeded: ${doc.title}`);
             successCount++;
+            seededIds.add(doc.id);
           }
         } catch (error) {
           console.error(`Error processing ${doc.id}:`, error);
@@ -538,78 +547,81 @@ Deno.serve(async (req) => {
           errorCount++;
         }
       }
-
-      console.log(`Seeding complete (client-provided): ${successCount} success, ${errorCount} errors`);
-
-      return new Response(
-        JSON.stringify({
-          success: true,
-          message: `Seeded ${successCount} documents successfully`,
-          errors,
-          stats: { total: (inputDocs?.length ?? 0), success: successCount, failed: errorCount }
-        }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
-      );
     }
 
-    // Fallback: attempt to read files from the repository (expected under web app public/docs). This may fail in hosted edge runtimes.
-    for (const doc of documentationIndex) {
-      try {
-        // Read file content from public/docs path
-        const filePath = `./public${doc.path}`;
-        let content = '';
-
+    // Step 2: If action is 'http-fetch-index' and baseUrl is provided, fetch remaining docs from HTTP
+    if (requestAction === 'http-fetch-index' && baseUrl) {
+      console.log(`🌐 Fetching indexed documents over HTTP from ${baseUrl}...`);
+      
+      // Filter out docs already seeded
+      const docsToFetch = documentationIndex.filter(doc => !seededIds.has(doc.id));
+      fetchedCount = docsToFetch.length;
+      
+      console.log(`📥 Fetching ${fetchedCount} documents from index...`);
+      
+      for (const doc of docsToFetch) {
         try {
-          content = await Deno.readTextFile(filePath);
-        } catch (fileError) {
-          console.error(`Failed to read file ${filePath}:`, fileError);
-          errors.push(`File not found: ${doc.path}`);
-          errorCount++;
-          continue;
-        }
+          const url = `${baseUrl}${doc.path}`;
+          console.log(`  Fetching: ${url}`);
+          
+          const response = await fetch(url);
+          
+          if (!response.ok) {
+            const errorMsg = `HTTP ${response.status} for ${doc.path}`;
+            console.error(errorMsg);
+            errors.push(errorMsg);
+            errorCount++;
+            continue;
+          }
+          
+          const content = await response.text();
+          
+          // Insert into database
+          const { error: insertError } = await supabase
+            .from('documentation')
+            .upsert({
+              id: doc.id,
+              title: doc.title,
+              content: content,
+              category: doc.category,
+              tags: doc.tags,
+              description: doc.description,
+              audience: doc.audience,
+              parent: null,
+              status: doc.status || 'draft'
+            }, {
+              onConflict: 'id'
+            });
 
-        // Insert into database
-        const { error: insertError } = await supabase
-          .from('documentation')
-          .upsert({
-            id: doc.id,
-            title: doc.title,
-            content: content,
-            category: doc.category,
-            tags: doc.tags,
-            description: doc.description,
-            audience: doc.audience,
-            parent: null,
-            status: doc.status || 'draft'
-          }, {
-            onConflict: 'id'
-          });
-
-        if (insertError) {
-          console.error(`Failed to insert ${doc.id}:`, insertError);
-          errors.push(`Insert failed for ${doc.id}: ${insertError.message}`);
+          if (insertError) {
+            console.error(`Failed to insert ${doc.id}:`, insertError);
+            errors.push(`Insert failed for ${doc.id}: ${insertError.message}`);
+            errorCount++;
+          } else {
+            console.log(`✓ Fetched & seeded: ${doc.title}`);
+            successCount++;
+          }
+        } catch (error) {
+          console.error(`Error fetching ${doc.id}:`, error);
+          const errorMessage = error instanceof Error ? error.message : String(error);
+          errors.push(`Fetch error for ${doc.path}: ${errorMessage}`);
           errorCount++;
-        } else {
-          console.log(`✓ Seeded: ${doc.title}`);
-          successCount++;
         }
-      } catch (error) {
-        console.error(`Error processing ${doc.id}:`, error);
-        const errorMessage = error instanceof Error ? error.message : String(error);
-        errors.push(`Processing error for ${doc.id}: ${errorMessage}`);
-        errorCount++;
       }
     }
 
-    console.log(`Seeding complete: ${successCount} success, ${errorCount} errors`);
+    const totalProcessed = receivedCount + (requestAction === 'http-fetch-index' ? fetchedCount : 0);
+    console.log(`Seeding complete: ${successCount} success, ${errorCount} errors (received: ${receivedCount}, fetched: ${fetchedCount})`);
 
     return new Response(
       JSON.stringify({
-        success: true,
-        message: `Seeded ${successCount} documents successfully`,
+        success: errorCount === 0 || successCount > 0,
+        message: `Seeded ${successCount} of ${totalProcessed} documents (${receivedCount} received, ${fetchedCount} fetched via HTTP)`,
         errors: errors,
         stats: {
-          total: documentationIndex.length,
+          total: totalProcessed,
+          received_count: receivedCount,
+          fetched_count: fetchedCount,
           success: successCount,
           failed: errorCount
         }

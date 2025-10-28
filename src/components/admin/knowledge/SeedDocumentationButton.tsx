@@ -13,7 +13,13 @@ export default function SeedDocumentationButton() {
   const [result, setResult] = useState<{
     success?: boolean;
     message?: string;
-    stats?: { total: number; success: number; failed: number };
+    stats?: { 
+      total: number; 
+      received_count?: number;
+      fetched_count?: number;
+      success: number; 
+      failed: number;
+    };
     errors?: string[];
   } | null>(null);
   const queryClient = useQueryClient();
@@ -31,7 +37,7 @@ export default function SeedDocumentationButton() {
         eager: true 
       });
       
-      const projectDocsModules = import.meta.glob('/docs/**/*.md', { 
+      const projectDocsModules = import.meta.glob('../../../../docs/**/*.md', { 
         as: 'raw',
         eager: true 
       });
@@ -100,10 +106,14 @@ export default function SeedDocumentationButton() {
       const uniqueDocs = Array.from(docMap.values());
       console.log(`✅ Parsed ${uniqueDocs.length} unique documents (${publicDocs.length} from public, ${projectDocs.length} from docs, deduped)`);
 
-      // Step 4: Send to edge function
+      // Step 4: Send to edge function with action to fetch public docs via HTTP
       console.log('🚀 Seeding database...');
       const { data, error } = await supabase.functions.invoke('seed-documentation', {
-        body: { docs: uniqueDocs }
+        body: { 
+          docs: uniqueDocs,
+          action: 'http-fetch-index',
+          baseUrl: window.location.origin
+        }
       });
 
       if (error) {
@@ -126,13 +136,17 @@ export default function SeedDocumentationButton() {
       // Invalidate documentation stats query to refresh counters
       queryClient.invalidateQueries({ queryKey: ['documentation-stats'] });
       
-      if (data.success) {
+      if (data.success && data.stats.failed === 0) {
         toast.success('Documentation seeded successfully!', {
-          description: `${data.stats.success} documents added to the Knowledge Centre`
+          description: `${data.stats.success} documents added (${data.stats.received_count || 0} from project, ${data.stats.fetched_count || 0} fetched via HTTP)`
+        });
+      } else if (data.stats.success > 0) {
+        toast.warning('Seeding completed with some errors', {
+          description: `${data.stats.success} succeeded, ${data.stats.failed} failed`
         });
       } else {
-        toast.error('Seeding completed with errors', {
-          description: `${data.stats.success} succeeded, ${data.stats.failed} failed`
+        toast.error('Seeding failed', {
+          description: `All ${data.stats.failed} documents failed to seed`
         });
       }
     } catch (err) {
@@ -161,7 +175,7 @@ export default function SeedDocumentationButton() {
               Seed Documentation Database
             </CardTitle>
             <CardDescription className="mt-1">
-              Automatically discover and seed all documentation files from /docs and /public/docs
+              Automatically discover project docs from /docs and fetch public docs via HTTP
             </CardDescription>
           </div>
           <Button 
@@ -210,19 +224,31 @@ export default function SeedDocumentationButton() {
 
             {/* Stats */}
             {result.stats && (
-              <div className="grid grid-cols-3 gap-4">
-                <div className="text-center p-3 rounded-lg bg-muted">
-                  <div className="text-2xl font-bold">{result.stats.total}</div>
-                  <div className="text-xs text-muted-foreground">Total Docs</div>
+              <div className="space-y-4">
+                <div className="grid grid-cols-4 gap-4">
+                  <div className="text-center p-3 rounded-lg bg-muted">
+                    <div className="text-2xl font-bold">{result.stats.total}</div>
+                    <div className="text-xs text-muted-foreground">Total</div>
+                  </div>
+                  <div className="text-center p-3 rounded-lg bg-blue-50 dark:bg-blue-950/20">
+                    <div className="text-2xl font-bold text-blue-600">{result.stats.received_count || 0}</div>
+                    <div className="text-xs text-muted-foreground">Received</div>
+                  </div>
+                  <div className="text-center p-3 rounded-lg bg-purple-50 dark:bg-purple-950/20">
+                    <div className="text-2xl font-bold text-purple-600">{result.stats.fetched_count || 0}</div>
+                    <div className="text-xs text-muted-foreground">Fetched</div>
+                  </div>
+                  <div className="text-center p-3 rounded-lg bg-green-50 dark:bg-green-950/20">
+                    <div className="text-2xl font-bold text-green-600">{result.stats.success}</div>
+                    <div className="text-xs text-muted-foreground">Seeded</div>
+                  </div>
                 </div>
-                <div className="text-center p-3 rounded-lg bg-green-50 dark:bg-green-950/20">
-                  <div className="text-2xl font-bold text-green-600">{result.stats.success}</div>
-                  <div className="text-xs text-muted-foreground">Seeded</div>
-                </div>
-                <div className="text-center p-3 rounded-lg bg-red-50 dark:bg-red-950/20">
-                  <div className="text-2xl font-bold text-red-600">{result.stats.failed}</div>
-                  <div className="text-xs text-muted-foreground">Failed</div>
-                </div>
+                {result.stats.failed > 0 && (
+                  <div className="text-center p-3 rounded-lg bg-red-50 dark:bg-red-950/20">
+                    <div className="text-2xl font-bold text-red-600">{result.stats.failed}</div>
+                    <div className="text-xs text-muted-foreground">Failed</div>
+                  </div>
+                )}
               </div>
             )}
 
