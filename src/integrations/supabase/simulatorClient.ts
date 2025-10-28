@@ -19,9 +19,4 @@ export const simulatorClient = createClient<Database>(SUPABASE_URL, SUPABASE_PUB
     autoRefreshToken: false, // Disable auto-refresh to prevent auth loops
     detectSessionInUrl: false, // Don't parse URL for auth params
   },
-  global: {
-    headers: {
-      'X-Simulator-Session': 'true', // Flag requests as simulator
-    },
-  },
 });
