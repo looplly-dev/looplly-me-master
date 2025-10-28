@@ -284,6 +284,53 @@ Security Verification:
 
 ---
 
+## October 27, 2025 | Country Selector UI Revert
+
+### Summary
+Reverted country selector UI changes (commit 6cc063a) back to emoji-based flag display due to rendering issues. Country selector now uses standard emoji flags instead of CDN-hosted images.
+
+### What Changed
+
+**Reverted Changes:**
+- Removed `CountryFlag` component that used `flagcdn.com` images
+- Restored emoji-based flag display in `formatCountryDisplay()` utility
+- Country selector trigger now shows: `🇿🇦 +27` (emoji + dial code)
+- Dropdown items show: `🇿🇦 +27 South Africa` (emoji + dial code + name)
+
+**Current Implementation:**
+- Uses native emoji flags from `countries.ts` data
+- Trigger width: `w-24 h-12`
+- Display format: `${country.flag} ${country.dialCode}`
+- Components: Register.tsx, Login.tsx, ForgotPassword.tsx
+
+### Technical Details
+
+**Utility Function:**
+```typescript
+// src/utils/countries.ts
+export const formatCountryDisplay = (country: Country): string => {
+  return `${country.flag} ${country.dialCode}`;
+};
+```
+
+**Reason for Revert:**
+- Emoji rendering issues on certain environments (Linux systems showing regional indicators instead of flags)
+- Need more robust cross-platform solution
+- Decided to keep simple emoji approach for now
+
+### Related Components
+- `src/components/auth/Register.tsx` (lines 390-406)
+- `src/components/auth/Login.tsx` (lines 178-194)
+- `src/components/auth/ForgotPassword.tsx` (lines 200-224)
+- `src/utils/countries.ts` (lines 18-24)
+
+### Future Enhancement
+- Consider implementing CDN-based flags with proper fallback handling
+- Add platform detection for optimal flag rendering strategy
+- Research alternative emoji rendering libraries
+
+---
+
 ## 2025-10-23 | Priority 2 Implementation
 
 ### Summary

@@ -159,7 +159,7 @@ Welcome to the Looplly Knowledge Centre. This index provides categorized access 
 
 - **[Data Isolation Quick Reference](DATA_ISOLATION_QUICK_REFERENCE.md)** - Quick guide to RLS policies
 - **[Country Code Specification](COUNTRY_CODE_SPECIFICATION.md)** - Country codes and dial codes reference
-- **[Recent Changes](RECENT_CHANGES.md)** (v1.1) - Latest platform changes and updates (last updated: 2025-10-27)
+- **[Recent Changes](RECENT_CHANGES.md)** (v1.2) - Latest platform changes and updates (last updated: 2025-10-27)
 
 ---
 
