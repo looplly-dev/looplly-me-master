@@ -111,6 +111,43 @@ export default function SimulatorSession() {
 
       } catch (error: any) {
         console.error('[SimulatorSession] ❌ Error:', error);
+        // Fallback: if edge function call fails (CORS, preview, etc.),
+        // create a minimal snapshot from the JWT so the simulator can proceed
+        try {
+          const customToken = searchParams.get('custom_token');
+          const stage = searchParams.get('stage');
+          if (customToken && stage) {
+            const payload = JSON.parse(atob(customToken.split('.')[1] || ''));
+            const snapshot = {
+              user_id: payload.sub,
+              first_name: payload.first_name || '',
+              last_name: payload.last_name || '',
+              mobile: payload.mobile || '',
+              country_code: payload.country_code || '+1',
+              is_test_account: true,
+              profile_complete: false
+            };
+
+            // Store fallback snapshot and auth
+            sessionStorage.setItem('simulator_user', JSON.stringify(snapshot));
+            sessionStorage.setItem('simulator_auth_token', customToken);
+            sessionStorage.setItem('simulator_stage', stage);
+
+            console.warn('[SimulatorSession] ⚠️ Using JWT fallback snapshot. Edge function failed.');
+
+            // Route based on show_ui flag or stage
+            const showUI = searchParams.get('show_ui');
+            if (showUI === 'registration_form' || stage === 'fresh_signup') {
+              navigate('/simulator/register', { replace: true });
+            } else {
+              navigate('/simulator/dashboard', { replace: true });
+            }
+            return;
+          }
+        } catch (fallbackErr) {
+          console.error('[SimulatorSession] Fallback failed:', fallbackErr);
+        }
+
         setError(error.message || 'Failed to initialize simulator session');
         setIsAuthenticating(false);
       }
