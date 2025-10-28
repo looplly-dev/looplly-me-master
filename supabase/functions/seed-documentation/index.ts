@@ -400,12 +400,14 @@ Deno.serve(async (req) => {
   }
 
   try {
-    // CRITICAL SECURITY: Verify authentication and admin role
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
-      console.error('Missing authorization header');
       return new Response(
-        JSON.stringify({ error: 'Unauthorized: Authentication required' }),
+        JSON.stringify({ 
+          success: false, 
+          error: 'Authentication required',
+          message: 'Please provide a valid Authorization header'
+        }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -413,43 +415,73 @@ Deno.serve(async (req) => {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+
+    // ========================================
+    // 1. CHECK IF THIS IS A CI/SERVICE CALL
+    // ========================================
+    const isTrustedServiceCall = authHeader === `Bearer ${supabaseServiceKey}`;
     
-    // Create client with user's auth token to verify identity
-    const supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
-      global: {
-        headers: {
-          Authorization: authHeader
-        }
+    if (isTrustedServiceCall) {
+      console.log('[seed-documentation] ✅ Trusted CI/service call - bypassing user checks');
+    } else {
+      // ========================================
+      // 2. VERIFY USER AUTHENTICATION & ADMIN ROLE
+      // ========================================
+      const supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
+        global: { headers: { Authorization: authHeader } }
+      });
+
+      const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
+      
+      if (userError || !user) {
+        console.error('[seed-documentation] Auth error:', userError);
+        return new Response(
+          JSON.stringify({ 
+            success: false, 
+            error: 'Invalid authentication',
+            message: 'Unable to verify user identity'
+          }),
+          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
       }
-    });
 
-    // Verify user is authenticated
-    const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
-    
-    if (userError || !user) {
-      console.error('Authentication failed:', userError);
-      return new Response(
-        JSON.stringify({ error: 'Unauthorized: Invalid authentication' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      console.log(`[seed-documentation] Authenticated user: ${user.id} (${user.email})`);
+
+      const { data: roleData, error: roleError } = await supabaseClient
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .in('role', ['admin', 'super_admin', 'tester'])
+        .maybeSingle();
+
+      if (roleError) {
+        console.error('[seed-documentation] Role check error:', roleError);
+        return new Response(
+          JSON.stringify({ 
+            success: false, 
+            error: 'Role verification failed',
+            message: roleError.message
+          }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      if (!roleData) {
+        console.warn(`[seed-documentation] Non-admin user attempted seeding: ${user.email}`);
+        return new Response(
+          JSON.stringify({ 
+            success: false, 
+            error: 'Insufficient permissions',
+            message: 'Only administrators can seed documentation'
+          }),
+          { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      console.log(`[seed-documentation] Admin verified: ${roleData.role}`);
     }
 
-    // CRITICAL: Verify user has admin role
-    const { data: roleData, error: roleError } = await supabaseClient
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', user.id)
-      .single();
-
-    if (roleError || !roleData || !['admin', 'super_admin'].includes(roleData.role)) {
-      console.error('Admin verification failed for user:', user.id);
-      return new Response(
-        JSON.stringify({ error: 'Forbidden: Admin access required for documentation seeding' }),
-        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    console.log(`Admin user ${user.id} authorized. Starting documentation seeding process...`);
+    console.log('[seed-documentation] Starting documentation seeding process...');
 
     // Try to parse request body for alternate modes
     let inputDocs: any[] | null = null;

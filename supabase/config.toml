@@ -1,5 +1,8 @@
 project_id = "kzqcfrubjccxrwfkkrze"
 
+[functions.seed-documentation]
+verify_jwt = false
+
 [functions.auto-generate-country-options]
 verify_jwt = true
 

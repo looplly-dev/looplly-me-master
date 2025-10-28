@@ -5,6 +5,7 @@ import { join } from 'path';
 import matter from 'gray-matter';
 
 const PUBLIC_DOCS_DIR = './public/docs';
+const DOCS_DIR = './docs';
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
@@ -33,40 +34,62 @@ async function getAllMarkdownFiles(dir) {
   return files;
 }
 
-async function parseDocument(filePath) {
-  const content = await readFile(filePath, 'utf-8');
-  const { data: frontmatter, content: body } = matter(content);
-  
-  // Generate ID from filename if not in frontmatter
-  const filename = filePath.split('/').pop().replace('.md', '');
-  const id = frontmatter.id || filename.toLowerCase().replace(/_/g, '-');
-  
-  // Build path for reference
-  const pathParts = filePath.split('public')[1];
-  
-  return {
-    id,
-    title: frontmatter.title || filename.replace(/_/g, ' '),
-    content: body,
-    category: frontmatter.category || 'Uncategorized',
-    tags: frontmatter.tags || [],
-    description: frontmatter.description || '',
-    audience: frontmatter.audience || 'all',
-    status: frontmatter.status || 'published',
-    path: pathParts
-  };
+async function parseDocument(filePath, source) {
+  try {
+    const content = await readFile(filePath, 'utf-8');
+    const { data: frontmatter, content: body } = matter(content);
+    
+    // Generate ID from filename if not in frontmatter
+    const filename = filePath.split('/').pop().replace('.md', '');
+    const id = frontmatter.id || filename.toLowerCase().replace(/_/g, '-');
+    
+    // Build path for reference
+    const pathParts = source === 'public' 
+      ? filePath.split('public')[1] 
+      : filePath.split('docs')[1] || filePath;
+    
+    return {
+      id,
+      title: frontmatter.title || filename.replace(/_/g, ' '),
+      content: body,
+      category: frontmatter.category || 'Uncategorized',
+      tags: frontmatter.tags || [],
+      description: frontmatter.description || '',
+      audience: frontmatter.audience || 'all',
+      status: frontmatter.status || 'published',
+      path: pathParts,
+      source
+    };
+  } catch (err) {
+    console.error(`Failed to parse ${filePath}:`, err.message);
+    return null;
+  }
 }
 
 async function seedDocumentation() {
   console.log('🔍 Discovering documentation files...');
   
-  const markdownFiles = await getAllMarkdownFiles(PUBLIC_DOCS_DIR);
-  console.log(`✅ Found ${markdownFiles.length} markdown files`);
+  const publicMarkdownFiles = await getAllMarkdownFiles(PUBLIC_DOCS_DIR);
+  const projectMarkdownFiles = await getAllMarkdownFiles(DOCS_DIR);
+  
+  console.log(`✅ Found ${publicMarkdownFiles.length} files in /public/docs, ${projectMarkdownFiles.length} files in /docs`);
   
   console.log('📖 Parsing frontmatter and content...');
-  const docs = await Promise.all(
-    markdownFiles.map(file => parseDocument(file))
-  );
+  const publicDocs = (await Promise.all(
+    publicMarkdownFiles.map(file => parseDocument(file, 'public'))
+  )).filter(Boolean);
+  
+  const projectDocs = (await Promise.all(
+    projectMarkdownFiles.map(file => parseDocument(file, 'docs'))
+  )).filter(Boolean);
+  
+  // Deduplicate by ID (prefer /docs over /public/docs)
+  const docMap = new Map();
+  publicDocs.forEach(doc => docMap.set(doc.id, doc));
+  projectDocs.forEach(doc => docMap.set(doc.id, doc)); // Override with project docs
+  
+  const docs = Array.from(docMap.values());
+  console.log(`✅ Parsed ${docs.length} unique documents (${publicDocs.length} from public, ${projectDocs.length} from docs, deduped)`);
   
   console.log(`🚀 Seeding ${docs.length} documents to Knowledge Centre...`);
   

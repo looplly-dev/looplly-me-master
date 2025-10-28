@@ -5,6 +5,8 @@ import { Badge } from '@/components/ui/badge';
 import { Database, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import matter from 'gray-matter';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function SeedDocumentationButton() {
   const [isSeeding, setIsSeeding] = useState(false);
@@ -14,102 +16,135 @@ export default function SeedDocumentationButton() {
     stats?: { total: number; success: number; failed: number };
     errors?: string[];
   } | null>(null);
+  const queryClient = useQueryClient();
 
   const handleSeed = async () => {
     setIsSeeding(true);
     setResult(null);
 
     try {
-      // Dynamic discovery: use Vite's import.meta.glob to find all .md files
-      const modules = import.meta.glob('/public/docs/**/*.md', { as: 'raw', eager: false });
-      const paths = Object.keys(modules);
+      // Step 1: Discover markdown files from BOTH /public/docs and /docs
+      console.log('🔍 Discovering documentation files...');
       
-      console.log(`📁 Discovered ${paths.length} documentation files`);
-
-      // Fetch and parse all markdown files in parallel
-      const fetched = await Promise.all(
-        paths.map(async (path) => {
-          try {
-            const loadContent = modules[path];
-            const content = await loadContent();
-            
-            // Extract metadata from filename and path
-            const filename = path.split('/').pop()?.replace('.md', '') || '';
-            const id = filename.toLowerCase().replace(/_/g, '-');
-            
-            // Parse basic frontmatter if present (simple parser for now)
-            const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---\n/);
-            let metadata: any = {};
-            
-            if (frontmatterMatch) {
-              const yamlContent = frontmatterMatch[1];
-              const lines = yamlContent.split('\n');
-              lines.forEach(line => {
-                const match = line.match(/^(\w+):\s*(.+)$/);
-                if (match) {
-                  const [, key, value] = match;
-                  metadata[key] = value.replace(/^["']|["']$/g, '');
-                }
-              });
-            }
-            
-            // Build document object
-            return {
-              id: metadata.id || id,
-              title: metadata.title || filename.replace(/_/g, ' '),
-              content: content,
-              category: metadata.category || 'Core Systems',
-              tags: metadata.tags ? metadata.tags.split(',').map((t: string) => t.trim()) : [],
-              description: metadata.description || '',
-              audience: metadata.audience || 'all',
-              status: metadata.status || 'published',
-              path: path.replace('/public', '')
-            };
-          } catch (e: any) {
-            console.error(`Failed to load ${path}:`, e);
-            return { __error: `Failed to load: ${path}` };
-          }
-        })
-      );
-
-      const docs = fetched.filter((d: any) => !d.__error);
-      const fileErrors = fetched.filter((d: any) => d.__error).map((d: any) => d.__error as string);
-
-      console.log(`✅ Parsed ${docs.length} documents successfully`);
-
-      // Send to edge function for seeding
-      const { data, error } = await supabase.functions.invoke('seed-documentation', {
-        body: { docs, action: 'manual-seed' }
+      const publicDocsModules = import.meta.glob('/public/docs/**/*.md', { 
+        as: 'raw',
+        eager: true 
+      });
+      
+      const projectDocsModules = import.meta.glob('/docs/**/*.md', { 
+        as: 'raw',
+        eager: true 
       });
 
-      if (error) throw error;
+      const publicCount = Object.keys(publicDocsModules).length;
+      const projectCount = Object.keys(projectDocsModules).length;
+      console.log(`✅ Found ${publicCount} files in /public/docs, ${projectCount} files in /docs`);
 
-      // Merge errors
-      const merged = {
-        ...data,
-        errors: [...(data?.errors || []), ...fileErrors],
-        stats: {
-          total: paths.length,
-          success: data?.stats?.success || 0,
-          failed: (data?.stats?.failed || 0) + fileErrors.length
+      const totalFiles = publicCount + projectCount;
+      if (totalFiles === 0) {
+        toast.error('No documentation files found');
+        setIsSeeding(false);
+        return;
+      }
+
+      // Step 2: Parse frontmatter and content using gray-matter
+      console.log('📖 Parsing frontmatter and content...');
+      
+      const parseDoc = (path: string, content: string, source: 'public' | 'docs') => {
+        try {
+          const { data: frontmatter, content: body } = matter(content);
+          
+          // Generate ID from filename if not in frontmatter
+          const filename = path.split('/').pop()?.replace('.md', '') || 'unknown';
+          const id = frontmatter.id || filename.toLowerCase().replace(/_/g, '-');
+          
+          return {
+            id,
+            title: frontmatter.title || filename.replace(/_/g, ' '),
+            content: body.trim(),
+            category: frontmatter.category || 'Uncategorized',
+            tags: Array.isArray(frontmatter.tags) ? frontmatter.tags : [],
+            description: frontmatter.description || '',
+            audience: frontmatter.audience || 'all',
+            status: frontmatter.status || 'published',
+            path: source === 'public' ? path.split('public')[1] || path : path,
+            source
+          };
+        } catch (err) {
+          console.error(`Failed to parse ${path}:`, err);
+          return null;
         }
       };
 
-      setResult(merged);
+      const publicDocs = Object.entries(publicDocsModules)
+        .map(([path, content]) => parseDoc(path, content, 'public'))
+        .filter(Boolean);
+      
+      const projectDocs = Object.entries(projectDocsModules)
+        .map(([path, content]) => parseDoc(path, content, 'docs'))
+        .filter(Boolean);
 
-      if (merged.success && merged.stats.failed === 0) {
-        toast.success(`Successfully seeded ${merged.stats.success} documents!`);
-      } else if (merged.success) {
-        toast.success(`Seeded ${merged.stats.success} docs with ${merged.stats.failed} errors`);
-      } else {
-        toast.error('Seeding completed with some errors');
+      // Step 3: Deduplicate by ID (prefer /docs over /public/docs)
+      const docMap = new Map();
+      
+      // Add public docs first
+      publicDocs.forEach(doc => {
+        if (doc) docMap.set(doc.id, doc);
+      });
+      
+      // Override with project docs (preferred source)
+      projectDocs.forEach(doc => {
+        if (doc) docMap.set(doc.id, doc);
+      });
+
+      const uniqueDocs = Array.from(docMap.values());
+      console.log(`✅ Parsed ${uniqueDocs.length} unique documents (${publicDocs.length} from public, ${projectDocs.length} from docs, deduped)`);
+
+      // Step 4: Send to edge function
+      console.log('🚀 Seeding database...');
+      const { data, error } = await supabase.functions.invoke('seed-documentation', {
+        body: { docs: uniqueDocs }
+      });
+
+      if (error) {
+        console.error('❌ Seeding failed:', error);
+        toast.error('Seeding failed', {
+          description: error.message
+        });
+        setResult({
+          success: false,
+          stats: { total: 0, success: 0, failed: 0 },
+          errors: [error.message]
+        });
+        return;
       }
-    } catch (error: any) {
-      console.error('Seeding error:', error);
-      toast.error('Failed to seed documentation');
+
+      console.log('✅ Seeding complete:', data);
+      
+      setResult(data);
+      
+      // Invalidate documentation stats query to refresh counters
+      queryClient.invalidateQueries({ queryKey: ['documentation-stats'] });
+      
+      if (data.success) {
+        toast.success('Documentation seeded successfully!', {
+          description: `${data.stats.success} documents added to the Knowledge Centre`
+        });
+      } else {
+        toast.error('Seeding completed with errors', {
+          description: `${data.stats.success} succeeded, ${data.stats.failed} failed`
+        });
+      }
+    } catch (err) {
+      console.error('💥 Fatal error:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
+      toast.error('Fatal error during seeding', {
+        description: errorMessage
+      });
       setResult({
         success: false,
-        message: error.message
+        stats: { total: 0, success: 0, failed: 0 },
+        errors: [errorMessage]
       });
     } finally {
       setIsSeeding(false);
@@ -126,7 +161,7 @@ export default function SeedDocumentationButton() {
               Seed Documentation Database
             </CardTitle>
             <CardDescription className="mt-1">
-              Automatically discover and seed all documentation files
+              Automatically discover and seed all documentation files from /docs and /public/docs
             </CardDescription>
           </div>
           <Button 
@@ -191,26 +226,10 @@ export default function SeedDocumentationButton() {
               </div>
             )}
 
-            {/* Wave Breakdown */}
-            {result.success && (
-              <div className="space-y-2">
-                <p className="text-sm font-semibold">Documents Seeded:</p>
-                <div className="flex flex-wrap gap-2">
-                  <Badge variant="default" className="gap-1">
-                    <CheckCircle2 className="h-3 w-3" />
-                    7 Published (Wave 1)
-                  </Badge>
-                  <Badge variant="secondary" className="gap-1">
-                    ○ 33 Coming Soon (Waves 2 & 3)
-                  </Badge>
-                </div>
-              </div>
-            )}
-
             {/* Errors */}
             {result.errors && result.errors.length > 0 && (
               <div className="space-y-2">
-                <p className="text-sm font-semibold text-red-600">Errors:</p>
+                <p className="text-sm font-semibold text-red-600">Errors ({result.errors.length}):</p>
                 <div className="space-y-1 max-h-40 overflow-y-auto">
                   {result.errors.map((error, idx) => (
                     <div key={idx} className="text-xs p-2 bg-red-50 dark:bg-red-950/20 rounded border border-red-200">
