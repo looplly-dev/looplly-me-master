@@ -119,12 +119,56 @@ export default function SimulatorApp() {
  * Visual indicator showing simulator mode is active
  */
 function SimulatorBanner() {
+  const [userInfo, setUserInfo] = useState<{ name: string; mobile: string } | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    // Try to get user info from sessionStorage
+    const simulatorUser = sessionStorage.getItem('simulator_user');
+    if (simulatorUser) {
+      try {
+        const user = JSON.parse(simulatorUser);
+        setUserInfo({
+          name: user.name || 'Unknown User',
+          mobile: user.mobile_number || 'Unknown Number'
+        });
+      } catch (e) {
+        console.error('Failed to parse simulator user:', e);
+      }
+    }
+  }, []);
+
+  const handleCopy = async () => {
+    if (!userInfo) return;
+    
+    const textToCopy = `${userInfo.name} ${userInfo.mobile}`;
+    try {
+      await navigator.clipboard.writeText(textToCopy);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
+  };
+
   return (
     <div className="fixed top-0 left-0 right-0 z-50 bg-orange-500 text-white">
       <Alert className="rounded-none border-0 bg-orange-500 text-white">
         <AlertCircle className="h-4 w-4" />
-        <AlertDescription className="text-white">
-          <strong>SIMULATOR MODE:</strong> You are testing as a simulated user. All actions affect test data only.
+        <AlertDescription className="text-white flex items-center justify-between">
+          <span>
+            <strong>Simulating as:</strong> {userInfo ? `${userInfo.name} ${userInfo.mobile}` : 'Loading...'}
+          </span>
+          {userInfo && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleCopy}
+              className="text-white hover:bg-orange-600 h-8 px-3"
+            >
+              {copied ? 'Copied!' : 'Copy'}
+            </Button>
+          )}
         </AlertDescription>
       </Alert>
     </div>
