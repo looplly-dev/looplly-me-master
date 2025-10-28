@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Routes, Route, Navigate, Link } from 'react-router-dom';
+import { Routes, Route, Navigate, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { SimulatorProvider } from '@/contexts/SimulatorContext';
 import { simulatorClient as supabase } from '@/integrations/supabase/simulatorClient';
@@ -137,22 +137,48 @@ function SimulatorBanner() {
  */
 function SessionAwaiter() {
   const [status, setStatus] = useState<'waiting' | 'timeout'>('waiting');
+  const navigate = useNavigate();
 
   useEffect(() => {
     let mounted = true;
+
+    // Fast-path: if simulator session is already in sessionStorage, route immediately
+    const fastSimUser = sessionStorage.getItem('simulator_user');
+    const simStage = sessionStorage.getItem('simulator_stage');
+    if (fastSimUser) {
+      const to = simStage === 'fresh_signup' || simStage === 'basic_profile'
+        ? '/simulator/register'
+        : '/simulator/dashboard';
+      navigate(to, { replace: true });
+      return () => { mounted = false; };
+    }
+
     const timeout = setTimeout(() => {
       if (mounted) setStatus('timeout');
-    }, 3000);
+    }, 7000);
 
     const checkSession = async () => {
-      for (let i = 0; i < 15; i++) {
+      for (let i = 0; i < 20; i++) {
         if (!mounted) break;
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session) {
-          console.log('SessionAwaiter - Session found, auth will handle redirect');
+
+        // Check simulator storage first on each tick
+        const simUser = sessionStorage.getItem('simulator_user');
+        const stage = sessionStorage.getItem('simulator_stage');
+        if (simUser) {
+          const to = stage === 'fresh_signup' || stage === 'basic_profile'
+            ? '/simulator/register'
+            : '/simulator/dashboard';
+          navigate(to, { replace: true });
           return;
         }
-        await new Promise(resolve => setTimeout(resolve, 200));
+
+        // Fallback: check Supabase auth session (not typically used in simulator)
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          navigate('/simulator/dashboard', { replace: true });
+          return;
+        }
+        await new Promise(resolve => setTimeout(resolve, 250));
       }
     };
 
@@ -162,7 +188,7 @@ function SessionAwaiter() {
       mounted = false;
       clearTimeout(timeout);
     };
-  }, []);
+  }, [navigate]);
 
   if (status === 'timeout') {
     return (
