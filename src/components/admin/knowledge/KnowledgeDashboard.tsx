@@ -3,7 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Lightbulb, BookOpen, FileText, Sparkles, CheckCircle2, Clock, Loader2 } from 'lucide-react';
+import { Lightbulb, BookOpen, FileText, Sparkles, CheckCircle2, Clock, Loader2, MessageSquare } from 'lucide-react';
 import DocumentationSearch from './DocumentationSearch';
 import QuickReference from './QuickReference';
 import SeedDocumentationButton from './SeedDocumentationButton';
@@ -11,6 +11,7 @@ import QuickStartGuides from './QuickStartGuides';
 import RecommendationsPanel from './RecommendationsPanel';
 import KeyboardShortcutsHelp from './KeyboardShortcutsHelp';
 import CategoryCard from './CategoryCard';
+import KnowledgeChat from './KnowledgeChat';
 import { useRole } from '@/hooks/useRole';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { useSearchHistory } from '@/hooks/useSearchHistory';
@@ -71,8 +72,16 @@ export default function KnowledgeDashboard() {
       </div>
 
       {/* Status Filter Tabs */}
-      <Tabs defaultValue="all" onValueChange={(value) => setStatusFilter(value as any)}>
-        <TabsList className="grid w-full max-w-md mx-auto grid-cols-3">
+      <Tabs defaultValue="chat" onValueChange={(value) => {
+        if (value !== 'chat') {
+          setStatusFilter(value as any);
+        }
+      }}>
+        <TabsList className="grid w-full max-w-2xl mx-auto grid-cols-4">
+          <TabsTrigger value="chat">
+            <MessageSquare className="h-4 w-4 mr-2" />
+            AI Chat
+          </TabsTrigger>
           <TabsTrigger value="all">
             All ({stats?.total || 0})
           </TabsTrigger>
@@ -83,6 +92,10 @@ export default function KnowledgeDashboard() {
             Coming Soon ({totalComingSoon})
           </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="chat" className="h-[calc(100vh-20rem)]">
+          <KnowledgeChat />
+        </TabsContent>
 
         <TabsContent value="all" className="space-y-6">
           {/* Search Section */}
