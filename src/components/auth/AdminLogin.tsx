@@ -19,7 +19,7 @@ export default function AdminLogin() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { login, authState } = useAuth();
+  const { login, authState, forgotPassword } = useAuth();
   const { toast } = useToast();
   const { isAdmin, isSuperAdmin } = useRole();
   const { userType } = useUserType();
@@ -163,7 +163,34 @@ export default function AdminLogin() {
               {isSubmitting ? 'Signing In...' : 'Sign In to Admin Portal'}
             </Button>
 
-            <div className="text-center">
+            <div className="text-center space-y-2">
+              <Button
+                type="button"
+                variant="ghost"
+                className="text-muted-foreground"
+                onClick={async () => {
+                  if (!formData.email) {
+                    toast({
+                      title: 'Enter Email',
+                      description: 'Please enter your admin email to reset your password',
+                    });
+                    return;
+                  }
+                  setIsSubmitting(true);
+                  try {
+                    const ok = await forgotPassword(formData.email);
+                    toast({
+                      title: ok ? 'Reset email sent' : 'Reset failed',
+                      description: ok ? 'Check your inbox for the reset link' : 'Could not send reset email',
+                      variant: ok ? 'default' : 'destructive'
+                    });
+                  } finally {
+                    setIsSubmitting(false);
+                  }
+                }}
+              >
+                Forgot password?
+              </Button>
               <Button
                 type="button"
                 variant="ghost"
