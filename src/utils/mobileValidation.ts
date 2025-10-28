@@ -55,6 +55,28 @@ export const validateAndNormalizeMobile = (
     // Remove leading zeros (common in local format)
     cleanInput = cleanInput.replace(/^0+/, '');
     
+    // SOUTH AFRICA SPECIFIC VALIDATION
+    if (countryISO === 'ZA') {
+      // SA mobile numbers must be exactly 9 digits after country code
+      // and must start with 6, 7, or 8
+      if (cleanInput.length !== 9) {
+        return {
+          isValid: false,
+          error: cleanInput.length < 9 
+            ? `Too short. SA mobiles need 9 digits (e.g., 0821234567)`
+            : `Too long. SA mobiles need 9 digits (e.g., 0821234567)`
+        };
+      }
+      
+      const firstDigit = cleanInput[0];
+      if (!['6', '7', '8'].includes(firstDigit)) {
+        return {
+          isValid: false,
+          error: 'SA mobile numbers must start with 06, 07, or 08'
+        };
+      }
+    }
+    
     // Construct full international number
     const fullNumber = `${countryDialCode}${cleanInput}`;
     
