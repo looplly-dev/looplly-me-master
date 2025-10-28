@@ -29,7 +29,7 @@ export default function SimulatorSession() {
         const customToken = searchParams.get('custom_token');
         const stage = searchParams.get('stage');
 
-        console.log('SimulatorSession - Received params:', {
+        console.log('[SimulatorSession] Received params:', {
           hasCustomToken: !!customToken,
           stage
         });
@@ -38,7 +38,7 @@ export default function SimulatorSession() {
           throw new Error('Missing authentication parameters');
         }
 
-        console.log('SimulatorSession - Decoding custom JWT...');
+        console.log('[SimulatorSession] Decoding and storing JWT FIRST...');
 
         // Decode JWT to get user info
         const payload = JSON.parse(atob(customToken.split('.')[1]));
@@ -49,9 +49,9 @@ export default function SimulatorSession() {
           throw new Error('Session token has expired');
         }
 
-        console.log('SimulatorSession - Force clearing ALL auth data...');
-        
-        // Force clear ALL possible auth keys to prevent any stale data
+        // CRITICAL: Store auth IMMEDIATELY to prevent CORS errors
+        // This must happen BEFORE any other requests (including manifest.json)
+        console.log('[SimulatorSession] Clearing stale auth...');
         const authKeys = [
           'simulator_auth_token',
           'simulator_user',
@@ -59,72 +59,58 @@ export default function SimulatorSession() {
           'looplly_user',
           'mockUser',
           'admin_auth_token',
-          'admin_user'
+          'admin_user',
+          'simulator' // Clear Supabase session storage key
         ];
         
         authKeys.forEach(key => {
           sessionStorage.removeItem(key);
           localStorage.removeItem(key);
         });
-        
-        console.log('SimulatorSession - All auth storage cleared');
 
-        console.log('SimulatorSession - Storing simulator auth in sessionStorage...');
-
-        // Store simulator auth in sessionStorage (isolated to iframe/tab)
+        // Store simulator auth SYNCHRONOUSLY
         sessionStorage.setItem('simulator_auth_token', customToken);
+        sessionStorage.setItem('simulator_stage', stage);
+        
+        console.log('[SimulatorSession] ✅ Auth stored, fetching profile...');
 
-        console.log('SimulatorSession - Fetching test profile snapshot via function...');
-
+        // Now fetch profile snapshot using the stored token
         const { data: snapshot, error: fnError } = await supabase.functions.invoke('simulator-get-profile', {
           body: { custom_token: customToken }
         });
 
         if (fnError) {
+          console.error('[SimulatorSession] Profile fetch error:', fnError);
           throw new Error(fnError.message || 'Failed to verify simulator token');
         }
-
-        console.log('SimulatorSession - Function snapshot:', snapshot);
 
         if (!snapshot?.is_test_account) {
           throw new Error('Session is not for a test account');
         }
 
-        console.log('SimulatorSession - Test user identity confirmed:', {
+        console.log('[SimulatorSession] ✅ Profile confirmed:', {
           user_id: snapshot.user_id,
-          name: `${snapshot.first_name} ${snapshot.last_name}`,
-          mobile: snapshot.mobile,
-          country_code: snapshot.country_code
+          name: `${snapshot.first_name || ''} ${snapshot.last_name || ''}`.trim(),
+          mobile: snapshot.mobile
         });
 
-        // Store snapshot for auth hook (used in simulator context)
+        // Store user snapshot
         sessionStorage.setItem('simulator_user', JSON.stringify(snapshot));
         
-        // Store stage for Register.tsx to detect fresh_signup
-        sessionStorage.setItem('simulator_stage', stage);
-        
-        console.log('SimulatorSession - Stored in sessionStorage:', {
-          simulator_auth_token: customToken.substring(0, 20) + '...',
-          simulator_user_mobile: snapshot.mobile,
-          simulator_stage: stage
-        });
+        console.log('[SimulatorSession] ✅ Session ready, navigating...');
 
         // Check for show_ui parameter
         const showUI = searchParams.get('show_ui');
 
-        console.log('SimulatorSession - Navigating to:', { stage, showUI });
-
         // Route based on show_ui flag or stage
         if (showUI === 'registration_form' || stage === 'fresh_signup') {
-          // Show Level 1 registration form
           navigate('/simulator/register', { replace: true });
         } else {
-          // Default: go to dashboard
           navigate('/simulator/dashboard', { replace: true });
         }
 
       } catch (error: any) {
-        console.error('Simulator session error:', error);
+        console.error('[SimulatorSession] ❌ Error:', error);
         setError(error.message || 'Failed to initialize simulator session');
         setIsAuthenticating(false);
       }

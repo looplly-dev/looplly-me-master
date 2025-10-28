@@ -13,16 +13,17 @@ interface SimulatorIframeProps {
 export default function SimulatorIframe({ sessionToken, stage, onReset }: SimulatorIframeProps) {
   const [iframeKey, setIframeKey] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [iframeError, setIframeError] = useState(false);
 
   // Parse session and construct URL with custom JWT token
   const simulatorUrl = (() => {
     try {
       const session = JSON.parse(sessionToken);
-      const customToken = session.custom_token; // NEW: expect custom_token
-      const showUI = session.show_ui; // Extract show_ui flag
+      const customToken = session.custom_token;
+      const showUI = session.show_ui;
 
       if (!customToken) {
-        console.error('No custom_token in session object:', session);
+        console.error('[SimulatorIframe] No custom_token in session:', session);
         return '';
       }
 
@@ -33,14 +34,13 @@ export default function SimulatorIframe({ sessionToken, stage, onReset }: Simula
         ts: Date.now().toString()
       });
 
-      // Add show_ui if present
       if (showUI) {
         params.set('show_ui', showUI);
       }
 
       return `${window.location.origin}/simulator/session?${params}`;
     } catch (error) {
-      console.error('Failed to parse session token:', error);
+      console.error('[SimulatorIframe] Failed to parse session token:', error);
       return '';
     }
   })();
@@ -56,15 +56,27 @@ export default function SimulatorIframe({ sessionToken, stage, onReset }: Simula
 
   useEffect(() => {
     setIsLoading(true);
+    setIframeError(false);
     setIframeKey(prev => prev + 1);
   }, [sessionToken, stage]);
 
-  // Log iframe URL for diagnostics
+  // Log iframe URL and detect load failures
   useEffect(() => {
     if (simulatorUrl) {
       console.info('[SimulatorIframe] URL:', simulatorUrl);
     }
-  }, [simulatorUrl, iframeKey]);
+    
+    // Detect if iframe fails to load (likely CORS issue)
+    const timeout = setTimeout(() => {
+      if (isLoading) {
+        console.warn('[SimulatorIframe] Load timeout - possible CORS issue');
+        setIframeError(true);
+        setIsLoading(false);
+      }
+    }, 5000); // 5 second timeout
+    
+    return () => clearTimeout(timeout);
+  }, [simulatorUrl, iframeKey, isLoading]);
 
   return (
     <div className="space-y-4">
@@ -107,13 +119,32 @@ export default function SimulatorIframe({ sessionToken, stage, onReset }: Simula
         </CardHeader>
       </Card>
 
-      <Alert>
-        <AlertCircle className="h-4 w-4" />
-        <AlertDescription>
-          <strong>Simulator Mode Active:</strong> You are viewing the app as a test user. 
-          Any actions taken will affect only the test account's data.
-        </AlertDescription>
-      </Alert>
+      {iframeError ? (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription className="space-y-2">
+            <p><strong>CORS Error Detected:</strong> The simulator couldn't load in an iframe due to platform authentication restrictions.</p>
+            <p className="text-sm">This is a known limitation in preview environments. Please use "Open in Tab" instead.</p>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={handleOpenInNewTab}
+              className="mt-2"
+            >
+              <ExternalLink className="h-4 w-4 mr-2" />
+              Open Simulator in New Tab
+            </Button>
+          </AlertDescription>
+        </Alert>
+      ) : (
+        <Alert>
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            <strong>Simulator Mode Active:</strong> You are viewing the app as a test user. 
+            Any actions taken will affect only the test account's data.
+          </AlertDescription>
+        </Alert>
+      )}
 
       <Card>
         <CardContent className="p-0">
