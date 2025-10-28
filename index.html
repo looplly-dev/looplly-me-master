@@ -159,6 +159,18 @@
         } catch(e) {}
       })();
     </script>
+
+    <!-- Simulator: Remove manifest to prevent CORS in iframe -->
+    <script>
+      (function(){
+        try {
+          if (location.pathname.startsWith('/simulator')) {
+            var m = document.querySelector('link[rel="manifest"]');
+            if (m) m.parentNode.removeChild(m);
+          }
+        } catch(e) {}
+      })();
+    </script>
   </head>
 
   <body>

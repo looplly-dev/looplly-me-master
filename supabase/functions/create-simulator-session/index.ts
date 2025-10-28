@@ -2,11 +2,12 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 import { create } from 'https://deno.land/x/djwt@v2.8/mod.ts';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
+const getCorsHeaders = (origin?: string) => ({
+  'Access-Control-Allow-Origin': origin || '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-simulator-session',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
-};
+  'Vary': 'Origin',
+});
 
 interface CreateSimulatorSessionRequest {
   test_user_id: string;
@@ -14,6 +15,9 @@ interface CreateSimulatorSessionRequest {
 }
 
 serve(async (req) => {
+  const origin = req.headers.get('Origin');
+  const corsHeaders = getCorsHeaders(origin || undefined);
+
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }

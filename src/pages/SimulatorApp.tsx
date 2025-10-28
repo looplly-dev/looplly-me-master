@@ -142,10 +142,12 @@ function SessionAwaiter() {
   useEffect(() => {
     let mounted = true;
 
-    // Fast-path: if simulator session is already in sessionStorage, route immediately
-    const fastSimUser = sessionStorage.getItem('simulator_user');
+    // Fast-path: Accept "token-only" sessions - route immediately if token+stage are present
+    const simToken = sessionStorage.getItem('simulator_auth_token');
     const simStage = sessionStorage.getItem('simulator_stage');
-    if (fastSimUser) {
+    
+    if (simToken && simStage) {
+      // Route immediately even if simulator_user isn't fully enriched yet
       const to = simStage === 'fresh_signup' || simStage === 'basic_profile'
         ? '/simulator/register'
         : '/simulator/dashboard';
@@ -161,10 +163,10 @@ function SessionAwaiter() {
       for (let i = 0; i < 20; i++) {
         if (!mounted) break;
 
-        // Check simulator storage first on each tick
-        const simUser = sessionStorage.getItem('simulator_user');
+        // Check for token+stage first (token-only sessions)
+        const token = sessionStorage.getItem('simulator_auth_token');
         const stage = sessionStorage.getItem('simulator_stage');
-        if (simUser) {
+        if (token && stage) {
           const to = stage === 'fresh_signup' || stage === 'basic_profile'
             ? '/simulator/register'
             : '/simulator/dashboard';

@@ -29,7 +29,7 @@ export default function SimulatorSession() {
         const customToken = searchParams.get('custom_token');
         const stage = searchParams.get('stage');
 
-        console.log('[SimulatorSession] Received params:', {
+        console.info('[SimulatorSession] 🚀 Received params:', {
           hasCustomToken: !!customToken,
           stage
         });
@@ -38,7 +38,7 @@ export default function SimulatorSession() {
           throw new Error('Missing authentication parameters');
         }
 
-        console.log('[SimulatorSession] Decoding and storing JWT FIRST...');
+        console.info('[SimulatorSession] 📝 Decoding JWT...');
 
         // Decode JWT to get user info
         const payload = JSON.parse(atob(customToken.split('.')[1]));
@@ -49,9 +49,8 @@ export default function SimulatorSession() {
           throw new Error('Session token has expired');
         }
 
-        // CRITICAL: Store auth IMMEDIATELY to prevent CORS errors
-        // This must happen BEFORE any other requests (including manifest.json)
-        console.log('[SimulatorSession] Clearing stale auth...');
+        // FAST PATH: Store minimal session IMMEDIATELY and navigate
+        console.info('[SimulatorSession] ⚡ FAST PATH: Clearing stale auth...');
         const authKeys = [
           'simulator_auth_token',
           'simulator_user',
@@ -68,45 +67,54 @@ export default function SimulatorSession() {
           localStorage.removeItem(key);
         });
 
-        // Store simulator auth SYNCHRONOUSLY
+        // Store auth token and stage immediately
         sessionStorage.setItem('simulator_auth_token', customToken);
         sessionStorage.setItem('simulator_stage', stage);
-        
-        console.log('[SimulatorSession] ✅ Auth stored, fetching profile...');
 
-        // Now fetch profile snapshot using the stored token
+        // Store minimal user snapshot from JWT
+        const minimalSnapshot = {
+          user_id: payload.sub,
+          first_name: payload.first_name || '',
+          last_name: payload.last_name || '',
+          mobile: payload.mobile || '',
+          country_code: payload.country_code || '+1',
+          is_test_account: true,
+          profile_complete: false
+        };
+        sessionStorage.setItem('simulator_user', JSON.stringify(minimalSnapshot));
+        
+        console.info('[SimulatorSession] ✅ JWT stored (fast path)', {
+          user_id: minimalSnapshot.user_id,
+          stage
+        });
+
+        // Navigate IMMEDIATELY (don't wait for backend)
+        const showUI = searchParams.get('show_ui');
+        const targetRoute = showUI === 'registration_form' || stage === 'fresh_signup'
+          ? '/simulator/register'
+          : '/simulator/dashboard';
+        
+        console.info('[SimulatorSession] 🎯 Navigating to:', targetRoute);
+        navigate(targetRoute, { replace: true });
+
+        // BACKGROUND ENRICHMENT: Fetch full profile after navigation
+        console.info('[SimulatorSession] 🔄 Background enrichment: start');
         const { data: snapshot, error: fnError } = await supabase.functions.invoke('simulator-get-profile', {
           body: { custom_token: customToken }
         });
 
         if (fnError) {
-          console.error('[SimulatorSession] Profile fetch error:', fnError);
-          throw new Error(fnError.message || 'Failed to verify simulator token');
+          console.warn('[SimulatorSession] ⚠️ Background enrichment: failed', fnError);
+          // Keep minimal snapshot, already navigated
+          return;
         }
 
-        if (!snapshot?.is_test_account) {
-          throw new Error('Session is not for a test account');
-        }
-
-        console.log('[SimulatorSession] ✅ Profile confirmed:', {
-          user_id: snapshot.user_id,
-          name: `${snapshot.first_name || ''} ${snapshot.last_name || ''}`.trim(),
-          mobile: snapshot.mobile
-        });
-
-        // Store user snapshot
-        sessionStorage.setItem('simulator_user', JSON.stringify(snapshot));
-        
-        console.log('[SimulatorSession] ✅ Session ready, navigating...');
-
-        // Check for show_ui parameter
-        const showUI = searchParams.get('show_ui');
-
-        // Route based on show_ui flag or stage
-        if (showUI === 'registration_form' || stage === 'fresh_signup') {
-          navigate('/simulator/register', { replace: true });
-        } else {
-          navigate('/simulator/dashboard', { replace: true });
+        if (snapshot?.is_test_account) {
+          sessionStorage.setItem('simulator_user', JSON.stringify(snapshot));
+          console.info('[SimulatorSession] ✅ Background enrichment: success', {
+            user_id: snapshot.user_id,
+            profile_complete: snapshot.profile_complete
+          });
         }
 
       } catch (error: any) {

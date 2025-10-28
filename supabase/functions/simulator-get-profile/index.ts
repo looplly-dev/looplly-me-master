@@ -3,13 +3,17 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { jwtVerify } from "https://deno.land/x/jose@v4.14.4/index.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
+const getCorsHeaders = (origin?: string) => ({
+  "Access-Control-Allow-Origin": origin || "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-simulator-session",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
-};
+  "Vary": "Origin",
+});
 
 serve(async (req) => {
+  const origin = req.headers.get("Origin");
+  const corsHeaders = getCorsHeaders(origin || undefined);
+
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });

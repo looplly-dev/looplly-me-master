@@ -18,29 +18,38 @@ export default function SimulatorIframe({ sessionToken, stage, onReset }: Simula
   // Parse session and construct URL with custom JWT token
   const simulatorUrl = (() => {
     try {
-      const session = JSON.parse(sessionToken);
+      let session;
+      try {
+        session = JSON.parse(sessionToken);
+      } catch (parseError) {
+        console.error('[SimulatorIframe] ❌ Failed to parse session token:', parseError);
+        throw new Error('Invalid session token format');
+      }
+
       const customToken = session.custom_token;
       const showUI = session.show_ui;
 
       if (!customToken) {
-        console.error('[SimulatorIframe] No custom_token in session:', session);
-        return '';
+        console.error('[SimulatorIframe] ❌ No custom_token in session:', session);
+        throw new Error('Missing custom_token in session');
       }
 
-      const params = new URLSearchParams({
-        custom_token: customToken,
-        stage: stage,
-        key: iframeKey.toString(),
-        ts: Date.now().toString()
-      });
+      // Explicitly encode token (URLSearchParams already does this, but being explicit)
+      const params = new URLSearchParams();
+      params.set('custom_token', customToken);
+      params.set('stage', stage);
+      params.set('key', iframeKey.toString());
+      params.set('ts', Date.now().toString());
 
       if (showUI) {
         params.set('show_ui', showUI);
       }
 
-      return `${window.location.origin}/simulator/session?${params}`;
+      const url = `${window.location.origin}/simulator/session?${params}`;
+      console.info('[SimulatorIframe] ✅ Generated URL');
+      return url;
     } catch (error) {
-      console.error('[SimulatorIframe] Failed to parse session token:', error);
+      console.error('[SimulatorIframe] ❌ URL generation failed:', error);
       return '';
     }
   })();
