@@ -1,7 +1,7 @@
 ---
 id: "admin-portal-guide"
 title: "Admin Portal Guide"
-category: "Admin Portal"
+category: "Admin"
 description: "Complete guide to admin portal sections, features, and operational procedures"
 audience: "all"
 tags: ["admin", "portal", "guide", "operations"]

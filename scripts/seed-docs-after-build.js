@@ -4,7 +4,6 @@ import { readdir, readFile } from 'fs/promises';
 import { join } from 'path';
 import matter from 'gray-matter';
 
-const PUBLIC_DOCS_DIR = './public/docs';
 const DOCS_DIR = './docs';
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -67,29 +66,18 @@ async function parseDocument(filePath, source) {
 }
 
 async function seedDocumentation() {
-  console.log('🔍 Discovering documentation files...');
+  console.log('🔍 Discovering documentation files from /docs...');
   
-  const publicMarkdownFiles = await getAllMarkdownFiles(PUBLIC_DOCS_DIR);
   const projectMarkdownFiles = await getAllMarkdownFiles(DOCS_DIR);
   
-  console.log(`✅ Found ${publicMarkdownFiles.length} files in /public/docs, ${projectMarkdownFiles.length} files in /docs`);
+  console.log(`✅ Found ${projectMarkdownFiles.length} files in /docs`);
   
   console.log('📖 Parsing frontmatter and content...');
-  const publicDocs = (await Promise.all(
-    publicMarkdownFiles.map(file => parseDocument(file, 'public'))
-  )).filter(Boolean);
-  
-  const projectDocs = (await Promise.all(
+  const docs = (await Promise.all(
     projectMarkdownFiles.map(file => parseDocument(file, 'docs'))
   )).filter(Boolean);
   
-  // Deduplicate by ID (prefer /docs over /public/docs)
-  const docMap = new Map();
-  publicDocs.forEach(doc => docMap.set(doc.id, doc));
-  projectDocs.forEach(doc => docMap.set(doc.id, doc)); // Override with project docs
-  
-  const docs = Array.from(docMap.values());
-  console.log(`✅ Parsed ${docs.length} unique documents (${publicDocs.length} from public, ${projectDocs.length} from docs, deduped)`);
+  console.log(`✅ Parsed ${docs.length} documents from single source of truth (/docs)`);
   
   console.log(`🚀 Seeding ${docs.length} documents to Knowledge Centre...`);
   

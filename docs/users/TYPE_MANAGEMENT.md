@@ -1,7 +1,7 @@
 ---
 title: "User Type Management"
 slug: "user-type-management"
-category: "authentication"
+category: "Admin"
 tags: ["user-types", "authentication", "roles", "admin", "rls-policies"]
 author: "Nadia Gaspari"
 technical_content: "AI-Generated with Human Review"

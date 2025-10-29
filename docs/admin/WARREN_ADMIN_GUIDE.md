@@ -1,7 +1,7 @@
 ---
 id: "warren-admin"
 title: "Warren Admin Guide"
-category: "Admin Guides"
+category: "Admin"
 description: "Admin guide for Warren"
 audience: "admin"
 tags: ["warren", "admin", "guide"]
