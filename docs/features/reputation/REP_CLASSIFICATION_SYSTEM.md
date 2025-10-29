@@ -1,5 +1,5 @@
 ---
-id: "reputation-system"
+id: "rep-classification-system"
 title: "Reputation Classification System"
 category: "Reputation & Rewards"
 description: "Gamified user reputation and tier progression system"

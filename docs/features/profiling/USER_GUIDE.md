@@ -1,5 +1,5 @@
 ---
-id: "profiling-user-guide"
+id: "user-guide"
 title: "User Profiling Guide"
 category: "User Guides"
 description: "Complete guide for users to understand and complete their profile"
