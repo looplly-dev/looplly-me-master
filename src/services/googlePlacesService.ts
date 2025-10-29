@@ -35,19 +35,17 @@ export interface AddressComponents {
 
 class GooglePlacesService {
   private useMock: boolean;
-  private apiKey: string | undefined;
 
   constructor() {
     const config = env.get();
     this.useMock = config.VITE_USE_MOCK_PLACES ?? true;
-    this.apiKey = config.VITE_GOOGLE_PLACES_API_KEY;
   }
 
   /**
    * Check if service is using mock data or real API
    */
   public isMockMode(): boolean {
-    return this.useMock || !this.apiKey;
+    return this.useMock;
   }
 
   /**

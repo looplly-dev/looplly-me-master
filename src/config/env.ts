@@ -74,12 +74,7 @@ const envSchema = z.object({
     .enum(['web', 'ios', 'android'])
     .optional(),
 
-  // Optional: Google Places API
-  VITE_GOOGLE_PLACES_API_KEY: z
-    .string()
-    .min(1, 'Google Places API key is required')
-    .optional(),
-  
+  // Optional: Google Places API (now server-side via Supabase Edge Function)
   VITE_USE_MOCK_PLACES: z
     .string()
     .transform((val) => val === 'true')
@@ -141,7 +136,6 @@ class EnvironmentConfig {
         VITE_API_BASE_URL: import.meta.env.VITE_API_BASE_URL,
         VITE_API_TIMEOUT: import.meta.env.VITE_API_TIMEOUT,
         VITE_CAPACITOR_PLATFORM: import.meta.env.VITE_CAPACITOR_PLATFORM,
-        VITE_GOOGLE_PLACES_API_KEY: import.meta.env.VITE_GOOGLE_PLACES_API_KEY,
         VITE_USE_MOCK_PLACES: import.meta.env.VITE_USE_MOCK_PLACES,
         VITE_AI_PROVIDER_API_KEY: import.meta.env.VITE_AI_PROVIDER_API_KEY,
         VITE_AI_PROVIDER: import.meta.env.VITE_AI_PROVIDER,
