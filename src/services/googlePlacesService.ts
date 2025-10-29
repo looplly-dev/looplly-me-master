@@ -1,5 +1,6 @@
 import { env } from '@/config/env';
 import mockPlacesData from '@/mock_data/features/google-places.json';
+import { supabase } from '@/integrations/supabase/client';
 
 export interface PlaceResult {
   place_id: string;
@@ -148,10 +149,16 @@ class GooglePlacesService {
 
   private async realSearchPlaces(query: string): Promise<any[]> {
     try {
-      const response = await fetch(
-        `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(query)}&key=${this.apiKey}`
-      );
-      const data = await response.json();
+      const { data, error } = await supabase.functions.invoke('google-places', {
+        body: { query },
+        method: 'POST',
+      });
+
+      if (error) {
+        console.error('Google Places Autocomplete error:', error);
+        throw error;
+      }
+
       console.log('🌍 Using REAL Google Places Autocomplete:', data.predictions?.length || 0, 'results');
       return data.predictions || [];
     } catch (error) {
@@ -162,10 +169,16 @@ class GooglePlacesService {
 
   private async realGetPlaceDetails(placeId: string): Promise<PlaceResult | null> {
     try {
-      const response = await fetch(
-        `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&key=${this.apiKey}`
-      );
-      const data = await response.json();
+      const { data, error } = await supabase.functions.invoke('google-places', {
+        body: { placeId },
+        method: 'POST',
+      });
+
+      if (error) {
+        console.error('Google Places Details error:', error);
+        throw error;
+      }
+
       console.log('🌍 Using REAL Google Places Details');
       return data.result || null;
     } catch (error) {
