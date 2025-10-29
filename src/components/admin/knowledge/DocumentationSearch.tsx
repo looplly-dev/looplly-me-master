@@ -3,11 +3,21 @@ import { useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Search, FileText } from 'lucide-react';
-import { documentationIndex, DocumentationItem } from '@/data/documentationIndex';
+import { Search, FileText, Shield } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useRole } from '@/hooks/useRole';
 import Fuse from 'fuse.js';
+
+interface DocumentationItem {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  tags: string[];
+  status?: string;
+  audience?: string;
+}
 
 interface DocumentationSearchProps {
   searchQuery: string;
@@ -18,7 +28,53 @@ interface DocumentationSearchProps {
 export default function DocumentationSearch({ searchQuery, onSearchChange, statusFilter = 'all' }: DocumentationSearchProps) {
   const navigate = useNavigate();
   const [results, setResults] = useState<DocumentationItem[]>([]);
+  const [allDocs, setAllDocs] = useState<DocumentationItem[]>([]);
   const { authState } = useAuth();
+  const { isAdmin } = useRole();
+
+  // Fetch documentation from Supabase with audience filtering
+  useEffect(() => {
+    const fetchDocs = async () => {
+      let query = supabase
+        .from('documentation')
+        .select('id, title, description, category, tags, status, audience');
+
+      // Apply audience filter based on user role
+      if (isAdmin) {
+        // Admins see both 'all' and 'admin' docs
+        query = query.in('audience', ['all', 'admin']);
+      } else {
+        // Non-admins only see 'all' docs
+        query = query.eq('audience', 'all');
+      }
+
+      // Apply status filter
+      if (statusFilter !== 'all') {
+        query = query.eq('status', statusFilter);
+      }
+
+      const { data, error } = await query;
+      
+      if (error) {
+        console.error('Failed to fetch documentation:', error);
+        return;
+      }
+
+      const docs = (data || []).map(doc => ({
+        id: doc.id,
+        title: doc.title || '',
+        description: doc.description || '',
+        category: doc.category || 'Uncategorized',
+        tags: doc.tags || [],
+        status: doc.status || 'published',
+        audience: doc.audience || 'all'
+      }));
+
+      setAllDocs(docs);
+    };
+
+    fetchDocs();
+  }, [isAdmin, statusFilter]);
 
   // SECURITY: Audit log search queries
   useEffect(() => {
@@ -36,14 +92,8 @@ export default function DocumentationSearch({ searchQuery, onSearchChange, statu
     }
   }, [searchQuery, authState.user]);
 
-  // Filter by status first
-  const filteredDocs = useMemo(() => {
-    if (statusFilter === 'all') return documentationIndex;
-    return documentationIndex.filter(doc => doc.status === statusFilter);
-  }, [statusFilter]);
-
   // Configure Fuse.js for fuzzy search
-  const fuse = useMemo(() => new Fuse(filteredDocs, {
+  const fuse = useMemo(() => new Fuse(allDocs, {
     keys: [
       { name: 'title', weight: 2 },
       { name: 'description', weight: 1.5 },
@@ -53,7 +103,7 @@ export default function DocumentationSearch({ searchQuery, onSearchChange, statu
     threshold: 0.4,
     includeScore: true,
     minMatchCharLength: 2,
-  }), [filteredDocs]);
+  }), [allDocs]);
 
   useEffect(() => {
     if (searchQuery.trim().length < 2) {
@@ -140,6 +190,12 @@ export default function DocumentationSearch({ searchQuery, onSearchChange, statu
                       <CardTitle className="text-base flex items-center gap-2">
                         <FileText className="h-4 w-4 text-primary" />
                         {doc.title}
+                        {doc.audience === 'admin' && (
+                          <Badge variant="outline" className="gap-1 ml-2 text-xs">
+                            <Shield className="h-3 w-3" />
+                            Admin Only
+                          </Badge>
+                        )}
                         {getStatusBadge(doc.status)}
                       </CardTitle>
                       <CardDescription className="mt-1">

@@ -47,6 +47,10 @@ async function parseDocument(filePath, source) {
       ? filePath.split('public')[1] 
       : filePath.split('docs')[1] || filePath;
     
+    // Auto-detect audience from folder structure
+    const isAdminDoc = filePath.includes('/docs/admin/');
+    const defaultAudience = isAdminDoc ? 'admin' : 'all';
+    
     return {
       id,
       title: frontmatter.title || filename.replace(/_/g, ' '),
@@ -54,7 +58,7 @@ async function parseDocument(filePath, source) {
       category: frontmatter.category || 'Uncategorized',
       tags: frontmatter.tags || [],
       description: frontmatter.description || '',
-      audience: frontmatter.audience || 'all',
+      audience: frontmatter.audience || defaultAudience,
       status: frontmatter.status || 'published',
       path: pathParts,
       source

@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useRole } from '@/hooks/useRole';
 
 export interface DocumentationStats {
   total: number;
@@ -14,13 +15,26 @@ export interface DocumentationStats {
 }
 
 export function useDocumentationStats() {
+  const { isAdmin } = useRole();
+  
   return useQuery({
-    queryKey: ['documentation-stats'],
+    queryKey: ['documentation-stats', isAdmin],
     queryFn: async (): Promise<DocumentationStats> => {
-      // Get total counts by status
-      const { data: docs, error } = await supabase
+      // Build query with audience filtering
+      let query = supabase
         .from('documentation')
-        .select('id, status, category');
+        .select('id, status, category, audience');
+
+      // Apply audience filter based on user role
+      if (isAdmin) {
+        // Admins see both 'all' and 'admin' docs
+        query = query.in('audience', ['all', 'admin']);
+      } else {
+        // Non-admins only see 'all' docs
+        query = query.eq('audience', 'all');
+      }
+
+      const { data: docs, error } = await query;
 
       if (error) throw error;
 
