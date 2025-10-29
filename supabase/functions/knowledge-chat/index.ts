@@ -29,7 +29,7 @@ serve(async (req) => {
     // Search for relevant documentation
     const { data: docs, error: searchError } = await supabase
       .from('documentation')
-      .select('title, content, category, path')
+      .select('title, content, category, id')
       .or(`title.ilike.%${question}%,content.ilike.%${question}%`)
       .limit(5);
 
