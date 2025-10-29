@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { documentationIndex, DocumentationItem } from '@/data/documentationIndex';
+import { DocumentationItem } from '@/data/documentationIndex';
 import { useAuth } from './useAuth';
 import { useRole } from './useRole';
+import { supabase } from '@/integrations/supabase/client';
 
 export function useRecommendations(limit: number = 6): DocumentationItem[] {
   const [recommendations, setRecommendations] = useState<DocumentationItem[]>([]);
@@ -9,11 +10,20 @@ export function useRecommendations(limit: number = 6): DocumentationItem[] {
   const { role } = useRole();
 
   useEffect(() => {
-    const getRecommendations = () => {
-      const published = documentationIndex.filter(doc => doc.status === 'published');
-      
+    const getRecommendations = async () => {
+      // Fetch published documents from database
+      const { data: docs, error } = await supabase
+        .from('documentation')
+        .select('id, title, category, tags, description, audience, status')
+        .eq('status', 'published');
+
+      if (error || !docs) {
+        console.error('Error fetching recommendations:', error);
+        return;
+      }
+
       // Score documents based on relevance
-      const scored = published.map(doc => {
+      const scored = docs.map(doc => {
         let score = 0;
 
         // Role-based recommendations
@@ -36,7 +46,7 @@ export function useRecommendations(limit: number = 6): DocumentationItem[] {
       const sorted = scored
         .sort((a, b) => b.score - a.score)
         .slice(0, limit)
-        .map(item => item.doc);
+        .map(item => item.doc as DocumentationItem);
 
       setRecommendations(sorted);
     };
