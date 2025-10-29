@@ -326,3 +326,5 @@ Action: Updates answer, resets is_stale to false
 - [Table Architecture](./TABLE_ARCHITECTURE.md) - Database schema
 - [Admin Portal Guide](./ADMIN_PORTAL_GUIDE.md) - Navigation and features
 - [Recent Changes](./RECENT_CHANGES.md) - Latest updates
+
+Note: metadata refreshed.

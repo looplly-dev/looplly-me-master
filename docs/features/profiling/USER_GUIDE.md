@@ -164,3 +164,5 @@ A: Yes. We use bank-level encryption and never sell personal data. See our Priva
 ## Need Help?
 
 Visit the **Support** tab or contact our team through the in-app chat.
+
+Note: metadata refreshed.

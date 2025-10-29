@@ -376,3 +376,5 @@ function triggerTierUpNotification(userId: string, newTier: number) {
 - [Streak System](STREAK_REPUTATION_SYSTEM.md)
 - [User Classification](USER_CLASSIFICATION.md)
 - [Badge System](docs/BADGE_SYSTEM.md)
+
+Note: metadata refreshed.
