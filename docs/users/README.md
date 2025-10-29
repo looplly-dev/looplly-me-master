@@ -1,3 +1,16 @@
+---
+id: "users-readme"
+title: "User Management Documentation"
+category: "User Management"
+description: "User management documentation covering classification, roles, account operations, and access control systems"
+audience: "all"
+tags: ["users", "classification", "roles", "accounts", "overview"]
+status: "published"
+version: "1.0.0"
+created_at: "2025-01-28"
+updated_at: "2025-01-28"
+---
+
 # User Management Documentation
 
 ## Overview

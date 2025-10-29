@@ -1,3 +1,16 @@
+---
+id: "reference-readme"
+title: "Reference Documentation"
+category: "Reference"
+description: "Reference materials including analytics documentation, tracking implementation, and platform change logs"
+audience: "all"
+tags: ["reference", "analytics", "changelog", "overview"]
+status: "published"
+version: "1.0.0"
+created_at: "2025-01-28"
+updated_at: "2025-01-28"
+---
+
 # Reference Documentation
 
 ## Overview

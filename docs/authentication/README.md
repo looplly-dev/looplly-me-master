@@ -1,3 +1,16 @@
+---
+id: "authentication-readme"
+title: "Authentication & Security Documentation"
+category: "Authentication"
+description: "Authentication system documentation covering dual-account model, verification, JWT implementation, and security features"
+audience: "all"
+tags: ["authentication", "security", "jwt", "verification", "overview"]
+status: "published"
+version: "1.0.0"
+created_at: "2025-01-28"
+updated_at: "2025-01-28"
+---
+
 # Authentication & Security Documentation
 
 ## Overview

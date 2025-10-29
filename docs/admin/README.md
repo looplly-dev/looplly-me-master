@@ -1,3 +1,16 @@
+---
+id: "admin-readme"
+title: "Admin Portal Documentation"
+category: "Admin"
+description: "Administrator portal documentation including user management, team operations, content management, and analytics"
+audience: "all"
+tags: ["admin", "portal", "management", "overview"]
+status: "published"
+version: "1.0.0"
+created_at: "2025-01-28"
+updated_at: "2025-01-28"
+---
+
 # Admin Portal Documentation
 
 ## Overview

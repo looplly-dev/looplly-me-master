@@ -1,3 +1,16 @@
+---
+id: "features-readme"
+title: "Features Documentation"
+category: "Features"
+description: "Overview of major platform features including profiling, reputation, mobile validation, and knowledge centre systems"
+audience: "all"
+tags: ["features", "profiling", "reputation", "mobile", "overview"]
+status: "published"
+version: "1.0.0"
+created_at: "2025-01-28"
+updated_at: "2025-01-28"
+---
+
 # Features Documentation
 
 ## Overview

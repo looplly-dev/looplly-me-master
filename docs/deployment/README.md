@@ -1,3 +1,16 @@
+---
+id: "deployment-readme"
+title: "Deployment & Configuration Documentation"
+category: "Technical Reference"
+description: "Deployment and configuration guide covering environment setup, database migrations, and third-party integrations"
+audience: "all"
+tags: ["deployment", "configuration", "environment", "integrations", "overview"]
+status: "published"
+version: "1.0.0"
+created_at: "2025-01-28"
+updated_at: "2025-01-28"
+---
+
 # Deployment & Configuration Documentation
 
 ## Overview

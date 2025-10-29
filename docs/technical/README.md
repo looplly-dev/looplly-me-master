@@ -1,3 +1,16 @@
+---
+id: "technical-readme"
+title: "Technical Documentation"
+category: "Technical Reference"
+description: "Technical architecture documentation including database schemas, data isolation, API patterns, and system design"
+audience: "all"
+tags: ["technical", "architecture", "database", "api", "overview"]
+status: "published"
+version: "1.0.0"
+created_at: "2025-01-28"
+updated_at: "2025-01-28"
+---
+
 # Technical Documentation
 
 ## Overview
