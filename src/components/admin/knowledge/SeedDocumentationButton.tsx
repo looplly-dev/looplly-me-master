@@ -5,7 +5,6 @@ import { Badge } from '@/components/ui/badge';
 import { Database, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import matter from 'gray-matter';
 import { useQueryClient } from '@tanstack/react-query';
 
 export default function SeedDocumentationButton() {
@@ -53,67 +52,40 @@ export default function SeedDocumentationButton() {
         return;
       }
 
-      // Step 2: Parse frontmatter and content using gray-matter
-      console.log('📖 Parsing frontmatter and content...');
+      // Step 2: Send raw markdown to edge function (let it parse server-side)
+      console.log('📦 Preparing documents for server-side parsing...');
       
-      const parseDoc = (path: string, content: string, source: 'public' | 'docs') => {
-        try {
-          const { data: frontmatter, content: body } = matter(content);
-          
-          // Generate ID from filename if not in frontmatter
-          const filename = path.split('/').pop()?.replace('.md', '') || 'unknown';
-          const id = frontmatter.id || filename.toLowerCase().replace(/_/g, '-');
-          
-          return {
-            id,
-            title: frontmatter.title || filename.replace(/_/g, ' '),
-            content: body.trim(),
-            category: frontmatter.category || 'Uncategorized',
-            tags: Array.isArray(frontmatter.tags) ? frontmatter.tags : [],
-            description: frontmatter.description || '',
-            audience: frontmatter.audience || 'all',
-            status: frontmatter.status || 'published',
-            path: source === 'public' ? path.split('public')[1] || path : path,
-            source
-          };
-        } catch (err) {
-          console.error(`Failed to parse ${path}:`, err);
-          return null;
-        }
+      const prepareDoc = (path: string, content: string, source: 'public' | 'docs') => {
+        const filename = path.split('/').pop()?.replace('.md', '') || 'unknown';
+        const id = filename.toLowerCase().replace(/_/g, '-');
+        
+        return {
+          id,
+          path: source === 'public' ? path.split('public')[1] || path : path,
+          rawContent: content,
+          source
+        };
       };
 
       const publicDocs = Object.entries(publicDocsModules)
-        .map(([path, content]) => parseDoc(path, content, 'public'))
-        .filter(Boolean);
+        .map(([path, content]) => prepareDoc(path, content, 'public'));
       
       const projectDocs = Object.entries(projectDocsModules)
-        .map(([path, content]) => parseDoc(path, content, 'docs'))
-        .filter(Boolean);
+        .map(([path, content]) => prepareDoc(path, content, 'docs'));
 
       // Step 3: Deduplicate by ID (prefer /docs over /public/docs)
       const docMap = new Map();
       
-      // Add public docs first
-      publicDocs.forEach(doc => {
-        if (doc) docMap.set(doc.id, doc);
-      });
-      
-      // Override with project docs (preferred source)
-      projectDocs.forEach(doc => {
-        if (doc) docMap.set(doc.id, doc);
-      });
+      publicDocs.forEach(doc => docMap.set(doc.id, doc));
+      projectDocs.forEach(doc => docMap.set(doc.id, doc)); // Override with project docs
 
       const uniqueDocs = Array.from(docMap.values());
-      console.log(`✅ Parsed ${uniqueDocs.length} unique documents (${publicDocs.length} from public, ${projectDocs.length} from docs, deduped)`);
+      console.log(`✅ Prepared ${uniqueDocs.length} unique documents (${publicDocs.length} from public, ${projectDocs.length} from docs)`);
 
-      // Step 4: Send to edge function with action to fetch public docs via HTTP
-      console.log('🚀 Seeding database...');
+      // Step 4: Send to edge function for server-side parsing
+      console.log('🚀 Sending to server for parsing and database seeding...');
       const { data, error } = await supabase.functions.invoke('seed-documentation', {
-        body: { 
-          docs: uniqueDocs,
-          action: 'http-fetch-index',
-          baseUrl: window.location.origin
-        }
+        body: { docs: uniqueDocs }
       });
 
       if (error) {
@@ -138,7 +110,7 @@ export default function SeedDocumentationButton() {
       
       if (data.success && data.stats.failed === 0) {
         toast.success('Documentation seeded successfully!', {
-          description: `${data.stats.success} documents added (${data.stats.received_count || 0} from project, ${data.stats.fetched_count || 0} fetched via HTTP)`
+          description: `${data.stats.success} documents added from /docs and /public/docs`
         });
       } else if (data.stats.success > 0) {
         toast.warning('Seeding completed with some errors', {
@@ -175,7 +147,7 @@ export default function SeedDocumentationButton() {
               Seed Documentation Database
             </CardTitle>
             <CardDescription className="mt-1">
-              Automatically discover project docs from /docs and fetch public docs via HTTP
+              Discovers and seeds all documentation from /docs and /public/docs folders
             </CardDescription>
           </div>
           <Button 
@@ -225,30 +197,22 @@ export default function SeedDocumentationButton() {
             {/* Stats */}
             {result.stats && (
               <div className="space-y-4">
-                <div className="grid grid-cols-4 gap-4">
+                <div className="grid grid-cols-3 gap-4">
                   <div className="text-center p-3 rounded-lg bg-muted">
                     <div className="text-2xl font-bold">{result.stats.total}</div>
                     <div className="text-xs text-muted-foreground">Total</div>
-                  </div>
-                  <div className="text-center p-3 rounded-lg bg-blue-50 dark:bg-blue-950/20">
-                    <div className="text-2xl font-bold text-blue-600">{result.stats.received_count || 0}</div>
-                    <div className="text-xs text-muted-foreground">Received</div>
-                  </div>
-                  <div className="text-center p-3 rounded-lg bg-purple-50 dark:bg-purple-950/20">
-                    <div className="text-2xl font-bold text-purple-600">{result.stats.fetched_count || 0}</div>
-                    <div className="text-xs text-muted-foreground">Fetched</div>
                   </div>
                   <div className="text-center p-3 rounded-lg bg-green-50 dark:bg-green-950/20">
                     <div className="text-2xl font-bold text-green-600">{result.stats.success}</div>
                     <div className="text-xs text-muted-foreground">Seeded</div>
                   </div>
+                  {result.stats.failed > 0 && (
+                    <div className="text-center p-3 rounded-lg bg-red-50 dark:bg-red-950/20">
+                      <div className="text-2xl font-bold text-red-600">{result.stats.failed}</div>
+                      <div className="text-xs text-muted-foreground">Failed</div>
+                    </div>
+                  )}
                 </div>
-                {result.stats.failed > 0 && (
-                  <div className="text-center p-3 rounded-lg bg-red-50 dark:bg-red-950/20">
-                    <div className="text-2xl font-bold text-red-600">{result.stats.failed}</div>
-                    <div className="text-xs text-muted-foreground">Failed</div>
-                  </div>
-                )}
               </div>
             )}
 
