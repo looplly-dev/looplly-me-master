@@ -1,3 +1,16 @@
+---
+title: "Admin Setup Instructions"
+slug: "admin-setup-instructions"
+category: "Admin Portal"
+description: "Step-by-step guide for setting up admin access, roles, and testing the admin portal"
+audience: "admin"
+tags: ["setup", "installation", "admin-portal", "roles", "security"]
+status: "published"
+version: "1.0.0"
+last_updated: "2025-01-29"
+author: "System"
+---
+
 # Admin Setup Instructions
 
 ## Phase 1: Security & Database Setup ✅
@@ -93,11 +106,11 @@ After running the migration, you need to grant the super admin role. Follow thes
 
 ## Related Documentation
 
-- [Role Architecture](docs/ROLE_ARCHITECTURE.md) - Understanding the dual-table role system
-- [User Type Management](docs/USER_TYPE_MANAGEMENT.md) - Managing office vs Looplly users
-- [Warren's Admin Guide](docs/WARREN_ADMIN_GUIDE.md) - Plain-English admin guide
-- [Profile System Admin Guide](docs/PROFILING/ADMIN_GUIDE.md) - Managing profile questions and decay
-- [Profiling System Docs](docs/PROFILING/README.md) - Complete profiling documentation
+- [Role Architecture](docs/admin/users/ROLE_ARCHITECTURE.md) - Understanding the dual-table role system
+- [User Type Management](docs/admin/users/TYPE_MANAGEMENT.md) - Managing office vs Looplly users
+- [Warren's Admin Guide](docs/admin/WARREN_ADMIN_GUIDE.md) - Plain-English admin guide
+- [Profile System Admin Guide](docs/admin/features/profiling/ADMIN_GUIDE.md) - Managing profile questions and decay
+- [Profiling System Docs](docs/admin/features/profiling/README.md) - Complete profiling documentation
 
 ## Next Steps (Phase 3 & 4)
 
