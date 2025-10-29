@@ -1,3 +1,16 @@
+---
+id: "profiling-earning-rules"
+title: "Profiling Earning Rules"
+category: "Profiling System"
+description: "How profile completion unlocks earning opportunities and reputation rewards"
+audience: "all"
+tags: ["profiling", "earning", "rewards", "reputation"]
+status: "published"
+version: "1.0"
+created_at: "2024-01-15"
+updated_at: "2024-01-15"
+---
+
 # Profile Completion & Earning Rules
 
 ## Overview

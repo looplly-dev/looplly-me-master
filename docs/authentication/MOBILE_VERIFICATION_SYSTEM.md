@@ -1,3 +1,16 @@
+---
+id: "authentication-mobile-verification"
+title: "Mobile Verification System"
+category: "Authentication & Access"
+description: "Mobile phone verification, OTP system, and Notify microservice integration documentation"
+audience: "all"
+tags: ["authentication", "mobile", "verification", "otp", "notify"]
+status: "published"
+version: "1.0"
+created_at: "2024-01-15"
+updated_at: "2024-01-15"
+---
+
 # Mobile Verification System Documentation
 
 ## Purpose

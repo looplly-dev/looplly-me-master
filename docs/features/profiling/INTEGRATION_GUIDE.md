@@ -1,3 +1,16 @@
+---
+id: "profiling-integration-guide"
+title: "Profiling System Integration Guide"
+category: "Profiling System"
+description: "Technical guide for integrating the profiling system into features, surveys, and targeting logic"
+audience: "all"
+tags: ["profiling", "integration", "development", "api"]
+status: "published"
+version: "1.0"
+created_at: "2024-01-15"
+updated_at: "2024-01-15"
+---
+
 # Profiling Integration Guide
 
 ## Overview

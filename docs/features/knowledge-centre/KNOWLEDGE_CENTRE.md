@@ -1,3 +1,16 @@
+---
+id: "knowledge-centre-overview"
+title: "Knowledge Centre"
+category: "Knowledge Centre"
+description: "Comprehensive documentation system with search, versioning, and role-based access"
+audience: "all"
+tags: ["knowledge-centre", "documentation", "search", "content"]
+status: "published"
+version: "1.0"
+created_at: "2024-01-15"
+updated_at: "2024-01-15"
+---
+
 # Knowledge Centre
 
 ## Overview

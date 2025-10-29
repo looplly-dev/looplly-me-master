@@ -1,3 +1,16 @@
+---
+id: "mobile-readme"
+title: "Mobile Validation Documentation"
+category: "Mobile & Global"
+description: "Mobile phone verification system and global mobile number format support"
+audience: "all"
+tags: ["mobile", "verification", "validation", "overview"]
+status: "published"
+version: "1.0"
+created_at: "2024-01-15"
+updated_at: "2024-01-15"
+---
+
 # Mobile Validation Documentation
 
 ## Overview

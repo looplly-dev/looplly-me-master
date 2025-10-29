@@ -1,3 +1,16 @@
+---
+id: "mobile-global-expansion"
+title: "Mobile Validation Global Expansion"
+category: "Mobile & Global"
+description: "Documentation guide for country-specific mobile validation patterns and global coverage"
+audience: "all"
+tags: ["mobile", "validation", "global", "expansion"]
+status: "published"
+version: "1.0"
+created_at: "2024-01-15"
+updated_at: "2024-01-15"
+---
+
 # Mobile Validation Documentation Guide
 
 ## Overview

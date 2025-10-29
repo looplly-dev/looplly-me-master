@@ -1,3 +1,16 @@
+---
+id: "deployment-config"
+title: "Deployment Configuration"
+category: "Deployment & Infrastructure"
+description: "Production deployment configuration, platform setup, and hosting best practices"
+audience: "all"
+tags: ["deployment", "configuration", "hosting", "infrastructure"]
+status: "published"
+version: "1.0"
+created_at: "2024-01-15"
+updated_at: "2024-01-15"
+---
+
 # Deployment Configuration
 
 ## Overview

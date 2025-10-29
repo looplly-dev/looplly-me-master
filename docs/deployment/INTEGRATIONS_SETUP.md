@@ -1,3 +1,16 @@
+---
+id: "deployment-integrations"
+title: "Third-Party Integrations Setup"
+category: "Deployment & Infrastructure"
+description: "Google Places API, AI providers, and external service integration configuration"
+audience: "all"
+tags: ["deployment", "integrations", "api", "security"]
+status: "published"
+version: "1.0"
+created_at: "2024-01-15"
+updated_at: "2024-01-15"
+---
+
 # Integrations Setup
 
 Setting up Google Places API and AI Provider integrations with secure secret storage.

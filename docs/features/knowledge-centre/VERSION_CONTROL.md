@@ -1,3 +1,16 @@
+---
+id: "knowledge-centre-version-control"
+title: "Documentation Version Control"
+category: "Knowledge Centre"
+description: "Automatic versioning and change tracking for all documentation updates"
+audience: "all"
+tags: ["knowledge-centre", "versioning", "history", "tracking"]
+status: "published"
+version: "1.0"
+created_at: "2024-01-15"
+updated_at: "2024-01-15"
+---
+
 # Documentation Version Control
 
 ## Overview

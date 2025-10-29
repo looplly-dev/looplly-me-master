@@ -1,3 +1,16 @@
+---
+id: "deployment-environment"
+title: "Environment Setup"
+category: "Deployment & Infrastructure"
+description: "Environment variables, local development setup, and configuration management"
+audience: "all"
+tags: ["deployment", "environment", "configuration", "development"]
+status: "published"
+version: "1.0"
+created_at: "2024-01-15"
+updated_at: "2024-01-15"
+---
+
 # Environment Setup
 
 ## Overview

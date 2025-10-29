@@ -1,3 +1,16 @@
+---
+id: "profiling-contextual-triggers"
+title: "Contextual Question Triggering System"
+category: "Profiling System"
+description: "Smart question triggering based on user context, behavior, and previous answers for optimized data collection"
+audience: "all"
+tags: ["profiling", "automation", "targeting", "intelligence"]
+status: "published"
+version: "1.0"
+created_at: "2024-01-15"
+updated_at: "2024-01-15"
+---
+
 # Contextual Triggers
 
 ## Overview

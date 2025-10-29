@@ -1,3 +1,16 @@
+---
+id: "users-role-architecture"
+title: "Role Architecture"
+category: "User Management"
+description: "Security-first RBAC system with server-side role enforcement and granular permissions"
+audience: "all"
+tags: ["users", "roles", "rbac", "security"]
+status: "published"
+version: "1.0"
+created_at: "2024-01-15"
+updated_at: "2024-01-15"
+---
+
 # Role Architecture
 
 ## Overview

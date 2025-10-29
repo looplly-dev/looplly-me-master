@@ -1,3 +1,16 @@
+---
+id: "reputation-streaks"
+title: "Streak & Reputation System"
+category: "Reputation & Rewards"
+description: "Daily streaks, multipliers, and reputation rewards for consistent platform engagement"
+audience: "all"
+tags: ["reputation", "streaks", "engagement", "rewards"]
+status: "published"
+version: "1.0"
+created_at: "2024-01-15"
+updated_at: "2024-01-15"
+---
+
 # Streak & Reputation System
 
 ## Overview

@@ -1,3 +1,16 @@
+---
+id: "profiling-admin-auto-generation"
+title: "Admin Auto-Generation Guide"
+category: "Profiling System"
+description: "Administrator guide for using AI tools to automatically generate country-specific answer options"
+audience: "all"
+tags: ["profiling", "admin", "ai", "automation"]
+status: "published"
+version: "1.0"
+created_at: "2024-01-15"
+updated_at: "2024-01-15"
+---
+
 # Admin Auto-Generation Guide
 
 ## Overview

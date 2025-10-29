@@ -1,3 +1,16 @@
+---
+id: "authentication-password-reset"
+title: "Password Reset Flow"
+category: "Authentication & Access"
+description: "Secure password recovery mechanisms for users and team members using mobile-based verification"
+audience: "all"
+tags: ["authentication", "password", "recovery", "security"]
+status: "published"
+version: "1.0"
+created_at: "2024-01-15"
+updated_at: "2024-01-15"
+---
+
 # Password Reset Flow
 
 Password management and recovery system documentation for both regular users and team members.

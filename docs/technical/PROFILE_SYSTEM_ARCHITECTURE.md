@@ -1,3 +1,16 @@
+---
+id: "technical-profile-architecture"
+title: "Profile System Architecture"
+category: "Security & Data"
+description: "Technical architecture for user profiles, data storage, and privacy compliance"
+audience: "all"
+tags: ["technical", "profiles", "architecture", "security"]
+status: "published"
+version: "1.0"
+created_at: "2024-01-15"
+updated_at: "2024-01-15"
+---
+
 # Profile System Architecture
 
 ## Overview

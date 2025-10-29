@@ -1,3 +1,16 @@
+---
+id: "knowledge-centre-readme"
+title: "Knowledge Centre Documentation"
+category: "Knowledge Centre"
+description: "In-application documentation system with contextual help and version control"
+audience: "all"
+tags: ["knowledge-centre", "documentation", "help", "overview"]
+status: "published"
+version: "1.0"
+created_at: "2024-01-15"
+updated_at: "2024-01-15"
+---
+
 # Knowledge Centre Documentation
 
 ## Overview

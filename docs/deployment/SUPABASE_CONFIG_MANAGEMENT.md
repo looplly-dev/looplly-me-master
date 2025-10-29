@@ -1,3 +1,16 @@
+---
+id: "deployment-supabase-config"
+title: "Supabase Configuration Management"
+category: "Deployment & Infrastructure"
+description: "Managing Supabase configurations, environment variables, and deployment settings"
+audience: "all"
+tags: ["deployment", "supabase", "configuration", "infrastructure"]
+status: "published"
+version: "1.0"
+created_at: "2024-01-15"
+updated_at: "2024-01-15"
+---
+
 # Supabase Configuration Management
 
 ## Overview

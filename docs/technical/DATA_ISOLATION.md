@@ -1,3 +1,16 @@
+---
+id: "technical-data-isolation"
+title: "Data Isolation Quick Reference"
+category: "Security & Data"
+description: "Row-Level Security policies and data isolation patterns for multi-tenancy and access control"
+audience: "all"
+tags: ["technical", "security", "rls", "data-isolation"]
+status: "published"
+version: "1.0"
+created_at: "2024-01-15"
+updated_at: "2024-01-15"
+---
+
 # Data Isolation Quick Reference
 
 ## Overview

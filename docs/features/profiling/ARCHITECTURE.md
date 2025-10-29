@@ -1,3 +1,16 @@
+---
+id: "profiling-architecture"
+title: "Profiling System Architecture"
+category: "Profiling System"
+description: "Technical architecture, database schema, and implementation details for the profiling system"
+audience: "all"
+tags: ["profiling", "architecture", "database", "technical"]
+status: "published"
+version: "1.0"
+created_at: "2024-01-15"
+updated_at: "2024-01-15"
+---
+
 # Profiling System Architecture
 
 ## Overview

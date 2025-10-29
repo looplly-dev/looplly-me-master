@@ -1,3 +1,16 @@
+---
+id: "admin-portal-guide"
+title: "Admin Portal Guide"
+category: "Admin Portal"
+description: "Complete guide to admin portal sections, features, and operational procedures"
+audience: "all"
+tags: ["admin", "portal", "guide", "operations"]
+status: "published"
+version: "1.0"
+created_at: "2024-01-15"
+updated_at: "2024-01-15"
+---
+
 # Admin Portal Guide
 
 Complete guide to all admin portal features and sections.

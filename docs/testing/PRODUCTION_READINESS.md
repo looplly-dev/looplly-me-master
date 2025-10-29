@@ -1,3 +1,16 @@
+---
+id: "testing-production-readiness"
+title: "Production Readiness Checklist"
+category: "Testing & QA"
+description: "Complete pre-deployment checklist for transitioning from mock to production authentication"
+audience: "all"
+tags: ["testing", "production", "deployment", "readiness"]
+status: "published"
+version: "1.0"
+created_at: "2024-01-15"
+updated_at: "2024-01-15"
+---
+
 # Production Readiness Checklist
 
 Last Updated: 2025-01-26

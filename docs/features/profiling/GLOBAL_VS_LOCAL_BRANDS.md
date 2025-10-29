@@ -1,3 +1,16 @@
+---
+id: "profiling-brand-strategy"
+title: "Global vs Local Brand Strategy"
+category: "Profiling System"
+description: "Strategic framework for balancing global and local brand options in profiling questions"
+audience: "all"
+tags: ["profiling", "brands", "localization", "strategy"]
+status: "published"
+version: "1.0"
+created_at: "2024-01-15"
+updated_at: "2024-01-15"
+---
+
 # Global vs Local Brands Strategy
 
 ## Overview

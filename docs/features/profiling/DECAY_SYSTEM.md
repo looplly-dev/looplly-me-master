@@ -1,3 +1,16 @@
+---
+id: "profiling-decay-system"
+title: "Profile Decay System"
+category: "Profiling System"
+description: "Profile staleness tracking and refresh mechanisms to maintain data quality over time"
+audience: "all"
+tags: ["profiling", "decay", "data-quality", "automation"]
+status: "published"
+version: "1.0"
+created_at: "2024-01-15"
+updated_at: "2024-01-15"
+---
+
 # Profile Decay System
 
 ## Overview

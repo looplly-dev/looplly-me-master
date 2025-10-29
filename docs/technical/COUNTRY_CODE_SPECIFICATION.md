@@ -1,3 +1,16 @@
+---
+id: "technical-country-codes"
+title: "Country Code Specification"
+category: "Security & Data"
+description: "ISO 3166-1 alpha-2 country code standard and implementation across the platform"
+audience: "all"
+tags: ["technical", "country-codes", "standards", "specification"]
+status: "published"
+version: "1.0"
+created_at: "2024-01-15"
+updated_at: "2024-01-15"
+---
+
 # Country Code Specification
 
 ## Overview

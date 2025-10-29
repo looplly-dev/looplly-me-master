@@ -1,3 +1,16 @@
+---
+id: "admin-feature-testing"
+title: "Feature Testing Catalog"
+category: "Admin Portal"
+description: "Comprehensive testing catalog and standards for all platform features and components"
+audience: "all"
+tags: ["admin", "testing", "catalog", "quality-assurance"]
+status: "published"
+version: "1.0"
+created_at: "2024-01-15"
+updated_at: "2024-01-15"
+---
+
 # Feature Testing Catalog
 
 ## Overview

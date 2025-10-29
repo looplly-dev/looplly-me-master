@@ -1,3 +1,16 @@
+---
+id: "technical-table-architecture"
+title: "Table Architecture - User Type Separation"
+category: "Security & Data"
+description: "Database table structure and separation strategy for regular users and team members"
+audience: "all"
+tags: ["technical", "database", "architecture", "schema"]
+status: "published"
+version: "1.0"
+created_at: "2024-01-15"
+updated_at: "2024-01-15"
+---
+
 # Table Architecture - User Type Separation
 
 ## Overview

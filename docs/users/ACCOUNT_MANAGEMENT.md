@@ -1,3 +1,16 @@
+---
+id: "users-account-management"
+title: "Account Management"
+category: "User Management"
+description: "User account operations including creation, modification, deletion, and troubleshooting"
+audience: "all"
+tags: ["users", "accounts", "management", "operations"]
+status: "published"
+version: "1.0"
+created_at: "2024-01-15"
+updated_at: "2024-01-15"
+---
+
 # Account Management
 
 ## Overview

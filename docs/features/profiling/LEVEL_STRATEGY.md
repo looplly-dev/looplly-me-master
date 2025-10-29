@@ -1,3 +1,16 @@
+---
+id: "profiling-level-strategy"
+title: "Progressive Profiling Level Strategy"
+category: "Profiling System"
+description: "Three-tier progressive profiling strategy balancing data collection with user experience"
+audience: "all"
+tags: ["profiling", "strategy", "user-experience", "levels"]
+status: "published"
+version: "1.0"
+created_at: "2024-01-15"
+updated_at: "2024-01-15"
+---
+
 # Progressive Profiling Level Strategy
 
 ## Philosophy

@@ -1,3 +1,16 @@
+---
+id: "reference-analytics"
+title: "Analytics Implementation"
+category: "Platform Reference"
+description: "Analytics system for tracking user behavior, engagement, and platform performance metrics"
+audience: "all"
+tags: ["analytics", "metrics", "tracking", "reporting"]
+status: "published"
+version: "1.0"
+created_at: "2024-01-15"
+updated_at: "2024-01-15"
+---
+
 # Analytics Implementation
 
 ## Overview

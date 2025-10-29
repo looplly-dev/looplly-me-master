@@ -1,3 +1,16 @@
+---
+id: "profiling-ai-prompts"
+title: "AI Generation Prompts for Country Options"
+category: "Profiling System"
+description: "Prompt templates and engineering guidelines for AI-powered country option generation"
+audience: "all"
+tags: ["profiling", "ai", "prompts", "automation"]
+status: "published"
+version: "1.0"
+created_at: "2024-01-15"
+updated_at: "2024-01-15"
+---
+
 # AI Generation Prompts
 
 ## Overview

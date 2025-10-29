@@ -1,3 +1,16 @@
+---
+id: "testing-simulator-architecture"
+title: "Simulator Architecture"
+category: "Testing & QA"
+description: "Technical architecture of the isolated testing environment for safe user journey testing"
+audience: "all"
+tags: ["testing", "simulator", "architecture", "isolation"]
+status: "published"
+version: "1.0"
+created_at: "2024-01-15"
+updated_at: "2024-01-15"
+---
+
 # Simulator Architecture
 
 ## Overview

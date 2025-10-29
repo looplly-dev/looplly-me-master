@@ -1,3 +1,16 @@
+---
+id: "profiling-country-management"
+title: "Country-Specific Question Management"
+category: "Profiling System"
+description: "Managing global fallback questions and country-specific answer options for localized profiling"
+audience: "all"
+tags: ["profiling", "localization", "country-options", "admin"]
+status: "published"
+version: "1.0"
+created_at: "2024-01-15"
+updated_at: "2024-01-15"
+---
+
 # Country-Specific Question Management
 
 ## Overview

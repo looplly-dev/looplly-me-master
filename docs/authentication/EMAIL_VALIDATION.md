@@ -1,3 +1,16 @@
+---
+id: "authentication-email-validation"
+title: "Email Validation System"
+category: "Authentication & Access"
+description: "Email validation rules, blocked domains, and test email protection for registration security"
+audience: "all"
+tags: ["authentication", "email", "validation", "security"]
+status: "published"
+version: "1.0"
+created_at: "2024-01-15"
+updated_at: "2024-01-15"
+---
+
 # Email Validation System
 
 ## Overview

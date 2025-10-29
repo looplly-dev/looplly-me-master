@@ -1,3 +1,16 @@
+---
+id: "deployment-migration-guide"
+title: "Supabase Migration Guide"
+category: "Deployment & Infrastructure"
+description: "Database migration procedures, best practices, and rollback strategies for Supabase"
+audience: "all"
+tags: ["deployment", "database", "migrations", "supabase"]
+status: "published"
+version: "1.0"
+created_at: "2024-01-15"
+updated_at: "2024-01-15"
+---
+
 # Supabase Migration Guide: From Lovable Cloud to Self-Hosted
 
 ## Overview

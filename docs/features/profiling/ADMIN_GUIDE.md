@@ -1,3 +1,16 @@
+---
+id: "profiling-admin-guide"
+title: "Profiling Admin Guide"
+category: "Profiling System"
+description: "Complete administrator guide for managing profiling questions, categories, and configurations"
+audience: "all"
+tags: ["profiling", "admin", "management", "configuration"]
+status: "published"
+version: "1.0"
+created_at: "2024-01-15"
+updated_at: "2024-01-15"
+---
+
 # Admin Profiling Management Guide
 
 ## Overview

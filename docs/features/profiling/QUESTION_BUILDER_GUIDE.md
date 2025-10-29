@@ -1,3 +1,16 @@
+---
+id: "profiling-question-builder"
+title: "Question Builder Guide"
+category: "Profiling System"
+description: "Comprehensive guide for creating and editing profiling questions in the admin portal"
+audience: "all"
+tags: ["profiling", "admin", "questions", "builder"]
+status: "published"
+version: "1.0"
+created_at: "2024-01-15"
+updated_at: "2024-01-15"
+---
+
 # Question Builder Guide
 
 ## Overview

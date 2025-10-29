@@ -1,3 +1,16 @@
+---
+id: "users-role-security-migration"
+title: "Role Security Migration Guide"
+category: "User Management"
+description: "Migration guide from insecure role storage to secure RLS-enforced role architecture"
+audience: "all"
+tags: ["users", "roles", "security", "migration"]
+status: "published"
+version: "1.0"
+created_at: "2024-01-15"
+updated_at: "2024-01-15"
+---
+
 # Role Security Migration Guide
 
 ## Overview

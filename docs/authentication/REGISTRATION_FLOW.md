@@ -1,3 +1,16 @@
+---
+id: "authentication-registration"
+title: "Registration & Onboarding Flow"
+category: "Authentication & Access"
+description: "Complete user registration journey from account creation through earning activation"
+audience: "all"
+tags: ["authentication", "registration", "onboarding", "profile"]
+status: "published"
+version: "1.0"
+created_at: "2024-01-15"
+updated_at: "2024-01-15"
+---
+
 # Registration & Onboarding Flow
 
 ## Overview

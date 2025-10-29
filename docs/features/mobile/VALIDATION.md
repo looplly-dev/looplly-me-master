@@ -1,3 +1,16 @@
+---
+id: "mobile-validation"
+title: "Mobile Number Validation"
+category: "Mobile & Global"
+description: "Country-aware mobile validation rules, formats, and normalization across global markets"
+audience: "all"
+tags: ["mobile", "validation", "verification", "global"]
+status: "published"
+version: "1.0"
+created_at: "2024-01-15"
+updated_at: "2024-01-15"
+---
+
 # Mobile Number Validation
 
 ## Overview

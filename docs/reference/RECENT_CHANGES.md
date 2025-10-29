@@ -1,3 +1,16 @@
+---
+id: "reference-recent-changes"
+title: "Recent Changes"
+category: "Platform Reference"
+description: "Changelog of latest updates, bug fixes, and improvements to the platform"
+audience: "all"
+tags: ["changelog", "updates", "changes", "history"]
+status: "published"
+version: "1.0"
+created_at: "2024-01-15"
+updated_at: "2024-01-15"
+---
+
 # Recent Changes
 
 Latest updates, bug fixes, and improvements to the Looplly platform.
