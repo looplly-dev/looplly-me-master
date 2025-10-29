@@ -37,7 +37,7 @@ export default function SeedDocumentationButton() {
         eager: true 
       });
       
-      const projectDocsModules = import.meta.glob('../../../../docs/**/*.md', { 
+      const projectDocsModules = import.meta.glob('/docs/**/*.md', { 
         as: 'raw',
         eager: true 
       });
