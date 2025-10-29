@@ -3,7 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Lightbulb, BookOpen, FileText, Sparkles, CheckCircle2, Clock, Loader2, MessageSquare } from 'lucide-react';
+import { Lightbulb, BookOpen, FileText, Sparkles, CheckCircle2, Clock, Loader2, MessageSquare, Download } from 'lucide-react';
 import DocumentationSearch from './DocumentationSearch';
 import QuickReference from './QuickReference';
 import SeedDocumentationButton from './SeedDocumentationButton';
@@ -17,12 +17,14 @@ import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { useSearchHistory } from '@/hooks/useSearchHistory';
 import { useDocumentationStats } from '@/hooks/useDocumentationStats';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
 
 export default function KnowledgeDashboard() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'published' | 'coming_soon'>('all');
   const [showShortcutsHelp, setShowShortcutsHelp] = useState(false);
-  const { isAdmin } = useRole();
+  const [isDownloading, setIsDownloading] = useState(false);
+  const { isAdmin, isSuperAdmin } = useRole();
   const { addSearch } = useSearchHistory();
   const { data: stats, isLoading } = useDocumentationStats();
 
@@ -30,6 +32,44 @@ export default function KnowledgeDashboard() {
     { key: '?', callback: () => setShowShortcutsHelp(true) },
     { key: '/', callback: () => document.querySelector<HTMLInputElement>('input[type="text"]')?.focus() }
   ]);
+
+  const handleBulkDownload = async () => {
+    setIsDownloading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('download-all-documentation', {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (error) throw error;
+
+      // Create blob and download
+      const blob = new Blob([data], { type: 'text/markdown' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `looplly-documentation-${new Date().toISOString().split('T')[0]}.md`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      toast({
+        title: "Download Complete",
+        description: "All documentation has been downloaded successfully.",
+      });
+    } catch (error) {
+      console.error('Download failed:', error);
+      toast({
+        title: "Download Failed",
+        description: "Failed to download documentation. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDownloading(false);
+    }
+  };
 
   const totalPublished = stats?.published || 0;
   const totalComingSoon = stats?.comingSoon || 0;
@@ -171,9 +211,21 @@ export default function KnowledgeDashboard() {
         </TabsContent>
       </Tabs>
 
-      {/* Admin Seeding Tools */}
+      {/* Admin Tools */}
       {isAdmin && !searchQuery && (
-        <SeedDocumentationButton />
+        <div className="flex gap-2 justify-center">
+          <SeedDocumentationButton />
+          {isSuperAdmin() && (
+            <Button 
+              variant="outline" 
+              onClick={handleBulkDownload}
+              disabled={isDownloading}
+            >
+              <Download className="h-4 w-4 mr-2" />
+              {isDownloading ? 'Preparing Download...' : 'Download All Docs'}
+            </Button>
+          )}
+        </div>
       )}
 
       {/* Quick Stats */}
