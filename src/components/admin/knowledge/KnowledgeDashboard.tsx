@@ -7,7 +7,6 @@ import { Lightbulb, BookOpen, FileText, Sparkles, CheckCircle2, Clock, Loader2, 
 import DocumentationSearch from './DocumentationSearch';
 import QuickReference from './QuickReference';
 import SeedDocumentationButton from './SeedDocumentationButton';
-import CleanupDocumentationButton from './CleanupDocumentationButton';
 import QuickStartGuides from './QuickStartGuides';
 import RecommendationsPanel from './RecommendationsPanel';
 import KeyboardShortcutsHelp from './KeyboardShortcutsHelp';
@@ -174,10 +173,7 @@ export default function KnowledgeDashboard() {
 
       {/* Admin Seeding Tools */}
       {isAdmin && !searchQuery && (
-        <div className="space-y-4">
-          <CleanupDocumentationButton />
-          <SeedDocumentationButton />
-        </div>
+        <SeedDocumentationButton />
       )}
 
       {/* Quick Stats */}
