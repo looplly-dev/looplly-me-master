@@ -28,33 +28,34 @@ USING (has_role(auth.uid(), 'admin'))
 WITH CHECK (has_role(auth.uid(), 'admin'));
 
 -- SECURE DOCUMENTATION HISTORY TABLE
+-- Note: Skipping documentation_history (table doesn't exist)
 
 -- Enable RLS on documentation_history if not already enabled
-ALTER TABLE documentation_history ENABLE ROW LEVEL SECURITY;
+-- ALTER TABLE documentation_history ENABLE ROW LEVEL SECURITY;
 
 -- Drop existing policies to recreate them securely
-DROP POLICY IF EXISTS "Admins can view history" ON documentation_history;
-DROP POLICY IF EXISTS "System can insert history" ON documentation_history;
+-- DROP POLICY IF EXISTS "Admins can view history" ON documentation_history;
+-- DROP POLICY IF EXISTS "System can insert history" ON documentation_history;
 
 -- Team members can read version history
-CREATE POLICY "Team members can read version history"
-ON documentation_history
-FOR SELECT
-TO authenticated
-USING (
-  EXISTS (
-    SELECT 1 
-    FROM profiles 
-    WHERE profiles.user_id = auth.uid() 
-    AND profiles.user_type = 'looplly_team_user'
-  )
-);
+-- CREATE POLICY "Team members can read version history"
+-- ON documentation_history
+-- FOR SELECT
+-- TO authenticated
+-- USING (
+--   EXISTS (
+--     SELECT 1 
+--     FROM profiles 
+--     WHERE profiles.user_id = auth.uid() 
+--     AND profiles.user_type = 'looplly_team_user'
+--   )
+-- );
 
 -- Only system/admins can create version history entries
-CREATE POLICY "System can insert version history"
-ON documentation_history
-FOR INSERT
-TO authenticated
-WITH CHECK (
-  has_role(auth.uid(), 'admin') OR auth.uid() IS NOT NULL
-);
+-- CREATE POLICY "System can insert version history"
+-- ON documentation_history
+-- FOR INSERT
+-- TO authenticated
+-- WITH CHECK (
+--   has_role(auth.uid(), 'admin') OR auth.uid() IS NOT NULL
+-- );

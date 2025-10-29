@@ -16,10 +16,10 @@ COMMENT ON TABLE team_profiles IS 'Team member profiles for Admin Portal. Uses e
 
 -- Step 1: Migrate existing test users to new mobile range (+274129900X)
 -- This prevents conflicts with real users who may use +274123400X range
+-- Note: Removed email column reference (doesn't exist in profiles)
 WITH test_user_numbers AS (
   SELECT 
     user_id,
-    email,
     ROW_NUMBER() OVER (ORDER BY created_at) as row_num
   FROM profiles
   WHERE is_test_account = true
@@ -34,9 +34,10 @@ ALTER TABLE profiles
 ADD CONSTRAINT profiles_mobile_unique UNIQUE (mobile);
 
 -- Step 3: Add partial UNIQUE constraint on email (allow multiple NULLs, but unique values)
-CREATE UNIQUE INDEX profiles_email_unique_idx 
-ON profiles (email) 
-WHERE email IS NOT NULL;
+-- Note: Email column doesn't exist in profiles, skipping index creation
+-- CREATE UNIQUE INDEX profiles_email_unique_idx 
+-- ON profiles (email) 
+-- WHERE email IS NOT NULL;
 
 -- Step 4: Add performance index for mobile (only if it doesn't exist)
 CREATE INDEX IF NOT EXISTS idx_profiles_mobile ON profiles(mobile) WHERE mobile IS NOT NULL;
@@ -45,8 +46,9 @@ CREATE INDEX IF NOT EXISTS idx_profiles_mobile ON profiles(mobile) WHERE mobile 
 COMMENT ON CONSTRAINT profiles_mobile_unique ON profiles IS 
 'Mobile numbers must be unique across all users. Mobile is the primary identifier for User Portal authentication.';
 
-COMMENT ON INDEX profiles_email_unique_idx IS 
-'Emails must be unique if provided, but multiple users can have NULL emails (email is optional for User Portal).';
+-- Email index comment removed (index doesn't exist)
+-- COMMENT ON INDEX profiles_email_unique_idx IS 
+-- 'Emails must be unique if provided, but multiple users can have NULL emails (email is optional for User Portal).';
 
 -- Verification check
 DO $$

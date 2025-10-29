@@ -270,16 +270,17 @@ CROSS JOIN public.profile_questions q
 WHERE q.question_key = 'last_name' AND p.last_name IS NOT NULL
 ON CONFLICT (user_id, question_id) DO NOTHING;
 
-INSERT INTO public.profile_answers (user_id, question_id, answer_value, last_updated)
-SELECT 
-  p.user_id,
-  q.id,
-  p.email,
-  p.updated_at
-FROM public.profiles p
-CROSS JOIN public.profile_questions q
-WHERE q.question_key = 'email' AND p.email IS NOT NULL
-ON CONFLICT (user_id, question_id) DO NOTHING;
+-- Email column does not exist in profiles table, skipping migration
+-- INSERT INTO public.profile_answers (user_id, question_id, answer_value, last_updated)
+-- SELECT 
+--   p.user_id,
+--   q.id,
+--   p.email,
+--   p.updated_at
+-- FROM public.profiles p
+-- CROSS JOIN public.profile_questions q
+-- WHERE q.question_key = 'email' AND p.email IS NOT NULL
+-- ON CONFLICT (user_id, question_id) DO NOTHING;
 
 INSERT INTO public.profile_answers (user_id, question_id, answer_value, last_updated)
 SELECT 

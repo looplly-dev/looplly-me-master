@@ -12,13 +12,14 @@ REFERENCES auth.users(id)
 ON DELETE CASCADE;
 
 -- Now insert the bootstrap audit logs
+-- Email column may not exist in team_profiles, using first_name/last_name
 INSERT INTO public.audit_logs (user_id, action, metadata)
 SELECT 
   tp.user_id,
   'role_bootstrap',
   jsonb_build_object(
     'role', 'super_admin',
-    'email', tp.email,
+    'name', tp.first_name || ' ' || tp.last_name,
     'reason', 'Initial super_admin role assignment for existing team members'
   )
 FROM public.team_profiles tp

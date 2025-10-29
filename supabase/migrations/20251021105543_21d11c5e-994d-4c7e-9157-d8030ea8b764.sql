@@ -75,5 +75,6 @@ WHERE country_code IS NOT NULL;
 CREATE INDEX idx_profiles_country_iso ON public.profiles(country_iso)
 WHERE country_iso IS NOT NULL;
 
-CREATE INDEX idx_profiles_country_tenant ON public.profiles(country_iso, tenant_id)
-WHERE country_iso IS NOT NULL;
+-- Tenant_id column does not exist in profiles table, skipping index
+-- CREATE INDEX idx_profiles_country_tenant ON public.profiles(country_iso, tenant_id)
+-- WHERE country_iso IS NOT NULL;

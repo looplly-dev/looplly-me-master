@@ -47,7 +47,7 @@ BEGIN
         profile_complete = false,
         profile_level = 1,
         profile_completeness_score = 0,
-        is_verified = false,
+        -- is_verified = false,  -- Column doesn't exist
         date_of_birth = NULL,
         gender = NULL,
         sec = NULL,
@@ -67,7 +67,7 @@ BEGIN
     
     WHEN 'otp_verified' THEN
       PERFORM reset_user_journey(p_caller_user_id, p_target_user_id, 'fresh_signup');
-      UPDATE profiles SET is_verified = true WHERE user_id = p_target_user_id;
+      -- UPDATE profiles SET is_verified = true WHERE user_id = p_target_user_id;  -- Column doesn't exist
       v_result = jsonb_build_object('stage', 'otp_verified', 'description', 'Verified mobile number');
     
     WHEN 'basic_profile' THEN

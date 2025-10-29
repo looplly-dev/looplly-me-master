@@ -60,13 +60,14 @@ TO authenticated
 USING (public.is_team_member(auth.uid()));
 
 -- Update history table policy
-DROP POLICY IF EXISTS "Team members can read version history" ON documentation_history;
+-- Note: documentation_history table doesn't exist, skipping
+-- DROP POLICY IF EXISTS "Team members can read version history" ON documentation_history;
 
-CREATE POLICY "Team members can read version history"
-ON documentation_history
-FOR SELECT
-TO authenticated
-USING (public.is_team_member(auth.uid()));
+-- CREATE POLICY "Team members can read version history"
+-- ON documentation_history
+-- FOR SELECT
+-- TO authenticated
+-- USING (public.is_team_member(auth.uid()));
 
 -- Step 4: Migrate existing team members from profiles table
 INSERT INTO public.team_members (user_id, department, added_at, is_active)

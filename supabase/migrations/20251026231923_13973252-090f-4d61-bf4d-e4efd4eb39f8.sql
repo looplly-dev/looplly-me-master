@@ -5,17 +5,24 @@
 
 -- 1. Verify team users exist in team_profiles (should already be there)
 -- If not, this will copy them over
+-- Email column does not exist in profiles table, using placeholder
 INSERT INTO team_profiles (
   user_id, email, first_name, last_name, company_name, 
   company_role, is_active, created_at, updated_at
 )
 SELECT 
-  user_id, email, first_name, last_name, company_name,
-  company_role, true, created_at, updated_at
+  user_id,
+  COALESCE(first_name, 'team') || '@looplly.me' as email,  -- Generate placeholder email
+  first_name,
+  last_name,
+  company_name,
+  company_role,
+  true,
+  created_at,
+  updated_at
 FROM profiles
 WHERE user_type = 'looplly_team_user'
 ON CONFLICT (user_id) DO UPDATE SET
-  email = EXCLUDED.email,
   first_name = EXCLUDED.first_name,
   last_name = EXCLUDED.last_name,
   company_name = EXCLUDED.company_name,

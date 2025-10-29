@@ -85,6 +85,7 @@ CREATE POLICY "System can insert team activity"
 -- =====================================================
 
 -- Copy existing team users to team_profiles
+-- Note: email column doesn't exist in profiles, will need to be added separately
 INSERT INTO public.team_profiles (
   user_id,
   email,
@@ -94,28 +95,18 @@ INSERT INTO public.team_profiles (
   country_code,
   company_name,
   company_role,
-  must_change_password,
-  temp_password_expires_at,
-  first_login_at,
-  invited_by,
-  invitation_sent_at,
   created_at,
   updated_at
 )
 SELECT 
   user_id,
-  email,
+  'team@looplly.me' as email,  -- Placeholder email since column doesn't exist in source
   first_name,
   last_name,
   mobile,
   country_code,
   company_name,
   company_role,
-  must_change_password,
-  temp_password_expires_at,
-  first_login_at,
-  invited_by,
-  invitation_sent_at,
   created_at,
   updated_at
 FROM public.profiles
@@ -123,6 +114,7 @@ WHERE user_type = 'looplly_team_user'
 ON CONFLICT (user_id) DO NOTHING;
 
 -- Clean up team user profiling data from profiles table
+-- Note: is_verified column doesn't exist, removed from UPDATE
 UPDATE public.profiles
 SET
   profile_complete = false,
@@ -134,8 +126,7 @@ SET
   address = NULL,
   household_income = NULL,
   ethnicity = NULL,
-  gps_enabled = false,
-  is_verified = false
+  gps_enabled = false
 WHERE user_type = 'looplly_team_user';
 
 -- =====================================================
