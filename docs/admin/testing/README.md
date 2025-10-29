@@ -3,7 +3,7 @@ id: "testing-readme"
 title: "Testing & Quality Assurance Documentation"
 category: "Testing"
 description: "Testing and QA documentation covering simulator usage, testing strategies, and production readiness checklists"
-audience: "all"
+audience: "admin"
 tags: ["testing", "qa", "simulator", "strategy", "overview"]
 status: "published"
 version: "1.0.0"

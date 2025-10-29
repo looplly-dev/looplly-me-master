@@ -3,7 +3,7 @@ id: "technical-readme"
 title: "Technical Documentation"
 category: "Technical Reference"
 description: "Technical architecture documentation including database schemas, data isolation, API patterns, and system design"
-audience: "all"
+audience: "admin"
 tags: ["technical", "architecture", "database", "api", "overview"]
 status: "published"
 version: "1.0.0"
