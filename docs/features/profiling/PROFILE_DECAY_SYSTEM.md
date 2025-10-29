@@ -1,3 +1,13 @@
+---
+id: "profile-decay-system"
+title: "Profile Decay System"
+category: "Profiling System"
+description: "Profile data freshness management and decay interval configuration"
+audience: "admin"
+tags: ["profiling", "decay", "freshness", "data-quality"]
+status: "published"
+---
+
 # Profile Decay System
 
 Managing profile data freshness and decay interval configuration.

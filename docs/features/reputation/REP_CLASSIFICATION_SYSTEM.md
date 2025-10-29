@@ -1,3 +1,13 @@
+---
+id: "reputation-system"
+title: "Reputation Classification System"
+category: "Reputation & Rewards"
+description: "Gamified user reputation and tier progression system"
+audience: "all"
+tags: ["reputation", "gamification", "tiers", "points"]
+status: "published"
+---
+
 # Reputation Classification System
 
 ## Overview
