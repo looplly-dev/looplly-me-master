@@ -153,8 +153,12 @@ export const logoutUser = async (): Promise<void> => {
 export const resetUserPassword = async (email: string): Promise<{ success: boolean; error?: any }> => {
   try {
     console.log('Initiating forgot password for email:', email);
+    
+    // Use VITE_APP_URL for production, fallback to window.location.origin for dev
+    const redirectUrl = import.meta.env.VITE_APP_URL || window.location.origin;
+    
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
+      redirectTo: `${redirectUrl}/reset-password`,
     });
     
     if (error) {
