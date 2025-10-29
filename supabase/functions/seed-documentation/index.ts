@@ -149,6 +149,32 @@ Deno.serve(async (req) => {
         
         console.log(`  Parsing: ${title} (${doc.id})`);
         
+        // Check existing to avoid no-op updates
+        const { data: existing, error: fetchError } = await supabase
+          .from('documentation')
+          .select('title, content, category, tags, description, audience, status')
+          .eq('id', doc.id)
+          .maybeSingle();
+
+        if (fetchError) {
+          console.warn(`  ! Could not fetch existing ${doc.id} (proceeding with upsert):`, fetchError.message);
+        }
+
+        const isUnchanged = existing &&
+          existing.title === title &&
+          (existing.content || '').trim() === body.trim() &&
+          (existing.category || 'Uncategorized') === category &&
+          JSON.stringify(existing.tags || []) === JSON.stringify(tags) &&
+          (existing.description || '') === description &&
+          (existing.audience || 'all') === audience &&
+          (existing.status || 'published') === status;
+
+        if (isUnchanged) {
+          console.log(`  ↷ Skipped (no changes): ${title}`);
+          successCount++;
+          continue;
+        }
+
         // Upsert to database
         const { error: insertError } = await supabase
           .from('documentation')
