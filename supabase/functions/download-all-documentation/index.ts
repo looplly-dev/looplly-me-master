@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { zipSync, strToU8 } from "https://esm.sh/fflate@0.8.1";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -84,18 +85,18 @@ serve(async (req) => {
 
     console.log(`Preparing ZIP with ${documents.length} documents`);
 
-    // Create file structure
-    const files: { [key: string]: string } = {};
+    // Create file structure for ZIP
+    const zipFiles: { [key: string]: Uint8Array } = {};
     const timestamp = new Date().toISOString().split('T')[0];
 
     for (const doc of documents as DocumentRow[]) {
       // Build frontmatter
       const frontmatter = [
         '---',
-        `title: "${doc.title}"`,
+        `title: "${doc.title.replace(/"/g, '\\"')}"`,
         `slug: "${doc.doc_id}"`,
         `category: "${doc.category}"`,
-        `description: "${doc.description}"`,
+        `description: "${doc.description.replace(/"/g, '\\"')}"`,
         `audience: "${doc.audience}"`,
         `tags: [${doc.tags.map(t => `"${t}"`).join(', ')}]`,
         `status: "${doc.status}"`,
@@ -106,33 +107,27 @@ serve(async (req) => {
       ].join('\n');
 
       // Determine file path based on category
-      let filePath = '';
       const category = doc.category.toLowerCase().replace(/\s+/g, '-');
       const fileName = `${doc.doc_id}.md`;
+      const sanitizedParent = doc.parent ? doc.parent.replace(/[^a-zA-Z0-9-_]/g, '-') : '';
 
-      if (doc.parent) {
-        filePath = `documentation-export-${timestamp}/${category}/${doc.parent}/${fileName}`;
+      let filePath = '';
+      if (sanitizedParent) {
+        filePath = `looplly-documentation-${timestamp}/${category}/${sanitizedParent}/${fileName}`;
       } else {
-        filePath = `documentation-export-${timestamp}/${category}/${fileName}`;
+        filePath = `looplly-documentation-${timestamp}/${category}/${fileName}`;
       }
 
-      files[filePath] = frontmatter + doc.content;
+      // Convert markdown content to Uint8Array
+      const fileContent = frontmatter + doc.content;
+      zipFiles[filePath] = strToU8(fileContent);
     }
 
-    // Create ZIP file using simple zip approach
-    const encoder = new TextEncoder();
-    const zipContent: Uint8Array[] = [];
-    
-    // Simple ZIP creation (for demo - in production use proper ZIP library)
-    // For now, create a simple archive structure
-    let archiveContent = `# Looplly Documentation Export\n\n`;
-    archiveContent += `Generated: ${new Date().toISOString()}\n`;
-    archiveContent += `Total Documents: ${documents.length}\n\n`;
-    archiveContent += `---\n\n`;
-
-    for (const [path, content] of Object.entries(files)) {
-      archiveContent += `\n\n## File: ${path}\n\n${content}\n\n---\n`;
-    }
+    // Create ZIP file using fflate
+    const zipData = zipSync(zipFiles, {
+      level: 6, // Compression level (0-9)
+      mem: 8    // Memory level (1-9)
+    });
 
     // Log audit entry
     await supabase.from('audit_logs').insert({
@@ -141,19 +136,19 @@ serve(async (req) => {
       metadata: {
         document_count: documents.length,
         timestamp: new Date().toISOString(),
-        file_size_kb: Math.round(archiveContent.length / 1024),
+        file_size_kb: Math.round(zipData.length / 1024),
       },
     });
 
-    console.log('Download completed successfully');
+    console.log(`Download completed successfully - ZIP size: ${(zipData.length / 1024).toFixed(2)} KB`);
 
-    // Return as text file (simplified approach)
-    return new Response(archiveContent, {
+    // Return ZIP file
+    return new Response(zipData, {
       status: 200,
       headers: {
         ...corsHeaders,
-        'Content-Type': 'text/markdown',
-        'Content-Disposition': `attachment; filename="looplly-documentation-${timestamp}.md"`,
+        'Content-Type': 'application/zip',
+        'Content-Disposition': `attachment; filename="looplly-documentation-${timestamp}.zip"`,
       },
     });
 

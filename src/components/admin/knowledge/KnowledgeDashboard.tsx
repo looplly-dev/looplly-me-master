@@ -45,11 +45,11 @@ export default function KnowledgeDashboard() {
       if (error) throw error;
 
       // Create blob and download
-      const blob = new Blob([data], { type: 'text/markdown' });
+      const blob = new Blob([data], { type: 'application/zip' });
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `looplly-documentation-${new Date().toISOString().split('T')[0]}.md`;
+      a.download = `looplly-documentation-${new Date().toISOString().split('T')[0]}.zip`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
