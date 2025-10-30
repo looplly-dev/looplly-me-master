@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
   Users,
@@ -20,7 +20,10 @@ import {
   BookOpen,
   Globe,
   TestTube,
+  LogOut,
 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@/components/ui/button';
 import { useRole } from '@/hooks/useRole';
 import {
   Sidebar,
@@ -188,14 +191,32 @@ interface AdminLayoutProps {
 }
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate('/admin/login');
+  };
+
   return (
     <SidebarProvider defaultOpen={true}>
       <div className="min-h-screen flex w-full">
         <AdminSidebar />
         <div className="flex-1 flex flex-col">
-          <header className="h-14 border-b flex items-center px-4 gap-4 bg-background sticky top-0 z-10">
-            <SidebarTrigger />
-            <AdminBreadcrumb />
+          <header className="h-14 border-b flex items-center justify-between px-4 gap-4 bg-background sticky top-0 z-10">
+            <div className="flex items-center gap-4">
+              <SidebarTrigger />
+              <AdminBreadcrumb />
+            </div>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={handleLogout}
+              className="gap-2"
+            >
+              <LogOut className="h-4 w-4" />
+              <span>Logout</span>
+            </Button>
           </header>
           <main className="flex-1 px-6 py-6 lg:px-12 xl:px-16 bg-muted/30 overflow-auto">
             {children}
