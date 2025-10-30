@@ -572,49 +572,88 @@ export const useAuthLogic = () => {
         
         if (result.success) {
           // Custom JWT is now stored in localStorage
-          // Manually fetch profile and set auth state
+          // Use the user data returned from login (already includes profile data)
           const loopllyUser = localStorage.getItem('looplly_user');
           if (loopllyUser) {
             const user = JSON.parse(loopllyUser);
             
-            // Fetch fresh profile data
-            const { data: profile } = await supabase
-              .from('profiles')
-              .select('*')
-              .eq('user_id', user.id)
-              .single();
+            console.log('[useAuth] Setting auth state from login response:', user);
             
-            if (profile) {
-              setAuthState({
-                user: {
-                  id: profile.user_id,
-                  mobile: profile.mobile,
-                  countryCode: profile.country_code,
-                  firstName: profile.first_name,
-                  lastName: profile.last_name,
-                  email: profile.email,
-                  isVerified: profile.is_verified,
-                  profileComplete: profile.profile_complete,
-                  profile: {
-                    sec: (profile.sec as 'A' | 'B' | 'C1' | 'C2' | 'D' | 'E') || 'B',
-                    gender: (profile.gender as 'male' | 'female' | 'other') || 'other',
-                    dateOfBirth: profile.date_of_birth ? new Date(profile.date_of_birth) : new Date(),
-                    address: profile.address || '',
-                    gpsEnabled: profile.gps_enabled || false,
-                    firstName: profile.first_name || '',
-                    lastName: profile.last_name || '',
-                    email: profile.email || '',
-                    country_code: profile.country_code,
-                    country_iso: profile.country_iso
-                  }
-                },
-                isAuthenticated: true,
-                isLoading: false,
-                step: 'dashboard'
-              });
-              
-              return true;
-            }
+            // Set auth state directly from login response
+            setAuthState({
+              user: {
+                id: user.id,
+                mobile: user.mobile || email,
+                countryCode: user.countryCode || user.country_code || '+27',
+                firstName: user.firstName || user.first_name || '',
+                lastName: user.lastName || user.last_name || '',
+                email: user.email || '',
+                isVerified: user.isVerified ?? user.is_verified ?? false,
+                profileComplete: user.profileComplete ?? user.profile_complete ?? false,
+                profile: {
+                  sec: 'B' as const,
+                  gender: 'other' as const,
+                  dateOfBirth: new Date('1990-01-01'),
+                  address: '',
+                  gpsEnabled: false,
+                  firstName: user.firstName || user.first_name || '',
+                  lastName: user.lastName || user.last_name || '',
+                  email: user.email || '',
+                  country_code: user.countryCode || user.country_code,
+                  country_iso: user.country_iso
+                }
+              },
+              isAuthenticated: true,
+              isLoading: false,
+              step: 'dashboard'
+            });
+            
+            // Fetch fresh profile in background (non-blocking)
+            setTimeout(async () => {
+              try {
+                const { data: profile } = await supabase
+                  .from('profiles')
+                  .select('*')
+                  .eq('user_id', user.id)
+                  .maybeSingle();
+                
+                if (profile) {
+                  console.log('[useAuth] Background profile refresh successful');
+                  setAuthState({
+                    user: {
+                      id: profile.user_id,
+                      mobile: profile.mobile,
+                      countryCode: profile.country_code,
+                      firstName: profile.first_name,
+                      lastName: profile.last_name,
+                      email: profile.email,
+                      isVerified: profile.is_verified,
+                      profileComplete: profile.profile_complete,
+                      profile: {
+                        sec: (profile.sec as 'A' | 'B' | 'C1' | 'C2' | 'D' | 'E') || 'B',
+                        gender: (profile.gender as 'male' | 'female' | 'other') || 'other',
+                        dateOfBirth: profile.date_of_birth ? new Date(profile.date_of_birth) : new Date(),
+                        address: profile.address || '',
+                        gpsEnabled: profile.gps_enabled || false,
+                        firstName: profile.first_name || '',
+                        lastName: profile.last_name || '',
+                        email: profile.email || '',
+                        country_code: profile.country_code,
+                        country_iso: profile.country_iso
+                      }
+                    },
+                    isAuthenticated: true,
+                    isLoading: false,
+                    step: 'dashboard'
+                  });
+                }
+              } catch (error) {
+                console.warn('[useAuth] Background profile refresh failed:', error);
+                // Non-critical, continue with login response data
+              }
+            }, 100);
+            
+            return true;
           }
           
           setAuthState(prev => ({ ...prev, isLoading: false }));
