@@ -8,7 +8,7 @@ const corsHeaders = {
 };
 
 interface DocumentRow {
-  doc_id: string;
+  id: string;
   title: string;
   content: string;
   category: string;
@@ -64,7 +64,7 @@ serve(async (req) => {
     // Fetch all documents
     const { data: documents, error: docsError } = await supabase
       .from('documentation')
-      .select('doc_id, title, content, category, tags, description, audience, parent, status, version')
+      .select('id, title, content, category, tags, description, audience, parent, status, version')
       .order('category', { ascending: true })
       .order('title', { ascending: true });
 
@@ -94,7 +94,7 @@ serve(async (req) => {
       const frontmatter = [
         '---',
         `title: "${doc.title.replace(/"/g, '\\"')}"`,
-        `slug: "${doc.doc_id}"`,
+        `slug: "${doc.id}"`,
         `category: "${doc.category}"`,
         `description: "${doc.description.replace(/"/g, '\\"')}"`,
         `audience: "${doc.audience}"`,
@@ -108,7 +108,7 @@ serve(async (req) => {
 
       // Determine file path based on category
       const category = doc.category.toLowerCase().replace(/\s+/g, '-');
-      const fileName = `${doc.doc_id}.md`;
+      const fileName = `${doc.id}.md`;
       const sanitizedParent = doc.parent ? doc.parent.replace(/[^a-zA-Z0-9-_]/g, '-') : '';
 
       let filePath = '';
@@ -142,8 +142,8 @@ serve(async (req) => {
 
     console.log(`Download completed successfully - ZIP size: ${(zipData.length / 1024).toFixed(2)} KB`);
 
-    // Return ZIP file
-    return new Response(zipData, {
+    // Return ZIP file directly (zipData is already a Uint8Array)
+    return new Response(zipData as any, {
       status: 200,
       headers: {
         ...corsHeaders,
@@ -152,9 +152,9 @@ serve(async (req) => {
       },
     });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Download error:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ error: error.message || 'Unknown error' }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
