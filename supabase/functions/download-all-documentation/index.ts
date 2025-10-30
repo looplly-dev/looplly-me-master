@@ -142,8 +142,8 @@ serve(async (req) => {
 
     console.log(`Download completed successfully - ZIP size: ${(zipData.length / 1024).toFixed(2)} KB`);
 
-    // Return ZIP file directly (zipData is already a Uint8Array)
-    return new Response(zipData as any, {
+    // Return ZIP file with proper type casting for Deno
+    return new Response(zipData as unknown as BodyInit, {
       status: 200,
       headers: {
         ...corsHeaders,
