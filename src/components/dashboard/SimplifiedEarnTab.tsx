@@ -393,17 +393,11 @@ export default function SimplifiedEarnTab() {
           <Alert className="sticky top-0 z-10 border-amber-500/30 bg-amber-500/10">
             <Info className="h-4 w-4 text-amber-600" />
             <AlertTitle className="text-amber-900 dark:text-amber-100">Complete Your Profile</AlertTitle>
-            <AlertDescription className="flex items-center justify-between gap-4 flex-wrap">
-              <div className="flex-1 space-y-1">
-                <p className="text-sm text-amber-800 dark:text-amber-200">
-                  Answer {level2Required.length - level2Answered.length} quick questions to unlock all earning opportunities.
-                </p>
-                <div className="flex items-center gap-2">
-                  <Progress value={level2Percentage} className="h-2 w-32" />
-                  <span className="text-xs font-medium text-amber-700 dark:text-amber-300">{level2Percentage}%</span>
-                </div>
-              </div>
-              <Button 
+            <AlertDescription className="flex items-center justify-between gap-4">
+              <p className="text-sm text-amber-800 dark:text-amber-200">
+                Answer {level2Required.length - level2Answered.length} quick questions to start earning
+              </p>
+              <Button
                 onClick={() => {
                   analytics.trackProfileComplete();
                   navigate('/profile/complete');
@@ -422,13 +416,11 @@ export default function SimplifiedEarnTab() {
           <Alert className="sticky top-0 z-10 border-orange-500/30 bg-orange-500/10">
             <Shield className="h-4 w-4 text-orange-600" />
             <AlertTitle className="text-orange-900 dark:text-orange-100">Verify Mobile Number</AlertTitle>
-            <AlertDescription className="flex items-center justify-between gap-4 flex-wrap">
-              <div className="flex-1">
-                <p className="text-sm text-orange-800 dark:text-orange-200">
-                  Quick 5-digit verification required to unlock earning opportunities and protect your account.
-                </p>
-              </div>
-              <Button 
+            <AlertDescription className="flex items-center justify-between gap-4">
+              <p className="text-sm text-orange-800 dark:text-orange-200">
+                Verify your mobile number to start earning
+              </p>
+              <Button
                 onClick={() => navigate('/verify-mobile')}
                 size="sm"
                 variant="default"
