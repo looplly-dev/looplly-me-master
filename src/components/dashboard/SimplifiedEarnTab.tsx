@@ -153,6 +153,20 @@ export default function SimplifiedEarnTab() {
   };
 
   const handleStartTask = (type: string, title: string, reward: number) => {
+    // Check if content is locked
+    if (isContentLocked) {
+      toast({
+        title: 'Complete Your Profile',
+        description: 'Finish answering profile questions to unlock earning opportunities',
+        action: (
+          <Button size="sm" onClick={() => navigate('/profile/complete')}>
+            Complete Profile
+          </Button>
+        ),
+      });
+      return;
+    }
+    
     // Check verification status first
     if (!isVerified) {
       toast({
@@ -179,6 +193,20 @@ export default function SimplifiedEarnTab() {
   };
 
   const handleDataToggle = (type: keyof typeof dataOptIns, checked: boolean) => {
+    // Check if content is locked
+    if (isContentLocked) {
+      toast({
+        title: 'Complete Your Profile',
+        description: 'Finish answering profile questions to unlock data sharing',
+        action: (
+          <Button size="sm" onClick={() => navigate('/profile/complete')}>
+            Complete Profile
+          </Button>
+        ),
+      });
+      return;
+    }
+    
     setDataOptIns(prev => ({ ...prev, [type]: checked }));
     
     const earningsMap = {
@@ -320,56 +348,9 @@ export default function SimplifiedEarnTab() {
   const totalAvailable = surveyCount + videoCount + taskCount + dataCount;
 
 
-  // Gate 1: Check if Level 2 is complete
-  if (!level2Complete) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[500px] p-8 space-y-6 bg-gradient-to-b from-warning/5 to-transparent">
-        <div className="relative">
-          <AlertCircle className="h-20 w-20 text-warning mx-auto animate-pulse" />
-          <div className="absolute inset-0 h-20 w-20 mx-auto rounded-full bg-warning/20 animate-ping" />
-        </div>
-        <div className="text-center space-y-3">
-          <h2 className="text-3xl font-bold text-foreground">Complete Your Profile to Start Earning</h2>
-          <p className="text-lg text-muted-foreground max-w-md">
-            Answer 6 quick questions to unlock surveys
-          </p>
-          <p className="text-sm text-muted-foreground">
-            Takes less than 2 minutes
-          </p>
-        </div>
-        <Card className="max-w-md border-warning/30 bg-card">
-          <CardContent className="p-6 space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">Profile Progress</span>
-              <span className="text-sm font-bold text-warning">{Math.round(level2Percentage)}%</span>
-            </div>
-            <Progress value={level2Percentage} className="h-3" />
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li className="flex items-start gap-2">
-                <CheckCircle className="h-4 w-4 text-success mt-0.5 flex-shrink-0" />
-                <span>Takes less than 2 minutes</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="h-4 w-4 text-success mt-0.5 flex-shrink-0" />
-                <span>Unlocks all earning opportunities</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="h-4 w-4 text-success mt-0.5 flex-shrink-0" />
-                <span>Better survey matches = higher rewards</span>
-              </li>
-            </ul>
-          </CardContent>
-        </Card>
-        <Button onClick={() => {
-          analytics.trackProfileComplete();
-          navigate('/profile/complete');
-        }} size="lg" className="text-lg px-8 py-6">
-          <ArrowRight className="h-5 w-5 mr-2" />
-          Complete Profile Now
-        </Button>
-      </div>
-    );
-  }
+  // Lock state for grayed-out content
+  const isContentLocked = !level2Complete;
+  const lockStyles = isContentLocked ? "opacity-50 grayscale pointer-events-none" : "";
 
   // Gate 2: Check if mobile is verified
   if (!isVerified) {
@@ -433,10 +414,54 @@ export default function SimplifiedEarnTab() {
       
       {/* Normal Earn content renders underneath */}
       <div className="pt-0 pb-24 md:pb-20 lg:pb-8 px-0 md:px-6 lg:px-8 space-y-3">
+        
+        {/* Subtle Level 2 Completion Banner */}
+        {!level2Complete && (
+          <Alert className="sticky top-0 z-10 border-amber-500/30 bg-amber-500/10">
+            <Info className="h-4 w-4 text-amber-600" />
+            <AlertTitle className="text-amber-900 dark:text-amber-100">Complete Your Profile</AlertTitle>
+            <AlertDescription className="flex items-center justify-between gap-4 flex-wrap">
+              <div className="flex-1 space-y-1">
+                <p className="text-sm text-amber-800 dark:text-amber-200">
+                  Answer {level2Required.length - level2Answered.length} quick questions to unlock all earning opportunities.
+                </p>
+                <div className="flex items-center gap-2">
+                  <Progress value={level2Percentage} className="h-2 w-32" />
+                  <span className="text-xs font-medium text-amber-700 dark:text-amber-300">{level2Percentage}%</span>
+                </div>
+              </div>
+              <Button 
+                onClick={() => {
+                  analytics.trackProfileComplete();
+                  navigate('/profile/complete');
+                }}
+                size="sm"
+                variant="default"
+              >
+                Complete Now
+              </Button>
+            </AlertDescription>
+          </Alert>
+        )}
+        
         {/* Verification banner removed - now handled by gate above */}
         
         {/* Enhanced Balance Card with Progress */}
-        <Card className="bg-card border-0 shadow-lg">
+        <Card className={cn("bg-card border-0 shadow-lg relative", lockStyles)}>
+          {isContentLocked && (
+            <div className="absolute top-2 right-2 z-10">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <AlertCircle className="h-5 w-5 text-amber-600" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Complete profile to unlock</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+          )}
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
@@ -532,7 +557,21 @@ export default function SimplifiedEarnTab() {
       {/* Simplified Task Sections */}
       <div className="space-y-4">
         {/* Ready to Earn with Tabs */}
-        <Card className="bg-card shadow-sm border">
+        <Card className={cn("bg-card shadow-sm border relative", lockStyles)}>
+          {isContentLocked && (
+            <div className="absolute top-3 right-3 z-10">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <AlertCircle className="h-5 w-5 text-amber-600" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Complete profile to unlock</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+          )}
           <CardHeader className="pb-3 px-4 pt-2">
             <CardTitle className="flex items-center justify-between gap-2">
               <span className="flex items-center gap-1.5 md:gap-2 text-lg md:text-[26px]">
