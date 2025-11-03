@@ -257,7 +257,7 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
         const loginSuccess = await login(normalizedMobile, formData.password);
         
       if (loginSuccess) {
-        console.log('Registration + Login successful, showing onboarding');
+        console.log('Registration + Login successful, redirecting to profile completion');
         sessionStorage.setItem('show_onboarding_tour', 'true');
         
         // Detect if we're in simulator mode
@@ -268,7 +268,8 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
           sessionStorage.setItem('simulator_stage', 'registered');
           navigate('/simulator/dashboard');
         } else {
-          navigate('/');
+          // Redirect new users to complete Level 2 profile questions
+          navigate('/profile/complete');
         }
       }
       } else {

@@ -9,6 +9,7 @@ import ForgotPassword from './auth/ForgotPassword';
 import Earn from '@/pages/Earn';
 import Wallet from '@/pages/Wallet';
 import Profile from '@/pages/Profile';
+import ProfileComplete from '@/pages/ProfileComplete';
 import Refer from '@/pages/Refer';
 import Community from '@/pages/Community';
 import Rep from '@/pages/Rep';
@@ -46,6 +47,7 @@ export default function LoopllyApp() {
         <Route path="/" element={<Earn />} />
         <Route path="/wallet" element={<Wallet />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/profile/complete" element={<ProfileComplete />} />
         <Route path="/refer" element={<Refer />} />
         <Route path="/community" element={<Community />} />
         <Route path="/rep" element={<Rep />} />
