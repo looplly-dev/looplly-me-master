@@ -14,25 +14,7 @@ export const useProfileAnswers = () => {
   const userId = authState.user?.id;
   const [errors, setErrors] = useState<Record<string, string>>({});
   
-  // Team members don't have profile answers - early return
-  if (typeLoading) {
-    return { 
-      saveAnswer: async () => {}, 
-      saveAddress: async () => {}, 
-      isSaving: true, 
-      errors: {} 
-    };
-  }
-  
-  if (userType === 'looplly_team_user') {
-    return { 
-      saveAnswer: async () => {}, 
-      saveAddress: async () => {}, 
-      isSaving: false, 
-      errors: {} 
-    };
-  }
-
+  // All hooks must be called unconditionally at the top level
   const saveAnswerMutation = useMutation({
     mutationFn: async ({ 
       questionId, 
@@ -41,6 +23,8 @@ export const useProfileAnswers = () => {
       questionId: string; 
       value: any;
     }) => {
+      // Guard: skip for team users
+      if (userType === 'looplly_team_user') return;
       if (!userId) throw new Error('User not authenticated');
 
       const supabase = getSupabaseClient();
@@ -105,6 +89,8 @@ export const useProfileAnswers = () => {
 
   const saveAddressMutation = useMutation({
     mutationFn: async (addressData: AddressComponents) => {
+      // Guard: skip for team users
+      if (userType === 'looplly_team_user') return;
       if (!userId) throw new Error('User not authenticated');
 
       const supabase = getSupabaseClient();
@@ -175,19 +161,24 @@ export const useProfileAnswers = () => {
     }
   });
 
+  // Check if user is a team member
+  const isTeamUser = userType === 'looplly_team_user';
+  
   const saveAnswer = async (questionId: string, value: any) => {
+    if (isTeamUser) return;
     setErrors(prev => ({ ...prev, [questionId]: '' }));
     await saveAnswerMutation.mutateAsync({ questionId, value });
   };
 
   const saveAddress = async (addressData: AddressComponents) => {
+    if (isTeamUser) return;
     await saveAddressMutation.mutateAsync(addressData);
   };
 
   return {
     saveAnswer,
     saveAddress,
-    isSaving: saveAnswerMutation.isPending || saveAddressMutation.isPending,
-    errors
+    isSaving: typeLoading ? true : (saveAnswerMutation.isPending || saveAddressMutation.isPending),
+    errors: isTeamUser ? {} : errors
   };
 };
