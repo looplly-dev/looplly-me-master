@@ -155,24 +155,23 @@ export default function SimplifiedEarnTab() {
   const handleStartTask = (type: string, title: string, reward: number) => {
     // Check if content is locked
     if (isContentLocked) {
+      const title = !level2Complete ? 'Complete Your Profile' : 'Verify Mobile Number';
+      const description = !level2Complete 
+        ? 'Finish answering profile questions to unlock earning opportunities'
+        : 'Please verify your mobile number to start earning';
+      const buttonText = !level2Complete ? 'Complete Profile' : 'Verify Now';
+      const action = !level2Complete 
+        ? () => navigate('/profile/complete')
+        : () => navigate('/verify-mobile');
+      
       toast({
-        title: 'Complete Your Profile',
-        description: 'Finish answering profile questions to unlock earning opportunities',
+        title,
+        description,
         action: (
-          <Button size="sm" onClick={() => navigate('/profile/complete')}>
-            Complete Profile
+          <Button size="sm" onClick={action}>
+            {buttonText}
           </Button>
         ),
-      });
-      return;
-    }
-    
-    // Check verification status first
-    if (!isVerified) {
-      toast({
-        title: 'Verification Required',
-        description: 'Please verify your mobile number to start earning',
-        variant: 'default'
       });
       return;
     }
@@ -195,12 +194,21 @@ export default function SimplifiedEarnTab() {
   const handleDataToggle = (type: keyof typeof dataOptIns, checked: boolean) => {
     // Check if content is locked
     if (isContentLocked) {
+      const title = !level2Complete ? 'Complete Your Profile' : 'Verify Mobile Number';
+      const description = !level2Complete 
+        ? 'Finish answering profile questions to unlock data sharing'
+        : 'Please verify your mobile number to enable data sharing';
+      const buttonText = !level2Complete ? 'Complete Profile' : 'Verify Now';
+      const action = !level2Complete 
+        ? () => navigate('/profile/complete')
+        : () => navigate('/verify-mobile');
+      
       toast({
-        title: 'Complete Your Profile',
-        description: 'Finish answering profile questions to unlock data sharing',
+        title,
+        description,
         action: (
-          <Button size="sm" onClick={() => navigate('/profile/complete')}>
-            Complete Profile
+          <Button size="sm" onClick={action}>
+            {buttonText}
           </Button>
         ),
       });
@@ -348,49 +356,14 @@ export default function SimplifiedEarnTab() {
   const totalAvailable = surveyCount + videoCount + taskCount + dataCount;
 
 
-  // Lock state for grayed-out content
-  const isContentLocked = !level2Complete;
+  // Lock state for grayed-out content - check BOTH Level 2 AND verification
+  const isContentLocked = !level2Complete || !isVerified;
+  const lockReason = !level2Complete 
+    ? "Complete Level 2 profile" 
+    : !isVerified 
+    ? "Verify mobile number" 
+    : "";
   const lockStyles = isContentLocked ? "opacity-50 grayscale pointer-events-none" : "";
-
-  // Gate 2: Check if mobile is verified
-  if (!isVerified) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[500px] p-8 space-y-6 bg-gradient-to-b from-amber-500/5 to-transparent">
-        <div className="relative">
-          <Shield className="h-20 w-20 text-amber-600 mx-auto animate-pulse" />
-          <div className="absolute inset-0 h-20 w-20 mx-auto rounded-full bg-amber-500/20 animate-ping" />
-        </div>
-        <div className="text-center space-y-3">
-          <h2 className="text-3xl font-bold text-foreground">Verify Your Mobile to Start Earning</h2>
-          <p className="text-lg text-muted-foreground max-w-md">
-            We need to verify your mobile number before you can access surveys
-          </p>
-        </div>
-        <Card className="max-w-md border-amber-500/30 bg-card">
-          <CardContent className="p-6 space-y-4">
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li className="flex items-start gap-2">
-                <CheckCircle className="h-4 w-4 text-success mt-0.5 flex-shrink-0" />
-                <span>Quick 5-digit code verification</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="h-4 w-4 text-success mt-0.5 flex-shrink-0" />
-                <span>Protects your account and earnings</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="h-4 w-4 text-success mt-0.5 flex-shrink-0" />
-                <span>Required for payment processing</span>
-              </li>
-            </ul>
-          </CardContent>
-        </Card>
-        <Button onClick={() => navigate('/verify-mobile')} size="lg" className="text-lg px-8 py-6">
-          <Shield className="h-5 w-5 mr-2" />
-          Verify Mobile Now
-        </Button>
-      </div>
-    );
-  }
 
   // Direct pop-up if stale data exists (no prompt screen)
   const showUpdateModal = hasStaleData && !hasSkippedUpdate() && showProfileModal;
@@ -444,7 +417,28 @@ export default function SimplifiedEarnTab() {
           </Alert>
         )}
         
-        {/* Verification banner removed - now handled by gate above */}
+        {/* Mobile Verification Banner */}
+        {level2Complete && !isVerified && (
+          <Alert className="sticky top-0 z-10 border-orange-500/30 bg-orange-500/10">
+            <Shield className="h-4 w-4 text-orange-600" />
+            <AlertTitle className="text-orange-900 dark:text-orange-100">Verify Mobile Number</AlertTitle>
+            <AlertDescription className="flex items-center justify-between gap-4 flex-wrap">
+              <div className="flex-1">
+                <p className="text-sm text-orange-800 dark:text-orange-200">
+                  Quick 5-digit verification required to unlock earning opportunities and protect your account.
+                </p>
+              </div>
+              <Button 
+                onClick={() => navigate('/verify-mobile')}
+                size="sm"
+                variant="default"
+              >
+                <Shield className="h-4 w-4 mr-1" />
+                Verify Now
+              </Button>
+            </AlertDescription>
+          </Alert>
+        )}
         
         {/* Enhanced Balance Card with Progress */}
         <Card className={cn("bg-card border-0 shadow-lg relative", lockStyles)}>
@@ -456,7 +450,7 @@ export default function SimplifiedEarnTab() {
                     <AlertCircle className="h-5 w-5 text-amber-600" />
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>Complete profile to unlock</p>
+                    <p>{!level2Complete ? 'Complete profile to unlock' : 'Verify mobile to unlock'}</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
