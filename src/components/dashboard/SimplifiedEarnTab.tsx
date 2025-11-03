@@ -389,41 +389,50 @@ export default function SimplifiedEarnTab() {
       <div className="pt-0 pb-24 md:pb-20 lg:pb-8 px-0 md:px-6 lg:px-8 space-y-3">
         
         {/* Subtle Level 2 Completion Banner */}
-        {!level2Complete && (
-          <Alert className="sticky top-0 z-10 border-amber-500/30 bg-amber-500/10">
-            <Info className="h-4 w-4 text-amber-600" />
-            <AlertTitle className="text-amber-900 dark:text-amber-100">Complete Your Profile</AlertTitle>
-            <AlertDescription className="flex items-center justify-between gap-4">
-              <p className="text-sm text-amber-800 dark:text-amber-200">
-                Answer {level2Required.length - level2Answered.length} quick questions to start earning
-              </p>
-              <Button
-                onClick={() => {
-                  analytics.trackProfileComplete();
-                  navigate('/profile/complete');
-                }}
-                size="sm"
-                variant="default"
-              >
-                Complete Now
-              </Button>
-            </AlertDescription>
-          </Alert>
-        )}
+        {(() => {
+          const questionsRemaining = level2Required.length - level2Answered.length;
+          const questionText = questionsRemaining === 1 
+            ? "Answer 1 quick question to start earning"
+            : `Answer ${questionsRemaining} quick questions to start earning`;
+          
+          return !level2Complete && questionsRemaining > 0 && (
+            <Alert className="sticky top-0 z-10 border-amber-500/30 bg-amber-500/10">
+              <Info className="h-4 w-4 text-amber-600" />
+              <AlertTitle className="text-amber-900 dark:text-amber-100">Complete Your Profile</AlertTitle>
+              <AlertDescription className="flex items-center justify-between gap-4 sm:gap-6">
+                <p className="text-sm text-amber-800 dark:text-amber-200 flex-1 min-w-0">
+                  {questionText}
+                </p>
+                <Button
+                  onClick={() => {
+                    analytics.trackProfileComplete();
+                    navigate('/profile/complete');
+                  }}
+                  size="sm"
+                  variant="default"
+                  className="whitespace-nowrap shrink-0"
+                >
+                  Complete Now
+                </Button>
+              </AlertDescription>
+            </Alert>
+          );
+        })()}
         
         {/* Mobile Verification Banner */}
         {level2Complete && !isVerified && (
           <Alert className="sticky top-0 z-10 border-orange-500/30 bg-orange-500/10">
             <Shield className="h-4 w-4 text-orange-600" />
             <AlertTitle className="text-orange-900 dark:text-orange-100">Verify Mobile Number</AlertTitle>
-            <AlertDescription className="flex items-center justify-between gap-4">
-              <p className="text-sm text-orange-800 dark:text-orange-200">
+            <AlertDescription className="flex items-center justify-between gap-4 sm:gap-6">
+              <p className="text-sm text-orange-800 dark:text-orange-200 flex-1 min-w-0">
                 Verify your mobile number to start earning
               </p>
               <Button
                 onClick={() => navigate('/verify-mobile')}
                 size="sm"
                 variant="default"
+                className="whitespace-nowrap shrink-0"
               >
                 <Shield className="h-4 w-4 mr-1" />
                 Verify Now
