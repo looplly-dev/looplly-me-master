@@ -19,6 +19,7 @@ const mockAuthContext = {
   logout: jest.fn(),
   forgotPassword: jest.fn(),
   resetPassword: jest.fn(),
+  refreshUserProfile: jest.fn(),
 };
 
 const renderWithAuthContext = (component: React.ReactElement) => {

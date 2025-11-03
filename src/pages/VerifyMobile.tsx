@@ -7,10 +7,12 @@ import { supabase } from '@/integrations/supabase/client';
 import { Shield, Check } from 'lucide-react';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import { getCurrentUserId, getCurrentUserMobile } from '@/utils/authHelper';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function VerifyMobile() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { refreshUserProfile } = useAuth();
   const [otp, setOtp] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
   const [canResend, setCanResend] = useState(true);
@@ -47,13 +49,16 @@ export default function VerifyMobile() {
         const userId = await getCurrentUserId();
         if (!userId) throw new Error('Not authenticated');
 
-        // Mark as verified
+        // Mark as verified in database
         const { error } = await supabase
           .from('profiles')
           .update({ is_verified: true })
           .eq('user_id', userId);
 
         if (error) throw error;
+
+        // Refresh auth state to sync verification status
+        await refreshUserProfile();
 
         toast({
           title: '✅ Mobile Verified!',

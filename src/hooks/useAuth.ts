@@ -18,6 +18,7 @@ const AuthContext = createContext<{
   logout: () => void;
   forgotPassword: (email: string) => Promise<boolean>;
   resetPassword: (email: string, otp: string, password: string) => Promise<boolean>;
+  refreshUserProfile: () => Promise<void>;
 } | null>(null);
 
 export const useAuth = () => {
@@ -876,10 +877,18 @@ export const useAuthLogic = () => {
       .single();
     
     if (profile) {
+      // Update authState with ALL fresh fields (including is_verified, profile_complete, etc.)
       setAuthState(prev => ({
         ...prev,
         user: prev.user ? {
           ...prev.user,
+          isVerified: profile.is_verified,
+          profileComplete: profile.profile_complete,
+          firstName: profile.first_name || '',
+          lastName: profile.last_name || '',
+          mobile: profile.mobile,
+          countryCode: profile.country_code,
+          email: profile.email,
           profile: {
             sec: (profile.sec as 'A' | 'B' | 'C1' | 'C2' | 'D' | 'E') || 'B',
             gender: (profile.gender as 'male' | 'female' | 'other') || 'other',
@@ -899,6 +908,34 @@ export const useAuthLogic = () => {
           }
         } : null
       }));
+
+      // Update localStorage to keep it in sync
+      localStorage.setItem('looplly_user', JSON.stringify({
+        id: profile.user_id,
+        mobile: profile.mobile,
+        country_code: profile.country_code,
+        first_name: profile.first_name,
+        last_name: profile.last_name,
+        email: profile.email,
+        is_verified: profile.is_verified,
+        profile_complete: profile.profile_complete,
+        profile: {
+          sec: profile.sec,
+          gender: profile.gender,
+          date_of_birth: profile.date_of_birth,
+          address: profile.address,
+          gps_enabled: profile.gps_enabled,
+          country_code: profile.country_code,
+          country_iso: profile.country_iso,
+          user_type: profile.user_type,
+          company_name: profile.company_name,
+          company_role: profile.company_role,
+          must_change_password: profile.must_change_password,
+          is_verified: profile.is_verified
+        }
+      }));
+      
+      console.log('[refreshUserProfile] Profile refreshed, is_verified:', profile.is_verified);
     }
   };
 
@@ -1026,7 +1063,8 @@ export const useAuthLogic = () => {
     updateCommunicationPreferences,
     logout,
     forgotPassword,
-    resetPassword
+    resetPassword,
+    refreshUserProfile
   };
 };
 
