@@ -87,19 +87,18 @@ Deno.serve(async (req) => {
       throw updateTeamProfileError
     }
 
-    // CRITICAL: Also update profiles table (main table used by auth system)
-    const { error: updateProfileError } = await supabaseAdmin
+    // CRITICAL: Delete any conflicting profiles row to prevent auth confusion
+    // Team members should ONLY exist in team_profiles, not profiles
+    const { error: deleteProfileError } = await supabaseAdmin
       .from('profiles')
-      .update({
-        must_change_password: true,
-        temp_password_expires_at: expiresAt.toISOString(),
-        updated_at: new Date().toISOString()
-      })
+      .delete()
       .eq('user_id', teamProfile.user_id)
 
-    if (updateProfileError) {
-      console.error('Error updating main profile:', updateProfileError)
-      throw updateProfileError
+    if (deleteProfileError) {
+      console.warn('[reset-team-member-password] Could not delete conflicting profiles row:', deleteProfileError)
+      // Not a critical error - the is_team_member RPC will handle auth correctly
+    } else {
+      console.log('[reset-team-member-password] Deleted conflicting profiles row for team member')
     }
 
     // Log the action

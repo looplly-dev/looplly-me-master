@@ -238,46 +238,44 @@ export const useAuthLogic = () => {
         let teamProfile = null;
         let isTeamMember = false;
 
-        // Try profiles table first (most users are regular users)
-        const { data: profileData, error: profileError } = await activeSupabase
-          .from('profiles')
-          .select('*')
-          .eq('user_id', session.user.id)
-          .maybeSingle();
-
-        if (profileData) {
-          profile = profileData;
-          console.log('[useAuth] User found in profiles table:', profile.email);
-        } else if (profileError && profileError.code !== 'PGRST116') {
-          console.error('[useAuth] Error fetching profile:', profileError);
+        // CRITICAL: Check team membership FIRST via secure RPC to avoid conflicts with stale profiles table
+        const { data: isTeamMemberResult, error: teamCheckError } = await activeSupabase
+          .rpc('is_team_member', { _user_id: session.user.id });
+        
+        if (teamCheckError) {
+          console.error('[useAuth] Error checking team membership via RPC:', teamCheckError);
         }
-
-        // If not in profiles, check if user is a team member via secure RPC
-        if (!profile) {
-          const { data: isTeamMemberResult, error: teamCheckError } = await activeSupabase
-            .rpc('is_team_member', { _user_id: session.user.id });
+        
+        if (isTeamMemberResult) {
+          // User is a team member - fetch team profile data
+          const { data: teamData, error: teamError } = await activeSupabase
+            .from('team_profiles')
+            .select('*')
+            .eq('user_id', session.user.id)
+            .maybeSingle();
           
-          if (teamCheckError) {
-            console.error('[useAuth] Error checking team membership via RPC:', teamCheckError);
-          }
-          
-          if (isTeamMemberResult) {
-            // Fetch team profile data
-            const { data: teamData, error: teamError } = await activeSupabase
-              .from('team_profiles')
-              .select('*')
-              .eq('user_id', session.user.id)
-              .maybeSingle();
-            
-            if (teamData) {
-              teamProfile = teamData;
-              isTeamMember = true;
-              if (import.meta.env.DEV) {
-                console.info('[useAuth] Team member verified via RPC:', teamProfile.email);
-              }
-            } else if (teamError && teamError.code !== 'PGRST116') {
-              console.error('[useAuth] Error fetching team profile data:', teamError);
+          if (teamData) {
+            teamProfile = teamData;
+            isTeamMember = true;
+            if (import.meta.env.DEV) {
+              console.info('[useAuth] Team member verified via RPC:', teamProfile.email);
             }
+          } else if (teamError && teamError.code !== 'PGRST116') {
+            console.error('[useAuth] Error fetching team profile data:', teamError);
+          }
+        } else {
+          // Not a team member - check profiles table for regular users
+          const { data: profileData, error: profileError } = await activeSupabase
+            .from('profiles')
+            .select('*')
+            .eq('user_id', session.user.id)
+            .maybeSingle();
+
+          if (profileData) {
+            profile = profileData;
+            console.log('[useAuth] User found in profiles table:', profile.email);
+          } else if (profileError && profileError.code !== 'PGRST116') {
+            console.error('[useAuth] Error fetching profile:', profileError);
           }
         }
 
@@ -736,40 +734,40 @@ export const useAuthLogic = () => {
         const session = sessionData.session;
         
         if (session?.user) {
-          // SMART TABLE DETECTION: Check which table this user belongs to
+          // CRITICAL: Check team membership FIRST to avoid conflicts with stale profiles
           let profile = null;
           let teamProfile = null;
           let isTeamMember = false;
           
-          // Try profiles first (most users are regular users)
-          const { data: profileData } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('user_id', session.user.id)
-            .maybeSingle();
+          // Check team membership via secure RPC FIRST
+          const { data: isTeamMemberResult } = await supabase
+            .rpc('is_team_member', { _user_id: session.user.id });
           
-          if (profileData) {
-            profile = profileData;
-          } else {
-            // Check team membership via secure RPC
-            const { data: isTeamMemberResult } = await supabase
-              .rpc('is_team_member', { _user_id: session.user.id });
+          if (isTeamMemberResult) {
+            // User is a team member - fetch team profile data
+            const { data: teamData } = await supabase
+              .from('team_profiles')
+              .select('*')
+              .eq('user_id', session.user.id)
+              .maybeSingle();
             
-            if (isTeamMemberResult) {
-              // Fetch team profile data
-              const { data: teamData } = await supabase
-                .from('team_profiles')
-                .select('*')
-                .eq('user_id', session.user.id)
-                .maybeSingle();
-              
-              if (teamData) {
-                teamProfile = teamData;
-                isTeamMember = true;
-                if (import.meta.env.DEV) {
-                  console.info('[useAuth] Fast-path: Team member verified via RPC');
-                }
+            if (teamData) {
+              teamProfile = teamData;
+              isTeamMember = true;
+              if (import.meta.env.DEV) {
+                console.info('[useAuth] Fast-path: Team member verified via RPC');
               }
+            }
+          } else {
+            // Not a team member - check profiles for regular users
+            const { data: profileData } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('user_id', session.user.id)
+              .maybeSingle();
+            
+            if (profileData) {
+              profile = profileData;
             }
           }
           

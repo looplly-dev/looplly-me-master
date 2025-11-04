@@ -181,19 +181,18 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Also update the base profile with minimal data and team user type (deprecated, for backward compatibility)
-    const { error: profileError } = await supabaseAdmin
+    // CRITICAL: Delete any conflicting profiles row to prevent auth confusion
+    // Team members should ONLY exist in team_profiles, not profiles
+    const { error: deleteProfileError } = await supabaseAdmin
       .from('profiles')
-      .update({
-        user_type: 'looplly_team_user',
-        must_change_password: true,
-        temp_password_expires_at: expiresAt.toISOString()
-      })
+      .delete()
       .eq('user_id', newUser.user.id);
 
-    if (profileError) {
-      console.error('Error updating profile:', profileError);
-      // Note: Not a critical error, team_members is primary
+    if (deleteProfileError) {
+      console.warn('[create-team-member] Could not delete conflicting profiles row:', deleteProfileError);
+      // Not a critical error - the is_team_member RPC will handle auth correctly
+    } else {
+      console.log('[create-team-member] Deleted any conflicting profiles row for team member');
     }
 
     // Assign role in user_roles table
