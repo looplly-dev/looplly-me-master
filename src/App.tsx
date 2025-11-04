@@ -1,3 +1,4 @@
+import { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -6,37 +7,39 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import AuthProvider from "./components/auth/AuthProvider";
 import { useAnalytics } from "./hooks/useAnalytics";
-import LoopllyApp from "./components/LoopllyApp";
-import AdminDashboard from "./pages/AdminDashboard";
-import AdminTeam from "./pages/AdminTeam";
-import AdminUsers from "./pages/AdminUsers";
-import AdminContent from "./pages/AdminContent";
-import AdminBadges from "./pages/AdminBadges";
-import AdminRedemptions from "./pages/AdminRedemptions";
-import AdminAnalytics from "./pages/AdminAnalytics";
-import AdminIntegrations from "./pages/AdminIntegrations";
-import AdminAgents from "./pages/AdminAgents";
-import AdminMigration from "./pages/AdminMigration";
-import AdminStreakConfig from "./pages/AdminStreakConfig";
-import AdminProfileDecay from "./pages/AdminProfileDecay";
-import AdminProfileQuestions from "./pages/AdminProfileQuestions";
-import AdminQuestionBuilder from "./pages/AdminQuestionBuilder";
-import AdminQuestions from "./pages/AdminQuestions";
-import AdminEarningRules from "./pages/AdminEarningRules";
-import AdminKnowledge from "./pages/AdminKnowledge";
-import AdminKnowledgeDoc from "./pages/AdminKnowledgeDoc";
-import AdminKnowledgeEdit from "./pages/AdminKnowledgeEdit";
-import AdminCountryBlocklist from "./pages/AdminCountryBlocklist";
-import AdminSimulator from "./pages/AdminSimulator";
-import SimulatorSession from "./pages/SimulatorSession";
-import SimulatorApp from "./pages/SimulatorApp";
-import ResetPassword from "./components/auth/ResetPassword";
-import ResetPasswordRequired from "./pages/ResetPasswordRequired";
-import AdminLogin from "./components/auth/AdminLogin";
-import AdminResetPassword from "./pages/AdminResetPassword";
-import ProtectedRoute from "./components/auth/ProtectedRoute";
-import ProfileComplete from "./pages/ProfileComplete";
-import VerifyMobile from "./pages/VerifyMobile";
+
+// Lazy load all pages for better performance
+const LoopllyApp = lazy(() => import("./components/LoopllyApp"));
+const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
+const AdminTeam = lazy(() => import("./pages/AdminTeam"));
+const AdminUsers = lazy(() => import("./pages/AdminUsers"));
+const AdminContent = lazy(() => import("./pages/AdminContent"));
+const AdminBadges = lazy(() => import("./pages/AdminBadges"));
+const AdminRedemptions = lazy(() => import("./pages/AdminRedemptions"));
+const AdminAnalytics = lazy(() => import("./pages/AdminAnalytics"));
+const AdminIntegrations = lazy(() => import("./pages/AdminIntegrations"));
+const AdminAgents = lazy(() => import("./pages/AdminAgents"));
+const AdminMigration = lazy(() => import("./pages/AdminMigration"));
+const AdminStreakConfig = lazy(() => import("./pages/AdminStreakConfig"));
+const AdminProfileDecay = lazy(() => import("./pages/AdminProfileDecay"));
+const AdminProfileQuestions = lazy(() => import("./pages/AdminProfileQuestions"));
+const AdminQuestionBuilder = lazy(() => import("./pages/AdminQuestionBuilder"));
+const AdminQuestions = lazy(() => import("./pages/AdminQuestions"));
+const AdminEarningRules = lazy(() => import("./pages/AdminEarningRules"));
+const AdminKnowledge = lazy(() => import("./pages/AdminKnowledge"));
+const AdminKnowledgeDoc = lazy(() => import("./pages/AdminKnowledgeDoc"));
+const AdminKnowledgeEdit = lazy(() => import("./pages/AdminKnowledgeEdit"));
+const AdminCountryBlocklist = lazy(() => import("./pages/AdminCountryBlocklist"));
+const AdminSimulator = lazy(() => import("./pages/AdminSimulator"));
+const SimulatorSession = lazy(() => import("./pages/SimulatorSession"));
+const SimulatorApp = lazy(() => import("./pages/SimulatorApp"));
+const ResetPassword = lazy(() => import("./components/auth/ResetPassword"));
+const ResetPasswordRequired = lazy(() => import("./pages/ResetPasswordRequired"));
+const AdminLogin = lazy(() => import("./components/auth/AdminLogin"));
+const AdminResetPassword = lazy(() => import("./pages/AdminResetPassword"));
+const ProtectedRoute = lazy(() => import("./components/auth/ProtectedRoute"));
+const ProfileComplete = lazy(() => import("./pages/ProfileComplete"));
+const VerifyMobile = lazy(() => import("./pages/VerifyMobile"));
 
 const queryClient = new QueryClient();
 
@@ -45,47 +48,55 @@ const AppContent = () => {
   useAnalytics();
   
   return (
-    <Routes>
-      {/* Admin Login - Must be before protected routes */}
-              <Route path="/admin/login" element={<AdminLogin />} />
-              <Route path="/admin/reset-password" element={<AdminResetPassword />} />
-              
-              <Route path="/admin" element={<AdminDashboard />} />
-              <Route path="/admin/dashboard" element={<AdminDashboard />} />
-              <Route path="/admin/team" element={<AdminTeam />} />
-              <Route path="/admin/users" element={<AdminUsers />} />
-              <Route path="/admin/content" element={<AdminContent />} />
-              <Route path="/admin/badges" element={<AdminBadges />} />
-              <Route path="/admin/redemptions" element={<AdminRedemptions />} />
-              <Route path="/admin/analytics" element={<AdminAnalytics />} />
-              <Route path="/admin/integrations" element={<AdminIntegrations />} />
-              <Route path="/admin/agents" element={<AdminAgents />} />
-              <Route path="/admin/migration" element={<AdminMigration />} />
-              <Route path="/admin/streak-config" element={<AdminStreakConfig />} />
-              <Route path="/admin/questions" element={<AdminQuestions />} />
-              <Route path="/admin/profile-decay" element={<AdminProfileDecay />} />
-              <Route path="/admin/profile-questions" element={<AdminProfileQuestions />} />
-              <Route path="/admin/question-builder" element={<AdminQuestionBuilder />} />
-              <Route path="/admin/earning-rules" element={<AdminEarningRules />} />
-              <Route path="/admin/simulator" element={<AdminSimulator />} />
-              <Route path="/admin/knowledge" element={<AdminKnowledge />} />
-              <Route path="/admin/knowledge/doc/:docId" element={<AdminKnowledgeDoc />} />
-              <Route path="/admin/knowledge/edit/:docId" element={<AdminKnowledgeEdit />} />
-              <Route path="/admin/country-blocklist" element={<AdminCountryBlocklist />} />
-              
-              {/* Simulator Routes - No ProtectedRoute wrappers */}
-              <Route path="/simulator/session" element={<SimulatorSession />} />
-              <Route path="/simulator/*" element={<SimulatorApp />} />
-              
-              <Route path="/reset-password" element={<ResetPassword />} />
-              <Route path="/reset-password-required" element={<ResetPasswordRequired />} />
-              
-              {/* Profile & Verification Routes */}
-              <Route path="/profile/complete" element={<ProtectedRoute><ProfileComplete /></ProtectedRoute>} />
-              <Route path="/verify-mobile" element={<ProtectedRoute><VerifyMobile /></ProtectedRoute>} />
-              
-              <Route path="/*" element={<LoopllyApp />} />
-            </Routes>
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-background">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </div>
+      }
+    >
+      <Routes>
+        {/* Admin Login - Must be before protected routes */}
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin/reset-password" element={<AdminResetPassword />} />
+        
+        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        <Route path="/admin/team" element={<AdminTeam />} />
+        <Route path="/admin/users" element={<AdminUsers />} />
+        <Route path="/admin/content" element={<AdminContent />} />
+        <Route path="/admin/badges" element={<AdminBadges />} />
+        <Route path="/admin/redemptions" element={<AdminRedemptions />} />
+        <Route path="/admin/analytics" element={<AdminAnalytics />} />
+        <Route path="/admin/integrations" element={<AdminIntegrations />} />
+        <Route path="/admin/agents" element={<AdminAgents />} />
+        <Route path="/admin/migration" element={<AdminMigration />} />
+        <Route path="/admin/streak-config" element={<AdminStreakConfig />} />
+        <Route path="/admin/questions" element={<AdminQuestions />} />
+        <Route path="/admin/profile-decay" element={<AdminProfileDecay />} />
+        <Route path="/admin/profile-questions" element={<AdminProfileQuestions />} />
+        <Route path="/admin/question-builder" element={<AdminQuestionBuilder />} />
+        <Route path="/admin/earning-rules" element={<AdminEarningRules />} />
+        <Route path="/admin/simulator" element={<AdminSimulator />} />
+        <Route path="/admin/knowledge" element={<AdminKnowledge />} />
+        <Route path="/admin/knowledge/doc/:docId" element={<AdminKnowledgeDoc />} />
+        <Route path="/admin/knowledge/edit/:docId" element={<AdminKnowledgeEdit />} />
+        <Route path="/admin/country-blocklist" element={<AdminCountryBlocklist />} />
+        
+        {/* Simulator Routes - No ProtectedRoute wrappers */}
+        <Route path="/simulator/session" element={<SimulatorSession />} />
+        <Route path="/simulator/*" element={<SimulatorApp />} />
+        
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/reset-password-required" element={<ResetPasswordRequired />} />
+        
+        {/* Profile & Verification Routes */}
+        <Route path="/profile/complete" element={<ProtectedRoute><ProfileComplete /></ProtectedRoute>} />
+        <Route path="/verify-mobile" element={<ProtectedRoute><VerifyMobile /></ProtectedRoute>} />
+        
+        <Route path="/*" element={<LoopllyApp />} />
+      </Routes>
+    </Suspense>
   );
 };
 
