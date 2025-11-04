@@ -21,10 +21,13 @@ import {
   Globe,
   TestTube,
   LogOut,
+  Moon,
+  Sun,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { useRole } from '@/hooks/useRole';
+import { useDarkMode } from '@/hooks/useDarkMode';
 import {
   Sidebar,
   SidebarContent,
@@ -192,6 +195,7 @@ interface AdminLayoutProps {
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
   const navigate = useNavigate();
+  const { isDarkMode, toggleDarkMode } = useDarkMode();
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -208,15 +212,29 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               <SidebarTrigger />
               <AdminBreadcrumb />
             </div>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={handleLogout}
-              className="gap-2"
-            >
-              <LogOut className="h-4 w-4" />
-              <span>Logout</span>
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={toggleDarkMode}
+                className="h-9 w-9"
+              >
+                {isDarkMode ? (
+                  <Sun className="h-5 w-5" />
+                ) : (
+                  <Moon className="h-5 w-5" />
+                )}
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={handleLogout}
+                className="gap-2"
+              >
+                <LogOut className="h-4 w-4" />
+                <span>Logout</span>
+              </Button>
+            </div>
           </header>
           <main className="flex-1 px-6 py-6 lg:px-12 xl:px-16 bg-muted/30 overflow-auto">
             {children}
