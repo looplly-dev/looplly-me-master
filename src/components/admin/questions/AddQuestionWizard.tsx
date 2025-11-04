@@ -394,7 +394,8 @@ export function AddQuestionWizard({ open, onClose, defaultLevel, editQuestion }:
       if (error) throw error;
       
       if (data?.options && Array.isArray(data.options)) {
-        setOptions([...options, ...data.options]);
+        const nonEmptyOptions = options.filter(opt => opt.label?.trim() || opt.value?.trim());
+        setOptions([...nonEmptyOptions, ...data.options]);
         toast.success(`Added ${data.options.length} AI-generated options!`);
       }
     } catch (error: any) {
