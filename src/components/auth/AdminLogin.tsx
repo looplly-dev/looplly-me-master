@@ -46,12 +46,22 @@ export default function AdminLogin() {
     setIsSubmitting(true);
     
     try {
-      // Use path-aware client for admin context
+      // Use path-aware client for admin context (will be adminClient)
       const supabase = getSupabaseClient();
       
-      // Clear any conflicting regular user tokens before login
+      // Pre-login cleanup: eradicate all stale tokens from all storage locations
+      await supabase.auth.signOut(); // Sign out admin session if any
+      
+      // Clear localStorage tokens (admin, regular user, Looplly custom)
+      localStorage.removeItem('admin_auth');
+      localStorage.removeItem('auth');
       localStorage.removeItem('looplly_auth_token');
       localStorage.removeItem('looplly_user');
+      
+      // Clear sessionStorage tokens (simulator)
+      sessionStorage.removeItem('simulator');
+      sessionStorage.removeItem('simulator_auth_token');
+      sessionStorage.removeItem('simulator_user');
       
       // Pass 'looplly_team_user' to enforce team member login
       const success = await login(formData.email, formData.password, 'looplly_team_user');

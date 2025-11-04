@@ -24,7 +24,7 @@ import {
   Moon,
   Sun,
 } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { getSupabaseClient } from '@/integrations/supabase/activeClient';
 import { Button } from '@/components/ui/button';
 import { useRole } from '@/hooks/useRole';
 import { useDarkMode } from '@/hooks/useDarkMode';
@@ -198,6 +198,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const { isDarkMode, toggleDarkMode } = useDarkMode();
 
   const handleLogout = async () => {
+    const supabase = getSupabaseClient();
     await supabase.auth.signOut();
     navigate('/admin/login');
   };
