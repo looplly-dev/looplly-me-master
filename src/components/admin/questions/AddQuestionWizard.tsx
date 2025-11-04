@@ -120,12 +120,57 @@ export function AddQuestionWizard({ open, onClose, defaultLevel, editQuestion }:
     },
   });
 
-  // Set options from editQuestion on mount
+  // Reset form when editQuestion changes or dialog opens
   useEffect(() => {
-    if (isEditMode && editQuestion?.options && open) {
-      setOptions(Array.isArray(editQuestion.options) ? editQuestion.options : []);
+    if (open) {
+      if (isEditMode && editQuestion) {
+        // Reset form with the current question's data
+        form.reset({
+          question_type: editQuestion.question_type || '',
+          question_text: editQuestion.question_text || '',
+          question_key: editQuestion.question_key || '',
+          help_text: editQuestion.help_text || '',
+          placeholder: editQuestion.placeholder || '',
+          is_required: editQuestion.is_required || false,
+          category_id: editQuestion.category_id || '',
+          level: editQuestion.level || defaultLevel || 2,
+          decay_config_key: editQuestion.decay_config_key || '',
+          applicability: editQuestion.applicability || 'global',
+          country_codes: editQuestion.country_codes || [],
+          options: editQuestion.options || [],
+          validation_rules: editQuestion.validation_rules || {},
+          is_draft: editQuestion.is_draft !== undefined ? editQuestion.is_draft : (defaultLevel === 2),
+        });
+        
+        // Update options state
+        if (editQuestion.options) {
+          setOptions(Array.isArray(editQuestion.options) ? editQuestion.options : []);
+        } else {
+          setOptions([]);
+        }
+      } else {
+        // Reset to empty form for create mode
+        form.reset({
+          question_type: '',
+          question_text: '',
+          question_key: '',
+          help_text: '',
+          placeholder: '',
+          is_required: false,
+          category_id: '',
+          level: defaultLevel || 2,
+          decay_config_key: '',
+          applicability: 'global',
+          country_codes: [],
+          options: [],
+          validation_rules: {},
+          is_draft: (defaultLevel === 2),
+        });
+        setOptions([]);
+      }
+      setActiveTab('edit'); // Reset to first tab
     }
-  }, [isEditMode, editQuestion, open]);
+  }, [editQuestion, open, isEditMode, form, defaultLevel]);
 
   const { data: categories } = useQuery({
     queryKey: ['profile_categories'],
