@@ -85,6 +85,38 @@ Provides address autocomplete and location services for user profiles.
 4. Start typing an address
 5. Verify autocomplete suggestions appear
 
+#### Step 5: Verify Geographic Restrictions
+
+**Important:** Address autocomplete is now geographically restricted to the user's registered country.
+
+1. Create a test user account with a specific country mobile number (e.g., +27 for South Africa)
+2. Navigate to Profile → Address question
+3. Type an address from a **different country** (e.g., "123 Main St, New York")
+4. Verify that:
+   - ✅ Only addresses from the registered country appear in autocomplete
+   - ✅ Country badge displays correct country with flag
+   - ✅ Country badge shows "Based on your mobile number - Address must be in this country"
+   - ✅ Country field is not editable
+5. Select an address from autocomplete
+6. Verify address components populate correctly
+7. Verify country matches mobile registration country
+
+**Expected Behavior:**
+- 🇿🇦 User with +27 (South Africa) → Only sees South African addresses
+- 🇳🇬 User with +234 (Nigeria) → Only sees Nigerian addresses  
+- 🇺🇸 User with +1 (United States) → Only sees US addresses
+
+**Testing Edge Cases:**
+
+**Missing Country Code:**
+- If user's profile has no `country_code`, address field shows error badge
+- Error message: "Country not detected. Please contact support."
+- Form cannot be submitted
+
+**Mock Mode:**
+- Mock addresses are also filtered by country for consistency
+- Badge shows "Mock Mode" indicator along with country restriction
+
 ### Troubleshooting
 
 **No autocomplete suggestions:**

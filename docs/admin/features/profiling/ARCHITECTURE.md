@@ -346,6 +346,120 @@ ProfileTab (main container)
         └── Validation feedback
 ```
 
+### Address Question Type Implementation
+
+#### Geographic Restriction Flow
+
+```typescript
+// 1. Fetch user's country from profile
+useEffect(() => {
+  if (question.question_type === 'address') {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('country_code')
+      .eq('user_id', user.id)
+      .single();
+    
+    setUserCountryCode(profile.country_code); // e.g., "+27"
+  }
+}, [question.question_type]);
+
+// 2. Derive country metadata
+const userCountryName = getCountryNameFromDialCode("+27"); // "South Africa"
+const userCountryISO = getISOFromDialCode("+27"); // "ZA"
+const userCountryFlag = getCountryFlagFromDialCode("+27"); // "🇿🇦"
+
+// 3. Filter autocomplete by country
+searchAddress("123 main st", "ZA"); // Only returns ZA addresses
+
+// 4. Validate selected address
+const address = await selectPlace(placeId, "South Africa");
+// Throws error if address.country !== "South Africa"
+
+// 5. Force country in stored data
+const forcedAddress = {
+  ...address,
+  country: userCountryName // Always set to profile country
+};
+```
+
+#### Data Integrity Rules
+
+**Client-Side:**
+1. Google Places API filtered with `&components=country:ZA` parameter
+2. Selected address validated against `expectedCountryName`
+3. Country field in form forced to profile country (immutable)
+4. Error toast displayed if validation fails
+
+**Database Level:**
+- `profile_answers.answer_json->>'country'` should match derived country from `profiles.country_code`
+- Future enhancement: Add trigger validation for country matching
+
+#### Component Props Flow
+
+```typescript
+// QuestionRenderer fetches country
+<QuestionRenderer 
+  question={question}
+  userCountryCode="+27" // From profiles table
+/>
+
+// Passes to AddressFieldsInput
+<AddressFieldsInput
+  userCountryCode="+27"
+  onChange={(address) => {
+    // address.country is guaranteed to match profile
+  }}
+/>
+
+// Uses in search and validation
+useAddressAutocomplete({
+  countryISO: "ZA",           // Filter API results
+  expectedCountry: "South Africa" // Validate selection
+})
+```
+
+#### Edge Function Integration
+
+The `google-places` edge function accepts a `countryCode` parameter:
+
+```typescript
+// Request
+{
+  query: "123 main street",
+  countryCode: "ZA"
+}
+
+// API Call
+https://maps.googleapis.com/maps/api/place/autocomplete/json
+  ?input=123+main+street
+  &components=country:za  // ← Geographic restriction
+  &key=API_KEY
+```
+
+#### User Experience Flow
+
+```
+Registration
+└── Mobile: +27 123 456 789
+    └── profiles.country_code = "+27"
+    └── profiles.country_iso = "ZA" (auto-generated)
+
+Profile Questions
+└── Address Question
+    ├── Fetch country_code from profile
+    ├── Derive: name="South Africa", ISO="ZA", flag="🇿🇦"
+    ├── User types address
+    │   └── API filtered to ZA only
+    ├── User selects address
+    │   └── Validation checks country matches
+    ├── Country badge displays (read-only)
+    │   └── "🇿🇦 South Africa"
+    │   └── "Based on your mobile number - Address must be in this country"
+    └── Form submits
+        └── address.country = "South Africa" (guaranteed)
+```
+
 ### State Management
 
 Profile data uses React Query for caching and real-time updates:

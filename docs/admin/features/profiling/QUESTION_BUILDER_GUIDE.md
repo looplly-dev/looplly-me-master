@@ -160,22 +160,62 @@ Date picker for calendar dates.
 ---
 
 ### 6. Address Autocomplete (`address`)
-Google Places API integration for address lookup.
+Google Places API integration with geographic restriction to user's registered country.
 
 **Best For:**
 - Home address
-- Work address
+- Work address  
 - Delivery addresses
+
+**Geographic Restriction:**
+- Address suggestions are **automatically filtered** to the user's registered country
+- Country is determined from the user's mobile verification during registration
+- Users **cannot** select addresses from other countries
+- Country field is **read-only** and auto-populated
 
 **Configuration:**
 - Automatically geocodes location
 - Stores formatted address and components
 - Requires Google Places API integration
+- **Enforces country matching** with mobile registration country
+
+**Data Storage:**
+The address is stored as a JSON object with these components:
+- `street_number` - House/building number
+- `route` - Street name
+- `locality` - City/town
+- `administrative_area_level_1` - Province/state
+- `administrative_area_level_2` - County/district (if applicable)
+- `country` - Country name (forced to match profile)
+- `postal_code` - ZIP/postal code
+- `sublocality` - Neighborhood/suburb (if applicable)
 
 **Example:**
 - Question: "What is your home address?"
 - Type: `address`
-- Returns: Full address, lat/long, postal code, etc.
+- User Country: South Africa (from mobile +27)
+- Autocomplete Results: Only South African addresses shown
+- Country Field Display: "🇿🇦 South Africa" (read-only badge)
+
+**Security Note:**
+This geographic restriction prevents data inconsistencies and ensures addresses match the user's verified country. The country cannot be changed or overridden, even through Google Places autocomplete.
+
+**Validation Rules:**
+- Country must match user's `profiles.country_code` (from mobile verification)
+- All address components must be present (except `administrative_area_level_2` and `sublocality` which are optional)
+- Postal code format is validated (when available)
+
+**User Experience:**
+1. User types address in search field
+2. Google Places API returns suggestions **filtered by country**
+3. User selects from dropdown
+4. Address components auto-populate
+5. Country badge displays (read-only, non-editable)
+6. If wrong country somehow selected, validation error shown
+
+**Error Messages:**
+- "Address must be in [Country Name]. Selected address is in [Other Country]."
+- "Country not detected. Please contact support."
 
 ---
 

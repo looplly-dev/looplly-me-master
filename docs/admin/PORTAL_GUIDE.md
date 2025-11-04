@@ -42,6 +42,7 @@ The Admin Portal provides comprehensive tools for managing users, content, integ
 #### **Profile Questions**
 - Create and edit profile questions
 - Configure question types (text, select, multi-select, date, address)
+- **Address questions automatically restricted to user's country** (based on mobile verification)
 - Set validation rules
 - Manage question categories
 - Configure country-specific options
