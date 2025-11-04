@@ -112,6 +112,24 @@ export const loginUser = async (params: LoginParams): Promise<{ success: boolean
       localStorage.setItem('looplly_user', JSON.stringify(data.user));
       
       console.log('Login successful - custom JWT stored');
+      
+      // CRITICAL: Establish Supabase session for RLS to work
+      if (data.supabase_auth_id) {
+        console.log('Establishing Supabase session for RLS...');
+        
+        // Sign in to Supabase with the mobile user's credentials
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email: `${data.user.id}@looplly.mobile`,
+          password: params.password
+        });
+        
+        if (signInError) {
+          console.warn('Failed to establish Supabase session:', signInError.message);
+          // Don't fail login, but note that RLS might have issues
+        } else {
+          console.log('Supabase session established successfully');
+        }
+      }
     } else {
       console.log('Logging in admin user with email:', params.email);
       // Email login for admin/team users (Supabase Auth)

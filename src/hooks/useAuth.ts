@@ -120,77 +120,97 @@ export const useAuthLogic = () => {
 
     // Skip Looplly JWT on admin routes to prevent regular user context from hijacking
     if (!isAdminRoute && loopllyToken && loopllyUser) {
-      try {
-        const payload = JSON.parse(atob(loopllyToken.split('.')[1]));
-        const now = Math.floor(Date.now() / 1000);
+      (async () => {
+        try {
+          const payload = JSON.parse(atob(loopllyToken.split('.')[1]));
+          const now = Math.floor(Date.now() / 1000);
 
-        if (payload.exp < now) {
-          console.log('Looplly JWT expired, clearing...');
+          if (payload.exp < now) {
+            console.log('Looplly JWT expired, clearing...');
+            localStorage.removeItem('looplly_auth_token');
+            localStorage.removeItem('looplly_user');
+          } else {
+            console.log('Found valid Looplly JWT, checking Supabase session...');
+            const user = JSON.parse(loopllyUser);
+            
+            // CRITICAL: Check if Supabase session exists for RLS to work
+            const { data: { session: existingSession } } = await supabase.auth.getSession();
+            
+            if (!existingSession) {
+              console.warn('[useAuth] No Supabase session found - RLS will fail. Clearing auth to force re-login.');
+              localStorage.removeItem('looplly_auth_token');
+              localStorage.removeItem('looplly_user');
+              setAuthState({
+                user: null,
+                isAuthenticated: false,
+                isLoading: false,
+                step: 'login'
+              });
+              return;
+            }
+            
+            console.log('[useAuth] Supabase session exists, auth.uid() will work for RLS');
+
+            // Set initial state but DON'T return - we need to attach the listener
+            setAuthState({
+              user: {
+                id: user.id,
+                mobile: user.mobile,
+                countryCode: user.country_code || '+1',
+                firstName: user.first_name || user.firstName || '',
+                lastName: user.last_name || user.lastName || '',
+                email: user.email,
+                isVerified: user.is_verified ?? false,
+                profileComplete: user.profile_complete ?? false,
+                profile: user.profile
+              },
+              isAuthenticated: true,
+              isLoading: false,
+              step: 'dashboard'
+            });
+
+            // Fetch fresh profile in background but don't block
+            setTimeout(async () => {
+              if (!mounted) return;
+              const { data: profile } = await supabase.from('profiles').select('*').eq('user_id', user.id).single();
+              if (profile && mounted) {
+                setAuthState({
+                  user: {
+                    id: profile.user_id,
+                    mobile: profile.mobile,
+                    countryCode: profile.country_code,
+                    firstName: profile.first_name,
+                    lastName: profile.last_name,
+                    email: profile.email,
+                    isVerified: profile.is_verified,
+                    profileComplete: profile.profile_complete,
+                    profile: profile ? {
+                      sec: (profile.sec as 'A' | 'B' | 'C1' | 'C2' | 'D' | 'E') || 'B',
+                      gender: (profile.gender as 'male' | 'female' | 'other') || 'other',
+                      dateOfBirth: profile.date_of_birth ? new Date(profile.date_of_birth) : new Date(),
+                      address: profile.address || '',
+                      gpsEnabled: profile.gps_enabled || false,
+                      firstName: profile.first_name || '',
+                      lastName: profile.last_name || '',
+                      email: profile.email || '',
+                      country_code: profile.country_code,
+                      country_iso: profile.country_iso
+                    } : undefined
+                  },
+                  isAuthenticated: true,
+                  isLoading: false,
+                  step: 'dashboard'
+                });
+              }
+            }, 0);
+            // Continue to attach listener below - don't return!
+          }
+        } catch (error) {
+          console.error('Error parsing Looplly JWT:', error);
           localStorage.removeItem('looplly_auth_token');
           localStorage.removeItem('looplly_user');
-        } else {
-          console.log('Found valid Looplly JWT, setting initial state...');
-          const user = JSON.parse(loopllyUser);
-
-          // Set initial state but DON'T return - we need to attach the listener
-          setAuthState({
-            user: {
-              id: user.id,
-              mobile: user.mobile,
-              countryCode: user.country_code || '+1',
-              firstName: user.first_name || user.firstName || '',
-              lastName: user.last_name || user.lastName || '',
-              email: user.email,
-              isVerified: user.is_verified ?? false,
-              profileComplete: user.profile_complete ?? false,
-              profile: user.profile
-            },
-            isAuthenticated: true,
-            isLoading: false,
-            step: 'dashboard'
-          });
-
-          // Fetch fresh profile in background but don't block
-          setTimeout(async () => {
-            if (!mounted) return;
-            const { data: profile } = await supabase.from('profiles').select('*').eq('user_id', user.id).single();
-            if (profile && mounted) {
-              setAuthState({
-                user: {
-                  id: profile.user_id,
-                  mobile: profile.mobile,
-                  countryCode: profile.country_code,
-                  firstName: profile.first_name,
-                  lastName: profile.last_name,
-                  email: profile.email,
-                  isVerified: profile.is_verified,
-                  profileComplete: profile.profile_complete,
-                  profile: profile ? {
-                    sec: (profile.sec as 'A' | 'B' | 'C1' | 'C2' | 'D' | 'E') || 'B',
-                    gender: (profile.gender as 'male' | 'female' | 'other') || 'other',
-                    dateOfBirth: profile.date_of_birth ? new Date(profile.date_of_birth) : new Date(),
-                    address: profile.address || '',
-                    gpsEnabled: profile.gps_enabled || false,
-                    firstName: profile.first_name || '',
-                    lastName: profile.last_name || '',
-                    email: profile.email || '',
-                    country_code: profile.country_code,
-                    country_iso: profile.country_iso
-                  } : undefined
-                },
-                isAuthenticated: true,
-                isLoading: false,
-                step: 'dashboard'
-              });
-            }
-          }, 0);
-          // Continue to attach listener below - don't return!
         }
-      } catch (error) {
-        console.error('Error parsing Looplly JWT:', error);
-        localStorage.removeItem('looplly_auth_token');
-        localStorage.removeItem('looplly_user');
-      }
+      })();
     }
     
     // 2. SECURITY: Validate mock user has proper structure and security tokens

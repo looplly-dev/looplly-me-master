@@ -1226,6 +1226,33 @@ export type Database = {
           },
         ]
       }
+      looplly_user_auth_mapping: {
+        Row: {
+          country_code: string
+          created_at: string | null
+          looplly_user_id: string
+          mobile: string
+          supabase_auth_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          country_code: string
+          created_at?: string | null
+          looplly_user_id: string
+          mobile: string
+          supabase_auth_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          country_code?: string
+          created_at?: string | null
+          looplly_user_id?: string
+          mobile?: string
+          supabase_auth_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       profile_answers: {
         Row: {
           answer_json: Json | null

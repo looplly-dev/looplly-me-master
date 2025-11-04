@@ -67,6 +67,68 @@ serve(async (req) => {
       );
     }
     
+    // Check if Supabase Auth user exists in mapping
+    const { data: mapping } = await supabase
+      .from('looplly_user_auth_mapping')
+      .select('supabase_auth_id')
+      .eq('looplly_user_id', profile.user_id)
+      .maybeSingle();
+    
+    let supabaseAuthId = mapping?.supabase_auth_id;
+    
+    // Create Supabase Auth user if not exists
+    if (!supabaseAuthId) {
+      console.log('[MOCK LOGIN] Creating Supabase Auth user for:', normalizedMobile);
+      
+      const { data: authUser, error: authError } = await supabase.auth.admin.createUser({
+        email: `${profile.user_id}@looplly.mobile`, // Synthetic email
+        password: password,
+        email_confirm: true,
+        user_metadata: {
+          mobile: profile.mobile,
+          country_code: profile.country_code,
+          first_name: profile.first_name,
+          last_name: profile.last_name,
+          looplly_user_id: profile.user_id,
+          user_type: 'looplly_user'
+        }
+      });
+      
+      if (authError || !authUser.user) {
+        console.error('[MOCK LOGIN] Failed to create Supabase Auth user:', authError);
+        // Continue with custom JWT only
+      } else {
+        supabaseAuthId = authUser.user.id;
+        
+        // Store mapping
+        await supabase
+          .from('looplly_user_auth_mapping')
+          .insert({
+            looplly_user_id: profile.user_id,
+            supabase_auth_id: supabaseAuthId,
+            mobile: normalizedMobile,
+            country_code: profile.country_code
+          });
+      }
+    }
+    
+    // Generate Supabase session if auth user exists
+    let supabaseSession = null;
+    if (supabaseAuthId) {
+      const { data: sessionData, error: sessionError } = await supabase.auth.admin.generateLink({
+        type: 'magiclink',
+        email: `${profile.user_id}@looplly.mobile`
+      });
+      
+      if (!sessionError && sessionData) {
+        supabaseSession = {
+          access_token: sessionData.properties.action_link,
+          refresh_token: sessionData.properties.action_link,
+          expires_in: 3600
+        };
+      }
+    }
+    
     // Generate custom JWT token
     const JWT_SECRET = Deno.env.get('LOOPLLY_JWT_SECRET') || 'dev-secret-change-in-production';
     const key = await crypto.subtle.importKey(
@@ -82,7 +144,8 @@ serve(async (req) => {
       mobile: profile.mobile,
       iat: Math.floor(Date.now() / 1000),
       exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24), // 24 hours
-      user_type: 'looplly_user'
+      user_type: 'looplly_user',
+      supabase_auth_id: supabaseAuthId
     };
     
     const token = await create({ alg: 'HS256', typ: 'JWT' }, payload, key);
@@ -93,6 +156,8 @@ serve(async (req) => {
       JSON.stringify({
         success: true,
         token,
+        supabase_session: supabaseSession,
+        supabase_auth_id: supabaseAuthId,
         user: {
           id: profile.user_id,
           mobile: profile.mobile,
