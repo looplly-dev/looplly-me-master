@@ -30,6 +30,7 @@ import { AddQuestionWizard } from '@/components/admin/questions/AddQuestionWizar
 import { QuestionDetailModal } from '@/components/admin/questions/QuestionDetailModal';
 import { QuestionPreviewModal } from '@/components/admin/questions/QuestionPreviewModal';
 import { SurveyJsBuilder } from '@/components/admin/questions/SurveyJsBuilder';
+import { CategoryManagement } from '@/components/admin/categories/CategoryManagement';
 
 function AdminQuestionsContent() {
   const { isSuperAdmin } = useRole();
@@ -115,10 +116,11 @@ function AdminQuestionsContent() {
       </div>
 
       <Tabs defaultValue="1" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="1">Level 1 (Registration)</TabsTrigger>
           <TabsTrigger value="2">Level 2 (Dashboard Modal)</TabsTrigger>
           <TabsTrigger value="3">Level 3 (Progressive)</TabsTrigger>
+          <TabsTrigger value="categories">Categories</TabsTrigger>
         </TabsList>
 
         <TabsContent value="1" className="space-y-4 mt-6">
@@ -430,6 +432,10 @@ function AdminQuestionsContent() {
           )}
             </>
           )}
+        </TabsContent>
+
+        <TabsContent value="categories" className="space-y-4 mt-6">
+          <CategoryManagement />
         </TabsContent>
       </Tabs>
 
