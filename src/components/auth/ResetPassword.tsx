@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
-import { CheckCircle2, AlertCircle } from 'lucide-react';
+import { CheckCircle2, AlertCircle, Shield } from 'lucide-react';
 
 const passwordSchema = z
   .string()
@@ -23,6 +23,7 @@ export default function ResetPassword() {
   const [confirm, setConfirm] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [recoveryReady, setRecoveryReady] = useState(false);
+  const [isAdminUser, setIsAdminUser] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -40,7 +41,7 @@ export default function ResetPassword() {
       setRecoveryReady(hasSession);
       
       if (hasSession && data.session.user) {
-        // Check if this is a team member - redirect to admin reset page if so
+        // Check if this is a team member
         const { data: teamProfile } = await supabase
           .from('team_profiles')
           .select('user_id')
@@ -48,7 +49,9 @@ export default function ResetPassword() {
           .maybeSingle();
         
         if (teamProfile) {
-          // Redirect to admin reset page for team members
+          // Mark as admin user for branding
+          setIsAdminUser(true);
+          // Also try to redirect to admin reset page
           navigate('/admin/reset-password');
           return;
         }
@@ -97,8 +100,20 @@ export default function ResetPassword() {
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <Card className="w-full max-w-md shadow-lg bg-card border">
         <CardHeader className="text-center pb-6">
-          <CardTitle className="text-2xl font-bold text-primary">Set a new password</CardTitle>
-          <p className="text-muted-foreground">Enter and confirm your new password</p>
+          {isAdminUser && (
+            <div className="mx-auto mb-4 w-16 h-16 bg-primary rounded-2xl flex items-center justify-center">
+              <Shield className="h-8 w-8 text-primary-foreground" />
+            </div>
+          )}
+          <CardTitle className="text-2xl font-bold text-primary">
+            {isAdminUser ? 'Set Your Admin Password' : 'Set a new password'}
+          </CardTitle>
+          <p className="text-muted-foreground">
+            {isAdminUser 
+              ? 'Admin Portal - Team Members Only' 
+              : 'Enter and confirm your new password'
+            }
+          </p>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
