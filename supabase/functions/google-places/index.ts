@@ -7,6 +7,7 @@ const corsHeaders = {
 
 interface AutocompleteRequest {
   query: string;
+  countryCode?: string; // ISO country code (e.g., "ZA", "NG", "US")
 }
 
 interface PlaceDetailsRequest {
@@ -30,7 +31,7 @@ serve(async (req) => {
     const endpoint = url.searchParams.get('endpoint') || 'autocomplete';
 
     if (endpoint === 'autocomplete') {
-      const { query } = await req.json() as AutocompleteRequest;
+      const { query, countryCode } = await req.json() as AutocompleteRequest;
       
       if (!query) {
         return new Response(
@@ -39,17 +40,23 @@ serve(async (req) => {
         );
       }
 
-      const response = await fetch(
-        `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(query)}&key=${apiKey}`
-      );
+      // Build API URL with country restriction
+      let apiUrl = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(query)}&key=${apiKey}`;
+      
+      // Add country filter if provided (restricts results to specific country)
+      if (countryCode) {
+        apiUrl += `&components=country:${countryCode.toLowerCase()}`;
+        console.log(`[GOOGLE-PLACES] Restricting autocomplete to country: ${countryCode}`);
+      }
 
+      const response = await fetch(apiUrl);
       const data = await response.json();
 
       return new Response(
         JSON.stringify(data),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
-    } 
+    }
     
     else if (endpoint === 'details') {
       const { placeId } = await req.json() as PlaceDetailsRequest;

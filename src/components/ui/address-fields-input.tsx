@@ -2,16 +2,19 @@ import { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Loader2, CheckCircle2 } from 'lucide-react';
+import { MapPin, Loader2, AlertCircle } from 'lucide-react';
 import { useAddressAutocomplete } from '@/hooks/useAddressAutocomplete';
 import { cn } from '@/lib/utils';
 import type { AddressComponents } from '@/services/googlePlacesService';
+import { getCountryNameFromDialCode, getCountryFlagFromDialCode, getISOFromDialCode } from '@/utils/countries';
+import { toast } from 'sonner';
 
 interface AddressFieldsInputProps {
   value?: Partial<AddressComponents>;
   onChange?: (address: AddressComponents) => void;
   disabled?: boolean;
   className?: string;
+  userCountryCode?: string; // e.g., "+27"
 }
 
 export const AddressFieldsInput = ({
@@ -19,9 +22,16 @@ export const AddressFieldsInput = ({
   onChange,
   disabled,
   className,
+  userCountryCode,
 }: AddressFieldsInputProps) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
+  
+  // Derive country info from userCountryCode
+  const userCountryName = userCountryCode ? getCountryNameFromDialCode(userCountryCode) : '';
+  const userCountryISO = userCountryCode ? getISOFromDialCode(userCountryCode) : '';
+  const userCountryFlag = userCountryCode ? getCountryFlagFromDialCode(userCountryCode) : '🌍';
+  
   const [addressFields, setAddressFields] = useState<Partial<AddressComponents>>({
     street_number: value?.street_number || '',
     route: value?.route || '',
@@ -29,7 +39,7 @@ export const AddressFieldsInput = ({
     locality: value?.locality || '',
     administrative_area_level_2: value?.administrative_area_level_2 || '',
     administrative_area_level_1: value?.administrative_area_level_1 || '',
-    country: value?.country || '',
+    country: userCountryName || value?.country || '', // FORCED from profile
     postal_code: value?.postal_code || '',
   });
   
@@ -44,7 +54,7 @@ export const AddressFieldsInput = ({
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       if (searchQuery && searchQuery.length >= 3) {
-        searchAddress(searchQuery);
+        searchAddress(searchQuery, userCountryISO); // Pass ISO code for filtering
         setShowSuggestions(true);
       } else {
         setShowSuggestions(false);
@@ -52,29 +62,53 @@ export const AddressFieldsInput = ({
     }, 500);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [searchQuery]);
+  }, [searchQuery, userCountryISO]);
 
   const handleSelectSuggestion = async (suggestion: any) => {
-    const address = await selectPlace(suggestion.place_id);
-    if (address) {
-      setAddressFields({
-        street_number: address.street_number,
-        route: address.route,
-        sublocality: address.sublocality,
-        locality: address.locality,
-        administrative_area_level_2: address.administrative_area_level_2,
-        administrative_area_level_1: address.administrative_area_level_1,
-        country: address.country,
-        postal_code: address.postal_code,
-      });
-      setSearchQuery('');
-      setShowSuggestions(false);
-      onChange?.(address);
+    try {
+      const address = await selectPlace(suggestion.place_id, userCountryName);
+      
+      if (address) {
+        // Force country to match profile (even if API returns different)
+        const forcedAddress = {
+          ...address,
+          country: userCountryName // FORCED
+        };
+        
+        setAddressFields({
+          street_number: forcedAddress.street_number,
+          route: forcedAddress.route,
+          sublocality: forcedAddress.sublocality,
+          locality: forcedAddress.locality,
+          administrative_area_level_2: forcedAddress.administrative_area_level_2,
+          administrative_area_level_1: forcedAddress.administrative_area_level_1,
+          country: userCountryName, // FORCED
+          postal_code: forcedAddress.postal_code,
+        });
+        
+        setSearchQuery('');
+        setShowSuggestions(false);
+        onChange?.(forcedAddress);
+      }
+    } catch (error) {
+      // Show error toast if country validation fails
+      toast.error(error instanceof Error ? error.message : 'Invalid address selection');
+      console.error('Address selection error:', error);
     }
   };
 
   const handleFieldChange = (field: keyof AddressComponents, fieldValue: string) => {
-    const updated = { ...addressFields, [field]: fieldValue };
+    // Block changes to country field - it's immutable
+    if (field === 'country') {
+      console.warn('Country field is immutable and matches mobile verification country');
+      return;
+    }
+    
+    const updated = { 
+      ...addressFields, 
+      [field]: fieldValue,
+      country: userCountryName // Always enforce profile country
+    };
     setAddressFields(updated);
     
     // Notify parent with updated address components
@@ -274,18 +308,33 @@ export const AddressFieldsInput = ({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="country" className="text-sm flex items-center gap-2">
+              <Label className="text-sm flex items-center gap-2">
+                <MapPin className="h-3 w-3" />
                 Country
-                <Badge variant="outline" className="text-[10px] font-normal">Optional</Badge>
+                <Badge variant="secondary" className="text-[10px] font-normal">Auto-Detected</Badge>
               </Label>
-              <Input
-                id="country"
-                value={addressFields.country || ''}
-                onChange={(e) => handleFieldChange('country', e.target.value)}
-                placeholder="Enter country"
-                disabled={disabled}
-                className="text-sm"
-              />
+              
+              {userCountryName ? (
+                <div className="flex items-center gap-3 px-4 py-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg border-2 border-blue-200 dark:border-blue-800">
+                  <span className="text-3xl">{userCountryFlag}</span>
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold text-blue-900 dark:text-blue-100">
+                      {userCountryName}
+                    </p>
+                    <p className="text-xs text-blue-700 dark:text-blue-300 flex items-center gap-1">
+                      <AlertCircle className="h-3 w-3" />
+                      Based on your mobile number - Address must be in this country
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 px-4 py-3 bg-destructive/10 rounded-lg border-2 border-destructive/50">
+                  <AlertCircle className="h-4 w-4 text-destructive" />
+                  <p className="text-sm text-destructive font-medium">
+                    Country not detected. Please contact support.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
 

@@ -53,3 +53,23 @@ export const getDialCodeFromISO = (isoCode: string): string | undefined => {
   const country = getCountryByCode(isoCode);
   return country?.dialCode;
 };
+
+/**
+ * Get country name from dial code
+ * @param dialCode - e.g., "+27", "+234", "+44"
+ * @returns Country name - e.g., "South Africa"
+ */
+export const getCountryNameFromDialCode = (dialCode: string): string => {
+  const country = countries.find(c => c.dialCode === dialCode);
+  return country?.name || '';
+};
+
+/**
+ * Get country flag emoji from dial code
+ * @param dialCode - e.g., "+27"
+ * @returns Flag emoji - e.g., "🇿🇦"
+ */
+export const getCountryFlagFromDialCode = (dialCode: string): string => {
+  const country = countries.find(c => c.dialCode === dialCode);
+  return country?.flag || '🌍';
+};

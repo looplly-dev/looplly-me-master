@@ -51,11 +51,11 @@ class GooglePlacesService {
   /**
    * Search for places (autocomplete)
    */
-  public async searchPlaces(query: string): Promise<any[]> {
+  public async searchPlaces(query: string, countryCode?: string): Promise<any[]> {
     if (this.isMockMode()) {
-      return this.mockSearchPlaces(query);
+      return this.mockSearchPlaces(query, countryCode);
     }
-    return this.realSearchPlaces(query);
+    return this.realSearchPlaces(query, countryCode);
   }
 
   /**
@@ -121,13 +121,22 @@ class GooglePlacesService {
 
   // ============ MOCK IMPLEMENTATIONS ============
 
-  private mockSearchPlaces(query: string): Promise<any[]> {
+  private mockSearchPlaces(query: string, countryCode?: string): Promise<any[]> {
     return new Promise((resolve) => {
       setTimeout(() => {
-        const results = mockPlacesData.mockAutocompleteResults.filter((place) =>
+        let results = mockPlacesData.mockAutocompleteResults.filter((place) =>
           place.description.toLowerCase().includes(query.toLowerCase())
         );
-        console.log('🎭 Using MOCK Google Places Autocomplete:', results.length, 'results');
+        
+        // Filter by country if specified (for mock data consistency)
+        if (countryCode) {
+          const countryName = this.getCountryNameFromCode(countryCode);
+          results = results.filter(place => 
+            place.description.toLowerCase().includes(countryName.toLowerCase())
+          );
+        }
+        
+        console.log(`🎭 Using MOCK Google Places Autocomplete (country: ${countryCode || 'all'}):`, results.length, 'results');
         resolve(results);
       }, 300); // Simulate network delay
     });
@@ -145,10 +154,13 @@ class GooglePlacesService {
 
   // ============ REAL API IMPLEMENTATIONS ============
 
-  private async realSearchPlaces(query: string): Promise<any[]> {
+  private async realSearchPlaces(query: string, countryCode?: string): Promise<any[]> {
     try {
       const { data, error } = await supabase.functions.invoke('google-places', {
-        body: { query },
+        body: { 
+          query,
+          countryCode // Pass country restriction
+        },
         method: 'POST',
       });
 
@@ -157,12 +169,28 @@ class GooglePlacesService {
         throw error;
       }
 
-      console.log('🌍 Using REAL Google Places Autocomplete:', data.predictions?.length || 0, 'results');
+      console.log(`🌍 Using REAL Google Places Autocomplete (country: ${countryCode || 'all'}):`, data.predictions?.length || 0, 'results');
       return data.predictions || [];
     } catch (error) {
       console.error('Google Places Autocomplete error:', error);
       throw error;
     }
+  }
+
+  private getCountryNameFromCode(code: string): string {
+    const countryMap: Record<string, string> = {
+      'ZA': 'South Africa',
+      'NG': 'Nigeria',
+      'US': 'United States',
+      'GB': 'United Kingdom',
+      'KE': 'Kenya',
+      'GH': 'Ghana',
+      'UG': 'Uganda',
+      'TZ': 'Tanzania',
+      'ZW': 'Zimbabwe',
+      'BW': 'Botswana',
+    };
+    return countryMap[code.toUpperCase()] || '';
   }
 
   private async realGetPlaceDetails(placeId: string): Promise<PlaceResult | null> {

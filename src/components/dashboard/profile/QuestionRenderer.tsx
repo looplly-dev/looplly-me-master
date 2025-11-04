@@ -40,6 +40,9 @@ export function QuestionRenderer({ question, onAnswerChange, onAddressChange, di
     isValid: false 
   });
 
+  // Address question specific state
+  const [userCountryCode, setUserCountryCode] = useState<string>('');
+
   const isLocked = question.is_immutable && !!question.user_answer?.answer_value;
   
   // Calculate days until expiry
@@ -74,6 +77,24 @@ export function QuestionRenderer({ question, onAnswerChange, onAddressChange, di
       fetchMinimumAge();
     }
   }, [question.question_key, authState.user?.id]);
+  
+  // Fetch user's country code for address questions
+  useEffect(() => {
+    if (question.question_type === 'address' && authState.user?.id) {
+      const fetchCountryCode = async () => {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('country_code')
+          .eq('user_id', authState.user!.id)
+          .single();
+
+        if (profile?.country_code) {
+          setUserCountryCode(profile.country_code);
+        }
+      };
+      fetchCountryCode();
+    }
+  }, [question.question_type, authState.user?.id]);
   
   // Validate phone number when value or country code changes
   useEffect(() => {
@@ -282,6 +303,7 @@ export function QuestionRenderer({ question, onAnswerChange, onAddressChange, di
               }
             }}
             disabled={disabled || isLocked}
+            userCountryCode={userCountryCode}
           />
         );
 

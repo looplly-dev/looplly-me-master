@@ -11,7 +11,7 @@ export const useAddressAutocomplete = () => {
     setIsMockMode(googlePlacesService.isMockMode());
   }, []);
 
-  const searchAddress = async (query: string) => {
+  const searchAddress = async (query: string, countryCode?: string) => {
     if (!query || query.length < 3) {
       setSuggestions([]);
       return;
@@ -19,7 +19,7 @@ export const useAddressAutocomplete = () => {
 
     setIsLoading(true);
     try {
-      const results = await googlePlacesService.searchPlaces(query);
+      const results = await googlePlacesService.searchPlaces(query, countryCode);
       setSuggestions(results);
     } catch (error) {
       console.error('Address search error:', error);
@@ -29,17 +29,24 @@ export const useAddressAutocomplete = () => {
     }
   };
 
-  const selectPlace = async (placeId: string) => {
+  const selectPlace = async (placeId: string, expectedCountryName?: string) => {
     setIsLoading(true);
     try {
       const placeDetails = await googlePlacesService.getPlaceDetails(placeId);
       if (placeDetails) {
         const parsedAddress = googlePlacesService.parseAddressComponents(placeDetails);
+        
+        // Validate country matches expected country
+        if (expectedCountryName && parsedAddress.country !== expectedCountryName) {
+          throw new Error(`Address must be in ${expectedCountryName}. Selected address is in ${parsedAddress.country}.`);
+        }
+        
         setSelectedAddress(parsedAddress);
         return parsedAddress;
       }
     } catch (error) {
       console.error('Place selection error:', error);
+      throw error; // Re-throw to be handled by caller
     } finally {
       setIsLoading(false);
     }
