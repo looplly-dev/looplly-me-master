@@ -1,18 +1,17 @@
 /**
- * Dummy Email Service
- * TODO: Replace with actual email service (Resend, SendGrid, etc.)
+ * Email Service
+ * Note: Password reset emails are handled by Supabase Auth's built-in email system.
+ * This service is for other application emails only.
  */
 
 export const sendPasswordResetEmail = async (email: string, resetLink: string) => {
-  console.log('📧 [MOCK] Password reset email would be sent to:', email);
-  console.log('🔗 [MOCK] Reset link:', resetLink);
-  
-  // Simulate email sending delay
-  await new Promise(resolve => setTimeout(resolve, 500));
+  // Password resets are now handled by Supabase Auth
+  // This function is kept for backward compatibility but does nothing
+  console.log('📧 [INFO] Password reset handled by Supabase Auth for:', email);
   
   return {
     success: true,
-    messageId: `mock-${Date.now()}`,
+    messageId: `supabase-auth-${Date.now()}`,
   };
 };
 

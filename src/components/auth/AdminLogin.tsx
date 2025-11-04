@@ -206,6 +206,7 @@ export default function AdminLogin() {
                 type="button"
                 variant="ghost"
                 className="text-muted-foreground"
+                disabled={isSubmitting}
                 onClick={async () => {
                   if (!formData.email) {
                     toast({
@@ -214,6 +215,10 @@ export default function AdminLogin() {
                     });
                     return;
                   }
+                  
+                  // Prevent double submission
+                  if (isSubmitting) return;
+                  
                   setIsSubmitting(true);
                   try {
                     const ok = await forgotPassword(formData.email);
