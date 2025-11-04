@@ -280,6 +280,9 @@ export function AddQuestionWizard({ open, onClose, defaultLevel, editQuestion }:
     // Clear previous errors
     setValidationErrors([]);
     
+    // Sync options state with form before validation
+    form.setValue('options', options);
+    
     // Trigger validation
     const isValid = await form.trigger();
     
@@ -346,13 +349,17 @@ export function AddQuestionWizard({ open, onClose, defaultLevel, editQuestion }:
   const addOption = () => {
     if (newOptionLabel.trim()) {
       const value = newOptionLabel.toLowerCase().replace(/\s+/g, '_');
-      setOptions([...options, { label: newOptionLabel, value }]);
+      const updatedOptions = [...options, { label: newOptionLabel, value }];
+      setOptions(updatedOptions);
+      form.setValue('options', updatedOptions); // Sync with form
       setNewOptionLabel('');
     }
   };
 
   const removeOption = (index: number) => {
-    setOptions(options.filter((_, i) => i !== index));
+    const updatedOptions = options.filter((_, i) => i !== index);
+    setOptions(updatedOptions);
+    form.setValue('options', updatedOptions); // Sync with form
   };
 
   const handleAIGenerateText = async () => {
@@ -414,7 +421,9 @@ export function AddQuestionWizard({ open, onClose, defaultLevel, editQuestion }:
       
       if (data?.options && Array.isArray(data.options)) {
         const nonEmptyOptions = options.filter(opt => opt.label?.trim() || opt.value?.trim());
-        setOptions([...nonEmptyOptions, ...data.options]);
+        const updatedOptions = [...nonEmptyOptions, ...data.options];
+        setOptions(updatedOptions);
+        form.setValue('options', updatedOptions); // Sync with form
         toast.success(`Added ${data.options.length} AI-generated options!`);
       }
     } catch (error: any) {
