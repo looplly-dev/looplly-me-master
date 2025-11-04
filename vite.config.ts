@@ -30,7 +30,8 @@ export default defineConfig(({ mode }) => ({
           ui: ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu'],
           router: ['react-router-dom'],
           query: ['@tanstack/react-query'],
-          utils: ['clsx', 'tailwind-merge', 'class-variance-authority']
+          utils: ['clsx', 'tailwind-merge', 'class-variance-authority'],
+          surveyjs: ['survey-core', 'survey-creator-core', 'survey-creator-react', 'survey-react-ui']
         },
         // Optimize chunk names
         chunkFileNames: 'assets/js/[name]-[hash].js',
@@ -56,7 +57,11 @@ export default defineConfig(({ mode }) => ({
       '@tanstack/react-query',
       'lucide-react',
       'clsx',
-      'tailwind-merge'
+      'tailwind-merge',
+      'survey-core',
+      'survey-creator-core',
+      'survey-creator-react',
+      'survey-react-ui'
     ]
   },
   // Preview optimization
