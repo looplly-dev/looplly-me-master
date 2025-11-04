@@ -11,10 +11,6 @@ import {
   getDefaultSurveyJson 
 } from '@/utils/surveyJsMapper';
 
-// Import SurveyJS styles
-import 'survey-core/survey.core.css';
-import 'survey-creator-core/survey-creator-core.css';
-
 interface Category {
   id: string;
   name: string;
