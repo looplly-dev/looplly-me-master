@@ -1,5 +1,8 @@
 project_id = "kzqcfrubjccxrwfkkrze"
 
+[functions.google-places]
+verify_jwt = false
+
 [functions.seed-documentation]
 verify_jwt = false
 
