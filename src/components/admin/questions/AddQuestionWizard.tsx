@@ -285,16 +285,31 @@ export function AddQuestionWizard({ open, onClose, defaultLevel, editQuestion }:
     
     if (!isValid) {
       const errors = form.formState.errors;
-      const errorFields: string[] = [];
       
-      // Collect error messages
-      if (errors.question_text) errorFields.push('Question Text');
-      if (errors.question_type) errorFields.push('Question Type');
-      if (errors.question_key) errorFields.push('Question Key');
-      if (errors.category_id) errorFields.push('Category');
-      if (errors.decay_config_key) errorFields.push('Decay Configuration');
-      if (errors.level) errorFields.push('Level');
-      if (errors.applicability) errorFields.push('Applicability');
+      // Field name mapping for user-friendly labels
+      const fieldLabels: Record<string, string> = {
+        question_type: 'Question Type',
+        question_text: 'Question Text',
+        question_key: 'Question Key',
+        help_text: 'Help Text',
+        placeholder: 'Placeholder',
+        category_id: 'Category',
+        level: 'Level',
+        decay_config_key: 'Decay Configuration',
+        applicability: 'Applicability',
+        country_codes: 'Country Codes',
+      };
+      
+      // Dynamically collect all error fields
+      const errorFields = Object.keys(errors).map(key => 
+        fieldLabels[key] || key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+      );
+      
+      // Dev mode logging
+      if (import.meta.env.DEV) {
+        console.log('Form validation errors:', errors);
+        console.log('Missing fields:', errorFields);
+      }
       
       // Set errors for inline display
       setValidationErrors(errorFields);
@@ -306,7 +321,11 @@ export function AddQuestionWizard({ open, onClose, defaultLevel, editQuestion }:
         setActiveTab('assignment');
       }
       
-      toast.error(`Please fix the following fields: ${errorFields.join(', ')}`);
+      const errorMessage = errorFields.length > 0 
+        ? `Please fix the following fields: ${errorFields.join(', ')}`
+        : 'Please check all required fields and try again';
+      
+      toast.error(errorMessage);
       return;
     }
     
