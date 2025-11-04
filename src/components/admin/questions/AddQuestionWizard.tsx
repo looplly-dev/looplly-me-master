@@ -83,6 +83,7 @@ export function AddQuestionWizard({ open, onClose, defaultLevel, editQuestion }:
   const [newOptionLabel, setNewOptionLabel] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [previewDevice, setPreviewDevice] = useState<'mobile' | 'tablet' | 'desktop'>('desktop');
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const queryClient = useQueryClient();
   const isEditMode = !!editQuestion;
 
@@ -271,10 +272,14 @@ export function AddQuestionWizard({ open, onClose, defaultLevel, editQuestion }:
     setActiveTab('edit');
     setOptions([]);
     setNewOptionLabel('');
+    setValidationErrors([]);
     onClose();
   };
 
   const handleSubmit = async () => {
+    // Clear previous errors
+    setValidationErrors([]);
+    
     // Trigger validation
     const isValid = await form.trigger();
     
@@ -291,6 +296,9 @@ export function AddQuestionWizard({ open, onClose, defaultLevel, editQuestion }:
       if (errors.level) errorFields.push('Level');
       if (errors.applicability) errorFields.push('Applicability');
       
+      // Set errors for inline display
+      setValidationErrors(errorFields);
+      
       // Navigate to first tab with error
       if (errors.question_text || errors.question_type || errors.question_key || errors.help_text || errors.placeholder) {
         setActiveTab('edit');
@@ -304,7 +312,9 @@ export function AddQuestionWizard({ open, onClose, defaultLevel, editQuestion }:
     
     // Additional validation for select types
     if (isSelectType && options.length === 0) {
-      toast.error('Please add at least one option for select/multi-select questions');
+      const errorMsg = 'Please add at least one option for select/multi-select questions';
+      setValidationErrors([errorMsg]);
+      toast.error(errorMsg);
       setActiveTab('options');
       return;
     }
@@ -1041,7 +1051,21 @@ export function AddQuestionWizard({ open, onClose, defaultLevel, editQuestion }:
           </Tabs>
         </Form>
 
-        <DialogFooter className="flex justify-between items-center">
+        {validationErrors.length > 0 && (
+          <Alert variant="destructive" className="mt-4">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertTitle>Please fix the following fields:</AlertTitle>
+            <AlertDescription>
+              <ul className="list-disc list-inside">
+                {validationErrors.map((error, index) => (
+                  <li key={index}>{error}</li>
+                ))}
+              </ul>
+            </AlertDescription>
+          </Alert>
+        )}
+
+        <DialogFooter className="flex justify-between items-center mt-4">
           <Button type="button" variant="ghost" onClick={handleClose}>
             Cancel
           </Button>
