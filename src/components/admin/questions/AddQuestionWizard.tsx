@@ -20,7 +20,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Trash2, Save, AlertTriangle, Sparkles, Smartphone, Monitor, Tablet } from 'lucide-react';
+import { Plus, Trash2, Save, AlertTriangle, Sparkles, Smartphone, Monitor, Tablet, Eye, Settings, Pencil } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -496,9 +496,49 @@ export function AddQuestionWizard({ open, onClose, defaultLevel, editQuestion }:
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>
-            {isEditMode ? `Edit Question: ${editQuestion.question_text}` : defaultLevel ? `Add Level ${defaultLevel} Question` : 'Add New Question'}
-          </DialogTitle>
+          <div className="flex items-center justify-between">
+            <DialogTitle>
+              {isEditMode ? `Edit Question: ${editQuestion.question_text}` : defaultLevel ? `Add Level ${defaultLevel} Question` : 'Add New Question'}
+            </DialogTitle>
+            <div className="flex items-center gap-1">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => setActiveTab('edit')}
+                className={cn(
+                  "h-8 w-8 p-0",
+                  activeTab === 'edit' && "bg-primary/20"
+                )}
+              >
+                <Pencil className="h-4 w-4" />
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => setActiveTab('assignment')}
+                className={cn(
+                  "h-8 w-8 p-0",
+                  activeTab === 'assignment' && "bg-primary/20"
+                )}
+              >
+                <Settings className="h-4 w-4" />
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => setActiveTab('preview')}
+                className={cn(
+                  "h-8 w-8 p-0",
+                  activeTab === 'preview' && "bg-primary/20"
+                )}
+              >
+                <Eye className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
         </DialogHeader>
 
         {validationErrors.length > 0 && (
