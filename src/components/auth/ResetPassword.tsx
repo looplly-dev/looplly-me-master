@@ -51,9 +51,6 @@ export default function ResetPassword() {
         if (teamProfile) {
           // Mark as admin user for branding
           setIsAdminUser(true);
-          // Also try to redirect to admin reset page
-          navigate('/admin/reset-password');
-          return;
         }
       }
       
