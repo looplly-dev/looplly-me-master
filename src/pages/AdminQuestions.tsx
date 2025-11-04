@@ -27,6 +27,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { QuestionInlineCard } from '@/components/admin/questions/QuestionInlineCard';
 import { CountryOptionsDialog } from '@/components/admin/questions/CountryOptionsDialog';
 import { AddQuestionWizard } from '@/components/admin/questions/AddQuestionWizard';
+import { QuestionDetailModal } from '@/components/admin/questions/QuestionDetailModal';
 
 function AdminQuestionsContent() {
   const { isSuperAdmin } = useRole();
@@ -34,6 +35,9 @@ function AdminQuestionsContent() {
   const [showAddWizard, setShowAddWizard] = useState(false);
   const [selectedLevel, setSelectedLevel] = useState<number | null>(null);
   const [showDrafts, setShowDrafts] = useState(false);
+  const [selectedQuestion, setSelectedQuestion] = useState<any>(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [editQuestion, setEditQuestion] = useState<any>(null);
 
   // Fetch all data in one query
   const { data: questionsData, isLoading } = useQuery({
@@ -160,6 +164,14 @@ function AdminQuestionsContent() {
                     question={question}
                     decayLabel={getDecayLabel(question)}
                     onManageCountries={() => setCountryOptionsQuestion(question)}
+                    onSettings={() => {
+                      setSelectedQuestion(question);
+                      setShowDetailModal(true);
+                    }}
+                    onEdit={() => {
+                      setEditQuestion(question);
+                      setShowAddWizard(true);
+                    }}
                     isEditable={isSuperAdmin()}
                   />
                 ))}
@@ -237,6 +249,14 @@ function AdminQuestionsContent() {
                     question={question}
                     decayLabel={getDecayLabel(question)}
                     onManageCountries={() => setCountryOptionsQuestion(question)}
+                    onSettings={() => {
+                      setSelectedQuestion(question);
+                      setShowDetailModal(true);
+                    }}
+                    onEdit={() => {
+                      setEditQuestion(question);
+                      setShowAddWizard(true);
+                    }}
                     isEditable={true}
                   />
                 ))}
@@ -291,6 +311,14 @@ function AdminQuestionsContent() {
                     question={question}
                     decayLabel={getDecayLabel(question)}
                     onManageCountries={() => setCountryOptionsQuestion(question)}
+                    onSettings={() => {
+                      setSelectedQuestion(question);
+                      setShowDetailModal(true);
+                    }}
+                    onEdit={() => {
+                      setEditQuestion(question);
+                      setShowAddWizard(true);
+                    }}
                     isEditable={true}
                   />
                 ))}
@@ -314,13 +342,23 @@ function AdminQuestionsContent() {
         />
       )}
 
+      {showDetailModal && selectedQuestion && (
+        <QuestionDetailModal
+          question={selectedQuestion}
+          open={showDetailModal}
+          onOpenChange={setShowDetailModal}
+        />
+      )}
+
       <AddQuestionWizard 
         open={showAddWizard} 
         onClose={() => {
           setShowAddWizard(false);
           setSelectedLevel(null);
+          setEditQuestion(null);
         }}
         defaultLevel={selectedLevel}
+        editQuestion={editQuestion}
       />
     </div>
   );

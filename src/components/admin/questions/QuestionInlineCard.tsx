@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Edit, Settings, Globe, MapPin, Eye, EyeOff } from 'lucide-react';
+import { Edit, Settings, Globe, MapPin, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useRole } from '@/hooks/useRole';
 import {
@@ -22,6 +22,8 @@ interface QuestionInlineCardProps {
   question: any;
   decayLabel: string;
   onManageCountries: () => void;
+  onSettings?: () => void;
+  onEdit?: () => void;
   isEditable?: boolean;
 }
 
@@ -55,6 +57,8 @@ export function QuestionInlineCard({
   question, 
   decayLabel,
   onManageCountries,
+  onSettings,
+  onEdit,
   isEditable = true
 }: QuestionInlineCardProps) {
   const { isSuperAdmin } = useRole();
@@ -105,12 +109,13 @@ export function QuestionInlineCard({
             <Badge variant="destructive">Required</Badge>
           )}
 
-          {question.is_draft && (
-            <Badge variant="secondary" className="bg-gray-200 text-gray-700 dark:bg-gray-800 dark:text-gray-300">
-              <EyeOff className="mr-1 h-3 w-3" />
-              Draft
-            </Badge>
-          )}
+          <Badge variant={question.is_draft ? "secondary" : "default"}>
+            {question.is_draft ? (
+              <><EyeOff className="mr-1 h-3 w-3" />Draft</>
+            ) : (
+              <><Eye className="mr-1 h-3 w-3" />Published</>
+            )}
+          </Badge>
           
           <Badge variant="outline">{decayLabel}</Badge>
         </div>
@@ -142,7 +147,12 @@ export function QuestionInlineCard({
             onClick={handlePublishClick}
             disabled={toggleDraftMutation.isPending}
           >
-            {question.is_draft ? (
+            {toggleDraftMutation.isPending ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                {question.is_draft ? "Publishing..." : "Unpublishing..."}
+              </>
+            ) : question.is_draft ? (
               <>
                 <Eye className="mr-2 h-4 w-4" />
                 Publish
@@ -164,18 +174,14 @@ export function QuestionInlineCard({
                 size="sm"
                 title="Quick Settings"
                 disabled={!isEditable}
+                onClick={onSettings}
               >
                 <Settings className="h-4 w-4" />
               </Button>
             </TooltipTrigger>
             {!isEditable && (
               <TooltipContent>
-                <p className="text-sm">
-                  {isSuperAdmin() 
-                    ? "Level 1 questions require Super Admin access" 
-                    : "Level 1 questions are locked (Super Admin only)"
-                  }
-                </p>
+                <p className="text-sm">Level 1 questions are locked (Super Admin only)</p>
               </TooltipContent>
             )}
           </Tooltip>
@@ -189,18 +195,14 @@ export function QuestionInlineCard({
                 size="sm"
                 title="Edit Question"
                 disabled={!isEditable}
+                onClick={onEdit}
               >
                 <Edit className="h-4 w-4" />
               </Button>
             </TooltipTrigger>
             {!isEditable && (
               <TooltipContent>
-                <p className="text-sm">
-                  {isSuperAdmin() 
-                    ? "Level 1 questions require Super Admin access" 
-                    : "Level 1 questions are locked (Super Admin only)"
-                  }
-                </p>
+                <p className="text-sm">Level 1 questions are locked (Super Admin only)</p>
               </TooltipContent>
             )}
           </Tooltip>

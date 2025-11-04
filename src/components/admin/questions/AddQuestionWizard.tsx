@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -71,17 +72,35 @@ interface AddQuestionWizardProps {
   open: boolean;
   onClose: () => void;
   defaultLevel?: number;
+  editQuestion?: any;
 }
 
-export function AddQuestionWizard({ open, onClose, defaultLevel }: AddQuestionWizardProps) {
+export function AddQuestionWizard({ open, onClose, defaultLevel, editQuestion }: AddQuestionWizardProps) {
   const [activeTab, setActiveTab] = useState('edit');
   const [options, setOptions] = useState<Array<{ label: string; value: string }>>([]);
   const [newOptionLabel, setNewOptionLabel] = useState('');
   const queryClient = useQueryClient();
+  const isEditMode = !!editQuestion;
 
+  // Pre-fill form when editing
   const form = useForm<QuestionFormData>({
     resolver: zodResolver(questionSchema),
-    defaultValues: {
+    defaultValues: isEditMode && editQuestion ? {
+      question_type: editQuestion.question_type || '',
+      question_text: editQuestion.question_text || '',
+      question_key: editQuestion.question_key || '',
+      help_text: editQuestion.help_text || '',
+      placeholder: editQuestion.placeholder || '',
+      is_required: editQuestion.is_required || false,
+      category_id: editQuestion.category_id || '',
+      level: editQuestion.level || defaultLevel || 2,
+      decay_config_key: editQuestion.decay_config_key || '',
+      applicability: editQuestion.applicability || 'global',
+      country_codes: editQuestion.country_codes || [],
+      options: editQuestion.options || [],
+      validation_rules: editQuestion.validation_rules || {},
+      is_draft: editQuestion.is_draft !== undefined ? editQuestion.is_draft : (defaultLevel === 2),
+    } : {
       question_type: '',
       question_text: '',
       question_key: '',
@@ -96,6 +115,13 @@ export function AddQuestionWizard({ open, onClose, defaultLevel }: AddQuestionWi
       is_draft: (defaultLevel === 2),
     },
   });
+
+  // Set options from editQuestion on mount
+  useEffect(() => {
+    if (isEditMode && editQuestion?.options && open) {
+      setOptions(Array.isArray(editQuestion.options) ? editQuestion.options : []);
+    }
+  }, [isEditMode, editQuestion, open]);
 
   const { data: categories } = useQuery({
     queryKey: ['profile_categories'],
@@ -124,34 +150,70 @@ export function AddQuestionWizard({ open, onClose, defaultLevel }: AddQuestionWi
 
   const createQuestionMutation = useMutation({
     mutationFn: async (data: QuestionFormData) => {
-      const { error } = await supabase.from('profile_questions').insert({
-        question_type: data.question_type,
-        question_text: data.question_text,
-        question_key: data.question_key,
-        help_text: data.help_text || null,
-        placeholder: data.placeholder || null,
-        is_required: data.is_required,
-        category_id: data.category_id,
-        level: data.level,
-        decay_config_key: data.decay_config_key,
-        applicability: data.applicability,
-        country_codes: data.applicability === 'country-specific' ? data.country_codes : null,
-        options: options.length > 0 ? options : null,
-        validation_rules: data.validation_rules || {},
-        is_active: true,
-        is_draft: data.is_draft,
-        display_order: 999,
-      });
-      if (error) throw error;
+      if (isEditMode) {
+        // Update existing question
+        const { error } = await supabase
+          .from('profile_questions')
+          .update({
+            question_type: data.question_type,
+            question_text: data.question_text,
+            question_key: data.question_key,
+            help_text: data.help_text || null,
+            placeholder: data.placeholder || null,
+            is_required: data.is_required,
+            category_id: data.category_id,
+            level: data.level,
+            decay_config_key: data.decay_config_key,
+            applicability: data.applicability,
+            country_codes: data.applicability === 'country-specific' ? data.country_codes : null,
+            options: options.length > 0 ? options : null,
+            validation_rules: data.validation_rules || {},
+            is_draft: data.is_draft,
+          })
+          .eq('id', editQuestion.id);
+        if (error) throw error;
+      } else {
+        // Check for duplicate question_key before creating
+        const { data: existing } = await supabase
+          .from('profile_questions')
+          .select('id')
+          .eq('question_key', data.question_key)
+          .single();
+        
+        if (existing) {
+          throw new Error(`Question with key "${data.question_key}" already exists`);
+        }
+
+        // Insert new question
+        const { error } = await supabase.from('profile_questions').insert({
+          question_type: data.question_type,
+          question_text: data.question_text,
+          question_key: data.question_key,
+          help_text: data.help_text || null,
+          placeholder: data.placeholder || null,
+          is_required: data.is_required,
+          category_id: data.category_id,
+          level: data.level,
+          decay_config_key: data.decay_config_key,
+          applicability: data.applicability,
+          country_codes: data.applicability === 'country-specific' ? data.country_codes : null,
+          options: options.length > 0 ? options : null,
+          validation_rules: data.validation_rules || {},
+          is_active: true,
+          is_draft: data.is_draft,
+          display_order: 999,
+        });
+        if (error) throw error;
+      }
     },
     onSuccess: () => {
-      toast.success('Question created successfully');
+      toast.success(isEditMode ? 'Question updated successfully' : 'Question created successfully');
       queryClient.invalidateQueries({ queryKey: ['profile_questions'] });
       queryClient.invalidateQueries({ queryKey: ['admin-questions-unified'] });
       handleClose();
     },
     onError: (error: any) => {
-      toast.error(`Failed to create question: ${error.message}`);
+      toast.error(`Failed to ${isEditMode ? 'update' : 'create'} question: ${error.message}`);
     },
   });
 
@@ -198,7 +260,7 @@ export function AddQuestionWizard({ open, onClose, defaultLevel }: AddQuestionWi
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {defaultLevel ? `Add Level ${defaultLevel} Question` : 'Add New Question'}
+            {isEditMode ? `Edit Question: ${editQuestion.question_text}` : defaultLevel ? `Add Level ${defaultLevel} Question` : 'Add New Question'}
           </DialogTitle>
         </DialogHeader>
 
@@ -655,7 +717,7 @@ export function AddQuestionWizard({ open, onClose, defaultLevel }: AddQuestionWi
             disabled={createQuestionMutation.isPending}
           >
             <Save className="mr-2 h-4 w-4" />
-            {createQuestionMutation.isPending ? 'Saving...' : 'Save Question'}
+            {createQuestionMutation.isPending ? (isEditMode ? 'Updating...' : 'Saving...') : (isEditMode ? 'Update Question' : 'Save Question')}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -91,10 +91,21 @@ export function QuestionDetailModal({ question, open, onOpenChange }: QuestionDe
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             {getQuestionTypeIcon(question.question_type)}
-            {question.question_text}
+            Question Details
           </DialogTitle>
-          <DialogDescription>
-            Full details and usage statistics for this question
+          <DialogDescription className="space-y-2">
+            <div className="font-medium text-foreground">{question.question_text}</div>
+            <div className="flex items-center gap-2 text-xs flex-wrap">
+              <Badge variant={question.is_draft ? "secondary" : "default"}>
+                {question.is_draft ? "Draft" : "Published"}
+              </Badge>
+              <Badge variant="outline">Level {question.level}</Badge>
+              <Badge variant="outline">{question.question_key}</Badge>
+              {question.short_id && <Badge variant="outline">ID: {question.short_id}</Badge>}
+              <Badge variant={question.is_active ? "default" : "secondary"}>
+                {question.is_active ? "Active" : "Inactive"}
+              </Badge>
+            </div>
           </DialogDescription>
         </DialogHeader>
 
@@ -123,20 +134,28 @@ export function QuestionDetailModal({ question, open, onOpenChange }: QuestionDe
 
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <span className="text-muted-foreground">Question Key:</span>
-                    <code className="ml-2 bg-muted px-2 py-1 rounded">{question.question_key}</code>
+                    <div className="text-muted-foreground">Type</div>
+                    <div className="font-medium">{question.question_type}</div>
                   </div>
                   <div>
-                    <span className="text-muted-foreground">Type:</span>
-                    <span className="ml-2 font-medium">{question.question_type}</span>
+                    <div className="text-muted-foreground">Category</div>
+                    <div className="font-medium">{question.profile_categories?.display_name || 'N/A'}</div>
                   </div>
                   <div>
-                    <span className="text-muted-foreground">Category:</span>
-                    <span className="ml-2 font-medium">{question.profile_categories?.display_name || 'N/A'}</span>
+                    <div className="text-muted-foreground">Display Order</div>
+                    <div className="font-medium">{question.display_order}</div>
                   </div>
                   <div>
-                    <span className="text-muted-foreground">Display Order:</span>
-                    <span className="ml-2 font-medium">{question.display_order}</span>
+                    <div className="text-muted-foreground">Required</div>
+                    <div className="font-medium">{question.is_required ? '✅ Yes' : '❌ No'}</div>
+                  </div>
+                  <div>
+                    <div className="text-muted-foreground">Applicability</div>
+                    <div className="font-medium">{question.applicability || 'global'}</div>
+                  </div>
+                  <div>
+                    <div className="text-muted-foreground">Decay Config</div>
+                    <div className="font-medium">{question.decay_config_key || 'None'}</div>
                   </div>
                 </div>
               </CardContent>
@@ -191,44 +210,55 @@ export function QuestionDetailModal({ question, open, onOpenChange }: QuestionDe
             )}
 
             {/* Options */}
-            {question.options && (
-              <Card>
-                <CardContent className="pt-6">
-                  <h3 className="font-semibold mb-4 flex items-center gap-2">
+            {question.options && Array.isArray(question.options) && question.options.length > 0 && (
+              <>
+                <Separator />
+                <div>
+                  <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
                     <Layers className="h-4 w-4" />
-                    Answer Options
+                    Answer Options ({question.options.length})
                   </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {(Array.isArray(question.options) ? question.options : []).map((option: string, idx: number) => (
-                      <Badge key={idx} variant="outline">{option}</Badge>
+                  <div className="grid grid-cols-2 gap-2">
+                    {question.options.map((opt: any, idx: number) => (
+                      <div key={idx} className="p-2 bg-muted rounded-md text-sm flex items-center gap-2">
+                        <span className="text-muted-foreground">#{idx + 1}</span>
+                        <span className="font-medium">{typeof opt === 'string' ? opt : opt.label || opt.value}</span>
+                      </div>
                     ))}
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </>
             )}
 
             {/* Country-Specific Options */}
             {countryOptions && countryOptions.length > 0 && (
-              <Card>
-                <CardContent className="pt-6">
-                  <h3 className="font-semibold mb-4 flex items-center gap-2">
+              <>
+                <Separator />
+                <div>
+                  <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
                     <MapPin className="h-4 w-4" />
-                    Country-Specific Options
+                    Country-Specific Options ({countryOptions.length} countries)
                   </h3>
                   <div className="space-y-3">
-                    {countryOptions.map((opt: any) => (
-                      <div key={opt.id}>
-                        <div className="font-medium text-sm mb-1">{opt.country_code}</div>
-                        <div className="flex flex-wrap gap-2">
-                          {(opt.options || []).map((option: string, idx: number) => (
-                            <Badge key={idx} variant="secondary">{option}</Badge>
-                          ))}
+                    {countryOptions.map((config: any) => (
+                      <div key={config.id} className="p-3 border rounded-md">
+                        <div className="font-medium mb-2 flex items-center gap-2">
+                          <Badge variant="outline">{config.country_code}</Badge>
+                          {config.is_fallback && (
+                            <Badge variant="secondary" className="text-xs">Fallback</Badge>
+                          )}
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          {Array.isArray(config.options) 
+                            ? config.options.slice(0, 5).map((o: any) => typeof o === 'string' ? o : o.label || o.value).join(', ') 
+                              + (config.options.length > 5 ? ` +${config.options.length - 5} more` : '')
+                            : 'No options'}
                         </div>
                       </div>
                     ))}
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </>
             )}
 
             {/* Validation Rules */}
@@ -246,25 +276,41 @@ export function QuestionDetailModal({ question, open, onOpenChange }: QuestionDe
               </Card>
             )}
 
-            {/* Help Text */}
-            {question.help_text && (
-              <Card>
-                <CardContent className="pt-6">
-                  <h3 className="font-semibold mb-2">Help Text</h3>
-                  <p className="text-sm text-muted-foreground italic">{question.help_text}</p>
-                </CardContent>
-              </Card>
+            {/* Help Text & Placeholder */}
+            {(question.help_text || question.placeholder) && (
+              <>
+                <Separator />
+                <div className="space-y-3">
+                  {question.help_text && (
+                    <div>
+                      <div className="text-sm font-medium mb-1">Help Text</div>
+                      <div className="text-sm text-muted-foreground p-2 bg-muted rounded-md">
+                        {question.help_text}
+                      </div>
+                    </div>
+                  )}
+                  {question.placeholder && (
+                    <div>
+                      <div className="text-sm font-medium mb-1">Placeholder</div>
+                      <div className="text-sm text-muted-foreground p-2 bg-muted rounded-md">
+                        {question.placeholder}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </>
             )}
 
-            {/* Placeholder */}
-            {question.placeholder && (
-              <Card>
-                <CardContent className="pt-6">
-                  <h3 className="font-semibold mb-2">Placeholder</h3>
-                  <p className="text-sm text-muted-foreground">{question.placeholder}</p>
-                </CardContent>
-              </Card>
-            )}
+            {/* Raw DB Data */}
+            <Separator />
+            <details className="space-y-2">
+              <summary className="text-sm font-semibold cursor-pointer hover:text-primary">
+                🔍 View Raw Database JSON
+              </summary>
+              <pre className="text-xs bg-muted p-3 rounded-md overflow-x-auto max-h-64 overflow-y-auto">
+                {JSON.stringify(question, null, 2)}
+              </pre>
+            </details>
           </div>
         </ScrollArea>
       </DialogContent>
