@@ -28,6 +28,7 @@ import { QuestionInlineCard } from '@/components/admin/questions/QuestionInlineC
 import { CountryOptionsDialog } from '@/components/admin/questions/CountryOptionsDialog';
 import { AddQuestionWizard } from '@/components/admin/questions/AddQuestionWizard';
 import { QuestionDetailModal } from '@/components/admin/questions/QuestionDetailModal';
+import { SurveyJsBuilder } from '@/components/admin/questions/SurveyJsBuilder';
 
 function AdminQuestionsContent() {
   const { isSuperAdmin } = useRole();
@@ -38,6 +39,8 @@ function AdminQuestionsContent() {
   const [selectedQuestion, setSelectedQuestion] = useState<any>(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [editQuestion, setEditQuestion] = useState<any>(null);
+  const [viewMode, setViewMode] = useState<'list' | 'visual'>('list');
+  const [visualBuilderLevel, setVisualBuilderLevel] = useState<number | null>(null);
 
   // Fetch all data in one query
   const { data: questionsData, isLoading } = useQuery({
@@ -146,7 +149,36 @@ function AdminQuestionsContent() {
             </AlertDescription>
           </Alert>
 
-          {groupQuestionsByCategory(1).map(category => (
+          <div className="flex items-center gap-2 mb-4">
+            <Button
+              variant={viewMode === 'list' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setViewMode('list')}
+            >
+              📋 List View
+            </Button>
+            <Button
+              variant={viewMode === 'visual' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => {
+                setViewMode('visual');
+                setVisualBuilderLevel(1);
+              }}
+              disabled={!isSuperAdmin()}
+            >
+              🎨 Visual Builder
+            </Button>
+          </div>
+
+          {viewMode === 'visual' && visualBuilderLevel === 1 ? (
+            <SurveyJsBuilder
+              level={1}
+              categories={groupQuestionsByCategory(1)}
+              onClose={() => setViewMode('list')}
+            />
+          ) : (
+            <>
+              {groupQuestionsByCategory(1).map(category => (
             <Card key={category.id}>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -185,6 +217,8 @@ function AdminQuestionsContent() {
               </CardContent>
             </Card>
           )}
+            </>
+          )}
         </TabsContent>
 
         <TabsContent value="2" className="space-y-4 mt-6">
@@ -210,13 +244,32 @@ function AdminQuestionsContent() {
           </Alert>
           
           <div className="flex items-center justify-between">
-            <Button 
-              variant={showDrafts ? "default" : "outline"}
-              size="sm"
-              onClick={() => setShowDrafts(prev => !prev)}
-            >
-              {showDrafts ? "Showing Drafts" : "Showing Published"}
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant={viewMode === 'list' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setViewMode('list')}
+              >
+                📋 List View
+              </Button>
+              <Button
+                variant={viewMode === 'visual' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => {
+                  setViewMode('visual');
+                  setVisualBuilderLevel(2);
+                }}
+              >
+                🎨 Visual Builder
+              </Button>
+              <Button 
+                variant={showDrafts ? "default" : "outline"}
+                size="sm"
+                onClick={() => setShowDrafts(prev => !prev)}
+              >
+                {showDrafts ? "Showing Drafts" : "Showing Published"}
+              </Button>
+            </div>
             
             <Button 
               variant="outline"
@@ -231,7 +284,15 @@ function AdminQuestionsContent() {
             </Button>
           </div>
 
-          {groupQuestionsByCategory(2, showDrafts).map(category => (
+          {viewMode === 'visual' && visualBuilderLevel === 2 ? (
+            <SurveyJsBuilder
+              level={2}
+              categories={groupQuestionsByCategory(2, showDrafts)}
+              onClose={() => setViewMode('list')}
+            />
+          ) : (
+            <>
+              {groupQuestionsByCategory(2, showDrafts).map(category => (
             <Card key={category.id}>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -270,6 +331,8 @@ function AdminQuestionsContent() {
               </CardContent>
             </Card>
           )}
+            </>
+          )}
         </TabsContent>
 
         <TabsContent value="3" className="space-y-4 mt-6">
@@ -281,7 +344,27 @@ function AdminQuestionsContent() {
             </AlertDescription>
           </Alert>
           
-          <div className="flex justify-end">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Button
+                variant={viewMode === 'list' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setViewMode('list')}
+              >
+                📋 List View
+              </Button>
+              <Button
+                variant={viewMode === 'visual' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => {
+                  setViewMode('visual');
+                  setVisualBuilderLevel(3);
+                }}
+              >
+                🎨 Visual Builder
+              </Button>
+            </div>
+            
             <Button 
               onClick={() => {
                 setSelectedLevel(3);
@@ -293,7 +376,15 @@ function AdminQuestionsContent() {
             </Button>
           </div>
 
-          {groupQuestionsByCategory(3).map(category => (
+          {viewMode === 'visual' && visualBuilderLevel === 3 ? (
+            <SurveyJsBuilder
+              level={3}
+              categories={groupQuestionsByCategory(3)}
+              onClose={() => setViewMode('list')}
+            />
+          ) : (
+            <>
+              {groupQuestionsByCategory(3).map(category => (
             <Card key={category.id}>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -331,6 +422,8 @@ function AdminQuestionsContent() {
                 No questions at this level yet
               </CardContent>
             </Card>
+          )}
+            </>
           )}
         </TabsContent>
       </Tabs>
