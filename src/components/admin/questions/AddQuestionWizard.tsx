@@ -1075,6 +1075,23 @@ export function AddQuestionWizard({ open, onClose, defaultLevel, editQuestion }:
                   </div>
                 </div>
 
+                {/* Debug info */}
+                {!form.watch('question_text') && (
+                  <Alert>
+                    <AlertTriangle className="h-4 w-4" />
+                    <AlertTitle>Preview Not Available</AlertTitle>
+                    <AlertDescription>
+                      <div className="space-y-1">
+                        <p>Question text is required to show a preview.</p>
+                        <p className="text-xs">
+                          Current values: Type: {form.watch('question_type') || 'none'}, 
+                          Text: {form.watch('question_text') ? 'filled' : 'empty'}
+                        </p>
+                      </div>
+                    </AlertDescription>
+                  </Alert>
+                )}
+
                 <div className="border rounded-lg p-6 bg-background">
                   <div
                     className={cn(
@@ -1084,7 +1101,7 @@ export function AddQuestionWizard({ open, onClose, defaultLevel, editQuestion }:
                       previewDevice === 'desktop' && "max-w-full"
                     )}
                   >
-                    {form.watch('question_text') ? (
+                    {form.watch('question_text') && form.watch('question_type') ? (
                       <QuestionRenderer
                         question={{
                           id: 'preview',
@@ -1115,8 +1132,22 @@ export function AddQuestionWizard({ open, onClose, defaultLevel, editQuestion }:
                         disabled={false}
                       />
                     ) : (
-                      <div className="text-center py-12 text-muted-foreground">
-                        <p>Fill in the question text to see a preview</p>
+                      <div className="text-center py-12 space-y-4">
+                        <div className="text-muted-foreground">
+                          <p className="text-lg font-medium">No Preview Available</p>
+                          <p className="text-sm mt-2">
+                            {!form.watch('question_type') && "Select a question type in the Edit tab"}
+                            {form.watch('question_type') && !form.watch('question_text') && "Add question text in the Edit tab"}
+                          </p>
+                        </div>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => setActiveTab('edit')}
+                        >
+                          <Pencil className="h-4 w-4 mr-2" />
+                          Go to Edit Tab
+                        </Button>
                       </div>
                     )}
                   </div>
