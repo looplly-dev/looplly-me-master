@@ -7,9 +7,9 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import AuthProvider from "./components/auth/AuthProvider";
 import { useAnalytics } from "./hooks/useAnalytics";
+import LoopllyApp from "./components/LoopllyApp";
 
-// Lazy load all pages for better performance
-const LoopllyApp = lazy(() => import("./components/LoopllyApp"));
+// Lazy load admin pages for better performance
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
 const AdminTeam = lazy(() => import("./pages/AdminTeam"));
 const AdminUsers = lazy(() => import("./pages/AdminUsers"));

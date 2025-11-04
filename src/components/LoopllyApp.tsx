@@ -5,9 +5,9 @@ import Login from './auth/Login';
 import Register from './auth/Register';
 import CommunicationPreferences from './auth/CommunicationPreferences';
 import ForgotPassword from './auth/ForgotPassword';
+import Earn from '@/pages/Earn';
 
-// Lazy load all user-facing pages
-const Earn = lazy(() => import('@/pages/Earn'));
+// Lazy load secondary user-facing pages
 const Wallet = lazy(() => import('@/pages/Wallet'));
 const Profile = lazy(() => import('@/pages/Profile'));
 const ProfileComplete = lazy(() => import('@/pages/ProfileComplete'));
