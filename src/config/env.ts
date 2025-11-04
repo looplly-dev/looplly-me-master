@@ -78,7 +78,7 @@ const envSchema = z.object({
   VITE_USE_MOCK_PLACES: z
     .string()
     .transform((val) => val === 'true')
-    .default('true'),
+    .default('false'),
 
   // Optional: AI Provider Configuration
   VITE_AI_PROVIDER_API_KEY: z
