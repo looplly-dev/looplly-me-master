@@ -254,30 +254,35 @@ export function AddQuestionWizard({ open, onClose, defaultLevel, editQuestion }:
     const questionKey = form.watch('question_key');
     const questionType = form.watch('question_type');
     
-    if (!questionKey || !questionType) {
-      toast.error('Please fill in question key and type first');
+    if (!questionKey) {
+      toast.error('Please fill in question key first');
       return;
     }
 
     setIsGenerating(true);
     try {
+      const body: any = { question_key: questionKey };
+      if (questionType) body.question_type = questionType;
+
       const { data, error } = await supabase.functions.invoke('generate-question-text', {
-        body: { question_key: questionKey, question_type: questionType }
+        body
       });
 
       if (error) throw error;
+      if (data?.error) throw new Error(data.error);
       
       if (data?.question_text) {
         form.setValue('question_text', data.question_text);
         toast.success('AI generated question text!');
       }
     } catch (error: any) {
-      if (error.message?.includes('Rate limit') || error.message?.includes('429')) {
+      const errorMsg = error.message || String(error);
+      if (errorMsg.includes('Rate limit') || errorMsg.includes('429')) {
         toast.error('⏸️ AI rate limit reached. Please wait a moment and try again.');
-      } else if (error.message?.includes('credits') || error.message?.includes('402')) {
+      } else if (errorMsg.includes('credits') || errorMsg.includes('402')) {
         toast.error('💳 AI credits depleted. Please add credits in Settings → Workspace → Usage.');
       } else {
-        toast.error('Failed to generate question text');
+        toast.error(`Failed to generate: ${errorMsg}`);
       }
     } finally {
       setIsGenerating(false);
@@ -323,30 +328,35 @@ export function AddQuestionWizard({ open, onClose, defaultLevel, editQuestion }:
     const questionKey = form.watch('question_key');
     const questionType = form.watch('question_type');
     
-    if (!questionKey || !questionType) {
-      toast.error('Please fill in question key and type first');
+    if (!questionKey) {
+      toast.error('Please fill in question key first');
       return;
     }
 
     setIsGenerating(true);
     try {
+      const body: any = { question_key: questionKey, type: 'help_text' };
+      if (questionType) body.question_type = questionType;
+
       const { data, error } = await supabase.functions.invoke('generate-question-text', {
-        body: { question_key: questionKey, question_type: questionType, type: 'help_text' }
+        body
       });
 
       if (error) throw error;
+      if (data?.error) throw new Error(data.error);
       
       if (data?.help_text) {
         form.setValue('help_text', data.help_text);
         toast.success('AI generated help text!');
       }
     } catch (error: any) {
-      if (error.message?.includes('Rate limit') || error.message?.includes('429')) {
+      const errorMsg = error.message || String(error);
+      if (errorMsg.includes('Rate limit') || errorMsg.includes('429')) {
         toast.error('⏸️ AI rate limit reached. Please wait a moment and try again.');
-      } else if (error.message?.includes('credits') || error.message?.includes('402')) {
+      } else if (errorMsg.includes('credits') || errorMsg.includes('402')) {
         toast.error('💳 AI credits depleted. Please add credits in Settings → Workspace → Usage.');
       } else {
-        toast.error('Failed to generate help text');
+        toast.error(`Failed to generate: ${errorMsg}`);
       }
     } finally {
       setIsGenerating(false);
@@ -394,10 +404,10 @@ export function AddQuestionWizard({ open, onClose, defaultLevel, editQuestion }:
                         variant="outline"
                         size="sm"
                         onClick={handleAIGenerateText}
-                        disabled={!form.watch('question_key') || !form.watch('question_type') || isGenerating}
+                        disabled={!form.watch('question_key') || isGenerating}
                       >
                         <Sparkles className="h-4 w-4 mr-1" />
-                        AI Suggest
+                        {isGenerating ? 'Generating...' : 'AI Suggest'}
                       </Button>
                     </div>
                     <FormControl>
@@ -473,7 +483,7 @@ export function AddQuestionWizard({ open, onClose, defaultLevel, editQuestion }:
                       disabled={!form.watch('question_text') || isGenerating}
                     >
                       <Sparkles className="h-4 w-4 mr-1" />
-                      AI Generate
+                      {isGenerating ? 'Generating...' : 'AI Generate'}
                     </Button>
                   </div>
                   <div className="space-y-2">
@@ -527,10 +537,10 @@ export function AddQuestionWizard({ open, onClose, defaultLevel, editQuestion }:
                         variant="outline"
                         size="sm"
                         onClick={handleAIGenerateHelpText}
-                        disabled={!form.watch('question_key') || !form.watch('question_type') || isGenerating}
+                        disabled={!form.watch('question_key') || isGenerating}
                       >
                         <Sparkles className="h-4 w-4 mr-1" />
-                        AI Suggest
+                        {isGenerating ? 'Generating...' : 'AI Suggest'}
                       </Button>
                     </div>
                     <FormControl>

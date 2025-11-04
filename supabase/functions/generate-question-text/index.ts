@@ -44,7 +44,9 @@ Return ONLY the help text, no extra formatting.`;
         boolean: 'Create a yes/no question about',
       };
 
-      const typeDesc = typeDescriptions[question_type] || 'Create a question about';
+      const typeDesc = question_type && typeDescriptions[question_type] 
+        ? typeDescriptions[question_type] 
+        : 'Create a question about';
       const categoryContext = category ? ` in the ${category} category` : '';
 
       prompt = `${typeDesc} "${question_key}"${categoryContext}.
