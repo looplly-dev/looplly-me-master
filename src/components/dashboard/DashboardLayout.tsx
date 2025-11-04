@@ -22,13 +22,14 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const isMobile = useIsMobile();
 
   // Redirect team members away from regular user routes (skip in simulator)
+  const teamMember = isTeamMember();
   useEffect(() => {
     const isSimulator = location.pathname.startsWith('/simulator');
-    if (!isSimulator && isTeamMember() && !location.pathname.startsWith('/admin') && !location.pathname.startsWith('/knowledge')) {
+    if (!isSimulator && teamMember && !location.pathname.startsWith('/admin') && !location.pathname.startsWith('/knowledge')) {
       console.log('Team member accessing regular user route, redirecting to /admin');
       navigate('/admin', { replace: true });
     }
-  }, [isTeamMember, location.pathname, navigate]);
+  }, [teamMember, location.pathname, navigate]);
 
   const handleLogout = () => {
     logout();

@@ -128,6 +128,18 @@
     </script>
     
     <!-- Google tag (gtag.js) -->
+    <script>
+      // Disable GA in Lovable Preview to prevent performance issues
+      (function(){
+        try {
+          var inIframe = window.self !== window.top;
+          var onLovable = location.hostname.endsWith('.lovableproject.com');
+          if (inIframe || onLovable) {
+            window['ga-disable-G-S726PDNXJQ'] = true;
+          }
+        } catch(e) {}
+      })();
+    </script>
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-S726PDNXJQ"></script>
     <script>
       window.dataLayer = window.dataLayer || [];

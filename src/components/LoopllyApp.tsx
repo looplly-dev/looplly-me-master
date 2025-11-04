@@ -1,6 +1,7 @@
 import { useState, Suspense, lazy } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { isPreview } from '@/utils/runtimeEnv';
 import Login from './auth/Login';
 import Register from './auth/Register';
 import CommunicationPreferences from './auth/CommunicationPreferences';
@@ -22,12 +23,16 @@ export default function LoopllyApp() {
   const [justCompletedProfile, setJustCompletedProfile] = useState(false);
   const { authState } = useAuth();
 
-  console.log('LoopllyApp - Current authState:', authState);
-  console.log('LoopllyApp - Current authFlow:', authFlow);
+  if (import.meta.env.DEV && !isPreview()) {
+    console.log('LoopllyApp - Current authState:', authState);
+    console.log('LoopllyApp - Current authFlow:', authFlow);
+  }
 
   // Show loading spinner while checking auth state
   if (authState.isLoading) {
-    console.log('LoopllyApp - Showing loading state');
+    if (import.meta.env.DEV && !isPreview()) {
+      console.log('LoopllyApp - Showing loading state');
+    }
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -42,7 +47,9 @@ export default function LoopllyApp() {
     // Skip profile-setup step and go directly to dashboard
     
     // User has completed all steps, show dashboard routes
-    console.log('LoopllyApp - Showing dashboard routes');
+    if (import.meta.env.DEV && !isPreview()) {
+      console.log('LoopllyApp - Showing dashboard routes');
+    }
     return (
       <Suspense
         fallback={
@@ -69,7 +76,9 @@ export default function LoopllyApp() {
 
   // Auth screens
   if (authFlow === 'register') {
-    console.log('LoopllyApp - Showing register form');
+    if (import.meta.env.DEV && !isPreview()) {
+      console.log('LoopllyApp - Showing register form');
+    }
     return (
       <Register
         onBack={() => setAuthFlow('login')}
@@ -80,11 +89,15 @@ export default function LoopllyApp() {
   }
 
   if (authFlow === 'forgot') {
-    console.log('LoopllyApp - Showing forgot password');
+    if (import.meta.env.DEV && !isPreview()) {
+      console.log('LoopllyApp - Showing forgot password');
+    }
     return <ForgotPassword onBack={() => setAuthFlow('login')} />;
   }
 
-  console.log('LoopllyApp - Showing login form');
+  if (import.meta.env.DEV && !isPreview()) {
+    console.log('LoopllyApp - Showing login form');
+  }
   return (
     <Login
       onForgotPassword={() => setAuthFlow('forgot')}

@@ -15,6 +15,7 @@ import {
   DataSharingParams,
   AnalyticsEvent
 } from '@/types/analytics';
+import { isPreview } from '@/utils/runtimeEnv';
 
 // Check if gtag is loaded
 declare global {
@@ -28,9 +29,12 @@ const isGtagLoaded = (): boolean => {
   return typeof window !== 'undefined' && typeof window.gtag === 'function';
 };
 
-// Check if analytics is enabled (production or explicit enable)
+// Check if analytics is enabled (production or explicit enable, but NEVER in Preview)
 const isAnalyticsEnabled = (): boolean => {
   if (typeof window === 'undefined') return false;
+  
+  // Never enable analytics in Lovable Preview (prevents console spam)
+  if (isPreview()) return false;
   
   // Check environment variable
   const enableAnalytics = import.meta.env.VITE_ENABLE_ANALYTICS;
@@ -40,11 +44,10 @@ const isAnalyticsEnabled = (): boolean => {
   return import.meta.env.PROD || enableAnalytics === 'true';
 };
 
-// Base gtag wrapper
+// Base gtag wrapper - silent no-op when disabled
 const gtag = (...args: any[]): void => {
   if (!isAnalyticsEnabled() || !isGtagLoaded()) {
-    console.log('[Analytics Debug]', ...args);
-    return;
+    return; // Silent no-op, no console logs
   }
   
   window.gtag?.(...args);

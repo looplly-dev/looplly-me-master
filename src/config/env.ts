@@ -213,7 +213,14 @@ export const isTest = env.isTest();
 // Validate environment on module load
 try {
   env.get();
-  console.log('✅ Environment variables validated successfully');
+  // Only log in dev, not in Preview (import dynamically to avoid circular deps)
+  if (import.meta.env.DEV) {
+    import('../utils/runtimeEnv').then(({ isPreview }) => {
+      if (!isPreview()) {
+        console.log('✅ Environment variables validated successfully');
+      }
+    });
+  }
 } catch (error) {
   console.error('❌ Environment validation failed:', error);
   throw error;

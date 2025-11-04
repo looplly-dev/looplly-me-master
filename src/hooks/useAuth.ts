@@ -7,6 +7,7 @@ import { updateUserProfile, fetchUserProfile } from '@/utils/profile';
 import { createDemoEarningActivities } from '@/utils/demoData';
 import { rateLimiter, withRateLimit } from '@/utils/rateLimiter';
 import { auditActions } from '@/utils/auditLogger';
+import { isPreview } from '@/utils/runtimeEnv';
 
 const AuthContext = createContext<{
   authState: AuthState;
@@ -38,14 +39,16 @@ export const useAuthLogic = () => {
     step: 'login'
   });
 
-  console.log('useAuthLogic - Current authState:', authState);
+  if (import.meta.env.DEV && !isPreview()) {
+    console.log('useAuthLogic - Current authState:', authState);
+  }
 
   useEffect(() => {
     let mounted = true;
     const supabase = getSupabaseClient();
     
-    // Diagnostic logging (dev only)
-    if (import.meta.env.DEV) {
+    // Diagnostic logging (dev only, not in Preview)
+    if (import.meta.env.DEV && !isPreview()) {
       const path = window.location.pathname;
       console.info('[useAuth] Active client for path:', path, 'is', 
         path.startsWith('/simulator') ? 'simulatorClient' : 'mainClient');
