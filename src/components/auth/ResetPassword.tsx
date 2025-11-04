@@ -6,11 +6,16 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
+import { CheckCircle2, AlertCircle } from 'lucide-react';
 
 const passwordSchema = z
   .string()
   .min(8, 'Password must be at least 8 characters')
+  .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+  .regex(/[0-9]/, 'Password must contain at least one number')
+  .regex(/[^A-Za-z0-9]/, 'Password must contain at least one special character')
   .max(128, 'Password is too long');
 
 export default function ResetPassword() {
@@ -20,6 +25,13 @@ export default function ResetPassword() {
   const [recoveryReady, setRecoveryReady] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  const passwordRequirements = [
+    { label: 'At least 8 characters', met: password.length >= 8 },
+    { label: 'One uppercase letter', met: /[A-Z]/.test(password) },
+    { label: 'One number', met: /[0-9]/.test(password) },
+    { label: 'One special character', met: /[^A-Za-z0-9]/.test(password) },
+  ];
 
   useEffect(() => {
     // Ensure we have a recovery session (from the email link)
@@ -115,6 +127,26 @@ export default function ResetPassword() {
                 required
               />
             </div>
+
+            <Alert>
+              <AlertDescription>
+                <p className="font-medium mb-2">Password Requirements:</p>
+                <ul className="space-y-1">
+                  {passwordRequirements.map((req, index) => (
+                    <li key={index} className="flex items-center gap-2">
+                      {req.met ? (
+                        <CheckCircle2 className="h-4 w-4 text-green-600" />
+                      ) : (
+                        <AlertCircle className="h-4 w-4 text-muted-foreground" />
+                      )}
+                      <span className={req.met ? 'text-green-600' : 'text-muted-foreground'}>
+                        {req.label}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </AlertDescription>
+            </Alert>
 
             <Button type="submit" variant="mobile" size="mobile" className="w-full" disabled={isSubmitting || !recoveryReady}>
               {isSubmitting ? 'Updating…' : 'Update Password'}
