@@ -57,7 +57,7 @@ const questionSchema = z.object({
   category_id: z.string().uuid('Please select a category'),
   level: z.number().min(1).max(3),
   decay_config_key: z.string().min(1, 'Decay configuration is required'),
-  applicability: z.enum(['global', 'country-specific']),
+  applicability: z.enum(['global', 'country_specific']),
   country_codes: z.array(z.string()).optional(),
   options: z.array(z.object({ label: z.string(), value: z.string() })).optional(),
   validation_rules: z.object({
@@ -215,7 +215,7 @@ export function AddQuestionWizard({ open, onClose, defaultLevel, editQuestion }:
             level: data.level,
             decay_config_key: data.decay_config_key,
             applicability: data.applicability,
-            country_codes: data.applicability === 'country-specific' ? data.country_codes : null,
+            country_codes: data.applicability === 'country_specific' ? data.country_codes : null,
             options: options.length > 0 ? options : null,
             validation_rules: data.validation_rules || {},
             is_draft: data.is_draft,
@@ -246,7 +246,7 @@ export function AddQuestionWizard({ open, onClose, defaultLevel, editQuestion }:
           level: data.level,
           decay_config_key: data.decay_config_key,
           applicability: data.applicability,
-          country_codes: data.applicability === 'country-specific' ? data.country_codes : null,
+          country_codes: data.applicability === 'country_specific' ? data.country_codes : null,
           options: options.length > 0 ? options : null,
           validation_rules: data.validation_rules || {},
           is_active: true,
@@ -810,9 +810,9 @@ export function AddQuestionWizard({ open, onClose, defaultLevel, editQuestion }:
                           <div className="text-sm text-muted-foreground">Available to all users worldwide</div>
                         </div>
                         <div
-                          onClick={() => field.onChange('country-specific')}
+                          onClick={() => field.onChange('country_specific')}
                           className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
-                            field.value === 'country-specific'
+                            field.value === 'country_specific'
                               ? 'border-primary bg-primary/5'
                               : 'border-border hover:border-primary/50'
                           }`}
@@ -827,7 +827,7 @@ export function AddQuestionWizard({ open, onClose, defaultLevel, editQuestion }:
                 )}
               />
 
-              {selectedApplicability === 'country-specific' && (
+              {selectedApplicability === 'country_specific' && (
                 <FormField
                   control={form.control}
                   name="country_codes"
