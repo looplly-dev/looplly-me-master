@@ -41,8 +41,6 @@ export const AddressFieldsInput = ({
     isMockMode,
   } = useAddressAutocomplete();
 
-  const hasSelectedAddress = !!(addressFields.route || addressFields.locality);
-
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       if (searchQuery && searchQuery.length >= 3) {
@@ -92,67 +90,67 @@ export const AddressFieldsInput = ({
 
   return (
     <div className={cn('space-y-4', className)}>
-      {/* Google Places Autocomplete Search */}
-      {!hasSelectedAddress && (
+      {/* Google Places Autocomplete Search - Optional Helper */}
+      <div className="relative">
+        <div className="flex items-center justify-between mb-2">
+          <Label>Search Address (Optional)</Label>
+          <Badge variant="outline" className="text-[10px]">Quick Fill Helper</Badge>
+        </div>
         <div className="relative">
-          <Label className="mb-2 block">Search Address</Label>
-          <div className="relative">
-            <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Start typing your address..."
-              className="pl-10"
-              disabled={disabled}
-            />
-            {isLoading && (
-              <Loader2 className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 animate-spin text-muted-foreground" />
-            )}
-          </div>
-
-          {/* Mock Mode Indicator */}
-          {isMockMode && (
-            <Badge variant="outline" className="mt-2 text-xs">
-              🎭 Mock Mode - Using Demo Data
-            </Badge>
-          )}
-
-          {/* Suggestions Dropdown */}
-          {showSuggestions && suggestions.length > 0 && (
-            <div className="absolute z-50 w-full mt-1 bg-background border rounded-md shadow-lg max-h-60 overflow-y-auto">
-              {suggestions.map((suggestion, index) => (
-                <div
-                  key={suggestion.place_id || index}
-                  onClick={() => handleSelectSuggestion(suggestion)}
-                  className="px-4 py-3 hover:bg-muted cursor-pointer border-b last:border-b-0 transition-colors"
-                >
-                  <div className="flex items-start gap-2">
-                    <MapPin className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">
-                        {suggestion.structured_formatting?.main_text || suggestion.description}
-                      </p>
-                      {suggestion.structured_formatting?.secondary_text && (
-                        <p className="text-xs text-muted-foreground">
-                          {suggestion.structured_formatting.secondary_text}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+          <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Type to auto-fill fields or skip and enter manually..."
+            className="pl-10"
+            disabled={disabled}
+          />
+          {isLoading && (
+            <Loader2 className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 animate-spin text-muted-foreground" />
           )}
         </div>
-      )}
 
-      {/* Address Component Fields */}
-      {hasSelectedAddress && (
-        <div className="space-y-6 p-4 bg-muted/30 rounded-lg border">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <CheckCircle2 className="h-4 w-4 text-success" />
-            <span>Address selected - you can edit fields below</span>
+        {/* Mock Mode Indicator */}
+        {isMockMode && (
+          <Badge variant="outline" className="mt-2 text-xs">
+            🎭 Mock Mode - Using Demo Data
+          </Badge>
+        )}
+
+        {/* Suggestions Dropdown */}
+        {showSuggestions && suggestions.length > 0 && (
+          <div className="absolute z-50 w-full mt-1 bg-background border rounded-md shadow-lg max-h-60 overflow-y-auto">
+            {suggestions.map((suggestion, index) => (
+              <div
+                key={suggestion.place_id || index}
+                onClick={() => handleSelectSuggestion(suggestion)}
+                className="px-4 py-3 hover:bg-muted cursor-pointer border-b last:border-b-0 transition-colors"
+              >
+                <div className="flex items-start gap-2">
+                  <MapPin className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium">
+                      {suggestion.structured_formatting?.main_text || suggestion.description}
+                    </p>
+                    {suggestion.structured_formatting?.secondary_text && (
+                      <p className="text-xs text-muted-foreground">
+                        {suggestion.structured_formatting.secondary_text}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Address Component Fields - Always Visible */}
+      <div className="space-y-6 p-4 bg-muted/30 rounded-lg border">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+            <MapPin className="h-4 w-4" />
+            <span>Enter address manually or use search above to auto-fill</span>
           </div>
 
           {/* Street Level Group */}
@@ -315,31 +313,7 @@ export const AddressFieldsInput = ({
             </div>
           </div>
 
-          {/* Change Address Link */}
-          <div className="pt-2 border-t">
-            <button
-              type="button"
-              onClick={() => {
-                setAddressFields({
-                  street_number: '',
-                  route: '',
-                  sublocality: '',
-                  locality: '',
-                  administrative_area_level_2: '',
-                  administrative_area_level_1: '',
-                  country: '',
-                  postal_code: '',
-                });
-                setSearchQuery('');
-              }}
-              className="text-sm text-primary hover:underline"
-              disabled={disabled}
-            >
-              Search for a different address
-            </button>
-          </div>
         </div>
-      )}
     </div>
   );
 };
