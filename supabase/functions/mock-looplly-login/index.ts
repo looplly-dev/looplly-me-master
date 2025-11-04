@@ -80,8 +80,11 @@ serve(async (req) => {
     if (!supabaseAuthId) {
       console.log('[MOCK LOGIN] Creating Supabase Auth user for:', normalizedMobile);
       
+      // First, check if auth user exists by trying to get it
+      const syntheticEmail = `${profile.user_id}@looplly.mobile`;
+      
       const { data: authUser, error: authError } = await supabase.auth.admin.createUser({
-        email: `${profile.user_id}@looplly.mobile`, // Synthetic email
+        email: syntheticEmail,
         password: password,
         email_confirm: true,
         user_metadata: {
@@ -94,38 +97,32 @@ serve(async (req) => {
         }
       });
       
-      if (authError || !authUser.user) {
+      if (authError) {
         console.error('[MOCK LOGIN] Failed to create Supabase Auth user:', authError);
-        // Continue with custom JWT only
-      } else {
+        // Try to find existing auth user by email
+        const { data: existingUsers } = await supabase.auth.admin.listUsers();
+        const existingUser = existingUsers?.users?.find(u => u.email === syntheticEmail);
+        if (existingUser) {
+          console.log('[MOCK LOGIN] Found existing Supabase Auth user');
+          supabaseAuthId = existingUser.id;
+        }
+      } else if (authUser.user) {
         supabaseAuthId = authUser.user.id;
-        
-        // Store mapping
+        console.log('[MOCK LOGIN] Created new Supabase Auth user');
+      }
+      
+      // Store mapping if we have supabaseAuthId
+      if (supabaseAuthId) {
         await supabase
           .from('looplly_user_auth_mapping')
-          .insert({
+          .upsert({
             looplly_user_id: profile.user_id,
             supabase_auth_id: supabaseAuthId,
             mobile: normalizedMobile,
             country_code: profile.country_code
+          }, {
+            onConflict: 'looplly_user_id'
           });
-      }
-    }
-    
-    // Generate Supabase session if auth user exists
-    let supabaseSession = null;
-    if (supabaseAuthId) {
-      const { data: sessionData, error: sessionError } = await supabase.auth.admin.generateLink({
-        type: 'magiclink',
-        email: `${profile.user_id}@looplly.mobile`
-      });
-      
-      if (!sessionError && sessionData) {
-        supabaseSession = {
-          access_token: sessionData.properties.action_link,
-          refresh_token: sessionData.properties.action_link,
-          expires_in: 3600
-        };
       }
     }
     
@@ -156,7 +153,6 @@ serve(async (req) => {
       JSON.stringify({
         success: true,
         token,
-        supabase_session: supabaseSession,
         supabase_auth_id: supabaseAuthId,
         user: {
           id: profile.user_id,
