@@ -20,10 +20,12 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Trash2, Save, AlertTriangle } from 'lucide-react';
+import { Plus, Trash2, Save, AlertTriangle, Sparkles, Smartphone, Monitor, Tablet } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { QuestionRenderer } from '@/components/dashboard/profile/QuestionRenderer';
+import { cn } from '@/lib/utils';
 import { 
   Form, 
   FormControl, 
@@ -79,6 +81,8 @@ export function AddQuestionWizard({ open, onClose, defaultLevel, editQuestion }:
   const [activeTab, setActiveTab] = useState('edit');
   const [options, setOptions] = useState<Array<{ label: string; value: string }>>([]);
   const [newOptionLabel, setNewOptionLabel] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [previewDevice, setPreviewDevice] = useState<'mobile' | 'tablet' | 'desktop'>('desktop');
   const queryClient = useQueryClient();
   const isEditMode = !!editQuestion;
 
@@ -246,6 +250,109 @@ export function AddQuestionWizard({ open, onClose, defaultLevel, editQuestion }:
     setOptions(options.filter((_, i) => i !== index));
   };
 
+  const handleAIGenerateText = async () => {
+    const questionKey = form.watch('question_key');
+    const questionType = form.watch('question_type');
+    
+    if (!questionKey || !questionType) {
+      toast.error('Please fill in question key and type first');
+      return;
+    }
+
+    setIsGenerating(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-question-text', {
+        body: { question_key: questionKey, question_type: questionType }
+      });
+
+      if (error) throw error;
+      
+      if (data?.question_text) {
+        form.setValue('question_text', data.question_text);
+        toast.success('AI generated question text!');
+      }
+    } catch (error: any) {
+      if (error.message?.includes('Rate limit') || error.message?.includes('429')) {
+        toast.error('⏸️ AI rate limit reached. Please wait a moment and try again.');
+      } else if (error.message?.includes('credits') || error.message?.includes('402')) {
+        toast.error('💳 AI credits depleted. Please add credits in Settings → Workspace → Usage.');
+      } else {
+        toast.error('Failed to generate question text');
+      }
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleAIGenerateOptions = async () => {
+    const questionKey = form.watch('question_key');
+    const questionText = form.watch('question_text');
+    const questionType = form.watch('question_type');
+    
+    if (!questionKey || !questionText) {
+      toast.error('Please fill in question key and text first');
+      return;
+    }
+
+    setIsGenerating(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-question-options', {
+        body: { question_key: questionKey, question_text: questionText, question_type: questionType }
+      });
+
+      if (error) throw error;
+      
+      if (data?.options && Array.isArray(data.options)) {
+        setOptions([...options, ...data.options]);
+        toast.success(`Added ${data.options.length} AI-generated options!`);
+      }
+    } catch (error: any) {
+      if (error.message?.includes('Rate limit') || error.message?.includes('429')) {
+        toast.error('⏸️ AI rate limit reached. Please wait a moment and try again.');
+      } else if (error.message?.includes('credits') || error.message?.includes('402')) {
+        toast.error('💳 AI credits depleted. Please add credits in Settings → Workspace → Usage.');
+      } else {
+        toast.error('Failed to generate options');
+      }
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleAIGenerateHelpText = async () => {
+    const questionKey = form.watch('question_key');
+    const questionType = form.watch('question_type');
+    
+    if (!questionKey || !questionType) {
+      toast.error('Please fill in question key and type first');
+      return;
+    }
+
+    setIsGenerating(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-question-text', {
+        body: { question_key: questionKey, question_type: questionType, type: 'help_text' }
+      });
+
+      if (error) throw error;
+      
+      if (data?.help_text) {
+        form.setValue('help_text', data.help_text);
+        toast.success('AI generated help text!');
+      }
+    } catch (error: any) {
+      if (error.message?.includes('Rate limit') || error.message?.includes('429')) {
+        toast.error('⏸️ AI rate limit reached. Please wait a moment and try again.');
+      } else if (error.message?.includes('credits') || error.message?.includes('402')) {
+        toast.error('💳 AI credits depleted. Please add credits in Settings → Workspace → Usage.');
+      } else {
+        toast.error('Failed to generate help text');
+      }
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   const selectedType = form.watch('question_type');
   const selectedApplicability = form.watch('applicability');
   const selectedLevel = form.watch('level');
@@ -266,10 +373,11 @@ export function AddQuestionWizard({ open, onClose, defaultLevel, editQuestion }:
 
         <Form {...form}>
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="edit">Edit</TabsTrigger>
               <TabsTrigger value="options">Options</TabsTrigger>
               <TabsTrigger value="assignment">Assignment</TabsTrigger>
+              <TabsTrigger value="preview">Preview</TabsTrigger>
             </TabsList>
 
             {/* Edit Tab */}
@@ -279,7 +387,19 @@ export function AddQuestionWizard({ open, onClose, defaultLevel, editQuestion }:
                 name="question_text"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Question Text</FormLabel>
+                    <div className="flex items-center justify-between">
+                      <FormLabel>Question Text</FormLabel>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={handleAIGenerateText}
+                        disabled={!form.watch('question_key') || !form.watch('question_type') || isGenerating}
+                      >
+                        <Sparkles className="h-4 w-4 mr-1" />
+                        AI Suggest
+                      </Button>
+                    </div>
                     <FormControl>
                       <Textarea
                         {...field}
@@ -343,7 +463,19 @@ export function AddQuestionWizard({ open, onClose, defaultLevel, editQuestion }:
 
               {isSelectType && (
                 <div className="space-y-3">
-                  <Label>Answer Choices</Label>
+                  <div className="flex items-center justify-between">
+                    <Label>Answer Choices</Label>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={handleAIGenerateOptions}
+                      disabled={!form.watch('question_text') || isGenerating}
+                    >
+                      <Sparkles className="h-4 w-4 mr-1" />
+                      AI Generate
+                    </Button>
+                  </div>
                   <div className="space-y-2">
                     {options.map((opt, idx) => (
                       <div key={idx} className="flex items-center gap-2">
@@ -388,7 +520,19 @@ export function AddQuestionWizard({ open, onClose, defaultLevel, editQuestion }:
                 name="help_text"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Help Text (Optional)</FormLabel>
+                    <div className="flex items-center justify-between">
+                      <FormLabel>Help Text (Optional)</FormLabel>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={handleAIGenerateHelpText}
+                        disabled={!form.watch('question_key') || !form.watch('question_type') || isGenerating}
+                      >
+                        <Sparkles className="h-4 w-4 mr-1" />
+                        AI Suggest
+                      </Button>
+                    </div>
                     <FormControl>
                       <Textarea
                         {...field}
@@ -702,6 +846,96 @@ export function AddQuestionWizard({ open, onClose, defaultLevel, editQuestion }:
                   </AlertDescription>
                 </Alert>
               )}
+            </TabsContent>
+
+            {/* Preview Tab */}
+            <TabsContent value="preview" className="space-y-6 py-4">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-medium">Live Preview</h3>
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      variant={previewDevice === 'mobile' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setPreviewDevice('mobile')}
+                    >
+                      <Smartphone className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={previewDevice === 'tablet' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setPreviewDevice('tablet')}
+                    >
+                      <Tablet className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={previewDevice === 'desktop' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setPreviewDevice('desktop')}
+                    >
+                      <Monitor className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="border rounded-lg p-6 bg-background">
+                  <div
+                    className={cn(
+                      "mx-auto transition-all",
+                      previewDevice === 'mobile' && "max-w-[375px]",
+                      previewDevice === 'tablet' && "max-w-[768px]",
+                      previewDevice === 'desktop' && "max-w-full"
+                    )}
+                  >
+                    {form.watch('question_text') ? (
+                      <QuestionRenderer
+                        question={{
+                          id: 'preview',
+                          question_text: form.watch('question_text'),
+                          question_type: form.watch('question_type') as any,
+                          question_key: form.watch('question_key') || 'preview',
+                          help_text: form.watch('help_text') || undefined,
+                          placeholder: form.watch('placeholder') || undefined,
+                          is_required: form.watch('is_required'),
+                          options: isSelectType ? options : undefined,
+                          level: form.watch('level'),
+                          category_id: form.watch('category_id'),
+                          display_order: 0,
+                          created_at: new Date().toISOString(),
+                          updated_at: new Date().toISOString(),
+                          is_immutable: false,
+                          decay_config_key: form.watch('decay_config_key'),
+                          applicability: form.watch('applicability') as 'global' | 'country-specific',
+                          country_codes: form.watch('country_codes') || null,
+                          validation_rules: form.watch('validation_rules') || null,
+                          is_draft: form.watch('is_draft'),
+                          targeting_tags: null,
+                          question_group: null,
+                          conditional_logic: null,
+                          decay_interval_days: null,
+                        } as any}
+                        onAnswerChange={() => {}}
+                        disabled={false}
+                      />
+                    ) : (
+                      <div className="text-center py-12 text-muted-foreground">
+                        <p>Fill in the question text to see a preview</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <Alert>
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertTitle>Preview Notes</AlertTitle>
+                  <AlertDescription>
+                    This preview shows how the question will appear to users. Some features like validation may not be fully functional in preview mode.
+                  </AlertDescription>
+                </Alert>
+              </div>
             </TabsContent>
           </Tabs>
         </Form>
