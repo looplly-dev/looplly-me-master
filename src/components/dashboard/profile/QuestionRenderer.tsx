@@ -11,10 +11,13 @@ import { Badge } from '@/components/ui/badge';
 import { AddressFieldsInput } from '@/components/ui/address-fields-input';
 import type { AddressComponents } from '@/services/googlePlacesService';
 import { Switch } from '@/components/ui/switch';
-import { Calendar as CalendarIcon, AlertCircle, Lock, Clock } from 'lucide-react';
+import { Calendar as CalendarIcon, AlertCircle, Lock, Clock, Check, X } from 'lucide-react';
 import type { ProfileQuestion } from '@/hooks/useProfileQuestions';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { validateAndNormalizeMobile } from '@/utils/mobileValidation';
+import { getMobileFormatInfo } from '@/utils/mobileFormatExamples';
+import { getAllCountries, formatCountryDisplay } from '@/utils/countries';
 
 interface QuestionRendererProps {
   question: ProfileQuestion;
@@ -30,6 +33,12 @@ export function QuestionRenderer({ question, onAnswerChange, onAddressChange, di
   const [ageError, setAgeError] = useState<string>('');
   const [minimumAge, setMinimumAge] = useState<number>(18);
   const { authState } = useAuth();
+  
+  // Phone input specific state - default to South Africa
+  const [countryCode, setCountryCode] = useState<string>('+27');
+  const [mobileValidation, setMobileValidation] = useState<{ isValid: boolean; message?: string }>({ 
+    isValid: false 
+  });
 
   const isLocked = question.is_immutable && !!question.user_answer?.answer_value;
   
@@ -65,6 +74,17 @@ export function QuestionRenderer({ question, onAnswerChange, onAddressChange, di
       fetchMinimumAge();
     }
   }, [question.question_key, authState.user?.id]);
+  
+  // Validate phone number when value or country code changes
+  useEffect(() => {
+    if (question.question_type === 'phone' && value) {
+      const validation = validateAndNormalizeMobile(value, countryCode);
+      setMobileValidation({
+        isValid: validation.isValid,
+        message: validation.error
+      });
+    }
+  }, [value, countryCode, question.question_type]);
 
   useEffect(() => {
     if (question.question_type === 'text' || question.question_type === 'email' || question.question_type === 'phone') {
@@ -106,17 +126,74 @@ export function QuestionRenderer({ question, onAnswerChange, onAddressChange, di
     switch (question.question_type) {
       case 'text':
       case 'email':
-      case 'phone':
         return (
           <Input
             id={question.id}
-            type={question.question_type === 'email' ? 'email' : question.question_type === 'phone' ? 'tel' : 'text'}
+            type={question.question_type === 'email' ? 'email' : 'text'}
             value={value}
             onChange={(e) => handleChange(e.target.value)}
             placeholder={question.placeholder || ''}
             disabled={disabled || isLocked}
             className="w-full"
           />
+        );
+      
+      case 'phone':
+        const countries = getAllCountries();
+        const formatInfo = getMobileFormatInfo(countryCode);
+        
+        return (
+          <div className="space-y-2">
+            <div className="flex gap-2">
+              <Select 
+                value={countryCode} 
+                onValueChange={setCountryCode}
+                disabled={disabled || isLocked}
+              >
+                <SelectTrigger className="w-[140px] flex-shrink-0">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {countries.map((country) => (
+                    <SelectItem key={country.code} value={country.dialCode}>
+                      {formatCountryDisplay(country)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              
+              <div className="relative flex-1">
+                <Input
+                  id={question.id}
+                  type="tel"
+                  value={value}
+                  onChange={(e) => handleChange(e.target.value)}
+                  placeholder={formatInfo.example}
+                  disabled={disabled || isLocked}
+                  className={cn(
+                    "pr-10",
+                    value && mobileValidation.isValid && "border-green-500",
+                    value && !mobileValidation.isValid && "border-destructive"
+                  )}
+                />
+                {value && (
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                    {mobileValidation.isValid ? (
+                      <Check className="h-4 w-4 text-green-500" />
+                    ) : (
+                      <X className="h-4 w-4 text-destructive" />
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+            {formatInfo.hint && (
+              <p className="text-xs text-muted-foreground">{formatInfo.hint}</p>
+            )}
+            {value && !mobileValidation.isValid && mobileValidation.message && (
+              <p className="text-xs text-destructive">{mobileValidation.message}</p>
+            )}
+          </div>
         );
 
       case 'number':
