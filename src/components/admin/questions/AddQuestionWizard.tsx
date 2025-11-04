@@ -229,14 +229,45 @@ export function AddQuestionWizard({ open, onClose, defaultLevel, editQuestion }:
     onClose();
   };
 
-  const handleSubmit = form.handleSubmit(async (data) => {
-    // Validate based on question type
-    if (isSelectType && options.length === 0) {
-      toast.error('Please add at least one option for select/multi-select questions');
+  const handleSubmit = async () => {
+    // Trigger validation
+    const isValid = await form.trigger();
+    
+    if (!isValid) {
+      const errors = form.formState.errors;
+      const errorFields: string[] = [];
+      
+      // Collect error messages
+      if (errors.question_text) errorFields.push('Question Text');
+      if (errors.question_type) errorFields.push('Question Type');
+      if (errors.question_key) errorFields.push('Question Key');
+      if (errors.category_id) errorFields.push('Category');
+      if (errors.decay_config_key) errorFields.push('Decay Configuration');
+      if (errors.level) errorFields.push('Level');
+      if (errors.applicability) errorFields.push('Applicability');
+      
+      // Navigate to first tab with error
+      if (errors.question_text || errors.question_type || errors.question_key || errors.help_text || errors.placeholder) {
+        setActiveTab('edit');
+      } else if (errors.category_id || errors.level || errors.decay_config_key || errors.applicability) {
+        setActiveTab('assignment');
+      }
+      
+      toast.error(`Please fix the following fields: ${errorFields.join(', ')}`);
       return;
     }
+    
+    // Additional validation for select types
+    if (isSelectType && options.length === 0) {
+      toast.error('Please add at least one option for select/multi-select questions');
+      setActiveTab('options');
+      return;
+    }
+    
+    // Get form data and submit
+    const data = form.getValues();
     createQuestionMutation.mutate(data);
-  });
+  };
 
   const addOption = () => {
     if (newOptionLabel.trim()) {
@@ -371,6 +402,11 @@ export function AddQuestionWizard({ open, onClose, defaultLevel, editQuestion }:
   
   // Filter categories by selected level
   const filteredCategories = categories?.filter(cat => cat.level === Number(selectedLevel)) || [];
+  
+  // Check which tabs have errors
+  const errors = form.formState.errors;
+  const hasEditErrors = !!(errors.question_text || errors.question_type || errors.question_key || errors.help_text || errors.placeholder);
+  const hasAssignmentErrors = !!(errors.category_id || errors.level || errors.decay_config_key || errors.applicability || errors.country_codes);
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
@@ -384,9 +420,19 @@ export function AddQuestionWizard({ open, onClose, defaultLevel, editQuestion }:
         <Form {...form}>
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="edit">Edit</TabsTrigger>
+              <TabsTrigger value="edit" className="relative">
+                Edit
+                {hasEditErrors && (
+                  <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-destructive" />
+                )}
+              </TabsTrigger>
               <TabsTrigger value="options">Options</TabsTrigger>
-              <TabsTrigger value="assignment">Assignment</TabsTrigger>
+              <TabsTrigger value="assignment" className="relative">
+                Assignment
+                {hasAssignmentErrors && (
+                  <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-destructive" />
+                )}
+              </TabsTrigger>
               <TabsTrigger value="preview">Preview</TabsTrigger>
             </TabsList>
 
