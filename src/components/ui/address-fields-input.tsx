@@ -25,8 +25,11 @@ export const AddressFieldsInput = ({
   const [addressFields, setAddressFields] = useState<Partial<AddressComponents>>({
     street_number: value?.street_number || '',
     route: value?.route || '',
+    sublocality: value?.sublocality || '',
     locality: value?.locality || '',
+    administrative_area_level_2: value?.administrative_area_level_2 || '',
     administrative_area_level_1: value?.administrative_area_level_1 || '',
+    country: value?.country || '',
     postal_code: value?.postal_code || '',
   });
   
@@ -59,8 +62,11 @@ export const AddressFieldsInput = ({
       setAddressFields({
         street_number: address.street_number,
         route: address.route,
+        sublocality: address.sublocality,
         locality: address.locality,
+        administrative_area_level_2: address.administrative_area_level_2,
         administrative_area_level_1: address.administrative_area_level_1,
+        country: address.country,
         postal_code: address.postal_code,
       });
       setSearchQuery('');
@@ -143,91 +149,195 @@ export const AddressFieldsInput = ({
 
       {/* Address Component Fields */}
       {hasSelectedAddress && (
-        <div className="space-y-4 p-4 bg-muted/30 rounded-lg border">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
+        <div className="space-y-6 p-4 bg-muted/30 rounded-lg border">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <CheckCircle2 className="h-4 w-4 text-success" />
             <span>Address selected - you can edit fields below</span>
           </div>
 
-          {/* Street Address */}
-          <div className="space-y-2">
-            <Label htmlFor="street">Street Address</Label>
-            <div className="grid grid-cols-4 gap-2">
-              <div className="col-span-1">
-                <Input
-                  id="street_number"
-                  value={addressFields.street_number || ''}
-                  onChange={(e) => handleFieldChange('street_number', e.target.value)}
-                  placeholder="No."
-                  disabled={disabled}
-                />
-              </div>
-              <div className="col-span-3">
-                <Input
-                  id="street"
-                  value={addressFields.route || ''}
-                  onChange={(e) => handleFieldChange('route', e.target.value)}
-                  placeholder="Street Name"
-                  disabled={disabled}
-                />
+          {/* Street Level Group */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <div className="h-px flex-1 bg-border" />
+              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Street Level</span>
+              <div className="h-px flex-1 bg-border" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="street" className="text-sm">
+                Street Address
+              </Label>
+              <div className="grid grid-cols-4 gap-2">
+                <div className="col-span-1">
+                  <Input
+                    id="street_number"
+                    value={addressFields.street_number || ''}
+                    onChange={(e) => handleFieldChange('street_number', e.target.value)}
+                    placeholder="No."
+                    disabled={disabled}
+                    className="text-sm"
+                  />
+                </div>
+                <div className="col-span-3">
+                  <Input
+                    id="street"
+                    value={addressFields.route || ''}
+                    onChange={(e) => handleFieldChange('route', e.target.value)}
+                    placeholder="Street Name"
+                    disabled={disabled}
+                    className="text-sm"
+                  />
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Suburb/Locality */}
-          <div className="space-y-2">
-            <Label htmlFor="suburb">Suburb / City</Label>
-            <Input
-              id="suburb"
-              value={addressFields.locality || ''}
-              onChange={(e) => handleFieldChange('locality', e.target.value)}
-              placeholder="Enter suburb or city"
-              disabled={disabled}
-            />
+          {/* Area Level Group */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <div className="h-px flex-1 bg-border" />
+              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Area Level</span>
+              <div className="h-px flex-1 bg-border" />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="sublocality" className="text-sm flex items-center gap-2">
+                Suburb / Neighborhood
+                <Badge variant="outline" className="text-[10px] font-normal">Optional</Badge>
+              </Label>
+              <Input
+                id="sublocality"
+                value={addressFields.sublocality || ''}
+                onChange={(e) => handleFieldChange('sublocality', e.target.value)}
+                placeholder="Enter suburb or neighborhood"
+                disabled={disabled}
+                className="text-sm"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="locality" className="text-sm flex items-center gap-2">
+                City / Town
+                <Badge variant="outline" className="text-[10px] font-normal">Optional</Badge>
+              </Label>
+              <Input
+                id="locality"
+                value={addressFields.locality || ''}
+                onChange={(e) => handleFieldChange('locality', e.target.value)}
+                placeholder="Enter city or town"
+                disabled={disabled}
+                className="text-sm"
+              />
+            </div>
           </div>
 
-          {/* Province/State */}
-          <div className="space-y-2">
-            <Label htmlFor="province">Province / State</Label>
-            <Input
-              id="province"
-              value={addressFields.administrative_area_level_1 || ''}
-              onChange={(e) => handleFieldChange('administrative_area_level_1', e.target.value)}
-              placeholder="Enter province or state"
-              disabled={disabled}
-            />
+          {/* Administrative Level Group */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <div className="h-px flex-1 bg-border" />
+              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Administrative Level</span>
+              <div className="h-px flex-1 bg-border" />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="region" className="text-sm flex items-center gap-2">
+                Region / County
+                <Badge variant="outline" className="text-[10px] font-normal">Optional</Badge>
+              </Label>
+              <Input
+                id="region"
+                value={addressFields.administrative_area_level_2 || ''}
+                onChange={(e) => handleFieldChange('administrative_area_level_2', e.target.value)}
+                placeholder="Enter region or county"
+                disabled={disabled}
+                className="text-sm"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="province" className="text-sm flex items-center gap-2">
+                Province / State
+                <Badge variant="destructive" className="text-[10px] font-normal">Required</Badge>
+              </Label>
+              <Input
+                id="province"
+                value={addressFields.administrative_area_level_1 || ''}
+                onChange={(e) => handleFieldChange('administrative_area_level_1', e.target.value)}
+                placeholder="Enter province or state"
+                disabled={disabled}
+                required
+                className={cn(
+                  "text-sm",
+                  !addressFields.administrative_area_level_1 && "border-destructive"
+                )}
+              />
+              {!addressFields.administrative_area_level_1 && (
+                <p className="text-xs text-destructive">Province/State is required for targeting</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="country" className="text-sm flex items-center gap-2">
+                Country
+                <Badge variant="outline" className="text-[10px] font-normal">Optional</Badge>
+              </Label>
+              <Input
+                id="country"
+                value={addressFields.country || ''}
+                onChange={(e) => handleFieldChange('country', e.target.value)}
+                placeholder="Enter country"
+                disabled={disabled}
+                className="text-sm"
+              />
+            </div>
           </div>
 
-          {/* Postal Code */}
-          <div className="space-y-2">
-            <Label htmlFor="postal_code">Postal Code</Label>
-            <Input
-              id="postal_code"
-              value={addressFields.postal_code || ''}
-              onChange={(e) => handleFieldChange('postal_code', e.target.value)}
-              placeholder="Enter postal code"
-              disabled={disabled}
-            />
+          {/* Additional Information Group */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <div className="h-px flex-1 bg-border" />
+              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Additional</span>
+              <div className="h-px flex-1 bg-border" />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="postal_code" className="text-sm flex items-center gap-2">
+                Postal Code
+                <Badge variant="outline" className="text-[10px] font-normal">Optional</Badge>
+              </Label>
+              <Input
+                id="postal_code"
+                value={addressFields.postal_code || ''}
+                onChange={(e) => handleFieldChange('postal_code', e.target.value)}
+                placeholder="Enter postal code"
+                disabled={disabled}
+                className="text-sm"
+              />
+            </div>
           </div>
 
           {/* Change Address Link */}
-          <button
-            type="button"
-            onClick={() => {
-              setAddressFields({
-                street_number: '',
-                route: '',
-                locality: '',
-                administrative_area_level_1: '',
-                postal_code: '',
-              });
-              setSearchQuery('');
-            }}
-            className="text-sm text-primary hover:underline"
-            disabled={disabled}
-          >
-            Search for a different address
-          </button>
+          <div className="pt-2 border-t">
+            <button
+              type="button"
+              onClick={() => {
+                setAddressFields({
+                  street_number: '',
+                  route: '',
+                  sublocality: '',
+                  locality: '',
+                  administrative_area_level_2: '',
+                  administrative_area_level_1: '',
+                  country: '',
+                  postal_code: '',
+                });
+                setSearchQuery('');
+              }}
+              className="text-sm text-primary hover:underline"
+              disabled={disabled}
+            >
+              Search for a different address
+            </button>
+          </div>
         </div>
       )}
     </div>
