@@ -8,6 +8,14 @@ import { createDemoEarningActivities } from '@/utils/demoData';
 import { rateLimiter, withRateLimit } from '@/utils/rateLimiter';
 import { auditActions } from '@/utils/auditLogger';
 import { isPreview } from '@/utils/runtimeEnv';
+import { 
+  storeSessionMetadata, 
+  checkSessionValidity, 
+  clearSessionMetadata,
+  clearAllSessionMetadata,
+  updateLastActivity 
+} from '@/utils/sessionManager';
+import { SESSION_CONFIG } from '@/config/sessionConfig';
 
 const AuthContext = createContext<{
   authState: AuthState;
@@ -361,8 +369,10 @@ export const useAuthLogic = () => {
               step: 'dashboard'
             });
             
-            // Audit log for team member login
+          // Store session metadata for team members
             if (event === 'SIGNED_IN') {
+              storeSessionMetadata(session.user.id, 'admin_auth', 'looplly_team_user');
+              
               setTimeout(() => {
                 auditActions.login(session.user.id, { 
                   method: 'email_password',
@@ -421,8 +431,10 @@ export const useAuthLogic = () => {
               step: !profile?.profile_complete ? 'profile-setup' : 'dashboard'
             });
             
-            // Audit log for regular user login
+            // Store session metadata for regular users
             if (event === 'SIGNED_IN') {
+              storeSessionMetadata(session.user.id, 'auth', 'looplly_user');
+              
               setTimeout(() => {
                 auditActions.login(session.user.id, { 
                   method: 'email_password',
@@ -465,7 +477,22 @@ export const useAuthLogic = () => {
     // FAST-PATH: Immediately check for existing session (don't wait for auth state change event)
     supabase.auth.getSession().then(({ data: { session } }) => {
       console.log('[useAuth] Fast-path session check:', session?.user?.id || 'no session');
-      if (mounted && session) {
+      if (mounted && session?.user) {
+        // Check session validity before processing
+        const { isValid, reason } = checkSessionValidity(session.user.id);
+        
+        if (!isValid) {
+          console.warn('[useAuth] Fast-path: Session invalid:', reason);
+          // Force logout for expired session
+          supabase.auth.signOut();
+          clearAllSessionMetadata();
+          if (mounted) {
+            setAuthState({ user: null, isAuthenticated: false, isLoading: false, step: 'login' });
+          }
+          return;
+        }
+        
+        // Session is valid, process it
         processSession(session).catch(error => {
           console.error('[useAuth] Fast-path error:', error);
           if (mounted) {
@@ -483,11 +510,30 @@ export const useAuthLogic = () => {
       }
     });
 
+    // Set up periodic session validity check
+    const sessionCheckInterval = setInterval(() => {
+      const currentUserId = authState.user?.id;
+      if (currentUserId && authState.isAuthenticated) {
+        const { isValid, reason } = checkSessionValidity(currentUserId);
+        
+        if (!isValid) {
+          console.warn('[useAuth] Periodic check: Session invalid:', reason);
+          // Force logout
+          supabase.auth.signOut();
+          clearAllSessionMetadata();
+          if (mounted) {
+            setAuthState({ user: null, isAuthenticated: false, isLoading: false, step: 'login' });
+          }
+        }
+      }
+    }, SESSION_CONFIG.SESSION_CHECK_INTERVAL_MS);
+
     return () => {
       mounted = false;
       subscription.unsubscribe();
+      clearInterval(sessionCheckInterval);
     };
-  }, []);
+  }, [authState.isAuthenticated, authState.user?.id]);
 
   const register = withRateLimit('registration', async (data: any): Promise<boolean> => {
     console.log('Registering user with data:', data);
@@ -823,6 +869,13 @@ export const useAuthLogic = () => {
           });
           
           console.info('[useAuth] Fast-path set:', isTeamMember ? 'team member' : 'regular user');
+          
+          // Store session metadata on successful login
+          storeSessionMetadata(
+            session.user.id,
+            isTeamMember ? 'admin_auth' : 'auth',
+            isTeamMember ? 'looplly_team_user' : 'looplly_user'
+          );
         } else {
           setAuthState(prev => ({ ...prev, isAuthenticated: true, isLoading: false }));
         }
@@ -1028,9 +1081,15 @@ export const useAuthLogic = () => {
   const logout = async () => {
     console.log('Logging out user');
     
+    // Clear session metadata first
+    if (authState.user?.id) {
+      clearSessionMetadata(authState.user.id);
+    }
+    
     // Clear all localStorage auth-related data
     localStorage.removeItem('mockUser');
     localStorage.removeItem('onboarding_completed');
+    clearAllSessionMetadata();
     
     await logoutUser();
   };

@@ -1,5 +1,7 @@
 import { ReactNode } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
+import { useActivityMonitor } from '@/hooks/useActivityMonitor';
 import {
   LayoutDashboard,
   Users,
@@ -196,6 +198,13 @@ interface AdminLayoutProps {
 export default function AdminLayout({ children }: AdminLayoutProps) {
   const navigate = useNavigate();
   const { isDarkMode, toggleDarkMode } = useDarkMode();
+  const { authState } = useAuth();
+  
+  // Track user activity for session management
+  useActivityMonitor({ 
+    userId: authState.user?.id || null,
+    enabled: authState.isAuthenticated 
+  });
 
   const handleLogout = async () => {
     const supabase = getSupabaseClient();

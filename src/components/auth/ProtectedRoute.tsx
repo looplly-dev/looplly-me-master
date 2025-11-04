@@ -7,6 +7,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Shield, Lock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { checkSessionValidity, clearAllSessionMetadata } from '@/utils/sessionManager';
+import { getSupabaseClient } from '@/integrations/supabase/activeClient';
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -23,11 +25,44 @@ export default function ProtectedRoute({
 }: ProtectedRouteProps) {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { authState } = useAuth();
+  const { authState, logout } = useAuth();
   const { hasRole, hasExactRole, isLoading: roleLoading, isAdmin, isSuperAdmin } = useRole();
   const { userType, isLoading: typeLoading } = useUserType();
   const toastShownRef = useRef(false);
   const [showTimeout, setShowTimeout] = useState(false);
+
+  // Check session validity for authenticated users
+  useEffect(() => {
+    if (authState.isAuthenticated && authState.user?.id) {
+      const { isValid, reason } = checkSessionValidity(authState.user.id);
+      
+      if (!isValid) {
+        console.warn('[ProtectedRoute] Session invalid:', reason);
+        
+        // Force logout
+        const performLogout = async () => {
+          const supabase = getSupabaseClient();
+          await supabase.auth.signOut();
+          clearAllSessionMetadata();
+          logout();
+          
+          const isAdminRoute = requiredRole === 'admin' || requiredRole === 'super_admin';
+          
+          toast({
+            title: 'Session Expired',
+            description: reason === 'inactive' 
+              ? 'You were logged out due to inactivity.'
+              : 'Your session has expired. Please log in again.',
+            variant: 'destructive'
+          });
+          
+          navigate(isAdminRoute ? '/admin/login?expired=true' : '/?expired=true');
+        };
+        
+        performLogout();
+      }
+    }
+  }, [authState.isAuthenticated, authState.user, requiredRole, logout, navigate, toast]);
 
   // Show access denied toast only for non-team users trying to access admin
   useEffect(() => {

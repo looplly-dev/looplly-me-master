@@ -10,6 +10,7 @@ import { Eye, EyeOff, Shield, ArrowLeft } from 'lucide-react';
 import { useRole } from '@/hooks/useRole';
 import { useUserType } from '@/hooks/useUserType';
 import { getSupabaseClient } from '@/integrations/supabase/activeClient';
+import { checkSessionValidity, clearAllSessionMetadata } from '@/utils/sessionManager';
 
 export default function AdminLogin() {
   const navigate = useNavigate();
@@ -24,12 +25,36 @@ export default function AdminLogin() {
   const { isAdmin, isSuperAdmin } = useRole();
   const { userType } = useUserType();
 
-  // Redirect if already logged in as team member
+  // Check for expired sessions on mount and redirect if already authenticated
   useEffect(() => {
-    if (authState.isAuthenticated && userType === 'looplly_team_user') {
-      navigate('/admin');
-    }
-  }, [authState.isAuthenticated, userType, navigate]);
+    const checkSession = async () => {
+      if (authState.isAuthenticated && authState.user?.id) {
+        // Check if session is valid
+        const { isValid, reason } = checkSessionValidity(authState.user.id);
+        
+        if (!isValid) {
+          console.log('[AdminLogin] Session invalid:', reason);
+          // Force sign out for expired sessions
+          const supabase = getSupabaseClient();
+          await supabase.auth.signOut();
+          clearAllSessionMetadata();
+          
+          toast({
+            title: 'Session Expired',
+            description: reason === 'inactive' 
+              ? 'You were logged out due to inactivity.'
+              : 'Your session has expired. Please log in again.',
+            variant: 'destructive'
+          });
+        } else if (userType === 'looplly_team_user') {
+          // Valid session, redirect to admin
+          navigate('/admin');
+        }
+      }
+    };
+    
+    checkSession();
+  }, [authState.isAuthenticated, authState.user, userType, navigate, toast]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,8 +74,11 @@ export default function AdminLogin() {
       // Use path-aware client for admin context (will be adminClient)
       const supabase = getSupabaseClient();
       
-      // Pre-login cleanup: eradicate all stale tokens from all storage locations
+      // Pre-login cleanup: eradicate all stale tokens and session metadata
       await supabase.auth.signOut(); // Sign out admin session if any
+      
+      // Clear ALL session metadata first
+      clearAllSessionMetadata();
       
       // Clear localStorage tokens (admin, regular user, Looplly custom)
       localStorage.removeItem('admin_auth');
