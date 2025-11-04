@@ -28,6 +28,7 @@ import { QuestionInlineCard } from '@/components/admin/questions/QuestionInlineC
 import { CountryOptionsDialog } from '@/components/admin/questions/CountryOptionsDialog';
 import { AddQuestionWizard } from '@/components/admin/questions/AddQuestionWizard';
 import { QuestionDetailModal } from '@/components/admin/questions/QuestionDetailModal';
+import { QuestionPreviewModal } from '@/components/admin/questions/QuestionPreviewModal';
 import { SurveyJsBuilder } from '@/components/admin/questions/SurveyJsBuilder';
 
 function AdminQuestionsContent() {
@@ -38,6 +39,7 @@ function AdminQuestionsContent() {
   const [showDrafts, setShowDrafts] = useState(false);
   const [selectedQuestion, setSelectedQuestion] = useState<any>(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
+  const [previewQuestion, setPreviewQuestion] = useState<any>(null);
   const [editQuestion, setEditQuestion] = useState<any>(null);
   const [viewMode, setViewMode] = useState<'list' | 'visual'>('list');
   const [visualBuilderLevel, setVisualBuilderLevel] = useState<number | null>(null);
@@ -204,6 +206,7 @@ function AdminQuestionsContent() {
                       setEditQuestion(question);
                       setShowAddWizard(true);
                     }}
+                    onPreview={() => setPreviewQuestion(question)}
                     isEditable={isSuperAdmin()}
                   />
                 ))}
@@ -318,6 +321,7 @@ function AdminQuestionsContent() {
                       setEditQuestion(question);
                       setShowAddWizard(true);
                     }}
+                    onPreview={() => setPreviewQuestion(question)}
                     isEditable={true}
                   />
                 ))}
@@ -410,6 +414,7 @@ function AdminQuestionsContent() {
                       setEditQuestion(question);
                       setShowAddWizard(true);
                     }}
+                    onPreview={() => setPreviewQuestion(question)}
                     isEditable={true}
                   />
                 ))}
@@ -443,7 +448,13 @@ function AdminQuestionsContent() {
         />
       )}
 
-      <AddQuestionWizard 
+      <QuestionPreviewModal
+        question={previewQuestion}
+        open={!!previewQuestion}
+        onOpenChange={(open) => !open && setPreviewQuestion(null)}
+      />
+
+      <AddQuestionWizard
         open={showAddWizard} 
         onClose={() => {
           setShowAddWizard(false);

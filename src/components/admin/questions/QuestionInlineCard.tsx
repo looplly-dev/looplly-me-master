@@ -24,6 +24,7 @@ interface QuestionInlineCardProps {
   onManageCountries: () => void;
   onSettings?: () => void;
   onEdit?: () => void;
+  onPreview?: () => void;
   isEditable?: boolean;
 }
 
@@ -59,6 +60,7 @@ export function QuestionInlineCard({
   onManageCountries,
   onSettings,
   onEdit,
+  onPreview,
   isEditable = true
 }: QuestionInlineCardProps) {
   const { isSuperAdmin } = useRole();
@@ -165,6 +167,15 @@ export function QuestionInlineCard({
             )}
           </Button>
         )}
+
+        <Button
+          variant="ghost"
+          size="sm"
+          title="Preview Question"
+          onClick={onPreview}
+        >
+          <Eye className="h-4 w-4" />
+        </Button>
 
         <TooltipProvider>
           <Tooltip>
