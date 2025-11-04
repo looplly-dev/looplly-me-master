@@ -154,11 +154,21 @@ export const resetUserPassword = async (email: string): Promise<{ success: boole
   try {
     console.log('Initiating forgot password for email:', email);
     
+    // Check if email belongs to a team member
+    const { data: teamProfile } = await supabase
+      .from('team_profiles')
+      .select('email')
+      .eq('email', email)
+      .maybeSingle();
+    
+    // Determine redirect path based on user type
+    const resetPath = teamProfile ? '/admin/reset-password' : '/reset-password';
+    
     // Use VITE_APP_URL for production, fallback to window.location.origin for dev
     const redirectUrl = import.meta.env.VITE_APP_URL || window.location.origin;
     
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${redirectUrl}/reset-password`,
+      redirectTo: `${redirectUrl}${resetPath}`,
     });
     
     if (error) {
@@ -166,7 +176,7 @@ export const resetUserPassword = async (email: string): Promise<{ success: boole
       return { success: false, error };
     }
     
-    console.log('Password reset email sent');
+    console.log('Password reset email sent to:', resetPath);
     return { success: true };
   } catch (error) {
     console.error('Forgot password failed:', error);

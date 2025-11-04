@@ -23,9 +23,25 @@ export default function ResetPassword() {
 
   useEffect(() => {
     // Ensure we have a recovery session (from the email link)
-    supabase.auth.getSession().then(({ data }) => {
+    supabase.auth.getSession().then(async ({ data }) => {
       const hasSession = !!data.session;
       setRecoveryReady(hasSession);
+      
+      if (hasSession && data.session.user) {
+        // Check if this is a team member - redirect to admin reset page if so
+        const { data: teamProfile } = await supabase
+          .from('team_profiles')
+          .select('user_id')
+          .eq('user_id', data.session.user.id)
+          .maybeSingle();
+        
+        if (teamProfile) {
+          // Redirect to admin reset page for team members
+          navigate('/admin/reset-password');
+          return;
+        }
+      }
+      
       if (!hasSession) {
         toast({
           title: 'Recovery link required',
@@ -34,7 +50,7 @@ export default function ResetPassword() {
         });
       }
     });
-  }, [toast]);
+  }, [toast, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
