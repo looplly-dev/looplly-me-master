@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Category } from '@/hooks/useCategoryManagement';
 import { useDecayConfig } from '@/hooks/useDecayConfig';
+import { renderIcon, commonIconNames } from '@/utils/iconMapper';
 
 interface CategoryFormProps {
   category: Category | null;
@@ -111,47 +112,58 @@ export const CategoryForm = ({ category, isOpen, onClose, onSave, canEditLevel }
             />
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="icon">Icon (emoji)</Label>
-              <Input
-                id="icon"
-                value={formData.icon}
-                onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
-                placeholder="👤"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="level">Level *</Label>
-              <Select
-                value={formData.level.toString()}
-                onValueChange={(val) => setFormData({ ...formData, level: parseInt(val) })}
-                disabled={!canEditLevel && category?.level === 1}
-              >
-                <SelectTrigger id="level">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1">Level 1</SelectItem>
-                  <SelectItem value="2">Level 2</SelectItem>
-                  <SelectItem value="3">Level 3</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="display_order">Display Order *</Label>
-              <Input
-                id="display_order"
-                type="number"
-                value={formData.display_order}
-                onChange={(e) => setFormData({ ...formData, display_order: parseInt(e.target.value) })}
-                min={0}
-                required
-              />
+          <div className="space-y-2">
+            <Label htmlFor="icon">Icon</Label>
+            <div className="flex items-center gap-3">
+              <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-primary/10 border">
+                {renderIcon(formData.icon, 24, 'text-primary')}
+              </div>
+              <div className="flex-1">
+                <Input
+                  id="icon"
+                  value={formData.icon || ''}
+                  onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
+                  placeholder="e.g., Shield, Users, DollarSign"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Common: {commonIconNames.slice(0, 10).join(', ')}, etc.
+                </p>
+              </div>
             </div>
           </div>
+
+          <div className="grid grid-cols-2 gap-4">
+
+              <div className="space-y-2">
+                <Label htmlFor="level">Level *</Label>
+                <Select
+                  value={formData.level.toString()}
+                  onValueChange={(val) => setFormData({ ...formData, level: parseInt(val) })}
+                  disabled={!canEditLevel && category?.level === 1}
+                >
+                  <SelectTrigger id="level">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1">Level 1</SelectItem>
+                    <SelectItem value="2">Level 2</SelectItem>
+                    <SelectItem value="3">Level 3</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="display_order">Display Order *</Label>
+                <Input
+                  id="display_order"
+                  type="number"
+                  value={formData.display_order}
+                  onChange={(e) => setFormData({ ...formData, display_order: parseInt(e.target.value) })}
+                  min={0}
+                  required
+                />
+              </div>
+            </div>
 
           <div className="space-y-2">
             <Label htmlFor="decay_config">Default Decay Config</Label>

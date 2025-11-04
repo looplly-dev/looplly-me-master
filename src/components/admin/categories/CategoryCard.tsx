@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Edit, GripVertical, Users } from 'lucide-react';
 import { Category } from '@/hooks/useCategoryManagement';
+import { renderIcon } from '@/utils/iconMapper';
 
 interface CategoryCardProps {
   category: Category;
@@ -25,7 +26,9 @@ export const CategoryCard = ({ category, onEdit, canEdit, isDragging }: Category
           <div className="flex items-start justify-between gap-2">
             <div className="flex items-center gap-2">
               {category.icon && (
-                <span className="text-2xl">{category.icon}</span>
+                <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10">
+                  {renderIcon(category.icon, 20, 'text-primary')}
+                </div>
               )}
               <div>
                 <h4 className="font-semibold">{category.display_name}</h4>
