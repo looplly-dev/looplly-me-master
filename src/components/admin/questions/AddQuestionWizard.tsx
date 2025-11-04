@@ -472,6 +472,20 @@ export function AddQuestionWizard({ open, onClose, defaultLevel, editQuestion }:
           </DialogTitle>
         </DialogHeader>
 
+        {validationErrors.length > 0 && (
+          <Alert variant="destructive" className="absolute top-4 right-4 max-w-sm z-10">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertTitle>Please fix the following fields:</AlertTitle>
+            <AlertDescription>
+              <ul className="list-disc list-inside">
+                {validationErrors.map((error, index) => (
+                  <li key={index}>{error}</li>
+                ))}
+              </ul>
+            </AlertDescription>
+          </Alert>
+        )}
+
         <Form {...form}>
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid w-full grid-cols-4">
@@ -1051,21 +1065,7 @@ export function AddQuestionWizard({ open, onClose, defaultLevel, editQuestion }:
           </Tabs>
         </Form>
 
-        {validationErrors.length > 0 && (
-          <Alert variant="destructive" className="mt-4">
-            <AlertTriangle className="h-4 w-4" />
-            <AlertTitle>Please fix the following fields:</AlertTitle>
-            <AlertDescription>
-              <ul className="list-disc list-inside">
-                {validationErrors.map((error, index) => (
-                  <li key={index}>{error}</li>
-                ))}
-              </ul>
-            </AlertDescription>
-          </Alert>
-        )}
-
-        <DialogFooter className="flex justify-between items-center mt-4">
+        <DialogFooter className="flex justify-between items-center">
           <Button type="button" variant="ghost" onClick={handleClose}>
             Cancel
           </Button>
