@@ -137,16 +137,42 @@ export const useAuthLogic = () => {
             const { data: { session: existingSession } } = await supabase.auth.getSession();
             
             if (!existingSession) {
-              console.warn('[useAuth] No Supabase session found - RLS will fail. Clearing auth to force re-login.');
-              localStorage.removeItem('looplly_auth_token');
-              localStorage.removeItem('looplly_user');
-              setAuthState({
-                user: null,
-                isAuthenticated: false,
-                isLoading: false,
-                step: 'login'
-              });
-              return;
+              // Check if this is a fresh login attempt (give it a brief window to complete)
+              const justLoggedIn = sessionStorage.getItem('looplly_just_logged_in');
+              
+              if (justLoggedIn) {
+                console.log('[useAuth] Fresh login detected, allowing brief retry window for session establishment');
+                // Wait a moment for signInWithPassword to complete
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                // Check again
+                const { data: { session: retrySession } } = await supabase.auth.getSession();
+                if (!retrySession) {
+                  console.warn('[useAuth] No Supabase session after retry - clearing auth to force re-login');
+                  localStorage.removeItem('looplly_auth_token');
+                  localStorage.removeItem('looplly_user');
+                  sessionStorage.removeItem('looplly_just_logged_in');
+                  setAuthState({
+                    user: null,
+                    isAuthenticated: false,
+                    isLoading: false,
+                    step: 'login'
+                  });
+                  return;
+                }
+                console.log('[useAuth] Session established after retry');
+              } else {
+                console.warn('[useAuth] No Supabase session found - RLS will fail. Clearing auth to force re-login.');
+                localStorage.removeItem('looplly_auth_token');
+                localStorage.removeItem('looplly_user');
+                setAuthState({
+                  user: null,
+                  isAuthenticated: false,
+                  isLoading: false,
+                  step: 'login'
+                });
+                return;
+              }
             }
             
             console.log('[useAuth] Supabase session exists, auth.uid() will work for RLS');

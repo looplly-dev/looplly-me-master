@@ -113,23 +113,34 @@ export const loginUser = async (params: LoginParams): Promise<{ success: boolean
       
       console.log('Login successful - custom JWT stored');
       
-      // CRITICAL: Establish Supabase session for RLS to work
-      if (data.supabase_auth_id) {
-        console.log('Establishing Supabase session for RLS...');
-        
-        // Sign in to Supabase with the mobile user's credentials
-        const { error: signInError } = await supabase.auth.signInWithPassword({
-          email: `${data.user.id}@looplly.mobile`,
-          password: params.password
-        });
-        
-        if (signInError) {
-          console.warn('Failed to establish Supabase session:', signInError.message);
-          // Don't fail login, but note that RLS might have issues
-        } else {
-          console.log('Supabase session established successfully');
-        }
+      // CRITICAL: ALWAYS establish Supabase session for RLS to work
+      // Use synthetic email pattern for backend authentication
+      const syntheticEmail = `${data.user.id}@looplly.mobile`;
+      console.log('[Login] Establishing Supabase session with synthetic email:', syntheticEmail);
+      
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: syntheticEmail,
+        password: params.password
+      });
+      
+      if (signInError) {
+        console.error('[Login] Failed to establish Supabase session:', signInError.message);
+        // Clear the custom token since we can't establish a backend session
+        localStorage.removeItem('looplly_auth_token');
+        localStorage.removeItem('looplly_user');
+        return { 
+          success: false, 
+          error: { 
+            message: 'Login failed. Please try again or contact support if the issue persists.' 
+          } 
+        };
       }
+      
+      console.log('[Login] Supabase session established successfully - RLS will work');
+      
+      // Set a flag to help useAuth avoid premature token clearing
+      sessionStorage.setItem('looplly_just_logged_in', '1');
+      setTimeout(() => sessionStorage.removeItem('looplly_just_logged_in'), 1000);
     } else {
       console.log('Logging in admin user with email:', params.email);
       // Email login for admin/team users (Supabase Auth)

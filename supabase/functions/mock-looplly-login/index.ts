@@ -80,7 +80,6 @@ serve(async (req) => {
     if (!supabaseAuthId) {
       console.log('[MOCK LOGIN] Creating Supabase Auth user for:', normalizedMobile);
       
-      // First, check if auth user exists by trying to get it
       const syntheticEmail = `${profile.user_id}@looplly.mobile`;
       
       const { data: authUser, error: authError } = await supabase.auth.admin.createUser({
@@ -99,14 +98,40 @@ serve(async (req) => {
       
       if (authError) {
         console.error('[MOCK LOGIN] Failed to create Supabase Auth user:', authError);
-        // Try to find existing auth user by email
-        const { data: existingUsers } = await supabase.auth.admin.listUsers();
-        const existingUser = existingUsers?.users?.find(u => u.email === syntheticEmail);
-        if (existingUser) {
-          console.log('[MOCK LOGIN] Found existing Supabase Auth user, updating password and metadata');
-          supabaseAuthId = existingUser.id;
-          // Ensure password matches and metadata is up to date
-          const { error: updateError } = await supabase.auth.admin.updateUserById(existingUser.id, {
+        
+        // Robust multi-page search for existing user
+        console.log('[MOCK LOGIN] Searching for existing auth user with email:', syntheticEmail);
+        let foundUser = null;
+        let page = 1;
+        const perPage = 1000;
+        const maxPages = 10;
+        
+        while (!foundUser && page <= maxPages) {
+          const { data: pageData } = await supabase.auth.admin.listUsers({ 
+            page, 
+            perPage 
+          });
+          
+          if (pageData?.users) {
+            foundUser = pageData.users.find(u => u.email === syntheticEmail);
+            if (foundUser) {
+              console.log('[MOCK LOGIN] Found existing user on page', page);
+              break;
+            }
+          }
+          
+          if (!pageData?.users || pageData.users.length < perPage) {
+            break; // No more pages
+          }
+          page++;
+        }
+        
+        if (foundUser) {
+          supabaseAuthId = foundUser.id;
+          console.log('[MOCK LOGIN] Updating existing auth user:', supabaseAuthId);
+          
+          // Update password and metadata
+          const { error: updateError } = await supabase.auth.admin.updateUserById(foundUser.id, {
             password,
             email_confirm: true,
             user_metadata: {
@@ -118,28 +143,54 @@ serve(async (req) => {
               user_type: 'looplly_user'
             }
           });
+          
           if (updateError) {
             console.error('[MOCK LOGIN] Failed to update existing auth user:', updateError);
           }
+        } else {
+          console.error('[MOCK LOGIN] Could not find or create Supabase Auth user');
+          return new Response(
+            JSON.stringify({ error: 'Failed to establish authentication session' }), 
+            {
+              status: 500,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+            }
+          );
         }
       } else if (authUser.user) {
         supabaseAuthId = authUser.user.id;
-        console.log('[MOCK LOGIN] Created new Supabase Auth user');
+        console.log('[MOCK LOGIN] Created new Supabase Auth user:', supabaseAuthId);
       }
+    }
+    
+    // CRITICAL: Always upsert mapping to ensure consistency
+    if (supabaseAuthId) {
+      console.log('[MOCK LOGIN] Upserting mapping for looplly_user_id:', profile.user_id, 'supabase_auth_id:', supabaseAuthId);
+      const { error: mappingError } = await supabase
+        .from('looplly_user_auth_mapping')
+        .upsert({
+          looplly_user_id: profile.user_id,
+          supabase_auth_id: supabaseAuthId,
+          mobile: normalizedMobile,
+          country_code: profile.country_code
+        }, {
+          onConflict: 'looplly_user_id'
+        });
       
-      // Store mapping if we have supabaseAuthId
-      if (supabaseAuthId) {
-        await supabase
-          .from('looplly_user_auth_mapping')
-          .upsert({
-            looplly_user_id: profile.user_id,
-            supabase_auth_id: supabaseAuthId,
-            mobile: normalizedMobile,
-            country_code: profile.country_code
-          }, {
-            onConflict: 'looplly_user_id'
-          });
+      if (mappingError) {
+        console.error('[MOCK LOGIN] Failed to upsert mapping:', mappingError);
+      } else {
+        console.log('[MOCK LOGIN] Mapping upserted successfully');
       }
+    } else {
+      console.error('[MOCK LOGIN] CRITICAL: No supabaseAuthId available for mapping');
+      return new Response(
+        JSON.stringify({ error: 'Failed to establish authentication mapping' }), 
+        {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
     }
     
     // Generate custom JWT token
