@@ -23,8 +23,10 @@ export interface RegistrationParams {
 }
 
 export interface LoginParams {
-  email: string;
+  email?: string;
   password: string;
+  mobile?: string;
+  countryCode?: string;
 }
 
 export const registerUser = async (params: RegistrationParams): Promise<{ success: boolean; error?: any }> => {
@@ -78,27 +80,22 @@ export const registerUser = async (params: RegistrationParams): Promise<{ succes
 export const loginUser = async (params: LoginParams): Promise<{ success: boolean; error?: any }> => {
   try {
     // Determine if this is mobile or email login
-    const isMobileLogin = params.email.startsWith('+');
+    const isMobileLogin = params.mobile && params.countryCode;
     
     if (isMobileLogin) {
-      console.log('Logging in Looplly user with mobile:', params.email);
-      
-      // Extract country code and mobile
-      const countryCodeMatch = params.email.match(/^\+\d+/);
-      const countryCode = countryCodeMatch?.[0] || '+27';
-      const mobile = params.email.replace(/^\+\d+/, '');
+      console.log('[loginUser] Mobile login with countryCode:', params.countryCode, 'mobile:', params.mobile);
       
       // Call custom login edge function (NOT Supabase Auth)
       const { data, error } = await supabase.functions.invoke('mock-looplly-login', {
         body: {
-          mobile,
-          countryCode,
+          mobile: params.mobile,
+          countryCode: params.countryCode,
           password: params.password
         }
       });
 
       if (error || !data?.token) {
-        console.error('Login error:', error || data);
+        console.error('[loginUser] Login error:', error || data);
         return { 
           success: false, 
           error: { 
@@ -111,12 +108,12 @@ export const loginUser = async (params: LoginParams): Promise<{ success: boolean
       localStorage.setItem('looplly_auth_token', data.token);
       localStorage.setItem('looplly_user', JSON.stringify(data.user));
       
-      console.log('Login successful - custom JWT stored');
+      console.log('[loginUser] Login successful - custom JWT stored');
       
       // CRITICAL: ALWAYS establish Supabase session for RLS to work
       // Use synthetic email pattern for backend authentication
       const syntheticEmail = `${data.user.id}@looplly.mobile`;
-      console.log('[Login] Establishing Supabase session with synthetic email:', syntheticEmail);
+      console.log('[loginUser] Establishing Supabase session with synthetic email:', syntheticEmail);
       
       const { error: signInError } = await supabase.auth.signInWithPassword({
         email: syntheticEmail,
@@ -124,7 +121,7 @@ export const loginUser = async (params: LoginParams): Promise<{ success: boolean
       });
       
       if (signInError) {
-        console.error('[Login] Failed to establish Supabase session:', signInError.message);
+        console.error('[loginUser] Failed to establish Supabase session:', signInError.message);
         // Clear the custom token since we can't establish a backend session
         localStorage.removeItem('looplly_auth_token');
         localStorage.removeItem('looplly_user');
@@ -136,13 +133,13 @@ export const loginUser = async (params: LoginParams): Promise<{ success: boolean
         };
       }
       
-      console.log('[Login] Supabase session established successfully - RLS will work');
+      console.log('[loginUser] Supabase session established successfully - RLS will work');
       
       // Set a flag to help useAuth avoid premature token clearing
       sessionStorage.setItem('looplly_just_logged_in', '1');
       setTimeout(() => sessionStorage.removeItem('looplly_just_logged_in'), 1000);
-    } else {
-      console.log('Logging in admin user with email:', params.email);
+    } else if (params.email) {
+      console.log('[loginUser] Email login for admin/team user:', params.email);
       // Email login for admin/team users (Supabase Auth)
       const { error } = await supabase.auth.signInWithPassword({
         email: params.email,
@@ -150,7 +147,7 @@ export const loginUser = async (params: LoginParams): Promise<{ success: boolean
       });
 
       if (error) {
-        console.error('Login error:', error);
+        console.error('[loginUser] Email login error:', error);
         const errorMessage = error.message === 'Email not confirmed' 
           ? 'Please verify your email before logging in' 
           : error.message === 'Invalid login credentials'
@@ -158,12 +155,14 @@ export const loginUser = async (params: LoginParams): Promise<{ success: boolean
           : error.message || 'Login failed';
         return { success: false, error: { message: errorMessage } };
       }
+    } else {
+      return { success: false, error: { message: 'Invalid login parameters' } };
     }
     
-    console.log('Login successful');
+    console.log('[loginUser] Login successful');
     return { success: true };
   } catch (error) {
-    console.error('Login failed:', error);
+    console.error('[loginUser] Login failed:', error);
     return { success: false, error: { message: 'Something went wrong. Please try again.' } };
   }
 };

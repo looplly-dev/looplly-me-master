@@ -662,7 +662,19 @@ export const useAuthLogic = () => {
       
       // For Looplly mobile users, use custom auth
       if (isMobileLogin) {
-        const result = await loginUser({ email, password });
+        // Extract country code and mobile from the normalized number
+        // Match country code (1-4 digits after +)
+        const countryCodeMatch = email.match(/^(\+\d{1,4})/);
+        const countryCode = countryCodeMatch?.[1] || '+27';
+        const mobile = email.replace(/^(\+\d{1,4})/, '');
+        
+        console.log('[useAuth] Extracted countryCode:', countryCode, 'mobile:', mobile);
+        
+        const result = await loginUser({ 
+          mobile, 
+          countryCode, 
+          password 
+        });
         
         if (result.success) {
           // Custom JWT is now stored in localStorage
