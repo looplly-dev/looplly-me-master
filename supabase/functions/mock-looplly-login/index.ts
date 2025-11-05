@@ -103,8 +103,24 @@ serve(async (req) => {
         const { data: existingUsers } = await supabase.auth.admin.listUsers();
         const existingUser = existingUsers?.users?.find(u => u.email === syntheticEmail);
         if (existingUser) {
-          console.log('[MOCK LOGIN] Found existing Supabase Auth user');
+          console.log('[MOCK LOGIN] Found existing Supabase Auth user, updating password and metadata');
           supabaseAuthId = existingUser.id;
+          // Ensure password matches and metadata is up to date
+          const { error: updateError } = await supabase.auth.admin.updateUserById(existingUser.id, {
+            password,
+            email_confirm: true,
+            user_metadata: {
+              mobile: profile.mobile,
+              country_code: profile.country_code,
+              first_name: profile.first_name,
+              last_name: profile.last_name,
+              looplly_user_id: profile.user_id,
+              user_type: 'looplly_user'
+            }
+          });
+          if (updateError) {
+            console.error('[MOCK LOGIN] Failed to update existing auth user:', updateError);
+          }
         }
       } else if (authUser.user) {
         supabaseAuthId = authUser.user.id;
