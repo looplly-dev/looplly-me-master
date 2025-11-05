@@ -87,8 +87,7 @@ serve(async (req) => {
         password: password,
         email_confirm: true,
         user_metadata: {
-          mobile: profile.mobile,
-          country_code: profile.country_code,
+          // Intentionally omit mobile & country_code to avoid profiles.mobile unique conflict
           first_name: profile.first_name,
           last_name: profile.last_name,
           looplly_user_id: profile.user_id,
@@ -135,8 +134,7 @@ serve(async (req) => {
             password,
             email_confirm: true,
             user_metadata: {
-              mobile: profile.mobile,
-              country_code: profile.country_code,
+              // Omit mobile & country_code to prevent profile mobile unique conflicts
               first_name: profile.first_name,
               last_name: profile.last_name,
               looplly_user_id: profile.user_id,
