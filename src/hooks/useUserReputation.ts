@@ -46,27 +46,10 @@ export const useUserReputation = () => {
   const queryClient = useQueryClient();
   const { userType, isLoading: typeLoading } = useUserType();
   
-  // Team members don't have reputation - early return
-  if (typeLoading) {
-    return { 
-      reputation: null, 
-      isLoading: true, 
-      addReputationPoints: () => {}, 
-      updateQualityMetrics: () => {} 
-    };
-  }
-  
-  if (userType === 'looplly_team_user') {
-    return { 
-      reputation: null, 
-      isLoading: false, 
-      addReputationPoints: () => {}, 
-      updateQualityMetrics: () => {} 
-    };
-  }
-
+  // CRITICAL: Call useQuery unconditionally (Rules of Hooks)
+  // Disable query for team users instead of early return
   const { data: reputation, isLoading } = useQuery({
-    queryKey: ['user-reputation', authState.user?.id],
+    queryKey: ['user-reputation', authState.user?.id, userType],
     queryFn: async () => {
       if (!authState.user?.id) return null;
 
@@ -88,8 +71,28 @@ export const useUserReputation = () => {
         quality_metrics: data.quality_metrics as unknown as QualityMetrics,
       } as UserReputation;
     },
-    enabled: !!authState.user?.id,
+    // Disable query for team users and when still loading user type
+    enabled: !!authState.user?.id && !typeLoading && userType !== 'looplly_team_user',
   });
+  
+  // Handle team members AFTER all hooks are called
+  if (typeLoading) {
+    return { 
+      reputation: null, 
+      isLoading: true, 
+      addReputationPoints: () => {}, 
+      updateQualityMetrics: () => {} 
+    };
+  }
+  
+  if (userType === 'looplly_team_user') {
+    return { 
+      reputation: null, 
+      isLoading: false, 
+      addReputationPoints: () => {}, 
+      updateQualityMetrics: () => {} 
+    };
+  }
 
   const addReputationPoints = useMutation({
     mutationFn: async ({ points, action, category, description, metadata }: {
