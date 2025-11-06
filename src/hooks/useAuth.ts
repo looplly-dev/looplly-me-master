@@ -292,30 +292,22 @@ export const useAuthLogic = () => {
         let teamProfile = null;
         let isTeamMember = false;
 
-        // CRITICAL: Check team membership FIRST via secure RPC to avoid conflicts with stale profiles table
-        const { data: isTeamMemberResult, error: teamCheckError } = await activeSupabase
-          .rpc('is_team_member', { _user_id: session.user.id });
+        // Check team membership via team_profiles first (own row is allowed by RLS)
+        const { data: teamData, error: teamError } = await activeSupabase
+          .from('team_profiles')
+          .select('*')
+          .eq('user_id', session.user.id)
+          .maybeSingle();
         
-        if (teamCheckError) {
-          console.error('[useAuth] Error checking team membership via RPC:', teamCheckError);
+        if (teamError && teamError.code !== 'PGRST116') {
+          console.error('[useAuth] Error fetching team profile data:', teamError);
         }
         
-        if (isTeamMemberResult) {
-          // User is a team member - fetch team profile data
-          const { data: teamData, error: teamError } = await activeSupabase
-            .from('team_profiles')
-            .select('*')
-            .eq('user_id', session.user.id)
-            .maybeSingle();
-          
-          if (teamData) {
-            teamProfile = teamData;
-            isTeamMember = true;
-            if (import.meta.env.DEV) {
-              console.info('[useAuth] Team member verified via RPC:', teamProfile.email);
-            }
-          } else if (teamError && teamError.code !== 'PGRST116') {
-            console.error('[useAuth] Error fetching team profile data:', teamError);
+        if (teamData) {
+          teamProfile = teamData;
+          isTeamMember = true;
+          if (import.meta.env.DEV) {
+            console.info('[useAuth] Team member verified via team_profiles:', teamProfile.email);
           }
         } else {
           // Not a team member - check profiles table for regular users
@@ -529,16 +521,19 @@ export const useAuthLogic = () => {
         
         if (!isValid) {
           console.warn('[useAuth] Fast-path: Session invalid:', reason);
-          // Force logout for expired session
-          supabase.auth.signOut();
-          clearAllSessionMetadata();
-          if (mounted) {
-            setAuthState({ user: null, isAuthenticated: false, isLoading: false, step: 'login' });
+          // If metadata is missing, this may be a fresh session - proceed to processing
+          if (reason !== 'missing') {
+            // Force logout for expired/inactive session
+            supabase.auth.signOut();
+            clearAllSessionMetadata();
+            if (mounted) {
+              setAuthState({ user: null, isAuthenticated: false, isLoading: false, step: 'login' });
+            }
+            return;
           }
-          return;
         }
         
-        // Session is valid, process it
+        // Session is valid or metadata missing (fresh) - process it
         processSession(session).catch(error => {
           console.error('[useAuth] Fast-path error:', error);
           if (mounted) {
@@ -792,28 +787,27 @@ export const useAuthLogic = () => {
       // Validate user type if specified
       if (expectedUserType) {
         if (expectedUserType === 'looplly_team_user') {
-          // Use secure RPC to check team membership (bypasses RLS)
-          const { data: isTeamMemberResult, error: teamCheckError } = await supabase
-            .rpc('is_team_member', { _user_id: data.user.id });
+          // Verify team membership via team_profiles
+          const { data: teamProfile, error: teamErr } = await supabase
+            .from('team_profiles')
+            .select('user_id')
+            .eq('user_id', data.user.id)
+            .maybeSingle();
 
-          if (teamCheckError) {
-            console.error('[useAuth] Error checking team membership via RPC:', teamCheckError);
+          if (teamErr && teamErr.code !== 'PGRST116') {
+            console.error('[useAuth] Error checking team membership via team_profiles:', teamErr);
             await supabase.auth.signOut();
             setAuthState(prev => ({ ...prev, isLoading: false }));
             throw new Error('Unable to verify team membership. Please try again.');
           }
 
-          if (!isTeamMemberResult) {
+          if (!teamProfile) {
             if (import.meta.env.DEV) {
-              console.info('[useAuth] Team membership check failed via RPC');
+              console.info('[useAuth] Team membership check failed via team_profiles');
             }
             await supabase.auth.signOut();
             setAuthState(prev => ({ ...prev, isLoading: false }));
             throw new Error('Access denied. This portal is for team members only. Please use the main site to log in.');
-          }
-          
-          if (import.meta.env.DEV) {
-            console.info('[useAuth] Team membership verified via RPC');
           }
         } else if (expectedUserType === 'looplly_user') {
           // Check profiles table for regular users
@@ -843,24 +837,18 @@ export const useAuthLogic = () => {
           let teamProfile = null;
           let isTeamMember = false;
           
-          // Check team membership via secure RPC FIRST
-          const { data: isTeamMemberResult } = await supabase
-            .rpc('is_team_member', { _user_id: session.user.id });
+          // Check team membership via team_profiles FIRST
+          const { data: teamData } = await supabase
+            .from('team_profiles')
+            .select('*')
+            .eq('user_id', session.user.id)
+            .maybeSingle();
           
-          if (isTeamMemberResult) {
-            // User is a team member - fetch team profile data
-            const { data: teamData } = await supabase
-              .from('team_profiles')
-              .select('*')
-              .eq('user_id', session.user.id)
-              .maybeSingle();
-            
-            if (teamData) {
-              teamProfile = teamData;
-              isTeamMember = true;
-              if (import.meta.env.DEV) {
-                console.info('[useAuth] Fast-path: Team member verified via RPC');
-              }
+          if (teamData) {
+            teamProfile = teamData;
+            isTeamMember = true;
+            if (import.meta.env.DEV) {
+              console.info('[useAuth] Fast-path: Team member verified via team_profiles');
             }
           } else {
             // Not a team member - check profiles for regular users

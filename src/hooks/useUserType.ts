@@ -31,19 +31,22 @@ export function useUserType() {
       try {
         const supabase = getSupabaseClient();
         
-        // Step 1: Check team membership via secure RPC (bypasses RLS)
-        const { data: isTeamMemberResult, error: teamCheckError } = await supabase
-          .rpc('is_team_member', { _user_id: authState.user!.id });
+        // Step 1: Check team membership via team_profiles (own row)
+        const { data: teamProfile, error: teamError } = await supabase
+          .from('team_profiles')
+          .select('user_id')
+          .eq('user_id', authState.user!.id)
+          .maybeSingle();
 
-        if (teamCheckError) {
-          console.error('[useUserType] Error checking team membership via RPC:', teamCheckError);
+        if (teamError && teamError.code !== 'PGRST116') {
+          console.error('[useUserType] Error checking team_profiles:', teamError);
         }
 
-        if (isTeamMemberResult) {
+        if (teamProfile) {
           setUserType('looplly_team_user');
           setIsLoading(false);
           if (import.meta.env.DEV) {
-            console.info('[useUserType] Team membership verified via RPC');
+            console.info('[useUserType] Team membership verified via team_profiles');
           }
           return;
         }
