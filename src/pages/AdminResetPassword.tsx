@@ -26,34 +26,52 @@ export default function AdminResetPassword() {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Check for recovery session on mount
+  // Check for active session (either recovery link OR logged in with temp password)
   useEffect(() => {
-    const checkRecoverySession = async () => {
+    const checkSession = async () => {
       try {
         const supabase = getSupabaseClient();
         const { data: { session } } = await supabase.auth.getSession();
         
-        console.log('Recovery session check:', { 
+        console.log('Password reset session check:', { 
           hasSession: !!session,
           userId: session?.user?.id
         });
 
         if (!session) {
           toast({
-            title: 'Invalid Reset Link',
-            description: 'Please use the password reset link from your email.',
+            title: 'Session Required',
+            description: 'Please log in to change your password.',
             variant: 'destructive'
           });
           navigate('/admin/login');
           return;
         }
 
+        // Check if this is a team member who must change password
+        const { data: teamProfile } = await supabase
+          .from('team_profiles')
+          .select('must_change_password, email')
+          .eq('user_id', session.user.id)
+          .maybeSingle();
+
+        if (!teamProfile) {
+          toast({
+            title: 'Access Denied',
+            description: 'This page is only for team members.',
+            variant: 'destructive'
+          });
+          navigate('/admin/login');
+          return;
+        }
+
+        // Allow password change for any authenticated team member
         setIsRecoveryReady(true);
       } catch (error) {
         console.error('Session check error:', error);
         toast({
           title: 'Session Error',
-          description: 'Unable to verify reset session. Please try again.',
+          description: 'Unable to verify your session. Please try again.',
           variant: 'destructive'
         });
         navigate('/admin/login');
@@ -62,7 +80,7 @@ export default function AdminResetPassword() {
       }
     };
 
-    checkRecoverySession();
+    checkSession();
   }, [navigate, toast]);
 
   const passwordRequirements = [
