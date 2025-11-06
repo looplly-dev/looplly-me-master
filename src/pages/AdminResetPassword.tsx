@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { getSupabaseClient } from '@/integrations/supabase/activeClient';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { CheckCircle2, AlertCircle, Shield } from 'lucide-react';
+import { CheckCircle2, AlertCircle, Shield, Loader2 } from 'lucide-react';
 
 const passwordSchema = z
   .string()
@@ -21,8 +21,49 @@ export default function AdminResetPassword() {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isRecoveryReady, setIsRecoveryReady] = useState(false);
+  const [isCheckingSession, setIsCheckingSession] = useState(true);
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  // Check for recovery session on mount
+  useEffect(() => {
+    const checkRecoverySession = async () => {
+      try {
+        const supabase = getSupabaseClient();
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        console.log('Recovery session check:', { 
+          hasSession: !!session,
+          userId: session?.user?.id
+        });
+
+        if (!session) {
+          toast({
+            title: 'Invalid Reset Link',
+            description: 'Please use the password reset link from your email.',
+            variant: 'destructive'
+          });
+          navigate('/admin/login');
+          return;
+        }
+
+        setIsRecoveryReady(true);
+      } catch (error) {
+        console.error('Session check error:', error);
+        toast({
+          title: 'Session Error',
+          description: 'Unable to verify reset session. Please try again.',
+          variant: 'destructive'
+        });
+        navigate('/admin/login');
+      } finally {
+        setIsCheckingSession(false);
+      }
+    };
+
+    checkRecoverySession();
+  }, [navigate, toast]);
 
   const passwordRequirements = [
     { label: 'At least 8 characters', met: newPassword.length >= 8 },
@@ -34,11 +75,20 @@ export default function AdminResetPassword() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!isRecoveryReady) {
+      toast({
+        title: 'Session Not Ready',
+        description: 'Please wait for the session to be verified.',
+        variant: 'destructive'
+      });
+      return;
+    }
+
     // Validate password
     const validation = passwordSchema.safeParse(newPassword);
     if (!validation.success) {
       toast({
-        title: 'Invalid Password',
+        title: 'Password Requirements Not Met',
         description: validation.error.issues[0].message,
         variant: 'destructive'
       });
@@ -48,7 +98,7 @@ export default function AdminResetPassword() {
     // Check passwords match
     if (newPassword !== confirmPassword) {
       toast({
-        title: 'Passwords Do Not Match',
+        title: 'Passwords do not match',
         description: 'Please ensure both passwords are identical',
         variant: 'destructive'
       });
@@ -58,12 +108,13 @@ export default function AdminResetPassword() {
     setIsSubmitting(true);
 
     try {
-      // Use path-aware client (will be adminClient)
       const supabase = getSupabaseClient();
       
-      // Get current user
+      // Get current user from active session
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('No user found');
+      if (!user) {
+        throw new Error('No active session found');
+      }
 
       // Update password
       const { error: passwordError } = await supabase.auth.updateUser({
@@ -102,24 +153,38 @@ export default function AdminResetPassword() {
 
       toast({
         title: 'Password Updated',
-        description: 'Your password has been successfully changed'
+        description: 'Your password has been successfully changed. Please log in with your new password.'
       });
 
-      // Sign out and redirect to login with new password
+      // Sign out and redirect to login
       await supabase.auth.signOut();
       navigate('/admin/login');
 
     } catch (error: any) {
       console.error('Password reset error:', error);
       toast({
-        title: 'Reset Failed',
-        description: error.message || 'Failed to update password',
+        title: 'Failed to update password',
+        description: error.message || 'An error occurred while updating your password. Please try again.',
         variant: 'destructive'
       });
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  // Show loading state while checking session
+  if (isCheckingSession) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Card className="w-full max-w-md shadow-lg">
+          <CardContent className="pt-6 flex flex-col items-center gap-4">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <p className="text-muted-foreground">Verifying reset session...</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -188,9 +253,16 @@ export default function AdminResetPassword() {
             <Button
               type="submit"
               className="w-full h-12"
-              disabled={isSubmitting}
+              disabled={isSubmitting || !isRecoveryReady}
             >
-              {isSubmitting ? 'Updating Password...' : 'Set New Password'}
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Updating Password...
+                </>
+              ) : (
+                'Set New Password'
+              )}
             </Button>
           </form>
         </CardContent>
