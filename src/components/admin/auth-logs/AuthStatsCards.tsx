@@ -5,10 +5,11 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 interface AuthStatsCardsProps {
   timeRange: '1h' | '24h' | '7d';
+  portal?: 'user' | 'admin' | 'all';
 }
 
-export function AuthStatsCards({ timeRange }: AuthStatsCardsProps) {
-  const { data: stats, isLoading } = useAuthStats(timeRange);
+export function AuthStatsCards({ timeRange, portal = 'all' }: AuthStatsCardsProps) {
+  const { data: stats, isLoading } = useAuthStats(timeRange, portal);
 
   if (isLoading) {
     return (

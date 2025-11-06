@@ -17,7 +17,7 @@ export function AuthLogsDashboard() {
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [selectedLog, setSelectedLog] = useState<AuthLogEntry | null>(null);
   const [detailModalOpen, setDetailModalOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('all');
+  const [portalFilter, setPortalFilter] = useState<'all' | 'user' | 'admin'>('all');
   
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -27,6 +27,7 @@ export function AuthLogsDashboard() {
     eventType: eventType === 'all' ? undefined : eventType,
     userId: userId || undefined,
     status: status === 'all' ? undefined : status,
+    portal: portalFilter,
     autoRefresh,
   });
 
@@ -36,17 +37,17 @@ export function AuthLogsDashboard() {
     const search = searchTerm.toLowerCase();
     return (
       log.user_identifier?.toLowerCase().includes(search) ||
+      log.mobile?.includes(search) ||
       log.method?.toLowerCase().includes(search) ||
       log.error_message?.toLowerCase().includes(search) ||
       JSON.stringify(log.metadata).toLowerCase().includes(search)
     );
   });
 
-  // Filter logs by active tab
-  const tabFilteredLogs = filteredLogs.filter(log => {
-    if (activeTab === 'all') return true;
-    return log.event_type === activeTab;
-  });
+  // Calculate counts for tabs
+  const allCount = filteredLogs.length;
+  const userPortalCount = filteredLogs.filter(l => l.portal === 'user').length;
+  const adminPortalCount = filteredLogs.filter(l => l.portal === 'admin').length;
 
   const handleClearFilters = () => {
     setEventType('all');
@@ -95,7 +96,10 @@ export function AuthLogsDashboard() {
 
   return (
     <div className="space-y-6">
-      <AuthStatsCards timeRange={timeRange === 'custom' ? '24h' : timeRange} />
+      <AuthStatsCards 
+        timeRange={timeRange === 'custom' ? '24h' : timeRange} 
+        portal={portalFilter}
+      />
 
       <AuthLogFilters
         timeRange={timeRange}
@@ -115,21 +119,26 @@ export function AuthLogsDashboard() {
         onRefresh={() => refetch()}
       />
 
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
+      <Tabs value={portalFilter} onValueChange={(value) => setPortalFilter(value as 'all' | 'user' | 'admin')}>
         <TabsList>
-          <TabsTrigger value="all">All Events ({filteredLogs.length})</TabsTrigger>
-          <TabsTrigger value="login">
-            Logins ({filteredLogs.filter(l => l.event_type === 'login').length})
+          <TabsTrigger value="all">
+            All Portals ({allCount})
           </TabsTrigger>
-          <TabsTrigger value="logout">
-            Logouts ({filteredLogs.filter(l => l.event_type === 'logout').length})
+          <TabsTrigger value="user">
+            <svg className="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+            </svg>
+            User Portal ({userPortalCount})
           </TabsTrigger>
-          <TabsTrigger value="error">
-            Errors ({filteredLogs.filter(l => l.status === 'failed').length})
+          <TabsTrigger value="admin">
+            <svg className="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+            Admin Portal ({adminPortalCount})
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value={activeTab} className="mt-4">
+        <TabsContent value={portalFilter} className="mt-4">
           {isLoading ? (
             <div className="text-center py-12">
               <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -137,7 +146,7 @@ export function AuthLogsDashboard() {
             </div>
           ) : (
             <AuthLogsList
-              logs={tabFilteredLogs}
+              logs={filteredLogs}
               onViewDetails={handleViewDetails}
               onViewUser={handleViewUser}
             />
