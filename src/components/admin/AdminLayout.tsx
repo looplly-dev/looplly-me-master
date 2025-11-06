@@ -56,6 +56,7 @@ type UserRole = 'super_admin' | 'admin' | 'tester' | 'user';
 
 const adminNavItems = [
   { title: 'Dashboard', url: '/admin', icon: LayoutDashboard, exact: true, minRole: 'admin' as UserRole },
+  { title: 'Auth Logs', url: '/admin/auth-logs', icon: Shield, minRole: 'admin' as UserRole },
   { title: 'Journey Simulator', url: '/admin/simulator', icon: TestTube, minRole: 'tester' as UserRole },
   { title: 'Knowledge Center', url: '/admin/knowledge', icon: BookOpen, minRole: 'tester' as UserRole },
   { title: 'Team', url: '/admin/team', icon: UserCog, minRole: 'admin' as UserRole },

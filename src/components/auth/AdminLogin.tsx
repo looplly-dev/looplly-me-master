@@ -144,13 +144,21 @@ export default function AdminLogin() {
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <Card className="w-full max-w-md shadow-lg border">
         <CardHeader className="text-center pb-6">
-          <div className="mx-auto mb-4 w-16 h-16 bg-primary rounded-2xl flex items-center justify-center">
-            <Shield className="h-8 w-8 text-primary-foreground" />
+          <div className="mx-auto mb-4 w-16 h-16 bg-amber-500 rounded-2xl flex items-center justify-center">
+            <Shield className="h-8 w-8 text-white" />
+          </div>
+          <div className="mb-2">
+            <span className="inline-block px-3 py-1 bg-amber-500/20 text-amber-700 dark:text-amber-400 text-xs font-semibold rounded-full">
+              🛡️ ADMIN PORTAL
+            </span>
           </div>
           <CardTitle className="text-3xl font-bold">
-            Admin Portal
+            Team Member Login
           </CardTitle>
-          <p className="text-muted-foreground">Team Members Only</p>
+          <p className="text-muted-foreground">Authorized Personnel Only</p>
+          <p className="text-xs text-amber-600 dark:text-amber-400 mt-2">
+            This portal is for Looplly team members only
+          </p>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -241,8 +249,20 @@ export default function AdminLogin() {
                 onClick={() => navigate('/')}
               >
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Main Site
+                Back to User Portal
               </Button>
+            </div>
+
+            <div className="mt-4 pt-4 border-t text-center">
+              <p className="text-xs text-muted-foreground mb-2">
+                Not a team member?
+              </p>
+              <a 
+                href="/" 
+                className="text-sm text-primary hover:underline font-medium"
+              >
+                ← Back to User Portal
+              </a>
             </div>
           </form>
         </CardContent>

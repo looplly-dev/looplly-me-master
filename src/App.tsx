@@ -11,6 +11,7 @@ import LoopllyApp from "./components/LoopllyApp";
 
 // Lazy load admin pages for better performance
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
+const AdminAuthLogs = lazy(() => import("./pages/AdminAuthLogs"));
 const AdminTeam = lazy(() => import("./pages/AdminTeam"));
 const AdminUsers = lazy(() => import("./pages/AdminUsers"));
 const AdminContent = lazy(() => import("./pages/AdminContent"));
@@ -62,6 +63,7 @@ const AppContent = () => {
         
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        <Route path="/admin/auth-logs" element={<AdminAuthLogs />} />
         <Route path="/admin/team" element={<AdminTeam />} />
         <Route path="/admin/users" element={<AdminUsers />} />
         <Route path="/admin/content" element={<AdminContent />} />

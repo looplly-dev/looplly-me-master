@@ -278,6 +278,13 @@ export default function Login({ onForgotPassword, onRegister }: LoginProps) {
                 </Button>
               </p>
             </div>
+
+            <div className="mt-6 text-center text-sm text-muted-foreground border-t pt-4">
+              <p>Are you a team member?</p>
+              <a href="/admin/login" className="text-primary hover:underline font-medium">
+                Access Admin Portal →
+              </a>
+            </div>
           </form>
         </CardContent>
       </Card>
