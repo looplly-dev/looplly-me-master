@@ -79,7 +79,7 @@ export default function RepTab() {
   }, [selectedBadge]);
 
   // Fetch admin's badge preview setting
-  const { data: profile } = useQuery({
+  const { data: profile, isLoading: profileLoading, error: profileError } = useQuery({
     queryKey: ['user-profile', authState.user?.id],
     queryFn: async () => {
       if (!authState.user?.id) return null;
@@ -88,20 +88,23 @@ export default function RepTab() {
         .select('badge_preview_mode')
         .eq('user_id', authState.user.id)
         .single();
-      if (error) throw error;
+      if (error) {
+        console.error('Profile query error:', error);
+        return null; // Return null on error instead of throwing
+      }
       return data;
     },
     enabled: !!authState.user?.id,
   });
 
   // Fetch all badges from database
-  const { data: allBadges = [], isLoading: badgesLoading } = useQuery({
+  const { data: allBadges = [], isLoading: badgesLoading, error: badgesError } = useQuery({
     queryKey: ['badges'],
     queryFn: () => listBadges(true),
   });
 
   // Fetch user's earned badges
-  const { data: userBadges = [], isLoading: userBadgesLoading } = useQuery({
+  const { data: userBadges = [], isLoading: userBadgesLoading, error: userBadgesError } = useQuery({
     queryKey: ['user-badges'],
     queryFn: () => getUserBadges(),
   });
@@ -266,13 +269,25 @@ export default function RepTab() {
     }
   ];
 
-  // Show loading state
-  if (badgesLoading || userBadgesLoading) {
+  // Show loading state - include ALL loading states
+  if (badgesLoading || userBadgesLoading || profileLoading || reputationLoading) {
     return (
       <div className="p-4 md:p-6 lg:p-8 pb-24 md:pb-20 lg:pb-8 flex items-center justify-center min-h-[400px]">
         <div className="text-center space-y-4">
           <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
-          <p className="text-muted-foreground">Loading your badges...</p>
+          <p className="text-muted-foreground">Loading your reputation data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state if queries failed
+  if (badgesError || userBadgesError) {
+    return (
+      <div className="p-4 md:p-6 lg:p-8 pb-24 md:pb-20 lg:pb-8 flex items-center justify-center min-h-[400px]">
+        <div className="text-center space-y-4">
+          <AlertTriangle className="h-8 w-8 mx-auto text-destructive" />
+          <p className="text-muted-foreground">Unable to load badge data. Please try refreshing.</p>
         </div>
       </div>
     );
