@@ -74,25 +74,8 @@ export const useUserReputation = () => {
     // Disable query for team users and when still loading user type
     enabled: !!authState.user?.id && !typeLoading && userType !== 'looplly_team_user',
   });
-  
-  // Handle team members AFTER all hooks are called
-  if (typeLoading) {
-    return { 
-      reputation: null, 
-      isLoading: true, 
-      addReputationPoints: () => {}, 
-      updateQualityMetrics: () => {} 
-    };
-  }
-  
-  if (userType === 'looplly_team_user') {
-    return { 
-      reputation: null, 
-      isLoading: false, 
-      addReputationPoints: () => {}, 
-      updateQualityMetrics: () => {} 
-    };
-  }
+  // After all hooks are declared, we'll derive what to return for team users below.
+
 
   const addReputationPoints = useMutation({
     mutationFn: async ({ points, action, category, description, metadata }: {
@@ -204,9 +187,12 @@ export const useUserReputation = () => {
     },
   });
 
+  const effectiveReputation = (typeLoading || userType === 'looplly_team_user') ? null : reputation;
+  const effectiveLoading = typeLoading || (userType !== 'looplly_team_user' && isLoading);
+
   return {
-    reputation,
-    isLoading,
+    reputation: effectiveReputation,
+    isLoading: effectiveLoading,
     addReputationPoints: addReputationPoints.mutate,
     updateQualityMetrics: updateQualityMetrics.mutate,
   };
