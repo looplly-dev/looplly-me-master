@@ -2398,6 +2398,14 @@ export type Database = {
         }
         Returns: undefined
       }
+      audit_kyc_access: {
+        Args: {
+          access_reason: string
+          accessor_id: string
+          target_user_id: string
+        }
+        Returns: boolean
+      }
       can_view_user_profile: {
         Args: { _target_user_id: string; _viewer_id: string }
         Returns: boolean

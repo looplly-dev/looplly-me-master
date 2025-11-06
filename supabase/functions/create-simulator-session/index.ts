@@ -140,7 +140,12 @@ serve(async (req) => {
     });
 
     // Generate custom JWT token (same as login flow)
-    const JWT_SECRET = Deno.env.get('LOOPLLY_JWT_SECRET') || 'dev-secret-change-in-production';
+    const JWT_SECRET = Deno.env.get('LOOPLLY_JWT_SECRET');
+    if (!JWT_SECRET) {
+      console.error('[create-simulator-session] LOOPLLY_JWT_SECRET not configured');
+      throw new Error('Authentication service misconfigured');
+    }
+    
     const key = await crypto.subtle.importKey(
       'raw',
       new TextEncoder().encode(JWT_SECRET),

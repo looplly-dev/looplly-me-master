@@ -192,7 +192,18 @@ serve(async (req) => {
     }
     
     // Generate custom JWT token
-    const JWT_SECRET = Deno.env.get('LOOPLLY_JWT_SECRET') || 'dev-secret-change-in-production';
+    const JWT_SECRET = Deno.env.get('LOOPLLY_JWT_SECRET');
+    if (!JWT_SECRET) {
+      console.error('[MOCK LOGIN] LOOPLLY_JWT_SECRET not configured');
+      return new Response(
+        JSON.stringify({ error: 'Authentication service misconfigured' }), 
+        {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    }
+    
     const key = await crypto.subtle.importKey(
       'raw',
       new TextEncoder().encode(JWT_SECRET),
