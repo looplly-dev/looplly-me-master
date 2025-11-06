@@ -54,8 +54,8 @@ export function useMockAuth() {
 
   return {
     authState,
-    login: async () => {
-      console.warn('[MOCK AUTH] login() called - no-op in mock mode');
+    login: async (email: string, password: string, expectedUserType?: 'looplly_user' | 'looplly_team_user' | 'client_user') => {
+      console.warn('[MOCK AUTH] login() called - no-op in mock mode', { email, expectedUserType });
       return true;
     },
     logout: async () => {
@@ -66,30 +66,32 @@ export function useMockAuth() {
         isAuthenticated: false,
       }));
     },
-    register: async () => {
-      console.warn('[MOCK AUTH] register() called - no-op in mock mode');
-      return { success: true };
+    register: async (data: any) => {
+      console.warn('[MOCK AUTH] register() called - no-op in mock mode', { data });
+      return true;
     },
-    verifyOTP: async () => {
-      console.warn('[MOCK AUTH] verifyOTP() called - no-op in mock mode');
+    verifyOTP: async (otp: string) => {
+      console.warn('[MOCK AUTH] verifyOTP() called - no-op in mock mode', { otp });
       return true;
     },
     resendOTP: async () => {
       console.warn('[MOCK AUTH] resendOTP() called - no-op in mock mode');
     },
-    forgotPassword: async () => {
-      console.warn('[MOCK AUTH] forgotPassword() called - no-op in mock mode');
+    forgotPassword: async (email: string) => {
+      console.warn('[MOCK AUTH] forgotPassword() called - no-op in mock mode', { email });
       return true;
     },
-    resetPassword: async () => {
+    resetPassword: async (password: string) => {
       console.warn('[MOCK AUTH] resetPassword() called - no-op in mock mode');
       return true;
     },
-    completeProfile: async () => {
-      console.warn('[MOCK AUTH] completeProfile() called - no-op in mock mode');
+    completeProfile: async (profileData: any) => {
+      console.warn('[MOCK AUTH] completeProfile() called - no-op in mock mode', { profileData });
+      return true;
     },
-    updateCommunicationPreferences: async () => {
-      console.warn('[MOCK AUTH] updateCommunicationPreferences() called - no-op in mock mode');
+    updateCommunicationPreferences: async (preferences: any) => {
+      console.warn('[MOCK AUTH] updateCommunicationPreferences() called - no-op in mock mode', { preferences });
+      return true;
     },
     refreshUserProfile: async () => {
       console.warn('[MOCK AUTH] refreshUserProfile() called - no-op in mock mode');
