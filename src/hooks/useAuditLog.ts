@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { adminClient } from '@/integrations/supabase/adminClient';
 import { useTenant } from './useTenant';
 
 export interface AuditLogEntry {
@@ -17,14 +17,14 @@ export function useAuditLog() {
     try {
       setIsLogging(true);
 
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user } } = await adminClient.auth.getUser();
       
       if (!user) {
         console.warn('Cannot log audit event: no authenticated user');
         return;
       }
 
-      const { error } = await supabase.rpc('log_audit_event', {
+      const { error } = await adminClient.rpc('log_audit_event', {
         p_tenant_id: tenant?.id || null,
         p_user_id: user.id,
         p_action: entry.action,

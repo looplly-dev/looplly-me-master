@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { adminClient } from '@/integrations/supabase/adminClient';
 import { formatMobileForDisplay } from '@/utils/mobileValidation';
 
 export interface AdminUser {
@@ -26,7 +26,7 @@ export function useAdminUsers(searchQuery: string = '') {
     setError(null);
 
     try {
-      let query = supabase
+      let query = adminClient
         .from('profiles')
         .select(`
           user_id,

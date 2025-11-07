@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { adminClient } from '@/integrations/supabase/adminClient';
 
 export interface AuthLogEntry {
   id: string;
@@ -154,7 +154,7 @@ export function useAuthLogs(options: UseAuthLogsOptions = {}) {
 
       // 3. Fetch audit logs
       try {
-        const { data: auditLogs, error } = await supabase
+        const { data: auditLogs, error } = await adminClient
           .from('audit_logs')
           .select('*')
           .or('action.ilike.%auth%,action.ilike.%login%,action.ilike.%logout%')

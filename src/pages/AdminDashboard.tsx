@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/integrations/supabase/client';
+import { adminClient } from '@/integrations/supabase/adminClient';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 import { useIntegrationStatus } from '@/hooks/useIntegrationStatus';
@@ -59,7 +59,7 @@ function AdminDashboardContent() {
     queryKey: ['admin-profile', authState.user?.id],
     queryFn: async () => {
       if (!authState.user?.id) return null;
-      const { data, error } = await supabase
+      const { data, error } = await adminClient
         .from('profiles')
         .select('badge_preview_mode')
         .eq('user_id', authState.user.id)
@@ -74,7 +74,7 @@ function AdminDashboardContent() {
   const updatePreviewMode = useMutation({
     mutationFn: async (enabled: boolean) => {
       if (!authState.user?.id) throw new Error('No user ID');
-      const { error } = await supabase
+      const { error } = await adminClient
         .from('profiles')
         .update({ badge_preview_mode: enabled })
         .eq('user_id', authState.user.id);

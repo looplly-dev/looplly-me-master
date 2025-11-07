@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { adminClient } from '@/integrations/supabase/adminClient';
 
 export interface TeamMember {
   user_id: string;
@@ -30,7 +30,7 @@ export function useAdminTeam(searchQuery: string = '') {
       setError(null);
 
       // Step 1: Fetch team profiles with optional search filter
-      let profileQuery = supabase
+      let profileQuery = adminClient
         .from('team_profiles')
         .select('user_id, email, first_name, last_name, company_name, company_role, is_active, created_at')
         .eq('is_active', true)
@@ -46,7 +46,7 @@ export function useAdminTeam(searchQuery: string = '') {
       if (profileError) throw profileError;
 
       // Step 2: Fetch user roles for admin/super_admin/tester
-      const { data: roles, error: rolesError } = await supabase
+      const { data: roles, error: rolesError } = await adminClient
         .from('user_roles')
         .select('user_id, role')
         .in('role', ['super_admin', 'admin', 'tester']);
