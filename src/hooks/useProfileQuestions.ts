@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { getSupabaseClient } from '@/integrations/supabase/activeClient';
 import { useAuth } from '@/hooks/useAuth';
+import { useMemo, useRef, useEffect } from 'react';
 
 export interface ProfileQuestion {
   id: string;
@@ -48,11 +49,18 @@ export interface ProfileCategory {
 
 export const useProfileQuestions = () => {
   const { authState } = useAuth();
-  const userId = authState.user?.id;
+  // Stabilize userId - only changes when actual user ID changes, not on other authState changes
+  const userId = useMemo(() => authState.user?.id, [authState.user?.id]);
+  
+  // Track if query has been fetched at least once
+  const hasFetchedOnce = useRef(false);
 
-  const { data, isLoading, refetch } = useQuery({
+  const { data, isLoading, refetch, isFetching } = useQuery({
     queryKey: ['profile-questions', userId],
     queryFn: async () => {
+      if (import.meta.env.DEV) {
+        console.log('[useProfileQuestions] queryFn executing for user:', userId);
+      }
       if (!userId) throw new Error('User not authenticated');
 
       const supabase = getSupabaseClient();
@@ -314,7 +322,7 @@ export const useProfileQuestions = () => {
         level3Categories
       };
     },
-    enabled: !!userId,
+    enabled: !!userId, // Enable when user ID exists
     staleTime: Infinity, // Never consider data stale
     cacheTime: 1000 * 60 * 60, // Keep in cache for 1 hour
     refetchOnWindowFocus: false, // Don't refetch when window regains focus
@@ -323,7 +331,19 @@ export const useProfileQuestions = () => {
     refetchInterval: false, // Don't poll
     retry: 0, // Don't retry on failure - fail fast
     retryOnMount: false, // Don't retry when component mounts
+    keepPreviousData: true, // Keep previous data while fetching
+    notifyOnChangeProps: ['data', 'error'], // Only notify on data/error changes, not loading states
   });
+
+  // Log fetching state in dev mode
+  useEffect(() => {
+    if (import.meta.env.DEV && isFetching && !hasFetchedOnce.current) {
+      console.log('[useProfileQuestions] First fetch started');
+      hasFetchedOnce.current = true;
+    } else if (import.meta.env.DEV && isFetching) {
+      console.warn('[useProfileQuestions] ⚠️  Additional fetch detected - this should not happen!');
+    }
+  }, [isFetching]);
 
   return {
     categoriesWithQuestions: data?.categoriesWithQuestions || [],
