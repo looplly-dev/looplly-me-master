@@ -9,7 +9,7 @@ import StageSelector from './StageSelector';
 import SimulatorIframe from './SimulatorIframe';
 import StateInspector from './StateInspector';
 import SeedTestUsersButton from './SeedTestUsersButton';
-import { supabase } from '@/integrations/supabase/client';
+import { adminClient } from '@/integrations/supabase/adminClient';
 import { useToast } from '@/hooks/use-toast';
 
 export default function SimulatorDashboard() {
@@ -36,7 +36,7 @@ export default function SimulatorDashboard() {
 
     setIsLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke(
+      const { data, error } = await adminClient.functions.invoke(
         'create-simulator-session',
         {
           body: {

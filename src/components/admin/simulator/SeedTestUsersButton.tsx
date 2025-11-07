@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { supabase } from '@/integrations/supabase/client';
+import { adminClient } from '@/integrations/supabase/adminClient';
 import { toast } from 'sonner';
 import { Users, Loader2 } from 'lucide-react';
 
@@ -10,7 +10,7 @@ export default function SeedTestUsersButton() {
   const handleSeedTestUsers = async () => {
     setIsSeeding(true);
     try {
-      const { data, error } = await supabase.functions.invoke('seed-test-users', {
+      const { data, error } = await adminClient.functions.invoke('seed-test-users', {
         body: {},
       });
 

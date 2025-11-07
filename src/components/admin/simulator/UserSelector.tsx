@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { supabase } from '@/integrations/supabase/client';
+import { adminClient } from '@/integrations/supabase/adminClient';
 import { Loader2 } from 'lucide-react';
 
 interface UserSelectorProps {
@@ -29,25 +29,32 @@ export default function UserSelector({ onUserSelect }: UserSelectorProps) {
   const fetchUsers = async () => {
     setIsLoading(true);
     try {
-      // Fetch ONLY test accounts
-      const { data, error } = await supabase
+      // Fetch ONLY test accounts using adminClient to bypass RLS
+      const { data, error } = await adminClient
         .from('profiles')
-        .select('user_id, email, first_name, last_name, is_test_account')
+        .select('user_id, email, first_name, last_name, mobile, is_test_account')
         .eq('is_test_account', true)
         .eq('user_type', 'looplly_user')
-        .order('last_name', { ascending: true });
+        .order('first_name', { ascending: true });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching test users:', error);
+        throw error;
+      }
 
       const userOptions: UserOption[] = (data || []).map((profile: any) => ({
         id: profile.user_id,
-        email: profile.email || 'No email',
+        email: profile.email || profile.mobile || 'No email',
         firstName: profile.first_name || '',
         lastName: profile.last_name || '',
         userType: 'Test User',
       }));
 
       setUsers(userOptions);
+      
+      if (userOptions.length === 0) {
+        console.warn('No test users found. Click "Seed Test Users" to create them.');
+      }
     } catch (error) {
       console.error('Error fetching test users:', error);
     } finally {

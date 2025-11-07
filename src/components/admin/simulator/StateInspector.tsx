@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { RefreshCw, Loader2 } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { adminClient } from '@/integrations/supabase/adminClient';
 
 interface StateInspectorProps {
   userId: string;
@@ -24,17 +24,17 @@ export default function StateInspector({ userId }: StateInspectorProps) {
     setIsLoading(true);
     try {
       const [profileRes, reputationRes, answersRes] = await Promise.all([
-        supabase
+        adminClient
           .from('profiles')
           .select('*')
           .eq('user_id', userId)
           .single(),
-        supabase
+        adminClient
           .from('user_reputation')
           .select('*')
           .eq('user_id', userId)
           .single(),
-        supabase
+        adminClient
           .from('profile_answers')
           .select('id', { count: 'exact', head: true })
           .eq('user_id', userId),
