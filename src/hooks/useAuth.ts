@@ -1143,6 +1143,9 @@ export const useAuthLogic = () => {
   const logout = async () => {
     console.log('Logging out user');
     
+    // Store current path to determine redirect
+    const isAdminRoute = window.location.pathname.startsWith('/admin');
+    
     // Clear session metadata first
     if (authState.user?.id) {
       clearSessionMetadata(authState.user.id);
@@ -1153,7 +1156,19 @@ export const useAuthLogic = () => {
     localStorage.removeItem('onboarding_completed');
     clearAllSessionMetadata();
     
+    // Call logout utility
     await logoutUser();
+    
+    // Update auth state immediately
+    setAuthState({
+      user: null,
+      isAuthenticated: false,
+      isLoading: false,
+      step: 'login'
+    });
+    
+    // Navigate to appropriate login page
+    window.location.href = isAdminRoute ? '/admin/login' : '/';
   };
 
   const forgotPassword = async (email: string): Promise<boolean> => {

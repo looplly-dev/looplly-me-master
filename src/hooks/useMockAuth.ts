@@ -60,11 +60,19 @@ export function useMockAuth() {
     },
     logout: async () => {
       console.warn('[MOCK AUTH] logout() called - clearing mock session');
-      setAuthState(prev => ({
-        ...prev,
+      
+      // Store current path to determine redirect
+      const isAdminRoute = window.location.pathname.startsWith('/admin');
+      
+      setAuthState({
         user: null,
         isAuthenticated: false,
-      }));
+        isLoading: false,
+        step: 'login'
+      });
+      
+      // Navigate to appropriate login page
+      window.location.href = isAdminRoute ? '/admin/login' : '/';
     },
     register: async (data: any) => {
       console.warn('[MOCK AUTH] register() called - no-op in mock mode', { data });
