@@ -86,29 +86,14 @@ export default function ResetPassword() {
         const hasSession = !!session;
         
         if (hasSession && session!.user) {
-          // Check if this is a team member
+          // Check if this is a team member (for branding purposes only)
           const { data: teamProfile } = await client
             .from('team_profiles')
             .select('user_id')
             .eq('user_id', session!.user.id)
             .maybeSingle();
           
-          const isAdmin = !!teamProfile;
-          setIsAdminUser(isAdmin);
-          
-          // Redirect admin users to admin reset page if they're on the regular reset page
-          if (isAdmin && currentPath === '/reset-password') {
-            const fullUrl = window.location.href.replace('/reset-password', '/admin/reset-password');
-            window.location.href = fullUrl;
-            return; // Don't set recoveryReady yet, we're redirecting
-          }
-          
-          // Redirect regular users to regular reset page if they're on the admin reset page
-          if (!isAdmin && currentPath === '/admin/reset-password') {
-            const fullUrl = window.location.href.replace('/admin/reset-password', '/reset-password');
-            window.location.href = fullUrl;
-            return; // Don't set recoveryReady yet, we're redirecting
-          }
+          setIsAdminUser(!!teamProfile);
         }
         
         setRecoveryReady(hasSession);

@@ -183,24 +183,32 @@ export const logoutUser = async (): Promise<void> => {
 
 export const resetUserPassword = async (email: string): Promise<{ success: boolean; error?: any }> => {
   try {
-    const supabase = getSupabaseClient();
+    // IMPORTANT: Always use the regular supabase client (not adminClient) for pre-auth operations
+    // adminClient has no session during forgot password flow, causing RLS queries to fail
+    const { supabase } = await import('@/integrations/supabase/client');
     console.log('Initiating forgot password for email:', email);
     
     // Check if email belongs to a team member
+    // This query needs to work without authentication, so we use the regular client
     const { data: teamProfile } = await supabase
       .from('team_profiles')
       .select('email')
       .eq('email', email)
       .maybeSingle();
     
+    console.log('Team profile check result:', { email, found: !!teamProfile });
+    
     // Determine redirect path based on user type
     const resetPath = teamProfile ? '/admin/reset-password' : '/reset-password';
     
     // Use VITE_APP_URL for production, fallback to window.location.origin for dev
     const redirectUrl = import.meta.env.VITE_APP_URL || window.location.origin;
+    const fullRedirectUrl = `${redirectUrl}${resetPath}`;
+    
+    console.log('Sending password reset email with redirect:', fullRedirectUrl);
     
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${redirectUrl}${resetPath}`,
+      redirectTo: fullRedirectUrl,
     });
     
     if (error) {
