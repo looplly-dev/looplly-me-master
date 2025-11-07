@@ -5,6 +5,14 @@
 
 import { SESSION_CONFIG } from '@/config/sessionConfig';
 
+/**
+ * Validate if a string is a valid UUID
+ */
+export function isValidUUID(str: string): boolean {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(str);
+}
+
 export interface SessionMetadata {
   userId: string;
   createdAt: number;
@@ -23,6 +31,12 @@ export function storeSessionMetadata(
   storageKey: string,
   userType: 'looplly_user' | 'looplly_team_user' | 'client_user'
 ): void {
+  // Validate UUID before storing
+  if (!isValidUUID(userId)) {
+    console.error('[SessionManager] Invalid user ID (not a UUID):', userId);
+    throw new Error('Invalid user ID format');
+  }
+  
   const now = Date.now();
   const metadata: SessionMetadata = {
     userId,
@@ -44,11 +58,26 @@ export function storeSessionMetadata(
  * Get session metadata from localStorage
  */
 export function getSessionMetadata(userId: string): SessionMetadata | null {
+  // Validate UUID before reading
+  if (!isValidUUID(userId)) {
+    console.warn('[SessionManager] Invalid user ID detected (not a UUID):', userId);
+    clearInvalidSessions();
+    return null;
+  }
+  
   try {
     const data = localStorage.getItem(`${SESSION_METADATA_KEY}_${userId}`);
     if (!data) return null;
     
     const metadata: SessionMetadata = JSON.parse(data);
+    
+    // Double-check the stored userId is also valid
+    if (!isValidUUID(metadata.userId)) {
+      console.warn('[SessionManager] Stored session has invalid UUID, clearing');
+      clearSessionMetadata(userId);
+      return null;
+    }
+    
     return metadata;
   } catch (error) {
     console.error('[SessionManager] Error reading session metadata:', error);
@@ -150,5 +179,65 @@ export function clearAllSessionMetadata(): void {
     console.log('[SessionManager] Cleared all session metadata');
   } catch (error) {
     console.error('[SessionManager] Error clearing all session metadata:', error);
+  }
+}
+
+/**
+ * Clear sessions with invalid UUIDs
+ */
+export function clearInvalidSessions(): void {
+  try {
+    const keys = Object.keys(localStorage);
+    keys.forEach(key => {
+      if (key.startsWith(SESSION_METADATA_KEY)) {
+        try {
+          const data = localStorage.getItem(key);
+          if (data) {
+            const metadata = JSON.parse(data);
+            if (!isValidUUID(metadata.userId)) {
+              console.warn('[SessionManager] Removing invalid session:', key);
+              localStorage.removeItem(key);
+            }
+          }
+        } catch (e) {
+          console.warn('[SessionManager] Removing corrupted session:', key);
+          localStorage.removeItem(key);
+        }
+      }
+    });
+    
+    // Also clear any mock auth tokens
+    const loopllyUser = localStorage.getItem('looplly_user');
+    if (loopllyUser) {
+      try {
+        const user = JSON.parse(loopllyUser);
+        if (user.id && !isValidUUID(user.id)) {
+          console.warn('[SessionManager] Clearing looplly_user with invalid UUID');
+          localStorage.removeItem('looplly_user');
+          localStorage.removeItem('looplly_auth_token');
+        }
+      } catch (e) {
+        // Invalid JSON, clear it
+        localStorage.removeItem('looplly_user');
+        localStorage.removeItem('looplly_auth_token');
+      }
+    }
+    
+    const simulatorUser = sessionStorage.getItem('simulator_user');
+    if (simulatorUser) {
+      try {
+        const user = JSON.parse(simulatorUser);
+        if (user.id && !isValidUUID(user.id)) {
+          console.warn('[SessionManager] Clearing simulator_user with invalid UUID');
+          sessionStorage.removeItem('simulator_user');
+          sessionStorage.removeItem('simulator_auth_token');
+        }
+      } catch (e) {
+        sessionStorage.removeItem('simulator_user');
+        sessionStorage.removeItem('simulator_auth_token');
+      }
+    }
+  } catch (error) {
+    console.error('[SessionManager] Error clearing invalid sessions:', error);
   }
 }

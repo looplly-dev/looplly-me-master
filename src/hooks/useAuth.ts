@@ -13,7 +13,9 @@ import {
   checkSessionValidity, 
   clearSessionMetadata,
   clearAllSessionMetadata,
-  updateLastActivity 
+  updateLastActivity,
+  clearInvalidSessions,
+  isValidUUID
 } from '@/utils/sessionManager';
 import { SESSION_CONFIG } from '@/config/sessionConfig';
 
@@ -54,6 +56,9 @@ export const useAuthLogic = () => {
   useEffect(() => {
     let mounted = true;
     const supabase = getSupabaseClient();
+    
+    // Clear any invalid sessions first
+    clearInvalidSessions();
     
     // Diagnostic logging (dev only, not in Preview)
     if (import.meta.env.DEV && !isPreview()) {
