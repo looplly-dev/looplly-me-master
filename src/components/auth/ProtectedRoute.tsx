@@ -7,7 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Shield, Lock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { checkSessionValidity, clearAllSessionMetadata } from '@/utils/sessionManager';
+import { checkSessionValidity, clearAllSessionMetadata, storeSessionMetadata } from '@/utils/sessionManager';
 import { getSupabaseClient } from '@/integrations/supabase/activeClient';
 
 interface ProtectedRouteProps {
@@ -35,34 +35,45 @@ export default function ProtectedRoute({
   useEffect(() => {
     if (authState.isAuthenticated && authState.user?.id) {
       const { isValid, reason } = checkSessionValidity(authState.user.id);
-      
+      const isAdminRoute = requiredRole === 'admin' || requiredRole === 'super_admin';
+
       if (!isValid) {
         console.warn('[ProtectedRoute] Session invalid:', reason);
-        
-        // Force logout
+
+        // If metadata is missing, backfill it instead of logging out
+        if (reason === 'missing') {
+          const userTypeGuess = userType || (isAdminRoute ? 'looplly_team_user' : 'looplly_user');
+          const storageKey = isAdminRoute ? 'admin_auth' : 'auth';
+          try {
+            storeSessionMetadata(authState.user.id, storageKey, userTypeGuess as any);
+          } catch (e) {
+            console.warn('[ProtectedRoute] Failed to backfill session metadata:', e);
+          }
+          return; // don't log out on first-load missing metadata
+        }
+
+        // Expired or inactive -> force logout
         const performLogout = async () => {
           const supabase = getSupabaseClient();
           await supabase.auth.signOut();
           clearAllSessionMetadata();
           logout();
-          
-          const isAdminRoute = requiredRole === 'admin' || requiredRole === 'super_admin';
-          
+
           toast({
             title: 'Session Expired',
-            description: reason === 'inactive' 
+            description: reason === 'inactive'
               ? 'You were logged out due to inactivity.'
               : 'Your session has expired. Please log in again.',
             variant: 'destructive'
           });
-          
+
           navigate(isAdminRoute ? '/admin/login?expired=true' : '/?expired=true');
         };
-        
+
         performLogout();
       }
     }
-  }, [authState.isAuthenticated, authState.user, requiredRole, logout, navigate, toast]);
+  }, [authState.isAuthenticated, authState.user, requiredRole, userType, logout, navigate, toast]);
 
   // Show access denied toast only for non-team users trying to access admin
   useEffect(() => {
