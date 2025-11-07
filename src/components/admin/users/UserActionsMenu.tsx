@@ -270,20 +270,34 @@ export function UserActionsMenu({ user, onUpdate }: UserActionsMenuProps) {
                 }
                 setIsUpdating(true);
                 try {
+                  console.log('Attempting to delete user:', { email: user.email, userId: user.user_id });
+                  
                   // Call admin Edge Function responsible for cascading deletion
                   const { data, error } = await adminClient.functions.invoke('delete-user', {
                     body: { email: user.email, userId: user.user_id }
                   });
-                  if (error) throw error;
+                  
+                  console.log('Delete function response:', { data, error });
+                  
+                  if (error) {
+                    console.error('Edge Function error:', error);
+                    throw new Error(`Edge Function failed: ${error.message || JSON.stringify(error)}`);
+                  }
+                  
                   if (data && data.error) {
+                    console.error('Delete operation error:', data.error);
                     throw new Error(data.error);
                   }
+                  
+                  console.log('User deleted successfully');
                   toast.success('User deleted successfully');
                   setShowDeleteDialog(false);
+                  setConfirmText('');
                   onUpdate();
                 } catch (err) {
-                  console.error('Error deleting user:', err);
-                  toast.error(err instanceof Error ? err.message : 'Failed to delete user');
+                  console.error('Full error deleting user:', err);
+                  const errorMsg = err instanceof Error ? err.message : 'Failed to delete user';
+                  toast.error(errorMsg);
                 } finally {
                   setIsUpdating(false);
                 }

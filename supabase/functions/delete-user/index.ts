@@ -12,8 +12,12 @@ Deno.serve(async (req) => {
   }
 
   try {
+    console.log('[delete-user] Function invoked');
+    
     // Get authorization header
     const authHeader = req.headers.get('authorization')
+    console.log('[delete-user] Auth header present:', !!authHeader);
+    
     if (!authHeader) {
       throw new Error('Missing authorization header')
     }
