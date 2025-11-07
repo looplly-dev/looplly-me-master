@@ -520,17 +520,8 @@ export const useAuthLogic = () => {
         const { isValid, reason } = checkSessionValidity(session.user.id);
         
         if (!isValid) {
-          console.warn('[useAuth] Fast-path: Session invalid:', reason);
-          // If metadata is missing, this may be a fresh session - proceed to processing
-          if (reason !== 'missing') {
-            // Force logout for expired/inactive session
-            supabase.auth.signOut();
-            clearAllSessionMetadata();
-            if (mounted) {
-              setAuthState({ user: null, isAuthenticated: false, isLoading: false, step: 'login' });
-            }
-            return;
-          }
+          console.warn('[useAuth] Fast-path: Session metadata invalid:', reason, '- proceeding to refresh');
+          // Do not sign out here; processSession will refresh metadata based on active auth session
         }
         
         // Session is valid or metadata missing (fresh) - process it

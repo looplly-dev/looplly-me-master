@@ -52,25 +52,39 @@ export default function ProtectedRoute({
           return; // don't log out on first-load missing metadata
         }
 
-        // Expired or inactive -> force logout
-        const performLogout = async () => {
-          const supabase = getSupabaseClient();
-          await supabase.auth.signOut();
-          clearAllSessionMetadata();
-          logout();
+        // Expired or inactive -> check if an active auth session exists; if so, refresh metadata instead of logging out
+        const supabase = getSupabaseClient();
+        supabase.auth.getSession().then(({ data }) => {
+          const active = data.session;
+          if (active?.user?.id === authState.user?.id) {
+            const storageKey = isAdminRoute ? 'admin_auth' : 'auth';
+            const userTypeGuess = userType || (isAdminRoute ? 'looplly_team_user' : 'looplly_user');
+            try {
+              storeSessionMetadata(authState.user!.id, storageKey, userTypeGuess as any);
+              return; // metadata refreshed; no logout
+            } catch (e) {
+              console.warn('[ProtectedRoute] Failed to refresh session metadata after invalid check:', e);
+            }
+          }
 
-          toast({
-            title: 'Session Expired',
-            description: reason === 'inactive'
-              ? 'You were logged out due to inactivity.'
-              : 'Your session has expired. Please log in again.',
-            variant: 'destructive'
-          });
+          // No active session - force logout
+          (async () => {
+            await supabase.auth.signOut();
+            clearAllSessionMetadata();
+            logout();
 
-          navigate(isAdminRoute ? '/admin/login?expired=true' : '/?expired=true');
-        };
+            toast({
+              title: 'Session Expired',
+              description: reason === 'inactive'
+                ? 'You were logged out due to inactivity.'
+                : 'Your session has expired. Please log in again.',
+              variant: 'destructive'
+            });
 
-        performLogout();
+            navigate(isAdminRoute ? '/admin/login?expired=true' : '/?expired=true');
+          })();
+        });
+
       }
     }
   }, [authState.isAuthenticated, authState.user, requiredRole, userType, logout, navigate, toast]);
