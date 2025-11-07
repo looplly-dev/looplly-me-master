@@ -1,5 +1,5 @@
 // Authentication utilities
-import { supabase } from '@/integrations/supabase/client';
+import { getSupabaseClient } from '@/integrations/supabase/activeClient';
 import { validateAndNormalizeMobile } from './mobileValidation';
 
 // Blocked country codes (data residency compliance)
@@ -52,6 +52,7 @@ export const registerUser = async (params: RegistrationParams): Promise<{ succes
     }
     
     // Call custom registration edge function (NOT Supabase Auth)
+    const supabase = getSupabaseClient();
     const { data, error } = await supabase.functions.invoke('mock-looplly-register', {
       body: {
         mobile: params.mobile,
@@ -79,6 +80,7 @@ export const registerUser = async (params: RegistrationParams): Promise<{ succes
 
 export const loginUser = async (params: LoginParams): Promise<{ success: boolean; error?: any }> => {
   try {
+    const supabase = getSupabaseClient();
     // Determine if this is mobile or email login
     const isMobileLogin = params.mobile && params.countryCode;
     
@@ -175,11 +177,13 @@ export const logoutUser = async (): Promise<void> => {
   localStorage.removeItem('looplly_user');
   
   // Also sign out from Supabase Auth (for admin/team users)
+  const supabase = getSupabaseClient();
   await supabase.auth.signOut();
 };
 
 export const resetUserPassword = async (email: string): Promise<{ success: boolean; error?: any }> => {
   try {
+    const supabase = getSupabaseClient();
     console.log('Initiating forgot password for email:', email);
     
     // Check if email belongs to a team member
@@ -213,9 +217,9 @@ export const resetUserPassword = async (email: string): Promise<{ success: boole
 };
 
 export const getCurrentSession = async () => {
-  return await supabase.auth.getSession();
+  return await getSupabaseClient().auth.getSession();
 };
 
 export const getCurrentUser = async () => {
-  return await supabase.auth.getUser();
+  return await getSupabaseClient().auth.getUser();
 };
