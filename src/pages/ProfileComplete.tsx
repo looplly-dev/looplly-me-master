@@ -13,7 +13,7 @@ import { getCurrentUserId } from '@/utils/authHelper';
 export default function ProfileComplete() {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { level2Categories, refetch } = useProfileQuestions();
+  const { level2Categories, refetch, isLoading } = useProfileQuestions();
   
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -93,7 +93,8 @@ export default function ProfileComplete() {
     }
   };
 
-  if (!currentQuestion) {
+  // Show loading state while fetching
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Card className="max-w-md">
@@ -103,6 +104,12 @@ export default function ProfileComplete() {
         </Card>
       </div>
     );
+  }
+
+  // No questions available - navigate to dashboard
+  if (!currentQuestion || requiredQuestions.length === 0) {
+    navigate('/dashboard');
+    return null;
   }
 
   return (

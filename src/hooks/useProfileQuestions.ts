@@ -62,9 +62,20 @@ export const useProfileQuestions = () => {
         .from('profiles')
         .select('country_code, country_iso, user_type')
         .eq('user_id', userId)
-        .single();
+        .maybeSingle();
 
+      // If profile doesn't exist yet, return empty state (registration still in progress)
       if (profileError) throw profileError;
+      if (!profile) {
+        return {
+          categoriesWithQuestions: [],
+          level2Categories: [],
+          level3Categories: [],
+          level2Complete: false,
+          level3Percentage: 0,
+          staleQuestionCount: 0,
+        };
+      }
 
       // Team users don't have profile questions
       if (profile?.user_type === 'looplly_team_user') {
