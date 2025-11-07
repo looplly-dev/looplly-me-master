@@ -66,7 +66,7 @@ export default function VerifyMobile() {
         });
 
         // Navigate back to dashboard
-        navigate('/');
+        navigate('/dashboard');
       } else {
         toast({
           title: 'Invalid Code',
@@ -181,7 +181,7 @@ export default function VerifyMobile() {
           {/* Skip for now (optional) */}
           <div className="pt-2">
             <button
-              onClick={() => navigate('/')}
+              onClick={() => navigate('/dashboard')}
               className="text-sm text-muted-foreground hover:text-foreground"
             >
               I'll do this later

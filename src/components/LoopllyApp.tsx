@@ -59,7 +59,8 @@ export default function LoopllyApp() {
         }
       >
         <Routes>
-          <Route path="/" element={<Earn />} />
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/dashboard" element={<Earn />} />
           <Route path="/wallet" element={<Wallet />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/profile/complete" element={<ProfileComplete />} />
@@ -68,7 +69,7 @@ export default function LoopllyApp() {
           <Route path="/rep" element={<Rep />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/support" element={<Support />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
       </Suspense>
     );

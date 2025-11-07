@@ -89,7 +89,7 @@ export default function ProfileComplete() {
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex(prev => prev - 1);
     } else {
-      navigate('/');
+      navigate('/dashboard');
     }
   };
 

@@ -12,7 +12,7 @@ export default function Support() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/dashboard')}
             className="text-muted-foreground hover:text-primary"
           >
             ← Back
