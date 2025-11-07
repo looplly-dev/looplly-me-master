@@ -21,6 +21,8 @@ export function useUserType() {
   const { authState } = useAuth();
 
   useEffect(() => {
+    let mounted = true;
+    
     if (!authState.user) {
       setUserType(null);
       setIsLoading(false);
@@ -37,6 +39,8 @@ export function useUserType() {
           .select('user_id')
           .eq('user_id', authState.user!.id)
           .maybeSingle();
+
+        if (!mounted) return;
 
         if (teamError && teamError.code !== 'PGRST116') {
           console.error('[useUserType] Error checking team_profiles:', teamError);
@@ -58,26 +62,39 @@ export function useUserType() {
           .eq('user_id', authState.user!.id)
           .maybeSingle();
 
+        if (!mounted) return;
+
         if (profileError && profileError.code !== 'PGRST116') {
-          console.error('Error fetching user type from profiles:', profileError);
+          console.error('[useUserType] Error fetching user type from profiles:', profileError);
         }
 
         if (profile) {
           setUserType((profile.user_type as UserType) || 'looplly_user');
         } else {
-          console.warn('[useUserType] User not found in team_profiles or profiles, defaulting to looplly_user');
+          // User not found in either table - silently default without warning in production
+          if (import.meta.env.DEV) {
+            console.info('[useUserType] User not found in team_profiles or profiles, defaulting to looplly_user');
+          }
           setUserType('looplly_user');
         }
       } catch (error) {
-        console.error('Error in fetchUserType:', error);
-        setUserType('looplly_user');
+        console.error('[useUserType] Error in fetchUserType:', error);
+        if (mounted) {
+          setUserType('looplly_user');
+        }
       } finally {
-        setIsLoading(false);
+        if (mounted) {
+          setIsLoading(false);
+        }
       }
     };
 
     fetchUserType();
-  }, [authState.user]);
+    
+    return () => {
+      mounted = false;
+    };
+  }, [authState.user?.id]); // Only depend on user ID, not entire user object
 
   /**
    * Check if user has the specified type

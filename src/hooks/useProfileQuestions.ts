@@ -65,8 +65,15 @@ export const useProfileQuestions = () => {
         .maybeSingle();
 
       // If profile doesn't exist yet, return empty state (registration still in progress)
-      if (profileError) throw profileError;
+      if (profileError && profileError.code !== 'PGRST116') {
+        console.error('[useProfileQuestions] Error fetching profile:', profileError);
+        throw profileError;
+      }
+      
       if (!profile) {
+        if (import.meta.env.DEV) {
+          console.info('[useProfileQuestions] No profile found, returning empty state');
+        }
         return {
           categoriesWithQuestions: [],
           level2Categories: [],
@@ -79,6 +86,9 @@ export const useProfileQuestions = () => {
 
       // Team users don't have profile questions
       if (profile?.user_type === 'looplly_team_user') {
+        if (import.meta.env.DEV) {
+          console.info('[useProfileQuestions] Team user detected, skipping profile questions');
+        }
         return {
           categoriesWithQuestions: [],
           level2Categories: [],
@@ -279,6 +289,9 @@ export const useProfileQuestions = () => {
     },
     enabled: !!userId,
     staleTime: 30000, // 30 seconds
+    refetchOnWindowFocus: false, // Don't refetch when window regains focus
+    refetchOnMount: false, // Don't refetch on component remount
+    retry: 1, // Only retry once on failure
   });
 
   return {
