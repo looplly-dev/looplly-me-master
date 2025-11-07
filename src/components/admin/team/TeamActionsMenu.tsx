@@ -36,7 +36,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { supabase } from '@/integrations/supabase/client';
+import { adminClient } from '@/integrations/supabase/adminClient';
 import { toast } from 'sonner';
 import { TeamMember } from '@/hooks/useAdminTeam';
 
@@ -66,7 +66,7 @@ export function TeamActionsMenu({ member, onUpdate }: TeamActionsMenuProps) {
   const handleRoleChange = async () => {
     setIsUpdating(true);
     try {
-      const { error } = await supabase
+      const { error } = await adminClient
         .from('user_roles')
         .update({ role: selectedRole })
         .eq('user_id', member.user_id);
@@ -87,7 +87,7 @@ export function TeamActionsMenu({ member, onUpdate }: TeamActionsMenuProps) {
   const handleEditDetails = async () => {
     setIsUpdating(true);
     try {
-      const { error } = await supabase
+      const { error } = await adminClient
         .from('team_profiles')
         .update({
           first_name: editFormData.first_name,
@@ -114,7 +114,7 @@ export function TeamActionsMenu({ member, onUpdate }: TeamActionsMenuProps) {
   const handleRemove = async () => {
     setIsUpdating(true);
     try {
-      const { error } = await supabase
+      const { error } = await adminClient
         .from('user_roles')
         .delete()
         .eq('user_id', member.user_id);
@@ -135,7 +135,7 @@ export function TeamActionsMenu({ member, onUpdate }: TeamActionsMenuProps) {
   const handleResetPassword = async () => {
     setIsUpdating(true);
     try {
-      const { data, error } = await supabase.functions.invoke('reset-team-member-password', {
+      const { data, error } = await adminClient.functions.invoke('reset-team-member-password', {
         body: { email: member.email }
       });
 

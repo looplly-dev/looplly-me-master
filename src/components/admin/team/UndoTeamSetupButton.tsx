@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { adminClient } from '@/integrations/supabase/adminClient';
 import { Undo2 } from 'lucide-react';
 import {
   AlertDialog,
@@ -22,7 +22,7 @@ export function UndoTeamSetupButton() {
   const handleUndo = async () => {
     setIsUndoing(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { session } } = await adminClient.auth.getSession();
       
       if (!session) {
         toast({
@@ -33,7 +33,7 @@ export function UndoTeamSetupButton() {
         return;
       }
 
-      const response = await supabase.functions.invoke('undo-team-dual-accounts', {
+      const response = await adminClient.functions.invoke('undo-team-dual-accounts', {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${session.access_token}`,

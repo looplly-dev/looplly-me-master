@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { adminClient } from '@/integrations/supabase/adminClient';
 import { Copy, AlertTriangle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
@@ -58,7 +58,7 @@ export function AddTeamMemberModal({ open, onOpenChange, onSuccess }: AddTeamMem
     setIsSubmitting(true);
 
     try {
-      const { data, error } = await supabase.functions.invoke('create-team-member', {
+      const { data, error } = await adminClient.functions.invoke('create-team-member', {
         body: formData
       });
 
