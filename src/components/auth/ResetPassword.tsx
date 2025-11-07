@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
+import { getSupabaseClient } from '@/integrations/supabase/activeClient';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -37,8 +37,11 @@ export default function ResetPassword() {
   useEffect(() => {
     const init = async () => {
       try {
+        const client = getSupabaseClient();
+        const currentPath = window.location.pathname;
+        
         // 1) Check if we already have a recovery session
-        let { data: { session } } = await supabase.auth.getSession();
+        let { data: { session } } = await client.auth.getSession();
 
         // 2) If not, try to establish one from URL params (handles both hash and query formats)
         if (!session) {
@@ -62,16 +65,16 @@ export default function ResetPassword() {
           const access_token = hash.get('access_token');
           const refresh_token = hash.get('refresh_token');
           if (!session && type === 'recovery' && access_token && refresh_token) {
-            const { data, error } = await supabase.auth.setSession({ access_token, refresh_token });
+            const { data, error } = await client.auth.setSession({ access_token, refresh_token });
             if (error) console.warn('[ResetPassword] setSession failed:', error);
             session = data?.session ?? null;
           }
 
           // Query flow: some environments send ?code=...; try exchangeCodeForSession when available
           const code = search.get('code');
-          if (!session && code && !errorParam && typeof (supabase.auth as any).exchangeCodeForSession === 'function') {
+          if (!session && code && !errorParam && typeof (client.auth as any).exchangeCodeForSession === 'function') {
             try {
-              const { data, error } = await (supabase.auth as any).exchangeCodeForSession({ code });
+              const { data, error } = await (client.auth as any).exchangeCodeForSession({ code });
               if (error) console.warn('[ResetPassword] exchangeCodeForSession failed:', error);
               session = data?.session ?? null;
             } catch (e) {
@@ -81,17 +84,36 @@ export default function ResetPassword() {
         }
 
         const hasSession = !!session;
-        setRecoveryReady(hasSession);
         
         if (hasSession && session!.user) {
-          // Check if this is a team member (for branding)
-          const { data: teamProfile } = await supabase
+          // Check if this is a team member
+          const { data: teamProfile } = await client
             .from('team_profiles')
             .select('user_id')
             .eq('user_id', session!.user.id)
             .maybeSingle();
-          if (teamProfile) setIsAdminUser(true);
-        } else {
+          
+          const isAdmin = !!teamProfile;
+          setIsAdminUser(isAdmin);
+          
+          // Redirect admin users to admin reset page if they're on the regular reset page
+          if (isAdmin && currentPath === '/reset-password') {
+            const fullUrl = window.location.href.replace('/reset-password', '/admin/reset-password');
+            window.location.href = fullUrl;
+            return; // Don't set recoveryReady yet, we're redirecting
+          }
+          
+          // Redirect regular users to regular reset page if they're on the admin reset page
+          if (!isAdmin && currentPath === '/admin/reset-password') {
+            const fullUrl = window.location.href.replace('/admin/reset-password', '/reset-password');
+            window.location.href = fullUrl;
+            return; // Don't set recoveryReady yet, we're redirecting
+          }
+        }
+        
+        setRecoveryReady(hasSession);
+        
+        if (!hasSession) {
           // No session -> user likely opened an expired/invalid link
           toast({
             title: 'Recovery link required',
@@ -129,7 +151,8 @@ export default function ResetPassword() {
 
     setIsSubmitting(true);
     try {
-      const { error } = await supabase.auth.updateUser({ password });
+      const client = getSupabaseClient();
+      const { error } = await client.auth.updateUser({ password });
       if (error) throw error;
 
       toast({ title: 'Password updated', description: 'You can now sign in with your new password.' });
