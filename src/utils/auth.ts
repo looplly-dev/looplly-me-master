@@ -183,14 +183,15 @@ export const logoutUser = async (): Promise<void> => {
 
 export const resetUserPassword = async (email: string): Promise<{ success: boolean; error?: any }> => {
   try {
-    // IMPORTANT: Always use the regular supabase client (not adminClient) for pre-auth operations
-    // adminClient has no session during forgot password flow, causing RLS queries to fail
-    const { supabase } = await import('@/integrations/supabase/client');
+    // Use route-aware client to maintain session isolation
+    // When called from /admin/login, uses adminClient (admin_auth storage)
+    // When called from user login, uses supabase (auth storage)
+    const client = getSupabaseClient();
     console.log('Initiating forgot password for email:', email);
     
     // Check if email belongs to a team member
-    // This query needs to work without authentication, so we use the regular client
-    const { data: teamProfile } = await supabase
+    // RLS policy allows unauthenticated lookups on team_profiles.email
+    const { data: teamProfile } = await client
       .from('team_profiles')
       .select('email')
       .eq('email', email)
@@ -207,7 +208,7 @@ export const resetUserPassword = async (email: string): Promise<{ success: boole
     
     console.log('Sending password reset email with redirect:', fullRedirectUrl);
     
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    const { error } = await client.auth.resetPasswordForEmail(email, {
       redirectTo: fullRedirectUrl,
     });
     
