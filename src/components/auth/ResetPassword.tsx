@@ -35,33 +35,81 @@ export default function ResetPassword() {
   ];
 
   useEffect(() => {
-    // Ensure we have a recovery session (from the email link)
-    supabase.auth.getSession().then(async ({ data }) => {
-      const hasSession = !!data.session;
-      setRecoveryReady(hasSession);
-      
-      if (hasSession && data.session.user) {
-        // Check if this is a team member
-        const { data: teamProfile } = await supabase
-          .from('team_profiles')
-          .select('user_id')
-          .eq('user_id', data.session.user.id)
-          .maybeSingle();
-        
-        if (teamProfile) {
-          // Mark as admin user for branding
-          setIsAdminUser(true);
+    const init = async () => {
+      try {
+        // 1) Check if we already have a recovery session
+        let { data: { session } } = await supabase.auth.getSession();
+
+        // 2) If not, try to establish one from URL params (handles both hash and query formats)
+        if (!session) {
+          const url = new URL(window.location.href);
+          const search = url.searchParams;
+          const hash = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+
+          const errorParam = search.get('error') || hash.get('error');
+          const errorDesc = search.get('error_description') || hash.get('error_description');
+          if (errorParam) {
+            // Common case: otp_expired / invalid link
+            toast({
+              title: 'Reset link error',
+              description: decodeURIComponent(errorDesc || errorParam || 'The link is invalid or has expired.'),
+              variant: 'destructive',
+            });
+          }
+
+          // Hash flow: access/refresh tokens present with type=recovery
+          const type = hash.get('type') || search.get('type');
+          const access_token = hash.get('access_token');
+          const refresh_token = hash.get('refresh_token');
+          if (!session && type === 'recovery' && access_token && refresh_token) {
+            const { data, error } = await supabase.auth.setSession({ access_token, refresh_token });
+            if (error) console.warn('[ResetPassword] setSession failed:', error);
+            session = data?.session ?? null;
+          }
+
+          // Query flow: some environments send ?code=...; try exchangeCodeForSession when available
+          const code = search.get('code');
+          if (!session && code && !errorParam && typeof (supabase.auth as any).exchangeCodeForSession === 'function') {
+            try {
+              const { data, error } = await (supabase.auth as any).exchangeCodeForSession({ code });
+              if (error) console.warn('[ResetPassword] exchangeCodeForSession failed:', error);
+              session = data?.session ?? null;
+            } catch (e) {
+              console.warn('[ResetPassword] exchangeCodeForSession threw:', e);
+            }
+          }
         }
-      }
-      
-      if (!hasSession) {
+
+        const hasSession = !!session;
+        setRecoveryReady(hasSession);
+        
+        if (hasSession && session!.user) {
+          // Check if this is a team member (for branding)
+          const { data: teamProfile } = await supabase
+            .from('team_profiles')
+            .select('user_id')
+            .eq('user_id', session!.user.id)
+            .maybeSingle();
+          if (teamProfile) setIsAdminUser(true);
+        } else {
+          // No session -> user likely opened an expired/invalid link
+          toast({
+            title: 'Recovery link required',
+            description: 'This link looks invalid or expired. Request a new password reset link to continue.',
+            variant: 'destructive',
+          });
+        }
+      } catch (e) {
+        console.error('[ResetPassword] Initialization error:', e);
         toast({
-          title: 'Recovery link required',
-          description: 'Open this page from the password reset email link to set a new password.',
+          title: 'Could not initialize reset',
+          description: 'Please request a new reset link and try again.',
           variant: 'destructive',
         });
       }
-    });
+    };
+
+    init();
   }, [toast, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {

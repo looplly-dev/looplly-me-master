@@ -550,12 +550,32 @@ export const useAuthLogic = () => {
         
         if (!isValid) {
           console.warn('[useAuth] Periodic check: Session invalid:', reason);
-          // Force logout
-          supabase.auth.signOut();
-          clearAllSessionMetadata();
-          if (mounted) {
-            setAuthState({ user: null, isAuthenticated: false, isLoading: false, step: 'login' });
-          }
+
+          const supabase = getSupabaseClient();
+          supabase.auth.getSession().then(({ data }) => {
+            const active = data.session;
+            const sameUser = active?.user?.id === currentUserId;
+            const isAdminRoute = window.location.pathname.startsWith('/admin');
+            const storageKey = isAdminRoute ? 'admin_auth' : 'auth';
+            const userTypeGuess = isAdminRoute ? 'looplly_team_user' : 'looplly_user';
+
+            // If we still have an active auth session for this user, refresh metadata instead of logging out
+            if (sameUser) {
+              try {
+                storeSessionMetadata(currentUserId, storageKey, userTypeGuess as any);
+                return; // metadata refreshed; keep user signed in
+              } catch (e) {
+                console.warn('[useAuth] Periodic check: Failed to refresh session metadata:', e);
+              }
+            }
+
+            // No active session -> force logout
+            supabase.auth.signOut();
+            clearAllSessionMetadata();
+            if (mounted) {
+              setAuthState({ user: null, isAuthenticated: false, isLoading: false, step: 'login' });
+            }
+          });
         }
       }
     }, SESSION_CONFIG.SESSION_CHECK_INTERVAL_MS);
