@@ -7,6 +7,7 @@ import { Loader2 } from 'lucide-react';
 
 interface UserSelectorProps {
   onUserSelect: (userId: string) => void;
+  selectedUserId?: string;
 }
 
 interface UserOption {
@@ -17,10 +18,9 @@ interface UserOption {
   userType: string;
 }
 
-export default function UserSelector({ onUserSelect }: UserSelectorProps) {
+export default function UserSelector({ onUserSelect, selectedUserId: externalSelectedUserId }: UserSelectorProps) {
   const [users, setUsers] = useState<UserOption[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedUserId, setSelectedUserId] = useState<string>('');
 
   useEffect(() => {
     fetchUsers();
@@ -63,7 +63,6 @@ export default function UserSelector({ onUserSelect }: UserSelectorProps) {
   };
 
   const handleUserChange = (userId: string) => {
-    setSelectedUserId(userId);
     onUserSelect(userId);
   };
 
@@ -81,7 +80,7 @@ export default function UserSelector({ onUserSelect }: UserSelectorProps) {
             <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
           </div>
         ) : (
-          <Select value={selectedUserId} onValueChange={handleUserChange}>
+          <Select value={externalSelectedUserId} onValueChange={handleUserChange}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Select a user..." />
             </SelectTrigger>

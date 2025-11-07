@@ -6,6 +6,7 @@ import { UserPlus, CheckCircle, ClipboardList, Trophy } from 'lucide-react';
 interface StageSelectorProps {
   onStageSelect: (stageId: string) => void;
   disabled?: boolean;
+  value?: string;
 }
 
 const JOURNEY_STAGES = [
@@ -46,7 +47,7 @@ const JOURNEY_STAGES = [
   }
 ];
 
-export default function StageSelector({ onStageSelect, disabled }: StageSelectorProps) {
+export default function StageSelector({ onStageSelect, disabled, value }: StageSelectorProps) {
   return (
     <Card className={disabled ? 'opacity-50' : ''}>
       <CardHeader>
@@ -56,7 +57,7 @@ export default function StageSelector({ onStageSelect, disabled }: StageSelector
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <Select onValueChange={onStageSelect} disabled={disabled}>
+        <Select value={value} onValueChange={onStageSelect} disabled={disabled}>
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Choose a stage..." />
           </SelectTrigger>

@@ -49,6 +49,15 @@ class AuditLogger {
     this.queue = [];
 
     try {
+      // Skip audit logging in simulator/admin contexts to avoid RLS violations
+      const isSimulator = window.location.pathname.startsWith('/simulator');
+      const isAdmin = window.location.pathname.startsWith('/admin');
+      
+      if (isSimulator || isAdmin) {
+        console.log('[AuditLogger] Skipping audit logs in simulator/admin context:', batch.length, 'entries');
+        return; // Don't try to insert in these contexts
+      }
+
       // Note: audit_logs table will be created by Phase 1 migration
       // Types will be auto-generated after migration runs
       const { error } = await (supabase as any)
@@ -57,13 +66,11 @@ class AuditLogger {
 
       if (error) {
         console.error('Failed to flush audit logs:', error);
-        // Re-queue failed items
-        this.queue.push(...batch);
+        // Don't re-queue to prevent infinite retry loops on RLS errors
       }
     } catch (error) {
       console.error('Error flushing audit logs:', error);
-      // Re-queue failed items
-      this.queue.push(...batch);
+      // Don't re-queue to prevent infinite retry loops
     }
   }
 

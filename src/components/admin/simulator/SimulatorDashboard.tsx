@@ -137,9 +137,10 @@ export default function SimulatorDashboard() {
       )}
 
       <div className="grid gap-4 md:grid-cols-2">
-        <UserSelector onUserSelect={setSelectedUserId} />
+        <UserSelector onUserSelect={setSelectedUserId} selectedUserId={selectedUserId} />
         <StageSelector 
-          onStageSelect={setSelectedStage} 
+          onStageSelect={setSelectedStage}
+          value={selectedStage}
           disabled={!selectedUserId}
         />
       </div>
