@@ -1,0 +1,6 @@
+id;user_id;department;access_level;added_at;added_by;is_active;notes
+fb23c548-a383-43a1-852e-03eb988d0e57;bcf0974b-80b3-4b4c-a329-b8fdf3eee4fc;;standard;2025-10-23 21:42:53.965825+00;;true;
+36d3c52c-cd3a-4f46-b835-a8dd50bde8c5;92ecab67-e816-4dd7-acd8-b76ddd8ff258;Looplly;standard;2025-10-23 16:13:18.561476+00;;true;
+fe1db52c-5eca-45db-9731-2bc65a6345e4;8ea34a8d-92f4-4f1b-9f8f-9f4a73195409;;standard;2025-10-23 21:42:54.377696+00;;true;
+ed04855c-a9fa-402f-abb7-269ec0f10379;decce763-ca81-489d-a262-5ce7cebab2f7;Looplly;standard;2025-10-27 14:58:18.48462+00;bcf0974b-80b3-4b4c-a329-b8fdf3eee4fc;true;
+1a5a91b4-beb3-4543-bd5d-f20550778a56;613b5ca5-9bbc-48b9-8387-22fefd5d5728;Looplly;standard;2025-10-27 15:00:14.362603+00;bcf0974b-80b3-4b4c-a329-b8fdf3eee4fc;true;

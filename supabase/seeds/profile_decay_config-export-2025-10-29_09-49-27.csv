@@ -1,0 +1,6 @@
+id;config_key;interval_type;interval_days;description;is_active;created_at;updated_at
+4dbc0686-63b1-44ee-8e11-5f8225b09c25;decay_weekly;Weekly;7;Re-ask question every week;true;2025-10-18 07:50:28.200304+00;2025-10-18 07:50:28.200304+00
+110a4bd3-0189-48a5-9027-7c8a467d5512;decay_monthly;Monthly;30;Re-ask question every month;true;2025-10-18 07:50:28.200304+00;2025-10-18 07:50:28.200304+00
+4e884ebf-ec7e-4ec1-b9bf-73a85630e331;decay_quarterly;Quarterly;90;Re-ask question every quarter;true;2025-10-18 07:50:28.200304+00;2025-10-18 07:50:28.200304+00
+76d4a3e0-6f2b-4795-b1e3-856ff5bba422;decay_yearly;Yearly;365;Re-ask question every year;true;2025-10-18 07:50:28.200304+00;2025-10-18 07:50:28.200304+00
+fb681197-782a-44b4-a221-79de046e8a74;decay_never;Never;;Never expires (immutable fields);true;2025-10-18 07:50:28.200304+00;2025-10-18 07:50:28.200304+00

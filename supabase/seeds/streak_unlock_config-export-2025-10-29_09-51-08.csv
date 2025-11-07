@@ -1,0 +1,3 @@
+id;stage;config_key;config_value;description;is_active;tenant_id;created_at;updated_at
+09a9f2c3-886b-4f83-aae2-504c5cc48368;1;enabled;true;Stage 1 is always unlocked;true;2c3e7f22-f3ae-4936-a1e6-f57faf3ec2d4;2025-10-16 17:04:33.879562+00;2025-10-16 17:04:33.879562+00
+4bf389dd-16e0-4492-8048-694140b1a4a8;2;required_badges;"{""category"":""coreVerification"",""excludedBadgeIds"":[""crypto_token""],""message"":""Complete 4 of 5 core verification badges"",""required"":4,""total"":5}";Badge requirements for Stage 2;true;2c3e7f22-f3ae-4936-a1e6-f57faf3ec2d4;2025-10-16 17:04:33.879562+00;2025-10-16 17:04:33.879562+00

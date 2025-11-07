@@ -1,0 +1,4 @@
+id;question_key;auto_approve_enabled;confidence_threshold;require_manual_review;tenant_id;created_at;updated_at
+43ebebbe-0155-4730-bf95-d632b2b9a515;household_income;false;85;true;;2025-10-21 15:58:52.480281+00;2025-10-21 15:58:52.480281+00
+166c9ab2-0be1-45c8-8338-ed44f6908dcf;beverage_brands;false;80;true;;2025-10-21 15:58:52.480281+00;2025-10-21 15:58:52.480281+00
+ac4e05b6-4aa1-44e9-9c8d-b994ab4124f2;automotive_preferences;false;80;true;;2025-10-21 15:58:52.480281+00;2025-10-21 15:58:52.480281+00

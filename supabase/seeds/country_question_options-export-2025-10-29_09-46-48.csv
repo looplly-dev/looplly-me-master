@@ -1,0 +1,2 @@
+id;question_id;country_code;options;metadata;created_at;updated_at;is_fallback
+bcb80c8d-a5d1-48a5-ac09-8e8f3e3ffd04;cb5d9df8-2145-4ced-85b3-166a19ba4d32;GLOBAL;"[{""label"":""Under 20,000"",""value"":""under-20k""},{""label"":""20,000 - 50,000"",""value"":""20k-50k""},{""label"":""50,000 - 100,000"",""value"":""50k-100k""},{""label"":""100,000 - 200,000"",""value"":""100k-200k""},{""label"":""200,000+"",""value"":""200k-plus""}]";{};2025-10-21 15:58:52.480281+00;2025-10-21 15:58:52.480281+00;true

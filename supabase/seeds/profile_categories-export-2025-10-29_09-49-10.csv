@@ -1,0 +1,7 @@
+id;name;display_name;description;icon;level;display_order;is_active;created_at;updated_at;default_decay_config_key;short_id
+477819c4-8edc-4bf6-81d4-a045e85379d9;financial;Financial Profile;Income and financial information;DollarSign;2;3;true;2025-10-18 07:25:26.672621+00;2025-10-18 07:50:28.200304+00;decay_yearly;
+8b9184fc-9e40-4c47-97bd-56d92626b2e5;employment;Employment & Career;Work and career details;Briefcase;3;4;true;2025-10-18 07:25:26.672621+00;2025-10-18 07:50:28.200304+00;decay_yearly;
+dbcc304c-7ebd-40b4-ae24-6692d587dc75;automotive;Automotive & Transportation;Vehicle and transportation info;Car;3;6;true;2025-10-18 07:25:26.672621+00;2025-10-18 07:50:28.200304+00;decay_yearly;
+d096e4ed-084b-45d1-ad63-9bd001ffcbd6;identity_security;Identity & Security;Core identity and account security;Shield;1;1;true;2025-10-18 07:25:26.672621+00;2025-10-23 11:54:48.953637+00;decay_yearly;CAT_L1_IDENTITY
+7e632a1d-d3d0-40cb-8a2e-7893cd261438;demographics;Demographics;Basic demographic information;Users;2;2;true;2025-10-18 07:25:26.672621+00;2025-10-23 11:54:48.953637+00;decay_yearly;CAT_L2_DEMOGRAPHICS
+34a2408e-512a-4f4e-a5d2-f74f12887095;lifestyle;Lifestyle & Housing;Living situation and preferences;Home;3;5;true;2025-10-18 07:25:26.672621+00;2025-10-23 11:54:48.953637+00;decay_yearly;CAT_L3_LIFESTYLE
