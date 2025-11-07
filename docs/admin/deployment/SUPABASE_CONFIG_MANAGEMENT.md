@@ -45,15 +45,15 @@ Looplly uses multiple Supabase clients for session isolation:
 
 #### Main Client (`client.ts`)
 ```typescript
-// Admin/user portal client
+// User portal client ONLY
 // Storage: localStorage
-// Keys: 'admin_auth' (admin), 'auth' (users)
+// Key: 'auth' (hardcoded)
 import { supabase } from '@/integrations/supabase/client';
 ```
 
 **Configuration:**
-- Detects admin routes via `pathname.startsWith('/admin')`
-- Uses `storageKey: 'admin_auth'` for admin isolation
+- Hardcoded to `storageKey: 'auth'` for User Portal
+- NOT used by Admin Portal (uses adminClient.ts instead)
 - Persists across tabs and refreshes
 - Auto-refresh tokens enabled
 
@@ -89,7 +89,8 @@ import { getSupabaseClient } from '@/integrations/supabase/activeClient';
 |---------|--------|--------|
 | Hooks (useAuth, useProfile, etc.) | `activeClient` | Auto-selects based on context |
 | Direct simulator pages | `simulatorClient` | Explicit isolation needed |
-| Admin/user-specific code | `supabase` | Main client only |
+| User Portal specific code | `supabase` | User client only ('auth') |
+| Admin Portal specific code | `adminClient` | Admin client only ('admin_auth') |
 | Generic utilities | `activeClient` | Works in all contexts |
 
 ### Storage Strategy Comparison
@@ -106,9 +107,11 @@ import { getSupabaseClient } from '@/integrations/supabase/activeClient';
 ### Critical Rules
 
 1. **NEVER consolidate to single client** - breaks session isolation
-2. **NEVER modify storage keys** - causes cross-contamination
-3. **ALWAYS use activeClient in shared code** - ensures context-awareness
-4. **Test simulator after any client changes** - verify no admin logout
+2. **NEVER modify storage keys** - causes cross-contamination  
+3. **client.ts MUST remain hardcoded to 'auth'** - User Portal only
+4. **adminClient.ts MUST remain hardcoded to 'admin_auth'** - Admin Portal only
+5. **ALWAYS use activeClient in shared code** - ensures context-awareness
+6. **Test both portals after any client changes** - verify no session leakage
 
 ### Troubleshooting
 

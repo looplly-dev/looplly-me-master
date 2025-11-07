@@ -12,15 +12,14 @@ if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
-// Detect admin context for session isolation
-const isAdmin = typeof window !== 'undefined' && 
-                window.location && 
-                window.location.pathname.startsWith('/admin');
+// This client is dedicated to the User Portal only
+// Admin Portal uses adminClient.ts with 'admin_auth' storage
+// This ensures complete session isolation between portals
 
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
     storage: localStorage,
-    storageKey: isAdmin ? 'admin_auth' : 'auth', // Isolate admin sessions
+    storageKey: 'auth', // User Portal only - Admin uses 'admin_auth'
     persistSession: true,
     autoRefreshToken: true,
   }
