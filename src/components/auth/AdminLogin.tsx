@@ -10,7 +10,7 @@ import { Eye, EyeOff, Shield, ArrowLeft } from 'lucide-react';
 import { useRole } from '@/hooks/useRole';
 import { useUserType } from '@/hooks/useUserType';
 import { getSupabaseClient } from '@/integrations/supabase/activeClient';
-import { checkSessionValidity, clearAllSessionMetadata } from '@/utils/sessionManager';
+import { checkSessionValidity, clearAllSessionMetadata, storeSessionMetadata } from '@/utils/sessionManager';
 
 export default function AdminLogin() {
   const navigate = useNavigate();
@@ -34,11 +34,25 @@ export default function AdminLogin() {
         
         if (!isValid) {
           console.log('[AdminLogin] Session invalid:', reason);
-          // Force sign out for expired sessions
           const supabase = getSupabaseClient();
+          const { data } = await supabase.auth.getSession();
+          const active = data.session;
+          const sameUser = active?.user?.id === authState.user.id;
+
+          if (sameUser) {
+            // Refresh metadata instead of forcing logout
+            try {
+              storeSessionMetadata(authState.user.id, 'admin_auth', 'looplly_team_user');
+              navigate('/admin');
+              return;
+            } catch (e) {
+              console.warn('[AdminLogin] Failed to refresh session metadata after invalid check:', e);
+            }
+          }
+
+          // No active session -> sign out & notify
           await supabase.auth.signOut();
           clearAllSessionMetadata();
-          
           toast({
             title: 'Session Expired',
             description: reason === 'inactive' 

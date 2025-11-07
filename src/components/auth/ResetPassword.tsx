@@ -133,7 +133,7 @@ export default function ResetPassword() {
       if (error) throw error;
 
       toast({ title: 'Password updated', description: 'You can now sign in with your new password.' });
-      navigate('/');
+      navigate(isAdminUser ? '/admin/login' : '/');
     } catch (err: any) {
       toast({ title: 'Reset failed', description: err?.message || 'Please request a new reset link.', variant: 'destructive' });
     } finally {
