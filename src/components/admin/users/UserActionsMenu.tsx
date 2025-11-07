@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { MoreVertical, UserCog, Ban } from 'lucide-react';
+import { MoreVertical, UserCog, Ban, Trash2 } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,9 +35,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { supabase } from '@/integrations/supabase/client';
+import { adminClient } from '@/integrations/supabase/adminClient';
 import { toast } from 'sonner';
 import { AdminUser } from '@/hooks/useAdminUsers';
+import { useRole } from '@/hooks/useRole';
 
 interface UserActionsMenuProps {
   user: AdminUser;
@@ -51,18 +52,21 @@ export function UserActionsMenu({ user, onUpdate }: UserActionsMenuProps) {
     user.user_type || 'looplly_user'
   );
   const [isUpdating, setIsUpdating] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [confirmText, setConfirmText] = useState('');
+  const { isSuperAdmin } = useRole();
 
   const handleTypeChange = async () => {
     setIsUpdating(true);
     try {
       // Update user type using direct SQL since types table may not be in generated types yet
-      const { error } = await supabase
+      const { error } = await adminClient
         .rpc('get_auth_users_with_phones')
         .select('*')
         .limit(0); // Dummy query to ensure connection
 
       // Use direct update query
-      const { error: updateError } = await supabase
+      const { error: updateError } = await adminClient
         .from('profiles')
         .update({ 
           // Store in metadata temporarily until types are regenerated
@@ -87,7 +91,7 @@ export function UserActionsMenu({ user, onUpdate }: UserActionsMenuProps) {
   const handleSuspend = async () => {
     setIsUpdating(true);
     try {
-      const { error } = await supabase
+      const { error } = await adminClient
         .from('profiles')
         .update({ is_suspended: !user.is_suspended })
         .eq('user_id', user.user_id);
@@ -118,7 +122,7 @@ export function UserActionsMenu({ user, onUpdate }: UserActionsMenuProps) {
             <MoreVertical className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-[200px] z-50 bg-background">
+        <DropdownMenuContent align="end" className="w-[220px] z-50 bg-background">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={() => setShowTypeDialog(true)}>
@@ -138,6 +142,18 @@ export function UserActionsMenu({ user, onUpdate }: UserActionsMenuProps) {
               </>
             )}
           </DropdownMenuItem>
+          {isSuperAdmin() && (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem 
+                onClick={() => setShowDeleteDialog(true)}
+                className="text-destructive focus:text-destructive"
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                <span>Delete User…</span>
+              </DropdownMenuItem>
+            </>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
 
@@ -211,6 +227,74 @@ export function UserActionsMenu({ user, onUpdate }: UserActionsMenuProps) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Delete User Confirmation (Super Admin only) */}
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="text-destructive">Permanently Delete User</DialogTitle>
+            <DialogDescription>
+              This action will permanently delete the user and all associated data allowed by database constraints.
+              This cannot be undone. To confirm, type the user's email: <strong>{user.email || 'N/A'}</strong>
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="confirm-delete">Type email to confirm</Label>
+              <input
+                id="confirm-delete"
+                className="border rounded-md px-3 py-2 bg-background"
+                placeholder={user.email || ''}
+                value={confirmText}
+                onChange={(e) => setConfirmText(e.target.value)}
+              />
+              <p className="text-sm text-muted-foreground">
+                Deletion will use a secured admin endpoint and rely on foreign key ON DELETE rules and transactional cleanup.
+              </p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowDeleteDialog(false)} disabled={isUpdating}>
+              Cancel
+            </Button>
+            <Button 
+              variant="destructive" 
+              onClick={async () => {
+                if (!isSuperAdmin()) {
+                  toast.error('Only super admins may delete users.');
+                  return;
+                }
+                if ((user.email || '') !== confirmText) {
+                  toast.error('Confirmation text does not match the user email.');
+                  return;
+                }
+                setIsUpdating(true);
+                try {
+                  // Call admin Edge Function responsible for cascading deletion
+                  const { data, error } = await adminClient.functions.invoke('delete-user', {
+                    body: { email: user.email, userId: user.user_id }
+                  });
+                  if (error) throw error;
+                  if (data && data.error) {
+                    throw new Error(data.error);
+                  }
+                  toast.success('User deleted successfully');
+                  setShowDeleteDialog(false);
+                  onUpdate();
+                } catch (err) {
+                  console.error('Error deleting user:', err);
+                  toast.error(err instanceof Error ? err.message : 'Failed to delete user');
+                } finally {
+                  setIsUpdating(false);
+                }
+              }}
+              disabled={isUpdating || (user.email || '') !== confirmText}
+            >
+              {isUpdating ? 'Deleting…' : 'Delete User'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
