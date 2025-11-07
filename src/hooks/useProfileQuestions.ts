@@ -58,16 +58,43 @@ export const useProfileQuestions = () => {
       const supabase = getSupabaseClient();
       
       // Check if user is a team member - they don't need profile questions
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('country_code, country_iso, user_type')
-        .eq('user_id', userId)
-        .maybeSingle();
+      let profile = null;
+      let profileError = null;
+      
+      try {
+        const result = await supabase
+          .from('profiles')
+          .select('country_code, country_iso, user_type')
+          .eq('user_id', userId)
+          .maybeSingle();
+        
+        profile = result.data;
+        profileError = result.error;
+      } catch (err) {
+        console.error('[useProfileQuestions] Exception fetching profile:', err);
+        // If there's a network/parsing error, return empty state instead of crashing
+        return {
+          categoriesWithQuestions: [],
+          level2Categories: [],
+          level3Categories: [],
+          level2Complete: false,
+          level3Percentage: 0,
+          staleQuestionCount: 0,
+        };
+      }
 
       // If profile doesn't exist yet, return empty state (registration still in progress)
       if (profileError && profileError.code !== 'PGRST116') {
         console.error('[useProfileQuestions] Error fetching profile:', profileError);
-        throw profileError;
+        // Return empty state instead of throwing to prevent cascading errors
+        return {
+          categoriesWithQuestions: [],
+          level2Categories: [],
+          level3Categories: [],
+          level2Complete: false,
+          level3Percentage: 0,
+          staleQuestionCount: 0,
+        };
       }
       
       if (!profile) {
@@ -288,10 +315,14 @@ export const useProfileQuestions = () => {
       };
     },
     enabled: !!userId,
-    staleTime: 30000, // 30 seconds
+    staleTime: Infinity, // Never consider data stale
+    cacheTime: 1000 * 60 * 60, // Keep in cache for 1 hour
     refetchOnWindowFocus: false, // Don't refetch when window regains focus
     refetchOnMount: false, // Don't refetch on component remount
-    retry: 1, // Only retry once on failure
+    refetchOnReconnect: false, // Don't refetch on reconnect
+    refetchInterval: false, // Don't poll
+    retry: 0, // Don't retry on failure - fail fast
+    retryOnMount: false, // Don't retry when component mounts
   });
 
   return {
