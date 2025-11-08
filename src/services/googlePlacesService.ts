@@ -173,8 +173,11 @@ class GooglePlacesService {
         throw error;
       }
 
-      if (data.error) {
-        console.error('Google Places API returned error:', data.error);
+      // Check if Google API returned an error status
+      if (data.status && data.status !== 'OK' && data.status !== 'ZERO_RESULTS') {
+        const errorMessage = data.error_message || `Google Places API error: ${data.status}`;
+        console.error('Google Places API returned error:', { status: data.status, message: errorMessage });
+        throw new Error(errorMessage);
       }
 
       console.log(`🌍 Using REAL Google Places Autocomplete (country: ${countryCode || 'all'}):`, data.predictions?.length || 0, 'results');
@@ -211,6 +214,13 @@ class GooglePlacesService {
       if (error) {
         console.error('Google Places Details error:', error);
         throw error;
+      }
+
+      // Check if Google API returned an error status
+      if (data.status && data.status !== 'OK') {
+        const errorMessage = data.error_message || `Google Places API error: ${data.status}`;
+        console.error('Google Places Details error:', { status: data.status, message: errorMessage });
+        throw new Error(errorMessage);
       }
 
       console.log('🌍 Using REAL Google Places Details');
