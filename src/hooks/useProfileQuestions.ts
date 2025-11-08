@@ -55,7 +55,14 @@ export const useProfileQuestions = () => {
   // Track if query has been fetched at least once
   const hasFetchedOnce = useRef(false);
 
-  const { data, isLoading, refetch, isFetching } = useQuery({
+  const { data, isLoading, refetch, isFetching } = useQuery<{
+    categoriesWithQuestions: ProfileCategory[];
+    level2Complete: boolean;
+    level3Percentage: number;
+    staleQuestionCount: number;
+    level2Categories: ProfileCategory[];
+    level3Categories: ProfileCategory[];
+  }>({
     queryKey: ['profile-questions', userId],
     queryFn: async () => {
       if (import.meta.env.DEV) {
@@ -324,7 +331,7 @@ export const useProfileQuestions = () => {
     },
     enabled: !!userId, // Enable when user ID exists
     staleTime: Infinity, // Never consider data stale
-    cacheTime: 1000 * 60 * 60, // Keep in cache for 1 hour
+    gcTime: 1000 * 60 * 60, // Keep in cache for 1 hour
     refetchOnWindowFocus: false, // Don't refetch when window regains focus
     refetchOnMount: false, // Don't refetch on component remount
     refetchOnReconnect: false, // Don't refetch on reconnect
