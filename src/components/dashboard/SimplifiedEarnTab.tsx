@@ -1423,7 +1423,7 @@ export default function SimplifiedEarnTab() {
         title="Why Rep Matters"
         icon={<Shield className="h-5 w-5" />}
         defaultOpen={false}
-        className="border-accent/20"
+        className="border-accent/20 mt-4 relative"
       >
         <div className="space-y-4">
           <div className="grid grid-cols-1 gap-3">
