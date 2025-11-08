@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -13,6 +13,7 @@ import { getCurrentUserId } from '@/utils/authHelper';
 export default function ProfileComplete() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [searchParams] = useSearchParams();
   const { level2Categories, refetch, isLoading } = useProfileQuestions();
   
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -21,9 +22,37 @@ export default function ProfileComplete() {
   // Flatten all Level 2 questions
   const allQuestions = level2Categories.flatMap(cat => cat.questions);
   const requiredQuestions = allQuestions.filter(q => q.is_required);
-  const currentQuestion = requiredQuestions[currentQuestionIndex];
   
-  const progress = ((currentQuestionIndex + 1) / requiredQuestions.length) * 100;
+  // Filter to only show unanswered questions
+  const unansweredQuestions = requiredQuestions.filter(q => 
+    !q.user_answer?.answer_value && !q.user_answer?.answer_json
+  );
+  
+  const currentQuestion = unansweredQuestions[currentQuestionIndex];
+  
+  // On mount, check if a specific question ID is in the URL and navigate to it
+  useEffect(() => {
+    const questionId = searchParams.get('question');
+    if (questionId && requiredQuestions.length > 0) {
+      // Find the question in the unanswered list
+      const unanswered = requiredQuestions.filter(q => 
+        !q.user_answer?.answer_value && !q.user_answer?.answer_json
+      );
+      const questionIndex = unanswered.findIndex(q => q.id === questionId);
+      if (questionIndex !== -1) {
+        setCurrentQuestionIndex(questionIndex);
+      } else {
+        // Question not found in unanswered list, start at first unanswered
+        setCurrentQuestionIndex(0);
+      }
+    }
+    // Only run on mount when searchParams or requiredQuestions first become available
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams.get('question'), requiredQuestions.length > 0 ? 'ready' : 'loading']);
+  
+  const progress = unansweredQuestions.length > 0 
+    ? ((currentQuestionIndex + 1) / unansweredQuestions.length) * 100 
+    : 100;
 
   const handleAnswerSubmit = async (questionId: string, answer: any) => {
     setIsSubmitting(true);
@@ -66,9 +95,19 @@ export default function ProfileComplete() {
 
       if (error) throw error;
 
-      // Move to next question or complete
-      if (currentQuestionIndex < requiredQuestions.length - 1) {
-        setCurrentQuestionIndex(prev => prev + 1);
+      // Refetch to update the questions list
+      const { data } = await refetch();
+      
+      // Check if there are more unanswered questions after refetch
+      const allQuestionsAfterRefetch = data?.level2Categories?.flatMap(cat => cat.questions) || [];
+      const requiredAfterRefetch = allQuestionsAfterRefetch.filter(q => q.is_required);
+      const unansweredAfterRefetch = requiredAfterRefetch.filter(q => 
+        !q.user_answer?.answer_value && !q.user_answer?.answer_json
+      );
+
+      if (unansweredAfterRefetch.length > 0) {
+        // More questions to answer - stay at index 0 to show next question
+        setCurrentQuestionIndex(0);
       } else {
         // All questions answered - mark Level 2 complete
         const { error: profileError } = await supabase
@@ -127,7 +166,7 @@ export default function ProfileComplete() {
   }
 
   // No questions available - navigate to earn page
-  if (!currentQuestion || requiredQuestions.length === 0) {
+  if (!currentQuestion || unansweredQuestions.length === 0) {
     navigate('/earn');
     return null;
   }
@@ -148,7 +187,7 @@ export default function ProfileComplete() {
               Back
             </Button>
             <span className="text-sm font-medium text-muted-foreground">
-              Question {currentQuestionIndex + 1} of {requiredQuestions.length}
+              Question {currentQuestionIndex + 1} of {unansweredQuestions.length}
             </span>
           </div>
           <Progress value={progress} className="h-2" />
@@ -178,7 +217,7 @@ export default function ProfileComplete() {
       <div className="bg-card border-t py-4">
         <div className="max-w-3xl mx-auto px-4">
           <div className="flex items-center justify-center gap-2">
-            {requiredQuestions.map((_, idx) => (
+            {unansweredQuestions.map((_, idx) => (
               <div
                 key={idx}
                 className={`h-2 w-2 rounded-full transition-colors ${
