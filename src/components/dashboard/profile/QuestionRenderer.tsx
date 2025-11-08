@@ -293,18 +293,32 @@ export function QuestionRenderer({ question, onAnswerChange, onAddressChange, di
         );
 
       case 'address':
+        const hasRequiredAddressFields = value?.administrative_area_level_1 && value?.country;
+        
         return (
-          <AddressFieldsInput
-            value={question.user_answer?.answer_json}
-            onChange={(address) => {
-              setValue(address);
-              if (onAddressChange) {
-                onAddressChange(address);
-              }
-            }}
-            disabled={disabled || isLocked}
-            userCountryCode={userCountryCode}
-          />
+          <div className="space-y-4">
+            <AddressFieldsInput
+              value={question.user_answer?.answer_json}
+              onChange={(address) => {
+                setValue(address);
+                if (onAddressChange) {
+                  onAddressChange(address);
+                }
+              }}
+              disabled={disabled || isLocked}
+              userCountryCode={userCountryCode}
+            />
+            {!isLocked && (
+              <Button
+                onClick={() => onAnswerChange(question.id, value)}
+                disabled={disabled || !hasRequiredAddressFields}
+                className="w-full"
+                size="lg"
+              >
+                Continue to Next Question
+              </Button>
+            )}
+          </div>
         );
 
       case 'boolean':
