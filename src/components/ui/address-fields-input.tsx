@@ -64,7 +64,7 @@ export const AddressFieldsInput = ({
     }, 500);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [searchQuery, userCountryISO, searchAddress]);
+  }, [searchQuery, userCountryISO]); // Removed searchAddress - now stable via useCallback
 
   const handleSelectSuggestion = async (suggestion: any) => {
     try {

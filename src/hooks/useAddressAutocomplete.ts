@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { googlePlacesService, type AddressComponents } from '@/services/googlePlacesService';
 
 export const useAddressAutocomplete = () => {
@@ -6,28 +6,47 @@ export const useAddressAutocomplete = () => {
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [selectedAddress, setSelectedAddress] = useState<AddressComponents | null>(null);
   const [isMockMode, setIsMockMode] = useState(true);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
     setIsMockMode(googlePlacesService.isMockMode());
   }, []);
 
-  const searchAddress = async (query: string, countryCode?: string) => {
+  const searchAddress = useCallback(async (query: string, countryCode?: string) => {
+    // Cancel any in-flight requests
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+
     if (!query || query.length < 3) {
       setSuggestions([]);
       return;
     }
 
+    // Create new abort controller for this request
+    abortControllerRef.current = new AbortController();
+
     setIsLoading(true);
     try {
       const results = await googlePlacesService.searchPlaces(query, countryCode);
-      setSuggestions(results);
+      
+      // Only update if request wasn't aborted
+      if (!abortControllerRef.current.signal.aborted) {
+        setSuggestions(results);
+      }
     } catch (error) {
+      // Ignore abort errors
+      if (error instanceof Error && error.name === 'AbortError') {
+        return;
+      }
       console.error('Address search error:', error);
       setSuggestions([]);
     } finally {
-      setIsLoading(false);
+      if (!abortControllerRef.current?.signal.aborted) {
+        setIsLoading(false);
+      }
     }
-  };
+  }, []); // Empty dependency array - function is stable
 
   const selectPlace = async (placeId: string, expectedCountryName?: string) => {
     setIsLoading(true);
