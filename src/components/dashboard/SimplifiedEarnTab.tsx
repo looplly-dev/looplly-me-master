@@ -109,6 +109,14 @@ export default function SimplifiedEarnTab() {
     localStorage.setItem(SKIP_TIMESTAMP_KEY, Date.now().toString());
   };
 
+  // Helper to generate profile complete URL with level and question ID
+  const getProfileCompleteUrl = () => {
+    const firstUnanswered = level2Required.find(q => !q.user_answer?.answer_value && !q.user_answer?.answer_json);
+    return firstUnanswered 
+      ? `/profile/complete?level=2&question=${firstUnanswered.id}`
+      : '/profile/complete?level=2';
+  };
+
   // Using static mock data - no database calls needed
 
   // Progress to next goal (simplified for basic users)
@@ -161,7 +169,7 @@ export default function SimplifiedEarnTab() {
         : 'Please verify your mobile number to start earning';
       const buttonText = !level2Complete ? 'Complete Profile' : 'Verify Now';
       const action = !level2Complete 
-        ? () => navigate('/profile/complete')
+        ? () => navigate(getProfileCompleteUrl())
         : () => navigate('/verify-mobile');
       
       toast({
@@ -200,7 +208,7 @@ export default function SimplifiedEarnTab() {
         : 'Please verify your mobile number to enable data sharing';
       const buttonText = !level2Complete ? 'Complete Profile' : 'Verify Now';
       const action = !level2Complete 
-        ? () => navigate('/profile/complete')
+        ? () => navigate(getProfileCompleteUrl())
         : () => navigate('/verify-mobile');
       
       toast({
@@ -406,7 +414,7 @@ export default function SimplifiedEarnTab() {
                 <Button
                   onClick={() => {
                     analytics.trackProfileComplete();
-                    navigate('/profile/complete');
+                    navigate(getProfileCompleteUrl());
                   }}
                   size="sm"
                   variant="default"
