@@ -27,11 +27,33 @@ serve(async (req) => {
       throw new Error('GOOGLE_PLACES_API_KEY not configured');
     }
 
-    const url = new URL(req.url);
-    const endpoint = url.searchParams.get('endpoint') || 'autocomplete';
+    const body = await req.json();
+    
+    // Auto-detect operation type based on body content
+    if (body.placeId) {
+      // Place Details request
+      const { placeId } = body as PlaceDetailsRequest;
+      
+      if (!placeId) {
+        return new Response(
+          JSON.stringify({ error: 'Missing placeId parameter' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
 
-    if (endpoint === 'autocomplete') {
-      const { query, countryCode } = await req.json() as AutocompleteRequest;
+      const response = await fetch(
+        `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&key=${apiKey}`
+      );
+
+      const data = await response.json();
+
+      return new Response(
+        JSON.stringify(data),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    } else {
+      // Autocomplete request
+      const { query, countryCode } = body as AutocompleteRequest;
       
       if (!query) {
         return new Response(
@@ -57,33 +79,6 @@ serve(async (req) => {
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
-    
-    else if (endpoint === 'details') {
-      const { placeId } = await req.json() as PlaceDetailsRequest;
-      
-      if (!placeId) {
-        return new Response(
-          JSON.stringify({ error: 'Missing placeId parameter' }),
-          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-
-      const response = await fetch(
-        `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&key=${apiKey}`
-      );
-
-      const data = await response.json();
-
-      return new Response(
-        JSON.stringify(data),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    return new Response(
-      JSON.stringify({ error: 'Invalid endpoint. Use ?endpoint=autocomplete or ?endpoint=details' }),
-      { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
 
   } catch (error) {
     console.error('[GOOGLE-PLACES] Error:', error);
