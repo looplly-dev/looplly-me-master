@@ -386,7 +386,7 @@ export default function SimplifiedEarnTab() {
       )}
       
       {/* Normal Earn content renders underneath */}
-      <div className="pt-0 pb-24 md:pb-20 lg:pb-8 px-0 md:px-6 lg:px-8 space-y-3">
+      <div className="pt-4 pb-24 md:pb-20 lg:pb-8 px-0 md:px-6 lg:px-8 space-y-3">
         
         {/* Subtle Level 2 Completion Banner */}
         {(() => {
