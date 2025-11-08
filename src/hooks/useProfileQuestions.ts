@@ -338,8 +338,6 @@ export const useProfileQuestions = () => {
     refetchInterval: false, // Don't poll
     retry: 0, // Don't retry on failure - fail fast
     retryOnMount: false, // Don't retry when component mounts
-    keepPreviousData: true, // Keep previous data while fetching
-    notifyOnChangeProps: ['data', 'error'], // Only notify on data/error changes, not loading states
   });
 
   // Log fetching state in dev mode
