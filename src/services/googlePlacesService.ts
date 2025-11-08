@@ -156,6 +156,8 @@ class GooglePlacesService {
 
   private async realSearchPlaces(query: string, countryCode?: string): Promise<any[]> {
     try {
+      console.log('[GooglePlaces] Searching with:', { query, countryCode });
+      
       const { data, error } = await supabase.functions.invoke('google-places', {
         body: { 
           query,
@@ -164,9 +166,15 @@ class GooglePlacesService {
         method: 'POST',
       });
 
+      console.log('[GooglePlaces] API Response:', { data, error });
+
       if (error) {
         console.error('Google Places Autocomplete error:', error);
         throw error;
+      }
+
+      if (data.error) {
+        console.error('Google Places API returned error:', data.error);
       }
 
       console.log(`🌍 Using REAL Google Places Autocomplete (country: ${countryCode || 'all'}):`, data.predictions?.length || 0, 'results');
