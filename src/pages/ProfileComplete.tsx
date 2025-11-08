@@ -47,16 +47,22 @@ export default function ProfileComplete() {
       }
 
       // Save answer
+      const authUserId = session.user.id;
+      const normalizedValue = typeof answer === 'string' 
+        ? answer 
+        : (answer?.value || answer?.formatted_address || JSON.stringify(answer));
+
       const { error } = await supabase
         .from('profile_answers')
         .upsert({
-          user_id: userId,
+          user_id: authUserId,
           question_id: questionId,
           answer_value: typeof answer === 'string' ? answer : null,
           answer_json: typeof answer === 'object' ? answer : null,
+          answer_normalized: normalizedValue,
           last_updated: new Date().toISOString(),
           is_stale: false
-        });
+        }, { onConflict: 'user_id,question_id' });
 
       if (error) throw error;
 
@@ -73,7 +79,7 @@ export default function ProfileComplete() {
             profile_completeness_score: 100,
             last_profile_update: new Date().toISOString()
           })
-          .eq('user_id', userId);
+          .eq('user_id', authUserId);
 
         if (profileError) throw profileError;
 
