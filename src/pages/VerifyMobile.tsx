@@ -65,8 +65,8 @@ export default function VerifyMobile() {
           description: 'You\'re all set! Start earning now.',
         });
 
-        // Navigate back to dashboard
-        navigate('/dashboard');
+        // Navigate to earn page
+        navigate('/earn');
       } else {
         toast({
           title: 'Invalid Code',
@@ -181,7 +181,7 @@ export default function VerifyMobile() {
           {/* Skip for now (optional) */}
           <div className="pt-2">
             <button
-              onClick={() => navigate('/dashboard')}
+              onClick={() => navigate('/earn')}
               className="text-sm text-muted-foreground hover:text-foreground"
             >
               I'll do this later

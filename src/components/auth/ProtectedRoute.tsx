@@ -255,9 +255,9 @@ export default function ProtectedRoute({
               </p>
               <Button 
                 variant="secondary" 
-                onClick={() => navigate(userType === 'looplly_team_user' ? '/admin' : '/dashboard')}
+                onClick={() => navigate(userType === 'looplly_team_user' ? '/admin' : '/earn')}
               >
-                {userType === 'looplly_team_user' ? 'Go to Admin Dashboard' : 'Go to Dashboard'}
+                {userType === 'looplly_team_user' ? 'Go to Admin Dashboard' : 'Go to Earn'}
               </Button>
             </CardContent>
           </Card>

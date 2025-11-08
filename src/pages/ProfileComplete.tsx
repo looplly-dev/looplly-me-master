@@ -89,7 +89,7 @@ export default function ProfileComplete() {
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex(prev => prev - 1);
     } else {
-      navigate('/dashboard');
+      navigate('/earn');
     }
   };
 
@@ -106,9 +106,9 @@ export default function ProfileComplete() {
     );
   }
 
-  // No questions available - navigate to dashboard
+  // No questions available - navigate to earn page
   if (!currentQuestion || requiredQuestions.length === 0) {
-    navigate('/dashboard');
+    navigate('/earn');
     return null;
   }
 

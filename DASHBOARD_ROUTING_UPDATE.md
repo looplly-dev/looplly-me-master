@@ -1,55 +1,53 @@
-# Dashboard Routing Update
+# User Portal Routing Update
 
 ## Change Summary
-Updated user portal routing so authenticated users land on `/dashboard` instead of `/` after login.
+Updated user portal routing so authenticated users land on `/earn` instead of `/` after login.
+
+**Latest Update**: Changed route from `/dashboard` to `/earn` for more intuitive URL structure.
 
 ## Motivation
-- Clearer URL structure: `/` for login, `/dashboard` for authenticated landing page
-- Better semantics and user experience
-- Consistent with admin portal structure (`/admin` for admin dashboard)
+- Clearer URL structure: `/` for login, `/earn` for main authenticated page
+- Better semantics: URL matches the page purpose (earning)
+- More intuitive for users - they know they're on the earning page
+- Consistent with tab navigation structure
 
 ## Changes Made
 
 ### 1. **Main Route Configuration** (`src/components/LoopllyApp.tsx`)
-- **Before**: Route `/` served the Earn page directly
-- **After**: 
-  - Route `/` now redirects to `/dashboard` for authenticated users
-  - Route `/dashboard` serves the Earn page
-  - Catch-all `*` route redirects to `/dashboard` instead of `/`
+- **Evolution**: 
+  - Originally: Route `/` served the Earn page directly
+  - First update: Changed to `/dashboard`
+  - Current: Changed to `/earn` for better semantics
 
 ```typescript
-// Before
-<Route path="/" element={<Earn />} />
-<Route path="*" element={<Navigate to="/" replace />} />
-
-// After
-<Route path="/" element={<Navigate to="/dashboard" replace />} />
-<Route path="/dashboard" element={<Earn />} />
-<Route path="*" element={<Navigate to="/dashboard" replace />} />
+// Current
+<Route path="/" element={<Navigate to="/earn" replace />} />
+<Route path="/earn" element={<Earn />} />
+<Route path="*" element={<Navigate to="/earn" replace />} />
 ```
 
 ### 2. **Navigation Menu** (`src/components/dashboard/DashboardLayout.tsx`)
-- Updated the "Earn" navigation item from `/` to `/dashboard`
-- Bottom navigation bar now correctly highlights `/dashboard` as active
+- Updated the "Earn" navigation item to `/earn`
+- Bottom navigation bar now correctly highlights `/earn` as active
 
 ```typescript
-// Before
-{ path: '/', icon: Coins, label: 'Earn' }
-
-// After
-{ path: '/dashboard', icon: Coins, label: 'Earn' }
+// Current
+{ path: '/earn', icon: Coins, label: 'Earn' }
 ```
 
 ### 3. **Profile Completion Flow** (`src/pages/ProfileComplete.tsx`)
-- Back button navigation updated from `/` to `/dashboard`
-- User returns to dashboard when going back from profile questions
+- Back button navigation updated to `/earn`
+- User returns to earn page when going back from profile questions
 
 ### 4. **Mobile Verification** (`src/pages/VerifyMobile.tsx`)
-- Success navigation updated from `/` to `/dashboard`
-- "I'll do this later" skip button updated from `/` to `/dashboard`
+- Success navigation updated to `/earn`
+- "I'll do this later" skip button updated to `/earn`
 
 ### 5. **Support Page** (`src/pages/Support.tsx`)
-- Back button navigation updated from `/` to `/dashboard`
+- Back button navigation updated to `/earn`
+
+### 6. **Protected Route** (`src/components/auth/ProtectedRoute.tsx`)
+- Access denied fallback button updated to redirect to `/earn`
 
 ## What Stays the Same
 
@@ -73,8 +71,8 @@ User visits any URL → Redirected to / (Login page)
 
 ### After Login
 ```
-User logs in → Redirected to /dashboard (Earn page)
-User navigates → /dashboard, /wallet, /profile, /refer, /community, /rep
+User logs in → Redirected to /earn (Earn page)
+User navigates → /earn, /wallet, /profile, /refer, /community, /rep
 ```
 
 ### After Logout
@@ -84,12 +82,12 @@ User clicks logout → Redirected to / (Login page)
 
 ## Testing Checklist
 - ✅ Build succeeds without errors
-- ✅ Login redirects to `/dashboard`
+- ✅ Login redirects to `/earn`
 - ✅ Logout redirects to `/` (login page)
 - ✅ All navigation items work correctly
 - ✅ Profile completion flows work
 - ✅ Mobile verification works
-- ✅ Back buttons navigate to `/dashboard`
+- ✅ Back buttons navigate to `/earn`
 - ✅ Admin routes remain unchanged
 
 ## Files Modified
@@ -98,15 +96,22 @@ User clicks logout → Redirected to / (Login page)
 3. `src/pages/ProfileComplete.tsx` - Back navigation
 4. `src/pages/VerifyMobile.tsx` - Success and skip navigation
 5. `src/pages/Support.tsx` - Back navigation
+6. `src/components/auth/ProtectedRoute.tsx` - Access denied fallback
 
 ## Migration Notes
 - No database changes required
 - No breaking changes to API
-- Existing users will be automatically redirected to `/dashboard` on next login
-- All internal links updated to point to `/dashboard`
+- Existing users will be automatically redirected to `/earn` on next login
+- All internal links updated to point to `/earn`
 - External links should point to `/` for login (unchanged)
+- Old `/dashboard` URL is no longer used
+
+## Route Evolution History
+1. **Original**: `/` → Earn page (direct)
+2. **First Update**: `/dashboard` → Earn page (for clarity)
+3. **Current**: `/earn` → Earn page (semantic and intuitive)
 
 ## Future Considerations
-- Consider adding a redirect from `/dashboard` to `/` for unauthenticated users (optional)
-- Monitor analytics to ensure users find the new URL structure intuitive
-- Update any documentation or onboarding materials that reference the old `/` route for the dashboard
+- Monitor analytics to ensure users find `/earn` URL intuitive
+- Update any documentation or onboarding materials
+- Consider similar semantic routes for other pages if beneficial

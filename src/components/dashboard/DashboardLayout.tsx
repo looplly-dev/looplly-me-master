@@ -40,7 +40,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
   // Build nav items based on user type
   const baseNavItems = [
-    { path: '/dashboard', icon: Coins, label: 'Earn' },
+    { path: '/earn', icon: Coins, label: 'Earn' },
     { path: '/wallet', icon: Wallet, label: 'Wallet' },
     { path: '/profile', icon: User, label: 'Profile' },
     { path: '/refer', icon: Users, label: 'Refer' },
