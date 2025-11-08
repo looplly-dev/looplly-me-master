@@ -32,6 +32,20 @@ export default function ProfileComplete() {
       const userId = await getCurrentUserId();
       if (!userId) throw new Error('Not authenticated');
 
+      // Debug: Check session state
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      console.log('[ProfileComplete] Auth debug:', {
+        userId,
+        sessionUserId: session?.user?.id,
+        hasSession: !!session,
+        sessionError,
+        pathname: window.location.pathname
+      });
+
+      if (!session) {
+        throw new Error('No active session. Please log in again.');
+      }
+
       // Save answer
       const { error } = await supabase
         .from('profile_answers')

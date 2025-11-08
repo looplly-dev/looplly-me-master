@@ -29,6 +29,19 @@ export const useProfileAnswers = () => {
 
       const supabase = getSupabaseClient();
       
+      // Debug: Log auth state
+      const { data: { session } } = await supabase.auth.getSession();
+      console.log('[useProfileAnswers] Auth state:', { 
+        userId, 
+        sessionUserId: session?.user?.id,
+        hasSession: !!session,
+        pathname: window.location.pathname 
+      });
+      
+      if (!session) {
+        throw new Error('No active session found. Please log in again.');
+      }
+      
       // Normalize value for targeting
       const normalizedValue = typeof value === 'string' 
         ? value 
