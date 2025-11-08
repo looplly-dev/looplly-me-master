@@ -547,7 +547,14 @@ export const useAuthLogic = () => {
       }
     });
 
-    // Set up periodic session validity check
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, []); // Run only once on mount - auth state changes are handled by the subscription
+
+  // Separate effect for periodic session validity check
+  useEffect(() => {
     const sessionCheckInterval = setInterval(() => {
       const currentUserId = authState.user?.id;
       if (currentUserId && authState.isAuthenticated) {
@@ -577,20 +584,14 @@ export const useAuthLogic = () => {
             // No active session -> force logout
             supabase.auth.signOut();
             clearAllSessionMetadata();
-            if (mounted) {
-              setAuthState({ user: null, isAuthenticated: false, isLoading: false, step: 'login' });
-            }
+            setAuthState({ user: null, isAuthenticated: false, isLoading: false, step: 'login' });
           });
         }
       }
     }, SESSION_CONFIG.SESSION_CHECK_INTERVAL_MS);
 
-    return () => {
-      mounted = false;
-      subscription.unsubscribe();
-      clearInterval(sessionCheckInterval);
-    };
-  }, [authState.isAuthenticated, authState.user?.id]);
+    return () => clearInterval(sessionCheckInterval);
+  }, [authState.user?.id, authState.isAuthenticated]); // Only re-setup interval when user ID or auth status changes
 
   const register = withRateLimit('registration', async (data: any): Promise<boolean> => {
     console.log('Registering user with data:', data);
