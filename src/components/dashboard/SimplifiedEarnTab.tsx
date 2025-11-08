@@ -396,7 +396,7 @@ export default function SimplifiedEarnTab() {
             : `Answer ${questionsRemaining} quick questions to start earning`;
           
           return !level2Complete && questionsRemaining > 0 && (
-            <Alert className="sticky top-16 md:top-20 z-30 border-amber-500/30 bg-amber-500/10 backdrop-blur-sm shadow-md">
+            <Alert className="sticky top-20 md:top-24 z-30 border-amber-500/30 bg-amber-500/10 backdrop-blur-sm shadow-md">
               <Info className="h-4 w-4 text-amber-600" />
               <AlertTitle className="text-amber-900 dark:text-amber-100">Complete Your Profile</AlertTitle>
               <AlertDescription className="flex items-center justify-between gap-4 sm:gap-6">
@@ -421,7 +421,7 @@ export default function SimplifiedEarnTab() {
         
         {/* Mobile Verification Banner */}
         {level2Complete && !isVerified && (
-          <Alert className="sticky top-16 md:top-20 z-30 border-orange-500/30 bg-orange-500/10 backdrop-blur-sm shadow-md">
+          <Alert className="sticky top-20 md:top-24 z-30 border-orange-500/30 bg-orange-500/10 backdrop-blur-sm shadow-md">
             <Shield className="h-4 w-4 text-orange-600" />
             <AlertTitle className="text-orange-900 dark:text-orange-100">Verify Mobile Number</AlertTitle>
             <AlertDescription className="flex items-center justify-between gap-4 sm:gap-6">
