@@ -54,7 +54,9 @@ export const AddressFieldsInput = ({
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       if (searchQuery && searchQuery.length >= 3) {
-        searchAddress(searchQuery, userCountryISO); // Pass ISO code for filtering
+        // Fallback to ZA (South Africa) if no country code is set
+        const countryFilter = userCountryISO || 'ZA';
+        searchAddress(searchQuery, countryFilter); // Pass ISO code for filtering
         setShowSuggestions(true);
       } else {
         setShowSuggestions(false);
@@ -62,7 +64,7 @@ export const AddressFieldsInput = ({
     }, 500);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [searchQuery, userCountryISO]);
+  }, [searchQuery, userCountryISO, searchAddress]);
 
   const handleSelectSuggestion = async (suggestion: any) => {
     try {
