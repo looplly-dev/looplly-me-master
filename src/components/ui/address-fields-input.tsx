@@ -32,6 +32,16 @@ export const AddressFieldsInput = ({
   const userCountryISO = userCountryCode ? getISOFromDialCode(userCountryCode) : '';
   const userCountryFlag = userCountryCode ? getCountryFlagFromDialCode(userCountryCode) : '🌍';
   
+  // Debug logging
+  useEffect(() => {
+    console.log('[AddressFieldsInput] Country detection:', {
+      userCountryCode,
+      userCountryName,
+      userCountryISO,
+      userCountryFlag
+    });
+  }, [userCountryCode, userCountryName, userCountryISO, userCountryFlag]);
+  
   const [addressFields, setAddressFields] = useState<Partial<AddressComponents>>({
     street_number: value?.street_number || '',
     route: value?.route || '',
@@ -42,6 +52,24 @@ export const AddressFieldsInput = ({
     country: userCountryName || value?.country || '', // FORCED from profile
     postal_code: value?.postal_code || '',
   });
+  
+  // Update country when userCountryCode becomes available
+  useEffect(() => {
+    if (userCountryName && addressFields.country !== userCountryName) {
+      setAddressFields(prev => ({
+        ...prev,
+        country: userCountryName
+      }));
+      
+      // Notify parent of the update
+      if (onChange) {
+        onChange({
+          ...addressFields,
+          country: userCountryName
+        } as AddressComponents);
+      }
+    }
+  }, [userCountryName]);
   
   const {
     isLoading,

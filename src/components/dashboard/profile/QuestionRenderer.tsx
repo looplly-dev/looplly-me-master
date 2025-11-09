@@ -17,7 +17,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { validateAndNormalizeMobile } from '@/utils/mobileValidation';
 import { getMobileFormatInfo } from '@/utils/mobileFormatExamples';
-import { getAllCountries, formatCountryDisplay } from '@/utils/countries';
+import { getAllCountries, formatCountryDisplay, getCountryNameFromDialCode } from '@/utils/countries';
 
 interface QuestionRendererProps {
   question: ProfileQuestion;
@@ -82,19 +82,68 @@ export function QuestionRenderer({ question, onAnswerChange, onAddressChange, di
   useEffect(() => {
     if (question.question_type === 'address' && authState.user?.id) {
       const fetchCountryCode = async () => {
-        const { data: profile } = await supabase
+        const { data: profile, error } = await supabase
           .from('profiles')
-          .select('country_code')
+          .select('country_code, mobile')
           .eq('user_id', authState.user!.id)
           .single();
 
+        if (error) {
+          console.error('[QuestionRenderer] Error fetching profile:', error);
+          return;
+        }
+
         if (profile?.country_code) {
+          console.log('[QuestionRenderer] User country code from profile:', profile.country_code);
           setUserCountryCode(profile.country_code);
+        } else if (profile?.mobile) {
+          // Fallback: Extract country code from mobile number
+          // Mobile numbers are stored in E.164 format (e.g., "+27821234567")
+          console.log('[QuestionRenderer] No country_code, extracting from mobile:', profile.mobile);
+          
+          // Match country code (1-4 digits after +)
+          const match = profile.mobile.match(/^(\+\d{1,4})/);
+          if (match) {
+            const extractedCode = match[1];
+            console.log('[QuestionRenderer] Extracted country code:', extractedCode);
+            setUserCountryCode(extractedCode);
+            
+            // Update the profile with the extracted country code for future use
+            supabase
+              .from('profiles')
+              .update({ country_code: extractedCode })
+              .eq('user_id', authState.user!.id)
+              .then(({ error: updateError }) => {
+                if (updateError) {
+                  console.error('[QuestionRenderer] Failed to update country_code:', updateError);
+                } else {
+                  console.log('[QuestionRenderer] Successfully updated country_code in profile');
+                }
+              });
+          } else {
+            console.error('[QuestionRenderer] Could not extract country code from mobile:', profile.mobile);
+          }
+        } else {
+          console.error('[QuestionRenderer] No country_code or mobile found in profile');
         }
       };
       fetchCountryCode();
     }
   }, [question.question_type, authState.user?.id]);
+  
+  // Update the address value when userCountryCode is set
+  useEffect(() => {
+    if (question.question_type === 'address' && userCountryCode && !value?.country) {
+      const countryName = getCountryNameFromDialCode(userCountryCode);
+      if (countryName) {
+        console.log('[QuestionRenderer] Setting country in value:', countryName);
+        setValue(prev => ({
+          ...prev,
+          country: countryName
+        }));
+      }
+    }
+  }, [userCountryCode, question.question_type, value?.country]);
   
   // Validate phone number when value or country code changes
   useEffect(() => {
@@ -293,13 +342,25 @@ export function QuestionRenderer({ question, onAnswerChange, onAddressChange, di
         );
 
       case 'address':
-        const hasRequiredAddressFields = value?.administrative_area_level_1 && value?.country;
+        // Check if we have the required address fields
+        // Province/State is required, country will be auto-filled from mobile number
+        const hasRequiredAddressFields = value?.administrative_area_level_1 && userCountryCode;
+        
+        // Debug logging
+        console.log('[QuestionRenderer] Address validation:', {
+          hasProvince: !!value?.administrative_area_level_1,
+          hasCountry: !!value?.country,
+          hasUserCountryCode: !!userCountryCode,
+          userCountryCode,
+          value
+        });
         
         return (
           <div className="space-y-4">
             <AddressFieldsInput
-              value={question.user_answer?.answer_json}
+              value={question.user_answer?.answer_json || value}
               onChange={(address) => {
+                console.log('[QuestionRenderer] Address changed:', address);
                 setValue(address);
                 if (onAddressChange) {
                   onAddressChange(address);
@@ -310,12 +371,17 @@ export function QuestionRenderer({ question, onAnswerChange, onAddressChange, di
             />
             {!isLocked && (
               <Button
-                onClick={() => onAnswerChange(question.id, value)}
+                onClick={() => {
+                  console.log('[QuestionRenderer] Submitting address:', value);
+                  onAnswerChange(question.id, value);
+                }}
                 disabled={disabled || !hasRequiredAddressFields}
                 className="w-full"
                 size="lg"
               >
-                Continue to Next Question
+                {!userCountryCode ? 'Loading country information...' : 
+                 !value?.administrative_area_level_1 ? 'Please enter Province/State' :
+                 'Continue to Next Question'}
               </Button>
             )}
           </div>
