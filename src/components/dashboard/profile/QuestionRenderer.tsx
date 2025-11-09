@@ -84,12 +84,15 @@ export function QuestionRenderer({ question, onAnswerChange, onAddressChange, di
       const fetchCountryCode = async () => {
         const { data: profile, error } = await supabase
           .from('profiles')
-          .select('country_code, mobile')
+          .select('country_code, country_iso, mobile')
           .eq('user_id', authState.user!.id)
           .single();
 
         if (error) {
           console.error('[QuestionRenderer] Error fetching profile:', error);
+          // Default to South Africa if profile fetch fails
+          console.log('[QuestionRenderer] Defaulting to South Africa (+27)');
+          setUserCountryCode('+27');
           return;
         }
 
@@ -121,10 +124,13 @@ export function QuestionRenderer({ question, onAnswerChange, onAddressChange, di
                 }
               });
           } else {
-            console.error('[QuestionRenderer] Could not extract country code from mobile:', profile.mobile);
+            console.warn('[QuestionRenderer] Could not extract country code from mobile, defaulting to +27');
+            setUserCountryCode('+27');
           }
         } else {
-          console.error('[QuestionRenderer] No country_code or mobile found in profile');
+          // No country_code or mobile found - default to South Africa
+          console.warn('[QuestionRenderer] No country_code or mobile found, defaulting to South Africa (+27)');
+          setUserCountryCode('+27');
         }
       };
       fetchCountryCode();

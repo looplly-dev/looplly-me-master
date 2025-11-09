@@ -14,7 +14,8 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const PROJECT_ROOT = path.resolve(__dirname, '..');
+// Use process.cwd() as fallback for working directory
+const PROJECT_ROOT = process.env.PWD || process.cwd() || path.resolve(__dirname, '..');
 const ENV_FILES_TO_CHECK = [
   '.env',
   '.env.local',
@@ -194,6 +195,8 @@ function generateSecurityReport() {
 // Main execution
 if (import.meta.url === `file://${process.argv[1]}`) {
   try {
+    // Log project root for debugging
+    console.log('🔍 Validating environment from:', PROJECT_ROOT);
     const success = generateSecurityReport();
     // Always exit 0 to prevent build failures
     // This is a validation helper, not a build requirement
