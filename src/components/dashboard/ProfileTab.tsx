@@ -6,6 +6,7 @@ import { useProfileAnswers } from '@/hooks/useProfileAnswers';
 import { ProfileHeader } from './profile/ProfileHeader';
 import { LevelCompletionAlert } from './profile/LevelCompletionAlert';
 import { ProfileCategorySection } from './profile/ProfileCategorySection';
+import { DeleteAccountSection } from './profile/DeleteAccountSection';
 
 export default function ProfileTab() {
   const {
@@ -117,6 +118,9 @@ export default function ProfileTab() {
           </CardContent>
         </Card>
       )}
+
+      {/* Delete Account Section */}
+      <DeleteAccountSection />
     </div>
   );
 }
