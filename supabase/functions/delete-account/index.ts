@@ -60,32 +60,68 @@ Deno.serve(async (req) => {
     console.log('[delete-account] Deleting account for user:', userId);
 
     // Start deletion process
-    // Note: Most tables have ON DELETE CASCADE foreign keys pointing to auth.users
-    // or profiles, so they will be automatically deleted
+    // Strategy: Delete dependent data first, then profile, then auth user
+    // Many tables have ON DELETE CASCADE to profiles, so deleting profile will cascade
     
-    // Delete from profiles first (this will cascade to many tables)
-    const { error: profileError } = await supabaseAdmin
-      .from('profiles')
-      .delete()
-      .eq('user_id', userId);
+    try {
+      // Step 1: Delete tables that may not have proper cascade constraints
+      console.log('[delete-account] Deleting dependent records...');
+      
+      // Delete user-specific data that might block profile deletion
+      const tablesToCleanup = [
+        'profile_answers',
+        'address_components',
+        'kyc_verifications',
+        'user_streaks',
+        'user_reputation',
+        'user_balances',
+        'user_badges',
+        'earning_activities',
+        'transactions',
+        'cint_survey_sessions',
+        'community_posts',
+        'community_votes',
+        'communication_preferences',
+        'audit_logs'
+      ];
 
-    if (profileError) {
-      console.error('[delete-account] Error deleting profile:', profileError);
-      throw new Error('Failed to delete profile data');
+      for (const table of tablesToCleanup) {
+        try {
+          await supabaseAdmin.from(table).delete().eq('user_id', userId);
+          console.log(`[delete-account] Deleted from ${table}`);
+        } catch (err) {
+          // Log but continue - table might not exist or already be empty
+          console.warn(`[delete-account] Could not delete from ${table}:`, err);
+        }
+      }
+
+      // Step 2: Delete from profiles (this should cascade to remaining tables)
+      const { error: profileError } = await supabaseAdmin
+        .from('profiles')
+        .delete()
+        .eq('user_id', userId);
+
+      if (profileError) {
+        console.error('[delete-account] Error deleting profile:', profileError);
+        throw new Error(`Failed to delete profile: ${profileError.message}`);
+      }
+
+      console.log('[delete-account] Profile deleted successfully');
+
+      // Step 3: Delete the user from auth.users (final cleanup)
+      const { error: authError } = await supabaseAdmin.auth.admin.deleteUser(userId);
+
+      if (authError) {
+        console.error('[delete-account] Error deleting auth user:', authError);
+        throw new Error(`Failed to delete authentication record: ${authError.message}`);
+      }
+
+      console.log('[delete-account] User deleted successfully from auth');
+      
+    } catch (error) {
+      console.error('[delete-account] Deletion process error:', error);
+      throw error;
     }
-
-    console.log('[delete-account] Profile deleted successfully');
-
-    // Delete the user from auth.users (this is the final step)
-    // This will cascade delete to any remaining tables with foreign keys to auth.users
-    const { error: authError } = await supabaseAdmin.auth.admin.deleteUser(userId);
-
-    if (authError) {
-      console.error('[delete-account] Error deleting auth user:', authError);
-      throw new Error('Failed to delete authentication record');
-    }
-
-    console.log('[delete-account] User deleted successfully from auth');
 
     return new Response(
       JSON.stringify({ 
