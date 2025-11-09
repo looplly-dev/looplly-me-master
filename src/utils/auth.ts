@@ -20,6 +20,10 @@ export interface RegistrationParams {
   email: string;
   firstName?: string;
   lastName?: string;
+  dateOfBirth?: string;
+  gpsEnabled?: boolean;
+  latitude?: number;
+  longitude?: number;
 }
 
 export interface LoginParams {
@@ -60,8 +64,10 @@ export const registerUser = async (params: RegistrationParams): Promise<{ succes
         password: params.password,
         firstName: params.firstName || '',
         lastName: params.lastName || '',
-        dateOfBirth: null, // Will be set at Level 1 completion
-        gpsEnabled: false  // Will be set at Level 1 completion
+        dateOfBirth: params.dateOfBirth || null,
+        gpsEnabled: params.gpsEnabled || false,
+        latitude: params.latitude || null,
+        longitude: params.longitude || null
       }
     });
 

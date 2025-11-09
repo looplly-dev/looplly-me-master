@@ -40,7 +40,7 @@
 
 @layer components {
 .earn-card-content {
-  @apply min-h-[500px] max-h-[650px] overflow-visible;
+  @apply min-h-[500px] max-h-[650px] overflow-hidden;
   padding-left: 0 !important;
   padding-right: 0 !important;
 }

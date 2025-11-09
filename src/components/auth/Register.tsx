@@ -65,6 +65,10 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
     normalized?: string;
     error?: string;
   }>({ isValid: false });
+  const [locationCoordinates, setLocationCoordinates] = useState<{
+    latitude: number;
+    longitude: number;
+  } | null>(null);
   const { register, login, authState } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -207,6 +211,94 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
     }
   };
 
+  const handleGPSToggle = async (checked: boolean) => {
+    updateField('gpsEnabled', checked);
+    
+    if (checked) {
+      // Request location permission
+      if (!navigator.geolocation) {
+        toast({
+          title: 'Location not supported',
+          description: 'Your browser does not support location services.',
+          variant: 'destructive'
+        });
+        updateField('gpsEnabled', false);
+        return;
+      }
+
+      try {
+        const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(resolve, reject, {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
+          });
+        });
+
+        const coords = {
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude
+        };
+        
+        setLocationCoordinates(coords);
+        
+        toast({
+          title: 'Location enabled',
+          description: 'Your location has been captured successfully.',
+        });
+
+        // If user is already logged in, update their profile immediately
+        if (authState.user?.id) {
+          const supabase = getSupabaseClient();
+          await supabase
+            .from('profiles')
+            .update({
+              gps_enabled: true,
+              latitude: coords.latitude,
+              longitude: coords.longitude
+            })
+            .eq('user_id', authState.user.id);
+        }
+      } catch (error: any) {
+        console.error('Geolocation error:', error);
+        
+        let errorMessage = 'Failed to get your location.';
+        if (error.code === 1) {
+          errorMessage = 'Location permission denied. Please enable location access in your browser settings.';
+        } else if (error.code === 2) {
+          errorMessage = 'Location unavailable. Please check your device settings.';
+        } else if (error.code === 3) {
+          errorMessage = 'Location request timed out. Please try again.';
+        }
+        
+        toast({
+          title: 'Location access failed',
+          description: errorMessage,
+          variant: 'destructive'
+        });
+        
+        updateField('gpsEnabled', false);
+        setLocationCoordinates(null);
+      }
+    } else {
+      // Clear location when disabled
+      setLocationCoordinates(null);
+      
+      // If user is already logged in, update their profile immediately
+      if (authState.user?.id) {
+        const supabase = getSupabaseClient();
+        await supabase
+          .from('profiles')
+          .update({
+            gps_enabled: false,
+            latitude: null,
+            longitude: null
+          })
+          .eq('user_id', authState.user.id);
+      }
+    }
+  };
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -241,7 +333,11 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
       const success = await register({
         ...formData,
         dateOfBirth: formData.dateOfBirth,
-        gpsEnabled: formData.gpsEnabled
+        gpsEnabled: formData.gpsEnabled,
+        ...(locationCoordinates && {
+          latitude: locationCoordinates.latitude,
+          longitude: locationCoordinates.longitude
+        })
       });
       if (success) {
         // Track successful signup
@@ -565,7 +661,7 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
               <Switch
                 id="gps"
                 checked={formData.gpsEnabled || false}
-                onCheckedChange={(checked) => updateField('gpsEnabled', checked)}
+                onCheckedChange={handleGPSToggle}
               />
             </div>
 

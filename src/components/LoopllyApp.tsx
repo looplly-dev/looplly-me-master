@@ -1,5 +1,5 @@
 import { useState, Suspense, lazy } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { isPreview } from '@/utils/runtimeEnv';
 import Login from './auth/Login';
@@ -19,13 +19,13 @@ const Settings = lazy(() => import('@/pages/Settings'));
 const Support = lazy(() => import('@/pages/Support'));
 
 export default function LoopllyApp() {
-  const [authFlow, setAuthFlow] = useState<'login' | 'register' | 'forgot' | 'profile' | 'communication' | 'otp'>('login');
-  const [justCompletedProfile, setJustCompletedProfile] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
   const { authState } = useAuth();
 
   if (import.meta.env.DEV && !isPreview()) {
     console.log('LoopllyApp - Current authState:', authState);
-    console.log('LoopllyApp - Current authFlow:', authFlow);
+    console.log('LoopllyApp - Current location:', location.pathname);
   }
 
   // Show loading spinner while checking auth state
@@ -75,34 +75,30 @@ export default function LoopllyApp() {
     );
   }
 
-  // Auth screens
-  if (authFlow === 'register') {
-    if (import.meta.env.DEV && !isPreview()) {
-      console.log('LoopllyApp - Showing register form');
-    }
-    return (
-      <Register
-        onBack={() => setAuthFlow('login')}
-        onSuccess={() => setAuthFlow('login')}
-        onOTPRequired={() => setAuthFlow('login')}
-      />
-    );
-  }
-
-  if (authFlow === 'forgot') {
-    if (import.meta.env.DEV && !isPreview()) {
-      console.log('LoopllyApp - Showing forgot password');
-    }
-    return <ForgotPassword onBack={() => setAuthFlow('login')} />;
-  }
-
+  // Auth routes for non-authenticated users
   if (import.meta.env.DEV && !isPreview()) {
-    console.log('LoopllyApp - Showing login form');
+    console.log('LoopllyApp - Showing auth routes');
   }
+  
   return (
-    <Login
-      onForgotPassword={() => setAuthFlow('forgot')}
-      onRegister={() => setAuthFlow('register')}
-    />
+    <Routes>
+      <Route path="/register" element={
+        <Register
+          onBack={() => navigate('/login')}
+          onSuccess={() => navigate('/login')}
+          onOTPRequired={() => navigate('/login')}
+        />
+      } />
+      <Route path="/forgot-password" element={
+        <ForgotPassword onBack={() => navigate('/login')} />
+      } />
+      <Route path="/login" element={
+        <Login
+          onForgotPassword={() => navigate('/forgot-password')}
+          onRegister={() => navigate('/register')}
+        />
+      } />
+      <Route path="*" element={<Navigate to="/login" replace />} />
+    </Routes>
   );
 }

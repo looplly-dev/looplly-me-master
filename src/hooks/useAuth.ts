@@ -604,7 +604,11 @@ export const useAuthLogic = () => {
         password: data.password,
         email: data.email,
         firstName: data.firstName,
-        lastName: data.lastName
+        lastName: data.lastName,
+        dateOfBirth: data.dateOfBirth,
+        gpsEnabled: data.gpsEnabled,
+        latitude: data.latitude,
+        longitude: data.longitude
       });
 
       if (result.success) {

@@ -371,7 +371,8 @@ export default function SimplifiedEarnTab() {
     : !isVerified 
     ? "Verify mobile number" 
     : "";
-  const lockStyles = isContentLocked ? "opacity-50 grayscale pointer-events-none" : "";
+  const lockStyles = isContentLocked ? "opacity-50 grayscale" : "";
+  const lockContentStyles = isContentLocked ? "pointer-events-none" : "";
 
   // Direct pop-up if stale data exists (no prompt screen)
   const showUpdateModal = hasStaleData && !hasSkippedUpdate() && showProfileModal;
@@ -626,7 +627,7 @@ export default function SimplifiedEarnTab() {
                 </TabsTrigger>
               </TabsList>
 
-              <TabsContent value="surveys" className="earn-tab-content">
+              <TabsContent value="surveys" className={cn("earn-tab-content", lockContentStyles)}>
                 {/* Cint Premium Surveys */}
                 {cintLoading ? (
                   <div className="space-y-3">
@@ -768,7 +769,7 @@ export default function SimplifiedEarnTab() {
                 )}
               </TabsContent>
 
-              <TabsContent value="videos" className="earn-tab-content">
+              <TabsContent value="videos" className={cn("earn-tab-content", lockContentStyles)}>
                 {availableTasks.filter(a => a.activity_type === 'video').length === 0 ? (
                   <div className="text-center py-8">
                     <Play className="h-12 w-12 mx-auto mb-3 text-muted-foreground/50" />
@@ -835,7 +836,7 @@ export default function SimplifiedEarnTab() {
                 )}
               </TabsContent>
 
-              <TabsContent value="tasks" className="earn-tab-content">
+              <TabsContent value="tasks" className={cn("earn-tab-content", lockContentStyles)}>
                 {availableTasks.filter(a => a.activity_type === 'task').length === 0 ? (
                   <div className="text-center py-8">
                     <Zap className="h-12 w-12 mx-auto mb-3 text-muted-foreground/50" />
@@ -901,7 +902,7 @@ export default function SimplifiedEarnTab() {
                 )}
               </TabsContent>
 
-              <TabsContent value="data" className="earn-tab-content">
+              <TabsContent value="data" className={cn("earn-tab-content", lockContentStyles)}>
                 <div className="p-4 border rounded-lg bg-card shadow-sm">
                   <div className="flex gap-3 mb-4">
                     <div className="p-2 bg-primary/10 rounded-lg">
@@ -1425,14 +1426,16 @@ export default function SimplifiedEarnTab() {
           </Card>
         )}
       </div>
+     </div>
 
       {/* Rep Importance Section - Now Collapsible */}
-      <CollapsibleSection
-        title="Why Rep Matters"
-        icon={<Shield className="h-5 w-5" />}
-        defaultOpen={false}
-        className="border-accent/20 mt-4 relative"
-      >
+      <div className="pt-4 pb-24 md:pb-20 lg:pb-8 px-0 md:px-6 lg:px-8">
+        <CollapsibleSection
+          title="Why Rep Matters"
+          icon={<Shield className="h-5 w-5" />}
+          defaultOpen={false}
+          className="border-accent/20 relative"
+        >
         <div className="space-y-4">
           <div className="grid grid-cols-1 gap-3">
             <div className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">
@@ -1478,8 +1481,8 @@ export default function SimplifiedEarnTab() {
              </p>
            </div>
          </div>
-       </CollapsibleSection>
-     </div>
+        </CollapsibleSection>
+      </div>
      </TooltipProvider>
   );
 }
