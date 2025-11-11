@@ -825,6 +825,33 @@ export type Database = {
           },
         ]
       }
+      data_export_requests: {
+        Row: {
+          completed_at: string | null
+          export_data: Json | null
+          id: string
+          requested_at: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          export_data?: Json | null
+          id?: string
+          requested_at?: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          export_data?: Json | null
+          id?: string
+          requested_at?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       documentation: {
         Row: {
           audience: string
@@ -1497,9 +1524,12 @@ export type Database = {
       profiles: {
         Row: {
           address: string | null
+          age_verified_at: string | null
           badge_preview_mode: boolean | null
           company_name: string | null
           company_role: string | null
+          cookie_consent_given_at: string | null
+          cookie_consent_preferences: Json | null
           country_code: string | null
           country_iso: string | null
           created_at: string | null
@@ -1523,6 +1553,7 @@ export type Database = {
           must_change_password: boolean | null
           password_hash: string | null
           personal_income: string | null
+          privacy_policy_accepted_at: string | null
           profile_complete: boolean | null
           profile_completeness_score: number | null
           profile_level: number | null
@@ -1536,9 +1567,12 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          age_verified_at?: string | null
           badge_preview_mode?: boolean | null
           company_name?: string | null
           company_role?: string | null
+          cookie_consent_given_at?: string | null
+          cookie_consent_preferences?: Json | null
           country_code?: string | null
           country_iso?: string | null
           created_at?: string | null
@@ -1562,6 +1596,7 @@ export type Database = {
           must_change_password?: boolean | null
           password_hash?: string | null
           personal_income?: string | null
+          privacy_policy_accepted_at?: string | null
           profile_complete?: boolean | null
           profile_completeness_score?: number | null
           profile_level?: number | null
@@ -1575,9 +1610,12 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          age_verified_at?: string | null
           badge_preview_mode?: boolean | null
           company_name?: string | null
           company_role?: string | null
+          cookie_consent_given_at?: string | null
+          cookie_consent_preferences?: Json | null
           country_code?: string | null
           country_iso?: string | null
           created_at?: string | null
@@ -1601,6 +1639,7 @@ export type Database = {
           must_change_password?: boolean | null
           password_hash?: string | null
           personal_income?: string | null
+          privacy_policy_accepted_at?: string | null
           profile_complete?: boolean | null
           profile_completeness_score?: number | null
           profile_level?: number | null

@@ -51,7 +51,9 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
       gpsEnabled: false,
       firstName: '',
       lastName: '',
-      acceptTerms: false
+      acceptTerms: false,
+      acceptPrivacyPolicy: false,
+      confirmAge: false
     },
     validateFn: validateRegistration
   });
@@ -337,7 +339,9 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
         ...(locationCoordinates && {
           latitude: locationCoordinates.latitude,
           longitude: locationCoordinates.longitude
-        })
+        }),
+        privacyPolicyAcceptedAt: formData.acceptPrivacyPolicy ? new Date().toISOString() : undefined,
+        ageVerifiedAt: formData.confirmAge ? new Date().toISOString() : undefined
       });
       if (success) {
         // Track successful signup
@@ -665,18 +669,59 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
               />
             </div>
 
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="terms"
-                checked={formData.acceptTerms}
-                onCheckedChange={(checked) => updateField('acceptTerms', checked as boolean)}
-              />
-              <Label
-                htmlFor="terms"
-                className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                I accept the Terms of Service and Privacy Policy *
-              </Label>
+            <div className="space-y-3">
+              <div className="flex items-start space-x-2">
+                <Checkbox
+                  id="age"
+                  checked={formData.confirmAge}
+                  onCheckedChange={(checked) => updateField('confirmAge', checked as boolean)}
+                  className="mt-0.5"
+                />
+                <Label
+                  htmlFor="age"
+                  className="text-sm leading-snug peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  I confirm that I am 18 years of age or older *
+                </Label>
+              </div>
+
+              <div className="flex items-start space-x-2">
+                <Checkbox
+                  id="privacy"
+                  checked={formData.acceptPrivacyPolicy}
+                  onCheckedChange={(checked) => updateField('acceptPrivacyPolicy', checked as boolean)}
+                  className="mt-0.5"
+                />
+                <Label
+                  htmlFor="privacy"
+                  className="text-sm leading-snug peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  I accept the{' '}
+                  <a href="/privacy-policy" target="_blank" className="text-primary hover:underline">
+                    Privacy Policy
+                  </a>{' '}
+                  and{' '}
+                  <a href="/terms" target="_blank" className="text-primary hover:underline">
+                    Terms of Service
+                  </a>{' '}
+                  *
+                </Label>
+              </div>
+
+              <div className="flex items-start space-x-2">
+                <Checkbox
+                  id="terms"
+                  checked={formData.acceptTerms}
+                  onCheckedChange={(checked) => updateField('acceptTerms', checked as boolean)}
+                  className="mt-0.5"
+                />
+                <Label
+                  htmlFor="terms"
+                  className="text-sm leading-snug peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  I agree to receive communications about surveys and updates
+                </Label>
+              </div>
             </div>
 
             <Button 

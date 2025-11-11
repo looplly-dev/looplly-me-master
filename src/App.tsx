@@ -8,6 +8,8 @@ import { HelmetProvider } from "react-helmet-async";
 import AuthProvider from "./components/auth/AuthProvider";
 import { useAnalytics } from "./hooks/useAnalytics";
 import LoopllyApp from "./components/LoopllyApp";
+import CookieConsent from "./components/legal/CookieConsent";
+import Footer from "./components/layout/Footer";
 
 // Lazy load admin pages for better performance
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
@@ -42,6 +44,9 @@ const ProtectedRoute = lazy(() => import("./components/auth/ProtectedRoute"));
 const ProfileComplete = lazy(() => import("./pages/ProfileComplete"));
 const VerifyMobile = lazy(() => import("./pages/VerifyMobile"));
 
+// Lazy load privacy policy page
+const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
+
 const queryClient = new QueryClient();
 
 const AppContent = () => {
@@ -49,14 +54,15 @@ const AppContent = () => {
   useAnalytics();
   
   return (
-    <Suspense
-      fallback={
-        <div className="min-h-screen flex items-center justify-center bg-background">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-        </div>
-      }
-    >
-      <Routes>
+    <>
+      <Suspense
+        fallback={
+          <div className="min-h-screen flex items-center justify-center bg-background">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          </div>
+        }
+      >
+        <Routes>
         {/* Admin Login - Must be before protected routes */}
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/reset-password" element={<AdminResetPassword />} />
@@ -96,9 +102,16 @@ const AppContent = () => {
         <Route path="/profile/complete" element={<ProtectedRoute><ProfileComplete /></ProtectedRoute>} />
         <Route path="/verify-mobile" element={<ProtectedRoute><VerifyMobile /></ProtectedRoute>} />
         
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
+        
         <Route path="/*" element={<LoopllyApp />} />
-      </Routes>
-    </Suspense>
+        </Routes>
+      </Suspense>
+      
+      <CookieConsent />
+      <Footer />
+    </>
   );
 };
 

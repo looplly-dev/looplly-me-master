@@ -15,6 +15,10 @@ export interface RegistrationData {
   firstName?: string;
   lastName?: string;
   acceptTerms: boolean;
+  acceptPrivacyPolicy?: boolean;
+  confirmAge?: boolean;
+  privacyPolicyAcceptedAt?: string;
+  ageVerifiedAt?: string;
 }
 
 export interface ProfileData {
@@ -55,8 +59,16 @@ export const validateRegistration = (data: RegistrationData): ValidationResult =
     errors.push('Passwords do not match');
   }
 
-  if (!data.acceptTerms) {
-    errors.push('Please accept the terms and privacy policy');
+  if (!data.acceptTerms && !data.acceptPrivacyPolicy) {
+    errors.push('Please accept the privacy policy and confirm your age');
+  }
+
+  if (!data.acceptPrivacyPolicy) {
+    errors.push('Please accept the Privacy Policy and Terms of Service');
+  }
+
+  if (!data.confirmAge) {
+    errors.push('You must confirm you are 18 years or older');
   }
 
   // DOB validation - required and 18+ check
