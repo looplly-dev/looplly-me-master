@@ -12,6 +12,9 @@ verify_jwt = false
 [functions.download-all-documentation]
 verify_jwt = true
 
+[functions.download-collated-documentation]
+verify_jwt = true
+
 [functions.auto-generate-country-options]
 verify_jwt = true
 

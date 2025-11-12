@@ -24,6 +24,7 @@ export default function KnowledgeDashboard() {
   const [statusFilter, setStatusFilter] = useState<'all' | 'published' | 'coming_soon'>('all');
   const [showShortcutsHelp, setShowShortcutsHelp] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [isDownloadingCollated, setIsDownloadingCollated] = useState(false);
   const { isAdmin, isSuperAdmin } = useRole();
   const { addSearch } = useSearchHistory();
   const { data: stats, isLoading } = useDocumentationStats();
@@ -68,6 +69,44 @@ export default function KnowledgeDashboard() {
       });
     } finally {
       setIsDownloading(false);
+    }
+  };
+
+  const handleCollatedDownload = async () => {
+    setIsDownloadingCollated(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('download-collated-documentation', {
+        headers: {
+          'Content-Type': 'text/plain',
+        },
+      });
+
+      if (error) throw error;
+
+      // Create blob and download
+      const blob = new Blob([data], { type: 'text/plain; charset=utf-8' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `looplly-documentation-collated-${new Date().toISOString().split('T')[0]}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      toast({
+        title: "Download Complete",
+        description: "Collated documentation has been downloaded successfully.",
+      });
+    } catch (error) {
+      console.error('Collated download failed:', error);
+      toast({
+        title: "Download Failed",
+        description: "Failed to download collated documentation. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDownloadingCollated(false);
     }
   };
 
@@ -216,14 +255,24 @@ export default function KnowledgeDashboard() {
         <div className="flex gap-2 justify-center">
           <SeedDocumentationButton />
           {isSuperAdmin() && (
-            <Button 
-              variant="outline" 
-              onClick={handleBulkDownload}
-              disabled={isDownloading}
-            >
-              <Download className="h-4 w-4 mr-2" />
-              {isDownloading ? 'Preparing Download...' : 'Download All Docs'}
-            </Button>
+            <>
+              <Button 
+                variant="outline" 
+                onClick={handleBulkDownload}
+                disabled={isDownloading}
+              >
+                <Download className="h-4 w-4 mr-2" />
+                {isDownloading ? 'Preparing Download...' : 'Download All Docs'}
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={handleCollatedDownload}
+                disabled={isDownloadingCollated}
+              >
+                <FileText className="h-4 w-4 mr-2" />
+                {isDownloadingCollated ? 'Generating TXT...' : 'Download Collated TXT'}
+              </Button>
+            </>
           )}
         </div>
       )}
