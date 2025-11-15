@@ -1,17 +1,12 @@
 import { Link } from "react-router-dom";
-
 const Footer = () => {
   const currentYear = new Date().getFullYear();
-
-  return (
-    <footer className="bg-card border-t border-border mt-auto">
+  return <footer className="bg-card border-t border-border mt-auto">
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
             <h3 className="font-semibold text-foreground mb-4">Looplly</h3>
-            <p className="text-sm text-muted-foreground">
-              Your voice matters. Share your opinions and earn rewards.
-            </p>
+            <p className="text-sm text-muted-foreground">One platform. Infinite possibilities         </p>
           </div>
           
           <div>
@@ -49,7 +44,7 @@ const Footer = () => {
           <div>
             <h4 className="font-semibold text-foreground mb-4">Connect</h4>
             <p className="text-sm text-muted-foreground">
-              Email: support@looplly.com
+              Email: hello@looplly.com
             </p>
           </div>
         </div>
@@ -60,8 +55,6 @@ const Footer = () => {
           </p>
         </div>
       </div>
-    </footer>
-  );
+    </footer>;
 };
-
 export default Footer;
