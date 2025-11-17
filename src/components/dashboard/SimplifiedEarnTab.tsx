@@ -92,7 +92,7 @@ export default function SimplifiedEarnTab() {
   const { surveys: cintSurveys, isLoading: cintLoading, startSurvey } = useCintSurveys();
   const isMobile = useIsMobile();
   
-  const isVerified = authState.user?.profile?.is_verified ?? false;
+  const isVerified = authState.user?.isVerified ?? true; // Always true in new auth system
 
   // Skip tracking for stale profile updates
   const SKIP_TIMESTAMP_KEY = 'profile_update_skip_timestamp';
