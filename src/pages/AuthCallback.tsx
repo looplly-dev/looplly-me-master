@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import { getSupabaseClient } from '@/integrations/supabase/activeClient';
 
 export default function AuthCallback() {
-  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [errorMessage, setErrorMessage] = useState<string>('');
@@ -16,8 +15,42 @@ export default function AuthCallback() {
       try {
         const supabase = getSupabaseClient();
         
-        // Supabase handles the token exchange automatically
-        // We just need to check if there's a session
+        // Check if there's an access_token in the URL hash (Supabase uses hash-based auth)
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        const accessToken = hashParams.get('access_token');
+        const refreshToken = hashParams.get('refresh_token');
+        const type = hashParams.get('type');
+        
+        console.log('Auth callback - Type:', type, 'Has tokens:', !!accessToken);
+        
+        // If this is an email confirmation, Supabase will automatically exchange the tokens
+        if (type === 'signup' && accessToken) {
+          // Set the session using the tokens from the hash
+          const { data, error } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken || ''
+          });
+          
+          if (error) {
+            console.error('Session set error:', error);
+            setStatus('error');
+            setErrorMessage(error.message || 'Verification failed. The link may have expired.');
+            return;
+          }
+          
+          if (data.session) {
+            console.log('Session established successfully');
+            setStatus('success');
+            
+            // Redirect to dashboard after 2 seconds
+            setTimeout(() => {
+              navigate('/earn');
+            }, 2000);
+            return;
+          }
+        }
+        
+        // Fallback: Check if there's already a session
         const { data: { session }, error } = await supabase.auth.getSession();
 
         if (error) {
