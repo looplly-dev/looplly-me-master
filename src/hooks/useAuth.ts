@@ -1135,34 +1135,50 @@ export const useAuthLogic = () => {
   };
 
   const logout = async () => {
-    console.log('Logging out user');
-    
-    // Store current path to determine redirect
-    const isAdminRoute = window.location.pathname.startsWith('/admin');
-    
-    // Clear session metadata first
-    if (authState.user?.id) {
-      clearSessionMetadata(authState.user.id);
+    try {
+      console.log('[useAuth] Starting logout process...');
+      
+      // Store current path to determine redirect
+      const isAdminRoute = window.location.pathname.startsWith('/admin');
+      console.log('[useAuth] Is admin route:', isAdminRoute);
+      
+      // Clear session metadata first
+      if (authState.user?.id) {
+        console.log('[useAuth] Clearing session metadata for user:', authState.user.id);
+        clearSessionMetadata(authState.user.id);
+      }
+      
+      // Clear all localStorage auth-related data
+      console.log('[useAuth] Clearing localStorage auth data...');
+      localStorage.removeItem('mockUser');
+      localStorage.removeItem('looplly_auth_token');
+      localStorage.removeItem('looplly_user');
+      localStorage.removeItem('onboarding_completed');
+      sessionStorage.removeItem('looplly_just_logged_in');
+      clearAllSessionMetadata();
+      
+      // Call logout utility
+      console.log('[useAuth] Calling Supabase signOut...');
+      await logoutUser();
+      
+      // Update auth state immediately
+      console.log('[useAuth] Updating auth state to logged out');
+      setAuthState({
+        user: null,
+        isAuthenticated: false,
+        isLoading: false,
+        step: 'login'
+      });
+      
+      // Navigate to appropriate login page
+      const redirectPath = isAdminRoute ? '/admin/login' : '/';
+      console.log('[useAuth] Redirecting to:', redirectPath);
+      window.location.href = redirectPath;
+    } catch (error) {
+      console.error('[useAuth] Logout error:', error);
+      // Force redirect even if there's an error
+      window.location.href = '/';
     }
-    
-    // Clear all localStorage auth-related data
-    localStorage.removeItem('mockUser');
-    localStorage.removeItem('onboarding_completed');
-    clearAllSessionMetadata();
-    
-    // Call logout utility
-    await logoutUser();
-    
-    // Update auth state immediately
-    setAuthState({
-      user: null,
-      isAuthenticated: false,
-      isLoading: false,
-      step: 'login'
-    });
-    
-    // Navigate to appropriate login page
-    window.location.href = isAdminRoute ? '/admin/login' : '/';
   };
 
   const forgotPassword = async (email: string): Promise<boolean> => {
