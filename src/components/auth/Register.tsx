@@ -348,20 +348,11 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
         // Track successful signup
         analytics.trackSignup('email', true);
         
-        // Show email confirmation message
-        toast({
-          title: "Check your email!",
-          description: `We've sent a confirmation link to ${formData.email}. Please verify your email to continue.`,
-          duration: 10000, // Show for 10 seconds
-        });
-        
-        // Store email for later use
+        // Store email for verification page
         sessionStorage.setItem('pending_email_verification', formData.email);
         
-        // Redirect to a confirmation page or back to login
-        setTimeout(() => {
-          onBack(); // Go back to login page
-        }, 2000);
+        // Navigate to email verification page
+        navigate('/verify-email');
       } else {
         // Track signup failure
         analytics.trackSignup('email', false);

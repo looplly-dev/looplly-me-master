@@ -10,6 +10,7 @@ import { useAnalytics } from "./hooks/useAnalytics";
 import LoopllyApp from "./components/LoopllyApp";
 import CookieConsent from "./components/legal/CookieConsent";
 import Footer from "./components/layout/Footer";
+import EnvironmentIndicator from "./components/layout/EnvironmentIndicator";
 
 // Lazy load admin pages for better performance
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
@@ -43,6 +44,7 @@ const AdminResetPassword = lazy(() => import("./pages/AdminResetPassword"));
 const ProtectedRoute = lazy(() => import("./components/auth/ProtectedRoute"));
 const ProfileComplete = lazy(() => import("./pages/ProfileComplete"));
 const VerifyMobile = lazy(() => import("./pages/VerifyMobile"));
+const EmailVerification = lazy(() => import("./components/auth/EmailVerification"));
 
 // Lazy load privacy policy page
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
@@ -55,6 +57,7 @@ const AppContent = () => {
   
   return (
     <>
+      <EnvironmentIndicator />
       <Suspense
         fallback={
           <div className="min-h-screen flex items-center justify-center bg-background">
@@ -97,6 +100,9 @@ const AppContent = () => {
         
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/reset-password-required" element={<ResetPasswordRequired />} />
+        
+        {/* Email Verification */}
+        <Route path="/verify-email" element={<EmailVerification />} />
         
         {/* Profile & Verification Routes */}
         <Route path="/profile/complete" element={<ProtectedRoute><ProfileComplete /></ProtectedRoute>} />
