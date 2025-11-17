@@ -7,12 +7,13 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
-import { Eye, EyeOff, UserPlus } from 'lucide-react';
+import { Eye, EyeOff, UserPlus, Mail, Phone } from 'lucide-react';
 import { analytics } from '@/utils/analytics';
 import { countries } from '@/data/countries';
 import { getCountryByDialCode, getDefaultCountry, formatCountryDisplay, formatCountryOption } from '@/utils/countries';
 import { validateAndNormalizeMobile } from '@/utils/mobileValidation';
 import { getMobileFormatInfo } from '@/utils/mobileFormatExamples';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface LoginProps {
   onForgotPassword: () => void;
@@ -22,7 +23,9 @@ interface LoginProps {
 export default function Login({ onForgotPassword, onRegister }: LoginProps) {
   const defaultCountry = getDefaultCountry();
   
+  const [loginMethod, setLoginMethod] = useState<'email' | 'mobile'>('email');
   const [formData, setFormData] = useState({
+    email: '',
     countryCode: defaultCountry.dialCode,
     mobile: '',
     password: ''
@@ -37,56 +40,88 @@ export default function Login({ onForgotPassword, onRegister }: LoginProps) {
     e.preventDefault();
     setShowSignupPrompt(false);
     
-    if (!formData.mobile || !formData.password) {
-      toast({
-        title: 'Error',
-        description: 'Please fill in all fields',
-        variant: 'destructive'
-      });
-      return;
-    }
+    // Validate based on login method
+    if (loginMethod === 'email') {
+      if (!formData.email || !formData.password) {
+        toast({
+          title: 'Error',
+          description: 'Please fill in all fields',
+          variant: 'destructive'
+        });
+        return;
+      }
 
-    // Validate mobile number
-    const mobileValidation = validateAndNormalizeMobile(formData.mobile, formData.countryCode);
-    if (!mobileValidation.isValid) {
-      toast({
-        title: 'Invalid Mobile Number',
-        description: mobileValidation.error || 'Please enter a valid mobile number',
-        variant: 'destructive'
-      });
-      return;
+      // Basic email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.email)) {
+        toast({
+          title: 'Invalid Email',
+          description: 'Please enter a valid email address',
+          variant: 'destructive'
+        });
+        return;
+      }
+    } else {
+      if (!formData.mobile || !formData.password) {
+        toast({
+          title: 'Error',
+          description: 'Please fill in all fields',
+          variant: 'destructive'
+        });
+        return;
+      }
+
+      // Validate mobile number
+      const mobileValidation = validateAndNormalizeMobile(formData.mobile, formData.countryCode);
+      if (!mobileValidation.isValid) {
+        toast({
+          title: 'Invalid Mobile Number',
+          description: mobileValidation.error || 'Please enter a valid mobile number',
+          variant: 'destructive'
+        });
+        return;
+      }
     }
 
     // Track login attempt
-    analytics.trackLoginAttempt('mobile');
+    analytics.trackLoginAttempt(loginMethod);
 
     setIsSubmitting(true);
     
     try {
-      const normalizedMobile = mobileValidation.normalizedNumber!;
-      console.log('Attempting login with mobile:', normalizedMobile);
-      // Pass normalized mobile as the identifier
-      const success = await login(normalizedMobile, formData.password, 'looplly_user');
+      let success = false;
+      
+      if (loginMethod === 'email') {
+        console.log('Attempting login with email:', formData.email);
+        success = await login(formData.email, formData.password, 'looplly_user');
+      } else {
+        const mobileValidation = validateAndNormalizeMobile(formData.mobile, formData.countryCode);
+        const normalizedMobile = mobileValidation.normalizedNumber!;
+        console.log('Attempting login with mobile:', normalizedMobile);
+        success = await login(normalizedMobile, formData.password, 'looplly_user');
+      }
       
       if (!success) {
         // Track login failure
-        analytics.trackLogin('mobile', false);
+        analytics.trackLogin(loginMethod, false);
         
         toast({
           title: 'Login Failed',
-          description: 'Invalid mobile number or password. Please try again or create an account.',
+          description: loginMethod === 'email' 
+            ? 'Invalid email or password. Please try again or create an account.'
+            : 'Invalid mobile number or password. Please try again or create an account.',
           variant: 'destructive'
         });
         setShowSignupPrompt(true);
       } else {
         // Track login success
-        analytics.trackLogin('mobile', true);
+        analytics.trackLogin(loginMethod, true);
       }
     } catch (error: any) {
       console.error('Login component error:', error);
       
       // Track login failure
-      analytics.trackLogin('mobile', false);
+      analytics.trackLogin(loginMethod, false);
       
       // Show more specific error message
       const errorMessage = error?.message || 'Something went wrong. Please try again.';
@@ -168,51 +203,80 @@ export default function Login({ onForgotPassword, onRegister }: LoginProps) {
               </Alert>
             )}
 
-            <div className="space-y-2">
-              <Label htmlFor="mobile">Mobile Number</Label>
-              <div className="flex gap-2">
-                <Select 
-                  value={formData.countryCode} 
-                  onValueChange={(value) => setFormData({...formData, countryCode: value})}
-                >
-                  <SelectTrigger className="w-24 h-12">
-                    <SelectValue>
-                      {formatCountryDisplay(getCountryByDialCode(formData.countryCode) || defaultCountry)}
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent className="max-h-60">
-                  {countries.map((country) => (
-                       <SelectItem key={`${country.code}-${country.dialCode}`} value={country.dialCode}>
-                         <span className="flex items-center gap-2">
-                           <span className="text-lg">{country.flag}</span>
-                           <span className="font-medium">{country.dialCode}</span>
-                           <span className="text-muted-foreground">{country.name}</span>
-                         </span>
-                       </SelectItem>
-                  ))}
-                  </SelectContent>
-                </Select>
-                <div className="flex-1 space-y-1">
-                  <Input
-                    id="mobile"
-                    type="tel"
-                    placeholder={getMobileFormatInfo(formData.countryCode).example}
-                    value={formData.mobile}
-                    onChange={(e) => {
-                      setFormData({...formData, mobile: e.target.value});
-                      setShowSignupPrompt(false);
-                    }}
-                    className="h-12"
-                    required
-                  />
-                  {!formData.mobile && (
-                    <p className="text-xs text-muted-foreground">
-                      {getMobileFormatInfo(formData.countryCode).hint}
-                    </p>
-                  )}
+            <Tabs value={loginMethod} onValueChange={(v) => setLoginMethod(v as 'email' | 'mobile')} className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="email">
+                  <Mail className="h-4 w-4 mr-2" />
+                  Email
+                </TabsTrigger>
+                <TabsTrigger value="mobile">
+                  <Phone className="h-4 w-4 mr-2" />
+                  Mobile
+                </TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="email" className="space-y-2 mt-4">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="your.email@example.com"
+                  value={formData.email}
+                  onChange={(e) => {
+                    setFormData({...formData, email: e.target.value});
+                    setShowSignupPrompt(false);
+                  }}
+                  className="h-12"
+                  required
+                />
+              </TabsContent>
+              
+              <TabsContent value="mobile" className="space-y-2 mt-4">
+                <Label htmlFor="mobile">Mobile Number</Label>
+                <div className="flex gap-2">
+                  <Select 
+                    value={formData.countryCode} 
+                    onValueChange={(value) => setFormData({...formData, countryCode: value})}
+                  >
+                    <SelectTrigger className="w-24 h-12">
+                      <SelectValue>
+                        {formatCountryDisplay(getCountryByDialCode(formData.countryCode) || defaultCountry)}
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent className="max-h-60">
+                    {countries.map((country) => (
+                         <SelectItem key={`${country.code}-${country.dialCode}`} value={country.dialCode}>
+                           <span className="flex items-center gap-2">
+                             <span className="text-lg">{country.flag}</span>
+                             <span className="font-medium">{country.dialCode}</span>
+                             <span className="text-muted-foreground">{country.name}</span>
+                           </span>
+                         </SelectItem>
+                    ))}
+                    </SelectContent>
+                  </Select>
+                  <div className="flex-1 space-y-1">
+                    <Input
+                      id="mobile"
+                      type="tel"
+                      placeholder={getMobileFormatInfo(formData.countryCode).example}
+                      value={formData.mobile}
+                      onChange={(e) => {
+                        setFormData({...formData, mobile: e.target.value});
+                        setShowSignupPrompt(false);
+                      }}
+                      className="h-12"
+                      required
+                    />
+                    {!formData.mobile && (
+                      <p className="text-xs text-muted-foreground">
+                        {getMobileFormatInfo(formData.countryCode).hint}
+                      </p>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </div>
+              </TabsContent>
+            </Tabs>
 
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>

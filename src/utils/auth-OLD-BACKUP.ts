@@ -1,4 +1,4 @@
-// Simplified Authentication utilities using standard Supabase Auth
+// Authentication utilities
 import { getSupabaseClient } from '@/integrations/supabase/activeClient';
 import { validateAndNormalizeMobile } from './mobileValidation';
 
@@ -33,13 +33,9 @@ export interface LoginParams {
   countryCode?: string;
 }
 
-/**
- * Register a new user using standard Supabase Auth
- * Uses email-based authentication (mobile stored in user_metadata)
- */
 export const registerUser = async (params: RegistrationParams): Promise<{ success: boolean; error?: any }> => {
   try {
-    console.log('Registering user with email:', params.email);
+    console.log('Registering Looplly user with mobile:', params.mobile);
     
     // Check if country is blocked
     if (BLOCKED_COUNTRY_CODES.includes(params.countryCode)) {
@@ -59,38 +55,28 @@ export const registerUser = async (params: RegistrationParams): Promise<{ succes
       return { success: false, error: { message: mobileValidation.error || 'Invalid mobile number' } };
     }
     
-    const normalizedMobile = mobileValidation.normalized;
-    
-    // Use standard Supabase Auth sign up
+    // Call custom registration edge function (NOT Supabase Auth)
     const supabase = getSupabaseClient();
-    const { data, error } = await supabase.auth.signUp({
-      email: params.email,
-      password: params.password,
-      options: {
-        data: {
-          mobile: normalizedMobile,
-          country_code: params.countryCode,
-          first_name: params.firstName || '',
-          last_name: params.lastName || '',
-          date_of_birth: params.dateOfBirth || null,
-          gps_enabled: params.gpsEnabled || false,
-          latitude: params.latitude || null,
-          longitude: params.longitude || null,
-        },
-        emailRedirectTo: `${window.location.origin}/auth/callback`
+    const { data, error } = await supabase.functions.invoke('looplly-register', {
+      body: {
+        mobile: params.mobile,
+        countryCode: params.countryCode,
+        password: params.password,
+        firstName: params.firstName || '',
+        lastName: params.lastName || '',
+        dateOfBirth: params.dateOfBirth || null,
+        gpsEnabled: params.gpsEnabled || false,
+        latitude: params.latitude || null,
+        longitude: params.longitude || null
       }
     });
 
-    if (error) {
-      console.error('Registration error:', error);
-      return { success: false, error: { message: error.message } };
+    if (error || !data?.success) {
+      console.error('Registration error:', error || data);
+      return { success: false, error: error || { message: data?.error || 'Registration failed' } };
     }
     
-    if (!data.user) {
-      return { success: false, error: { message: 'Registration failed - no user created' } };
-    }
-    
-    console.log('Registration successful - user_id:', data.user.id);
+    console.log('Registration successful - user_id:', data.user_id);
     return { success: true };
   } catch (error) {
     console.error('Registration failed:', error);
@@ -98,73 +84,71 @@ export const registerUser = async (params: RegistrationParams): Promise<{ succes
   }
 };
 
-/**
- * Login user using standard Supabase Auth
- * Supports both email and mobile-based login
- */
 export const loginUser = async (params: LoginParams): Promise<{ success: boolean; error?: any }> => {
   try {
     const supabase = getSupabaseClient();
-    
     // Determine if this is mobile or email login
     const isMobileLogin = params.mobile && params.countryCode;
     
     if (isMobileLogin) {
-      console.log('[loginUser] Mobile login - converting to email lookup');
+      console.log('[loginUser] Mobile login with countryCode:', params.countryCode, 'mobile:', params.mobile);
       
-      // Normalize mobile number
-      const mobileValidation = validateAndNormalizeMobile(params.mobile!, params.countryCode!);
-      if (!mobileValidation.isValid) {
-        return { success: false, error: { message: 'Invalid mobile number' } };
-      }
-      
-      const normalizedMobile = mobileValidation.normalized;
-      
-      // Look up user by mobile number in profiles table
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('user_id')
-        .eq('mobile', normalizedMobile)
-        .maybeSingle();
-      
-      if (profileError || !profile) {
-        console.error('[loginUser] Profile lookup error:', profileError);
+      // Call custom login edge function (NOT Supabase Auth)
+      const { data, error } = await supabase.functions.invoke('mock-looplly-login', {
+        body: {
+          mobile: params.mobile,
+          countryCode: params.countryCode,
+          password: params.password
+        }
+      });
+
+      if (error || !data?.token) {
+        console.error('[loginUser] Login error:', error || data);
         return { 
           success: false, 
-          error: { message: 'Invalid mobile number or password' } 
+          error: { 
+            message: error?.message || data?.error || 'Invalid mobile number or password' 
+          } 
         };
       }
       
-      // Get auth user email from auth.users
-      const { data: authUser, error: authError } = await supabase
-        .rpc('get_user_email', { user_uuid: profile.user_id });
+      // Store custom JWT token and user data
+      localStorage.setItem('looplly_auth_token', data.token);
+      localStorage.setItem('looplly_user', JSON.stringify(data.user));
       
-      if (authError || !authUser) {
-        console.error('[loginUser] Auth user lookup error:', authError);
-        return { 
-          success: false, 
-          error: { message: 'Invalid mobile number or password' } 
-        };
-      }
+      console.log('[loginUser] Login successful - custom JWT stored');
       
-      // Sign in with email
-      console.log('[loginUser] Signing in with email for mobile user');
+      // CRITICAL: ALWAYS establish Supabase session for RLS to work
+      // Use synthetic email pattern for backend authentication
+      const syntheticEmail = `${data.user.id}@looplly.mobile`;
+      console.log('[loginUser] Establishing Supabase session with synthetic email:', syntheticEmail);
+      
       const { error: signInError } = await supabase.auth.signInWithPassword({
-        email: authUser,
+        email: syntheticEmail,
         password: params.password
       });
       
       if (signInError) {
-        console.error('[loginUser] Sign in error:', signInError);
+        console.error('[loginUser] Failed to establish Supabase session:', signInError.message);
+        // Clear the custom token since we can't establish a backend session
+        localStorage.removeItem('looplly_auth_token');
+        localStorage.removeItem('looplly_user');
         return { 
           success: false, 
-          error: { message: 'Invalid mobile number or password' } 
+          error: { 
+            message: 'Login failed. Please try again or contact support if the issue persists.' 
+          } 
         };
       }
-    } else if (params.email) {
-      console.log('[loginUser] Email login:', params.email);
       
-      // Standard email login
+      console.log('[loginUser] Supabase session established successfully - RLS will work');
+      
+      // Set a flag to help useAuth avoid premature token clearing
+      sessionStorage.setItem('looplly_just_logged_in', '1');
+      setTimeout(() => sessionStorage.removeItem('looplly_just_logged_in'), 1000);
+    } else if (params.email) {
+      console.log('[loginUser] Email login for admin/team user:', params.email);
+      // Email login for admin/team users (Supabase Auth)
       const { error } = await supabase.auth.signInWithPassword({
         email: params.email,
         password: params.password
@@ -191,25 +175,28 @@ export const loginUser = async (params: LoginParams): Promise<{ success: boolean
   }
 };
 
-/**
- * Logout user using standard Supabase Auth
- */
 export const logoutUser = async (): Promise<void> => {
   console.log('Logging out user');
   
+  // Clear custom Looplly auth if present
+  localStorage.removeItem('looplly_auth_token');
+  localStorage.removeItem('looplly_user');
+  
+  // Also sign out from Supabase Auth (for admin/team users)
   const supabase = getSupabaseClient();
   await supabase.auth.signOut();
 };
 
-/**
- * Reset user password using standard Supabase Auth
- */
 export const resetUserPassword = async (email: string): Promise<{ success: boolean; error?: any }> => {
   try {
+    // Use route-aware client to maintain session isolation
+    // When called from /admin/login, uses adminClient (admin_auth storage)
+    // When called from user login, uses supabase (auth storage)
     const client = getSupabaseClient();
-    console.log('Initiating password reset for email:', email);
+    console.log('Initiating forgot password for email:', email);
     
     // Check if email belongs to a team member
+    // RLS policy allows unauthenticated lookups on team_profiles.email
     const { data: teamProfile } = await client
       .from('team_profiles')
       .select('email')
@@ -221,6 +208,7 @@ export const resetUserPassword = async (email: string): Promise<{ success: boole
     // Determine redirect path based on user type
     const resetPath = teamProfile ? '/admin/reset-password' : '/reset-password';
     
+    // Use VITE_APP_URL for production, fallback to window.location.origin for dev
     const redirectUrl = import.meta.env.VITE_APP_URL || window.location.origin;
     const fullRedirectUrl = `${redirectUrl}${resetPath}`;
     
@@ -231,14 +219,14 @@ export const resetUserPassword = async (email: string): Promise<{ success: boole
     });
     
     if (error) {
-      console.error('Password reset error:', error);
+      console.error('Forgot password error:', error);
       return { success: false, error };
     }
     
-    console.log('Password reset email sent');
+    console.log('Password reset email sent to:', resetPath);
     return { success: true };
   } catch (error) {
-    console.error('Password reset failed:', error);
+    console.error('Forgot password failed:', error);
     return { success: false, error };
   }
 };

@@ -21,7 +21,7 @@ This guide provides a comprehensive analysis and step-by-step process for migrat
 
 ### Lovable Cloud Setup
 - **Backend**: Lovable-managed Supabase instance
-- **Project ID**: `kzqcfrubjccxrwfkkrze`
+- **Project ID**: `chlqpvzreztzxmjjdjpk`
 - **Deployment**: Automatic via Lovable platform
 - **Edge Functions**: Auto-deployed from `supabase/functions/`
 - **Database**: Managed schema with automatic migrations

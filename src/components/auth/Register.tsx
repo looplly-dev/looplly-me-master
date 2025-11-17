@@ -43,6 +43,7 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
     reset
   } = useFormValidation<RegistrationData>({
     initialData: {
+      email: '',
       countryCode: defaultCountry.dialCode,
       mobile: '',
       password: '',
@@ -479,6 +480,21 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
                   required
                 />
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="email">Email *</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="your.email@example.com"
+                value={formData.email || ''}
+                onChange={(e) => updateField('email', e.target.value)}
+                className="h-12"
+                autoComplete={isSimulatorMode ? 'off' : 'email'}
+                name={isSimulatorMode ? `email_sim_${antiFillToken}` : 'email'}
+                required
+              />
             </div>
 
             <div className="space-y-2">

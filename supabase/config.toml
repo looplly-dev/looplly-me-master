@@ -1,4 +1,16 @@
-project_id = "kzqcfrubjccxrwfkkrze"
+project_id = "chlqpvzreztzxmjjdjpk"
+
+[functions.looplly-register]
+verify_jwt = false
+
+[functions.mock-looplly-register]
+verify_jwt = false
+
+[functions.mock-looplly-login]
+verify_jwt = false
+
+[functions.mock-looplly-verify-otp]
+verify_jwt = false
 
 [functions.google-places]
 verify_jwt = false

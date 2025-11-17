@@ -6,6 +6,7 @@ export interface ValidationResult {
 }
 
 export interface RegistrationData {
+  email: string;
   countryCode: string;
   mobile: string;
   password: string;
@@ -41,6 +42,14 @@ export const validateRegistration = (data: RegistrationData): ValidationResult =
 
   if (!data.lastName?.trim()) {
     errors.push('Last name is required');
+  }
+
+  if (!data.email?.trim()) {
+    errors.push('Email is required');
+  } else if (!isValidEmail(data.email)) {
+    errors.push('Please enter a valid email address');
+  } else if (!isValidPublicEmail(data.email)) {
+    errors.push('Please use a public email address (e.g., Gmail, Outlook)');
   }
 
   if (!data.mobile.trim()) {
