@@ -16,33 +16,29 @@ export default function AuthCallback() {
       try {
         const supabase = getSupabaseClient();
         
-        // Get the token from URL
-        const token = searchParams.get('token');
-        const type = searchParams.get('type');
-        
-        if (!token || type !== 'signup') {
+        // Supabase handles the token exchange automatically
+        // We just need to check if there's a session
+        const { data: { session }, error } = await supabase.auth.getSession();
+
+        if (error) {
+          console.error('Session error:', error);
           setStatus('error');
-          setErrorMessage('Invalid verification link. Please request a new verification email.');
+          setErrorMessage(error.message || 'Verification failed. The link may have expired.');
           return;
         }
 
-        // Exchange the token for a session
-        const { error } = await supabase.auth.verifyOtp({
-          token_hash: token,
-          type: 'signup',
-        });
-
-        if (error) {
-          console.error('Verification error:', error);
-          setStatus('error');
-          setErrorMessage(error.message || 'Verification failed. The link may have expired.');
-        } else {
+        if (session) {
+          // User is verified and logged in
           setStatus('success');
           
-          // Redirect to login after 3 seconds
+          // Redirect to dashboard/profile after 2 seconds
           setTimeout(() => {
-            navigate('/login');
-          }, 3000);
+            navigate('/earn');
+          }, 2000);
+        } else {
+          // No session means verification didn't work
+          setStatus('error');
+          setErrorMessage('Verification failed. The link may have expired or is invalid.');
         }
       } catch (error: any) {
         console.error('Callback error:', error);
@@ -52,7 +48,7 @@ export default function AuthCallback() {
     };
 
     handleCallback();
-  }, [searchParams, navigate]);
+  }, [navigate]);
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -94,19 +90,19 @@ export default function AuthCallback() {
             <div className="space-y-4">
               <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-900 rounded-lg p-4">
                 <p className="text-green-900 dark:text-green-100 text-center">
-                  Your email has been successfully verified! You can now log in to your Looplly account.
+                  Your email has been successfully verified! Welcome to Looplly.
                 </p>
               </div>
               
               <p className="text-sm text-center text-muted-foreground">
-                Redirecting you to login in 3 seconds...
+                Redirecting you to your dashboard in 2 seconds...
               </p>
               
               <Button
-                onClick={() => navigate('/login')}
+                onClick={() => navigate('/earn')}
                 className="w-full"
               >
-                Go to Login Now
+                Go to Dashboard Now
               </Button>
             </div>
           )}
