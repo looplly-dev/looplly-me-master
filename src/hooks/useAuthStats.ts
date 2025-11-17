@@ -21,8 +21,8 @@ export function useAuthStats(timeRange: '1h' | '24h' | '7d' = '24h', portal: 'us
       let errorCount = 0;
 
       // Helper to detect portal
-      const detectPortal = (username?: string, method?: string): 'user' | 'admin' => {
-        if (username?.includes('@looplly.mobile') || method?.includes('mock-looplly-login')) {
+      const detectPortal = (username?: string): 'user' | 'admin' => {
+        if (username?.includes('@looplly.mobile')) {
           return 'user';
         }
         return 'admin';
@@ -95,7 +95,7 @@ export function useAuthStats(timeRange: '1h' | '24h' | '7d' = '24h', portal: 'us
             const action = log.action?.toLowerCase() || '';
             const metadata = log.metadata as Record<string, any> | null;
             const identifier = (metadata?.mobile as string) || (metadata?.email as string);
-            const logPortal = detectPortal(identifier, metadata?.method as string);
+            const logPortal = detectPortal(identifier);
             
             if (portal === 'all' || portal === logPortal) {
               if (action.includes('login') || action.includes('success')) {

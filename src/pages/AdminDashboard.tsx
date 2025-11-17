@@ -1,12 +1,11 @@
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Users, DollarSign, Award, TrendingUp, Eye, CheckCircle2, AlertTriangle, XCircle, Settings2, ArrowRight, Power, TestTube } from 'lucide-react';
+import { Users, DollarSign, Award, TrendingUp, Eye, CheckCircle2, AlertTriangle, XCircle, Settings2, ArrowRight } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useAuth } from '@/hooks/useAuth';
 import { adminClient } from '@/integrations/supabase/adminClient';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -32,27 +31,6 @@ function AdminDashboardContent() {
   const navigate = useNavigate();
   const { userType } = useUserType();
   const { data: integrationData } = useIntegrationStatus();
-  
-  // Mock auth mode state
-  const [authMode, setAuthMode] = useState<'real' | 'mock'>(
-    typeof window !== 'undefined' && localStorage.getItem('looplly_auth_mode') === 'mock' ? 'mock' : 'real'
-  );
-
-  const handleAuthModeChange = (mode: 'real' | 'mock') => {
-    localStorage.setItem('looplly_auth_mode', mode);
-    localStorage.setItem('looplly_auth_mode_changed_at', new Date().toISOString());
-    localStorage.setItem('looplly_auth_mode_changed_by', authState.user?.email || 'admin');
-    
-    setAuthMode(mode);
-    
-    toast({
-      title: mode === 'mock' ? '⚠️  Mock Auth Enabled' : '✅ Real Auth Enabled',
-      description: mode === 'mock' 
-        ? 'Users will auto-login with test data. Reload user portal to apply changes.'
-        : 'Normal authentication restored. Users must provide valid credentials.',
-      duration: 5000,
-    });
-  };
 
   // Fetch badge preview setting (only for regular users, not team members)
   const { data: profile } = useQuery({
@@ -161,77 +139,6 @@ function AdminDashboardContent() {
           </CardContent>
         </Card>
       </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Power className="h-5 w-5" />
-            Authentication Mode Control
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-sm text-muted-foreground">
-            Control which authentication flow is used for user login. Mock mode bypasses all real authentication for development purposes.
-          </p>
-          
-          <div className="p-4 rounded-lg bg-muted/50 space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className={`h-3 w-3 rounded-full ${authMode === 'real' ? 'bg-green-500' : 'bg-amber-500'}`} />
-                <span className="font-medium">
-                  Current Mode: {authMode === 'real' ? 'Real Authentication' : 'Mock Authentication'}
-                </span>
-              </div>
-              {authMode === 'mock' && (
-                <Badge variant="secondary" className="bg-amber-500/20 text-amber-700">
-                  <TestTube className="h-3 w-3 mr-1" />
-                  Development Only
-                </Badge>
-              )}
-            </div>
-
-            <RadioGroup value={authMode} onValueChange={(value) => handleAuthModeChange(value as 'real' | 'mock')}>
-              <div className="space-y-3">
-                <div className="flex items-start space-x-3 p-3 rounded-md border bg-card hover:bg-muted/50 cursor-pointer">
-                  <RadioGroupItem value="real" id="real" />
-                  <Label htmlFor="real" className="flex-1 cursor-pointer">
-                    <div>
-                      <p className="font-medium">Real Authentication (Production)</p>
-                      <ul className="text-sm text-muted-foreground mt-1 space-y-0.5">
-                        <li>• Uses mock-looplly-login edge function</li>
-                        <li>• Validates mobile & password against database</li>
-                        <li>• Requires OTP verification</li>
-                      </ul>
-                    </div>
-                  </Label>
-                </div>
-
-                <div className="flex items-start space-x-3 p-3 rounded-md border bg-card hover:bg-muted/50 cursor-pointer">
-                  <RadioGroupItem value="mock" id="mock" />
-                  <Label htmlFor="mock" className="flex-1 cursor-pointer">
-                    <div>
-                      <p className="font-medium">Mock Authentication (Development Only)</p>
-                      <ul className="text-sm text-muted-foreground mt-1 space-y-0.5">
-                        <li>• Auto-login as test user (mock-user-123)</li>
-                        <li>• Bypasses all password checks</li>
-                        <li>• Uses in-memory mock data</li>
-                        <li>• ⚠️  NOT FOR PRODUCTION USE</li>
-                      </ul>
-                    </div>
-                  </Label>
-                </div>
-              </div>
-            </RadioGroup>
-          </div>
-
-          {authMode === 'mock' && (
-            <div className="flex items-center gap-2 text-sm text-amber-600 dark:text-amber-400">
-              <AlertTriangle className="h-4 w-4" />
-              <span>Mock mode is active. Remember to switch back to real auth for production.</span>
-            </div>
-          )}
-        </CardContent>
-      </Card>
 
       <div className="grid gap-4 md:grid-cols-2">
         <Card>

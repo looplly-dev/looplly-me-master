@@ -95,7 +95,6 @@ This project uses **TWO separate authentication systems**:
 1. **User Portal (Custom JWT)**
    - Storage key: `'auth'` (localStorage)
    - Managed by: `src/components/auth/AuthProvider.tsx`
-   - Edge Functions: `mock-looplly-login`, `mock-looplly-register`, `mock-looplly-verify-otp`
    - JWT Secret: `LOOPLLY_JWT_SECRET` environment variable
    - Token stored in: `localStorage.getItem('looplly_auth_token')`
 
@@ -189,9 +188,6 @@ const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
 Located in `supabase/functions/`, organized by purpose:
 
 **Authentication:**
-- `mock-looplly-login` - User authentication with Custom JWT
-- `mock-looplly-register` - User registration
-- `mock-looplly-verify-otp` - Mobile verification
 - `reset-team-member-password` - Admin password resets
 
 **AI-Powered:**
