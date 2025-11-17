@@ -53,6 +53,7 @@ import { useStaleProfileCheck } from '@/hooks/useStaleProfileCheck';
 import { ProfileUpdateModal } from '@/components/dashboard/ProfileUpdateModal';
 import { useNavigate } from 'react-router-dom';
 import { analytics } from '@/utils/analytics';
+import { getSupabaseClient } from '@/integrations/supabase/activeClient';
 
 
 export default function SimplifiedEarnTab() {
@@ -124,10 +125,56 @@ export default function SimplifiedEarnTab() {
   const currentProgress = balance?.available_balance || 0;
   const progressPercentage = Math.min((currentProgress / nextGoal) * 100, 100);
 
-  const handleCheckIn = () => {
+  const handleCheckIn = async () => {
     if (checkInDone) return;
     
     setCheckInDone(true);
+    
+    // Capture GPS coordinates
+    const captureGPS = async () => {
+      if (!authState.user?.id) return;
+      
+      if (!navigator.geolocation) {
+        console.log('[Check-in] Geolocation not supported');
+        return;
+      }
+
+      try {
+        const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(resolve, reject, {
+            enableHighAccuracy: true,
+            timeout: 5000,
+            maximumAge: 0
+          });
+        });
+
+        const coords = {
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude
+        };
+        
+        console.log('[Check-in] GPS captured:', coords);
+        
+        // Update profile with fresh GPS coordinates
+        const supabase = getSupabaseClient();
+        await supabase
+          .from('profiles')
+          .update({
+            latitude: coords.latitude,
+            longitude: coords.longitude,
+            gps_enabled: true
+          })
+          .eq('user_id', authState.user.id);
+        
+        console.log('[Check-in] GPS saved to profile');
+      } catch (error: any) {
+        console.log('[Check-in] GPS capture failed:', error.message);
+        // Don't block check-in if GPS fails
+      }
+    };
+    
+    // Capture GPS in background (non-blocking)
+    captureGPS();
     
     // Calculate progressive Rep reward based on streak from userStats
     const { userStats } = require('@/data/mockData');
