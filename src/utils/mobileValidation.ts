@@ -30,8 +30,11 @@ export const validateAndNormalizeMobile = (
   countryDialCode: string
 ): MobileValidationResult => {
   try {
+    console.log('[validateMobile] Input:', { mobile, countryDialCode });
+    
     // Get ISO code from dial code (e.g., '+27' → 'ZA')
     const countryISO = getISOFromDialCode(countryDialCode);
+    console.log('[validateMobile] Country ISO:', countryISO);
     
     if (!countryISO) {
       return {
@@ -54,6 +57,7 @@ export const validateAndNormalizeMobile = (
     
     // Remove leading zeros (common in local format)
     cleanInput = cleanInput.replace(/^0+/, '');
+    console.log('[validateMobile] Clean input:', cleanInput);
     
     // SOUTH AFRICA SPECIFIC VALIDATION
     if (countryISO === 'ZA') {
@@ -79,9 +83,11 @@ export const validateAndNormalizeMobile = (
     
     // Construct full international number
     const fullNumber = `${countryDialCode}${cleanInput}`;
+    console.log('[validateMobile] Full number:', fullNumber);
     
     // Parse and validate using libphonenumber
     const phoneNumber = parsePhoneNumber(fullNumber, countryISO as CountryCode);
+    console.log('[validateMobile] Parsed:', phoneNumber);
     
     if (!phoneNumber) {
       return {
@@ -121,13 +127,16 @@ export const validateAndNormalizeMobile = (
       };
     }
     
-    return {
+    const result = {
       isValid: true,
       normalizedNumber: phoneNumber.number,  // E.164: +27823093959
       nationalFormat: phoneNumber.formatNational()  // 082 309 3959
     };
+    console.log('[validateMobile] Success:', result);
+    return result;
     
   } catch (error) {
+    console.error('[validateMobile] Error:', error);
     return {
       isValid: false,
       error: error instanceof Error ? error.message : 'Invalid phone number'
