@@ -9,6 +9,12 @@ export default function AuthCallback() {
   const navigate = useNavigate();
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [errorMessage, setErrorMessage] = useState<string>('');
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    console.log('AuthCallback component mounted');
+  }, []);
 
   useEffect(() => {
     const handleCallback = async () => {
@@ -81,6 +87,15 @@ export default function AuthCallback() {
 
     handleCallback();
   }, [navigate]);
+
+  // Fallback if component isn't rendering
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <div className="text-white text-xl">Loading callback...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
