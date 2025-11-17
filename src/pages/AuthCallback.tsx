@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { CheckCircle, XCircle, Loader2 } from 'lucide-react';
-import { getSupabaseClient } from '@/integrations/supabase/activeClient';
+import { supabase } from '@/integrations/supabase/client';
 
 export default function AuthCallback() {
   const navigate = useNavigate();
@@ -13,7 +13,6 @@ export default function AuthCallback() {
   useEffect(() => {
     const handleCallback = async () => {
       try {
-        const supabase = getSupabaseClient();
         
         // Check if there's an access_token in the URL hash (Supabase uses hash-based auth)
         const hashParams = new URLSearchParams(window.location.hash.substring(1));
