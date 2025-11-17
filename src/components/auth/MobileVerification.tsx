@@ -64,9 +64,15 @@ export default function MobileVerification({ open, onClose, onSuccess }: MobileV
       const userId = authState.user?.id;
       if (!userId) throw new Error('No user ID');
 
-      // TODO: Create production verify-otp edge function to replace archived mock-looplly-verify-otp
-      // For now, accepting code '12345' in development
-      if (otp !== '12345') {
+      // Call custom verify OTP edge function
+      const { data, error } = await supabase.functions.invoke('mock-looplly-verify-otp', {
+        body: {
+          user_id: userId,
+          otp: otp
+        }
+      });
+
+      if (error || !data?.verified) {
         setError('Invalid OTP code. Try 12345 (development mode)');
         return;
       }
