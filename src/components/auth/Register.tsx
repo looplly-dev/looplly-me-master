@@ -348,31 +348,21 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
         // Track successful signup
         analytics.trackSignup('email', true);
         
+        // Show email confirmation message
         toast({
-          title: "Account created successfully!",
-          description: "Let's set up your profile.",
+          title: "Check your email!",
+          description: `We've sent a confirmation link to ${formData.email}. Please verify your email to continue.`,
+          duration: 10000, // Show for 10 seconds
         });
         
-        // Auto-login the user with their credentials (using email)
-        const loginSuccess = await login(formData.email, formData.password);
+        // Store email for later use
+        sessionStorage.setItem('pending_email_verification', formData.email);
         
-      if (loginSuccess) {
-        console.log('Registration + Login successful, redirecting to profile completion');
-        sessionStorage.setItem('show_onboarding_tour', 'true');
-        
-        // Detect if we're in simulator mode
-        const isSimulatorMode = window.location.pathname.startsWith('/simulator');
-        
-        if (isSimulatorMode) {
-          // Mark that we've completed registration in simulator
-          sessionStorage.setItem('simulator_stage', 'registered');
-          navigate('/simulator/dashboard');
-        } else {
-          // Redirect new users to complete Level 2 profile questions
-          navigate('/profile/complete');
-        }
+        // Redirect to a confirmation page or back to login
+        setTimeout(() => {
+          onBack(); // Go back to login page
+        }, 2000);
       }
-      } else {
         // Track signup failure
         analytics.trackSignup('email', false);
         
