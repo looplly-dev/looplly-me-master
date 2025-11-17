@@ -1154,7 +1154,15 @@ export const useAuthLogic = () => {
       localStorage.removeItem('looplly_auth_token');
       localStorage.removeItem('looplly_user');
       localStorage.removeItem('onboarding_completed');
+      
+      // Clear admin auth session (critical for admin portal logout)
+      localStorage.removeItem('admin_auth');
+      
+      // Clear session storage
       sessionStorage.removeItem('looplly_just_logged_in');
+      sessionStorage.removeItem('simulator_auth_token');
+      sessionStorage.removeItem('simulator_user');
+      
       clearAllSessionMetadata();
       
       // Call logout utility

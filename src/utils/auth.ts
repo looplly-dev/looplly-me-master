@@ -211,12 +211,24 @@ export const loginUser = async (params: LoginParams): Promise<{ success: boolean
 
 /**
  * Logout user using standard Supabase Auth
+ * Handles both regular user and admin client sessions
  */
 export const logoutUser = async (): Promise<void> => {
-  console.log('Logging out user');
+  console.log('[logoutUser] Starting logout...');
   
   const supabase = getSupabaseClient();
+  
+  // Sign out from the active client (user or admin)
   await supabase.auth.signOut();
+  
+  // If on admin route, also sign out from admin client explicitly
+  if (window.location.pathname.startsWith('/admin')) {
+    console.log('[logoutUser] Admin route detected, signing out admin client...');
+    const { adminClient } = await import('@/integrations/supabase/adminClient');
+    await adminClient.auth.signOut();
+  }
+  
+  console.log('[logoutUser] Logout complete');
 };
 
 /**
