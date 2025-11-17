@@ -353,9 +353,8 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
           description: "Let's set up your profile.",
         });
         
-        // Auto-login the user with their credentials
-        const normalizedMobile = `${formData.countryCode}${formData.mobile.replace(/^0+/, '')}`;
-        const loginSuccess = await login(normalizedMobile, formData.password);
+        // Auto-login the user with their credentials (using email)
+        const loginSuccess = await login(formData.email, formData.password);
         
       if (loginSuccess) {
         console.log('Registration + Login successful, redirecting to profile completion');
