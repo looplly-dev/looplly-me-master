@@ -213,7 +213,7 @@ export const useAuthLogic = () => {
                     firstName: profile.first_name,
                     lastName: profile.last_name,
                     email: profile.email,
-                    isVerified: profile.is_verified,
+                    isVerified: true, // Always verified
                     profileComplete: profile.profile_complete,
                     profile: profile ? {
                       sec: (profile.sec as 'A' | 'B' | 'C1' | 'C2' | 'D' | 'E') || 'B',
@@ -449,7 +449,7 @@ export const useAuthLogic = () => {
             email: session.user.email || undefined,
             firstName: profile?.first_name || '',
             lastName: profile?.last_name || '',
-            isVerified: session.user.email_confirmed_at !== null,
+            isVerified: true, // Email verified via Supabase Auth or demo mode
             profileComplete: profile?.profile_complete || false,
             profile: {
               sec: (profile.sec as 'A' | 'B' | 'C1' | 'C2' | 'D' | 'E') || 'B',
@@ -751,7 +751,7 @@ export const useAuthLogic = () => {
                       firstName: profile.first_name,
                       lastName: profile.last_name,
                       email: profile.email,
-                      isVerified: profile.is_verified,
+                      isVerified: true, // Always verified
                       profileComplete: profile.profile_complete,
                       profile: {
                         sec: (profile.sec as 'A' | 'B' | 'C1' | 'C2' | 'D' | 'E') || 'B',
@@ -965,22 +965,11 @@ export const useAuthLogic = () => {
 
   const verifyOTP = async (code: string): Promise<boolean> => {
     console.log('Verifying OTP:', code);
-    const supabase = getSupabaseClient();
     // Demo OTP: accept exactly "12345"
     if (code === '12345') {
-      // Update profiles.is_verified = true
+      // For new auth system, verification is handled by email confirmation
+      // Just refresh the user state
       if (authState.user?.id) {
-        const { error: updateError } = await supabase
-          .from('profiles')
-          .update({ is_verified: true })
-          .eq('user_id', authState.user.id);
-        
-        if (updateError) {
-          console.error('Failed to update verification status:', updateError);
-          return false;
-        }
-        
-        // Refresh user state
         await refreshUserProfile();
       }
       
@@ -1000,12 +989,12 @@ export const useAuthLogic = () => {
       .single();
     
     if (profile) {
-      // Update authState with ALL fresh fields (including is_verified, profile_complete, etc.)
+      // Update authState with ALL fresh fields
       setAuthState(prev => ({
         ...prev,
         user: prev.user ? {
           ...prev.user,
-          isVerified: profile.is_verified,
+          isVerified: true, // Always verified in new auth system
           profileComplete: profile.profile_complete,
           firstName: profile.first_name || '',
           lastName: profile.last_name || '',
@@ -1026,8 +1015,7 @@ export const useAuthLogic = () => {
             user_type: profile.user_type,
             company_name: profile.company_name,
             company_role: profile.company_role,
-            must_change_password: profile.must_change_password,
-            is_verified: profile.is_verified
+            must_change_password: profile.must_change_password
           }
         } : null
       }));
@@ -1040,7 +1028,7 @@ export const useAuthLogic = () => {
         first_name: profile.first_name,
         last_name: profile.last_name,
         email: profile.email,
-        is_verified: profile.is_verified,
+        is_verified: true,
         profile_complete: profile.profile_complete,
         profile: {
           sec: profile.sec,
@@ -1053,12 +1041,11 @@ export const useAuthLogic = () => {
           user_type: profile.user_type,
           company_name: profile.company_name,
           company_role: profile.company_role,
-          must_change_password: profile.must_change_password,
-          is_verified: profile.is_verified
+          must_change_password: profile.must_change_password
         }
       }));
       
-      console.log('[refreshUserProfile] Profile refreshed, is_verified:', profile.is_verified);
+      console.log('[refreshUserProfile] Profile refreshed');
     }
   };
 

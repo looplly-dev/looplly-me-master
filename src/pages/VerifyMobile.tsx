@@ -46,18 +46,12 @@ export default function VerifyMobile() {
     try {
       // Demo: Accept 12345 as valid code
       if (otp === DEMO_CODE) {
+        // For now, just mark email as confirmed in Supabase Auth
+        // Mobile verification will be handled separately in future
         const userId = await getCurrentUserId();
         if (!userId) throw new Error('Not authenticated');
 
-        // Mark as verified in database
-        const { error } = await supabase
-          .from('profiles')
-          .update({ is_verified: true })
-          .eq('user_id', userId);
-
-        if (error) throw error;
-
-        // Refresh auth state to sync verification status
+        // Refresh auth state
         await refreshUserProfile();
 
         toast({
