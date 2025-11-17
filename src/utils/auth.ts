@@ -24,6 +24,8 @@ export interface RegistrationParams {
   gpsEnabled?: boolean;
   latitude?: number;
   longitude?: number;
+  privacyPolicyAcceptedAt?: string;
+  ageVerifiedAt?: string;
 }
 
 export interface LoginParams {
@@ -80,6 +82,8 @@ export const registerUser = async (params: RegistrationParams): Promise<{ succes
       gps_enabled: params.gpsEnabled || false,
       latitude: params.latitude || null,
       longitude: params.longitude || null,
+      privacy_policy_accepted_at: params.privacyPolicyAcceptedAt || null,
+      age_verified_at: params.ageVerifiedAt || null,
     };
     
     console.log('User Metadata:', JSON.stringify(userMetadata, null, 2));
