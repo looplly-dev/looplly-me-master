@@ -16,8 +16,8 @@ function AdminUsersContent() {
   // Calculate statistics
   const stats = useMemo(() => {
     const total = users.length;
-    const verified = users.filter(u => u.is_verified).length;
-    const unverified = users.filter(u => !u.is_verified).length;
+    const verified = users.filter(u => u.level_2_complete).length;
+    const unverified = users.filter(u => !u.level_2_complete).length;
     const suspended = users.filter(u => u.is_suspended).length;
     const profileComplete = users.filter(u => u.profile_complete).length;
     const profileIncomplete = users.filter(u => !u.profile_complete).length;
@@ -60,13 +60,13 @@ function AdminUsersContent() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Verified Users</CardTitle>
+            <CardTitle className="text-sm font-medium">Level 2 Complete</CardTitle>
             <UserCheck className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.verified}</div>
             <p className="text-xs text-muted-foreground mt-1">
-              {stats.verifiedPercentage}% of total • {stats.unverified} unverified
+              {stats.verifiedPercentage}% of total • {stats.unverified} at Level 1
             </p>
           </CardContent>
         </Card>

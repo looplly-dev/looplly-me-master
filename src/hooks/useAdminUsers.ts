@@ -11,7 +11,7 @@ export interface AdminUser {
   country_code: string | null;
   created_at: string | null;
   profile_complete: boolean | null;
-  is_verified: boolean | null;
+  level_2_complete: boolean | null;  // Using level_2_complete instead of is_verified
   is_suspended: boolean | null;
   user_type: 'looplly_user' | 'looplly_team_user' | 'client_user' | null;
 }
@@ -26,6 +26,15 @@ export function useAdminUsers(searchQuery: string = '') {
     setError(null);
 
     try {
+      // Debug: Check admin session
+      const { data: sessionData, error: sessionError } = await adminClient.auth.getSession();
+      console.log('[useAdminUsers] Session check:', { 
+        hasSession: !!sessionData?.session,
+        userId: sessionData?.session?.user?.id,
+        email: sessionData?.session?.user?.email,
+        sessionError 
+      });
+
       let query = adminClient
         .from('profiles')
         .select(`
@@ -37,7 +46,7 @@ export function useAdminUsers(searchQuery: string = '') {
           country_code,
           created_at,
           profile_complete,
-          is_verified,
+          level_2_complete,
           is_suspended,
           user_type
         `)
@@ -51,7 +60,16 @@ export function useAdminUsers(searchQuery: string = '') {
       }
 
       const { data: profilesData, error: profilesError } = await query;
-      if (profilesError) throw profilesError;
+      
+      console.log('[useAdminUsers] Query result:', { 
+        dataCount: profilesData?.length ?? 0,
+        error: profilesError 
+      });
+      
+      if (profilesError) {
+        console.error('[useAdminUsers] Query error:', profilesError);
+        throw profilesError;
+      }
 
       const usersWithTypes = profilesData?.map(profile => ({
         ...profile,
@@ -60,9 +78,11 @@ export function useAdminUsers(searchQuery: string = '') {
           : profile.mobile
       })) || [];
 
+      console.log('[useAdminUsers] Processed users:', usersWithTypes.length);
       setUsers(usersWithTypes);
     } catch (err) {
-      console.error('Error fetching users:', err);
+      console.error('[useAdminUsers] Error fetching users:', err);
+      console.error('[useAdminUsers] Error details:', JSON.stringify(err, null, 2));
       setError(err instanceof Error ? err.message : 'Failed to fetch users');
     } finally {
       setIsLoading(false);

@@ -93,15 +93,15 @@ export function UserListTable({ users, onUpdate }: UserListTableProps) {
                     </Badge>
                   ) : (
                     <>
-                      {user.is_verified ? (
+                      {user.level_2_complete ? (
                         <div className="flex items-center gap-1 text-green-600 dark:text-green-400">
                           <CheckCircle2 className="h-4 w-4" />
-                          <span className="text-xs">Verified</span>
+                          <span className="text-xs">Level 2</span>
                         </div>
                       ) : (
                         <div className="flex items-center gap-1 text-muted-foreground">
                           <XCircle className="h-4 w-4" />
-                          <span className="text-xs">Unverified</span>
+                          <span className="text-xs">Level 1</span>
                         </div>
                       )}
                       {user.profile_complete && (
