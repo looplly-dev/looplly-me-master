@@ -33,18 +33,20 @@ git clone <YOUR_GIT_URL>
 # Step 2: Navigate to the project directory.
 cd <YOUR_PROJECT_NAME>
 
-# Step 3: Set up environment variables.
-npm run env:setup
-# Edit .env file with your actual Supabase credentials
-
-# Step 4: Install the necessary dependencies.
+# Step 3: Install the necessary dependencies.
 npm i
 
-# Step 5: Validate your environment setup.
-npm run env:validate
+# Step 4: Set up for LOCAL development (recommended)
+npm run env:setup:local
+# OR for REMOTE Supabase:
+# npm run env:setup
+# # Then edit .env file with your actual Supabase credentials
 
-# Step 6: Start the development server with auto-reloading and an instant preview.
-npm run dev
+# Step 5: Start local Supabase + dev server (automatic)
+npm run dev:local
+# OR manually:
+# npm run supabase:start  # Start local Supabase
+# npm run dev             # Start dev server (uses local by default)
 ```
 
 ### **Edit a file directly in GitHub**
@@ -101,8 +103,11 @@ npm run config:docs
 - `VITE_SUPABASE_PROJECT_ID`: Your Supabase project ID
 
 For detailed setup instructions, see:
+- **[Local Development Guide](docs/LOCAL_DEVELOPMENT.md)** - 🆕 Complete guide for local Supabase setup
 - [Environment Setup Guide](docs/ENVIRONMENT_SETUP.md) - Traditional .env management
 - [Supabase Configuration Management](docs/SUPABASE_CONFIG_MANAGEMENT.md) - Dynamic configuration system
+- **[Migration Consolidation Guide](docs/MIGRATION_CONSOLIDATION.md)** - 🆕 Database consolidation (119 → 1 migration)
+- [Consolidation Summary](docs/CONSOLIDATION_SUMMARY.md) - Executive overview of migration consolidation
 
 ### Admin & Security Documentation
 - [Admin Setup Instructions](ADMIN_SETUP_INSTRUCTIONS.md) - Setting up admin access

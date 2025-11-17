@@ -1,0 +1,28 @@
+-- Insert 8 new blocked countries with detailed reasons
+INSERT INTO country_blocklist (country_code, dial_code, country_name, reason, blocked_at)
+VALUES
+  ('IR', '+98', 'Iran', 'Comprehensive data localization mandate under Iran''s Computer Crimes Law requiring all citizen data to be stored on servers physically located within Iran. Additionally, international sanctions and financial restrictions make compliance operationally infeasible for global platforms.', NOW()),
+  ('BR', '+55', 'Brazil', 'Lei Geral de Proteção de Dados (LGPD) Article 33 requires sensitive personal data processing to occur within Brazil or with adequate safeguards. Cross-border data transfers require ANPD approval and Standard Contractual Clauses, creating significant compliance overhead for our current infrastructure.', NOW()),
+  ('KR', '+82', 'South Korea', 'Personal Information Protection Act (PIPA) Articles 28-39 mandate that certain categories of personal data (credit information, location data, medical records) must be stored on servers located in South Korea. Our cloud architecture does not currently support region-specific data residency.', NOW()),
+  ('SA', '+966', 'Saudi Arabia', 'Cloud Computing Regulatory Framework (CCRF) issued by CITC requires Critical Data Infrastructure (CDI) to be physically located within Saudi Arabia. Healthcare, financial, and government-related data must not leave the Kingdom without explicit approval.', NOW()),
+  ('TH', '+66', 'Thailand', 'Personal Data Protection Act (PDPA) Section 28 restricts cross-border transfers of personal data unless the destination country has adequate protection standards as determined by the PDPC. Current lack of adequacy decision makes operations legally uncertain.', NOW()),
+  ('AE', '+971', 'UAE', 'Federal Decree-Law No. 45 of 2021 (Data Protection Law) and sector-specific regulations require sensitive personal data and critical infrastructure data to be stored within UAE borders. Financial and healthcare sectors face additional localization mandates from regulatory authorities.', NOW()),
+  ('AR', '+54', 'Argentina', 'Personal Data Protection Law (PDPL) 25,326 requires personal data processing to occur within Argentina or countries with adequate protection (whitelist). Cross-border transfers require explicit user consent and regulatory approval, creating operational friction incompatible with our automated onboarding.', NOW()),
+  ('SG', '+65', 'Singapore', 'While Singapore''s PDPA is generally flexible, the Banking Act and MAS Notice 655 impose strict data localization requirements on financial institutions. To avoid regulatory ambiguity around financial services classification, we restrict Singapore registrations pending legal clarity.', NOW());
+
+-- Update existing 8 countries with detailed legal reasons
+UPDATE country_blocklist SET reason = 'Cybersecurity Law (CSL) Article 37 and Personal Information Protection Law (PIPL) Chapter 3 mandate that personal information and important data collected within China must be stored on servers located in mainland China. Cross-border data transfers require security assessments and government approval, which our infrastructure cannot support.' WHERE country_code = 'CN';
+
+UPDATE country_blocklist SET reason = 'Federal Law 242-FZ (Data Localization Law) requires all personal data of Russian citizens to be stored on servers physically located within Russian territory during initial collection. Non-compliance carries criminal penalties, making operations legally untenable without local data centers.' WHERE country_code = 'RU';
+
+UPDATE country_blocklist SET reason = 'Digital Personal Data Protection Act (DPDPA) 2023 Section 16 requires certain categories of personal data to be stored and processed exclusively within India. The Data Protection Board''s evolving enforcement guidance creates regulatory uncertainty incompatible with our current cloud setup.' WHERE country_code = 'IN';
+
+UPDATE country_blocklist SET reason = 'Cybersecurity Law 2019 Article 26 mandates domestic storage of personal data and user-generated content for service providers operating in Vietnam. Foreign companies must establish local servers or partnerships, which exceeds our current operational capacity.' WHERE country_code = 'VN';
+
+UPDATE country_blocklist SET reason = 'Government Regulation 71/2019 (GR 71) requires electronic system operators to locate data centers and disaster recovery centers within Indonesian territory for public services. The broad definition of ''public service'' creates compliance risk.' WHERE country_code = 'ID';
+
+UPDATE country_blocklist SET reason = 'Personal Data Protection Law (KVKK) Article 9 restricts international data transfers to countries with adequate protection or requires explicit consent plus additional safeguards. Regulatory guidance remains unclear, creating legal uncertainty for automated data processing.' WHERE country_code = 'TR';
+
+UPDATE country_blocklist SET reason = 'Pakistan Telecommunication Authority (PTA) regulations and draft Personal Data Protection Bill indicate movement toward mandatory data localization. To avoid future compliance violations, we proactively restrict registrations pending legal framework finalization.' WHERE country_code = 'PK';
+
+UPDATE country_blocklist SET reason = 'Law on Personal Data and Its Protection Article 17 requires personal data to be recorded, systematized, and stored using databases located within Kazakhstan. Cross-border transfers require data subject consent and regulatory notification.' WHERE country_code = 'KZ';

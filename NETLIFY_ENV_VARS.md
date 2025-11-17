@@ -4,7 +4,7 @@
 
 This project uses **two separate Supabase projects** for development and production:
 
-- **Development** (`kzqcfrubjccxrwfkkrze`): Used in Lovable preview environment
+- **Development** (removed): Previously used in Lovable preview environment
 - **Production** (`chlqpvzreztzxmjjdjpk`): Used on Netlify deployed site (looplly.me)
 
 ### How It Works
@@ -54,9 +54,9 @@ The `.env` file in the repository contains development credentials and should **
 
 ```bash
 NODE_ENV=development
-VITE_SUPABASE_URL=https://kzqcfrubjccxrwfkkrze.supabase.co
-VITE_SUPABASE_PUBLISHABLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt6cWNmcnViamNjeHJ3ZmtrcnplIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwNjI4ODEsImV4cCI6MjA3NTYzODg4MX0.yCLjMC7QcM-RNHFxOdQb7O0C7yq0D9e3bP7kyrL0u3E
-VITE_SUPABASE_PROJECT_ID=kzqcfrubjccxrwfkkrze
+VITE_SUPABASE_URL=https://chlqpvzreztzxmjjdjpk.supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNobHFwdnpyZXp0enhtampkanBrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0MDUzOTcsImV4cCI6MjA3NTk4MTM5N30.2Gh1mfj43B4b_n78WEEPD9_8uS8eUgpl0AIEFC5T5_I
+VITE_SUPABASE_PROJECT_ID=chlqpvzreztzxmjjdjpk
 # ... other development settings
 ```
 
@@ -88,10 +88,10 @@ If you see authentication errors in production:
 
 If you see wrong data or users:
 - Check which Supabase project ID is being used
-- Development: Should see `kzqcfrubjccxrwfkkrze` in network requests
+- Development: Should see `chlqpvzreztzxmjjdjpk` in network requests (or local 127.0.0.1)
 - Production: Should see `chlqpvzreztzxmjjdjpk` in network requests
 
 ## Project Reference
 
-- **Development Project**: `kzqcfrubjccxrwfkkrze` (Lovable Cloud managed)
+- **Development Project**: Removed (previously Lovable Cloud managed)
 - **Production Project**: `chlqpvzreztzxmjjdjpk` (Your external Supabase project)

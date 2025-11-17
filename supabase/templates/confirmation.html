@@ -157,7 +157,7 @@
 
         <!-- Content -->
         <div class="content">
-            <p class="greeting">Hi {{ .Email }},</p>
+            <p class="greeting">Hi {{ .UserMetaData.first_name }},</p>
             
             <p class="message">
                 Thanks for joining Looplly! We're excited to have you on board. 
@@ -180,6 +180,9 @@
             <div class="alternative-link">
                 <p>If the button doesn't work, copy and paste this link into your browser:</p>
                 <div class="link-text">{{ .ConfirmationURL }}</div>
+                <p style="margin-top: 16px; font-size: 13px; color: #9ca3af;">
+                    This link will redirect you to looplly.me/auth/verify-email to complete verification.
+                </p>
             </div>
 
             <!-- Security Notice -->

@@ -12,7 +12,7 @@ const envSchema = z.object({
     .string()
     .url('VITE_SUPABASE_URL must be a valid URL')
     .refine(
-      (url) => url.includes('.supabase.co') || url.includes('.supabase.com') || url.includes('localhost'),
+      (url) => url.includes('.supabase.co') || url.includes('.supabase.com') || url.includes('localhost') || url.includes('127.0.0.1'),
       'VITE_SUPABASE_URL must be a valid Supabase URL'
     ),
   

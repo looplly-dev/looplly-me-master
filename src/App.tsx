@@ -45,6 +45,7 @@ const ProtectedRoute = lazy(() => import("./components/auth/ProtectedRoute"));
 const ProfileComplete = lazy(() => import("./pages/ProfileComplete"));
 const VerifyMobile = lazy(() => import("./pages/VerifyMobile"));
 const EmailVerification = lazy(() => import("./components/auth/EmailVerification"));
+const AuthCallback = lazy(() => import("./pages/AuthCallback"));
 
 // Lazy load privacy policy page
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
@@ -103,6 +104,7 @@ const AppContent = () => {
         
         {/* Email Verification */}
         <Route path="/verify-email" element={<EmailVerification />} />
+        <Route path="/auth/callback" element={<AuthCallback />} />
         
         {/* Profile & Verification Routes */}
         <Route path="/profile/complete" element={<ProtectedRoute><ProfileComplete /></ProtectedRoute>} />
