@@ -306,6 +306,17 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    console.log('=== FORM SUBMIT DEBUG ===');
+    console.log('Form Data:', {
+      email: formData.email,
+      mobile: formData.mobile,
+      countryCode: formData.countryCode,
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      dateOfBirth: formData.dateOfBirth,
+      gpsEnabled: formData.gpsEnabled
+    });
+    
     const validation = validate();
     if (!validation.isValid) {
       toast({
