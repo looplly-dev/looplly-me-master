@@ -67,7 +67,7 @@ export const registerUser = async (params: RegistrationParams): Promise<{ succes
       return { success: false, error: { message: mobileValidation.error || 'Invalid mobile number' } };
     }
     
-    const normalizedMobile = mobileValidation.normalized;
+    const normalizedMobile = mobileValidation.normalizedNumber;
     console.log('Mobile (normalized):', normalizedMobile);
     
     // Prepare metadata object
@@ -132,7 +132,7 @@ export const loginUser = async (params: LoginParams): Promise<{ success: boolean
         return { success: false, error: { message: 'Invalid mobile number' } };
       }
       
-      const normalizedMobile = mobileValidation.normalized;
+      const normalizedMobile = mobileValidation.normalizedNumber;
       
       // Look up user by mobile number in profiles table
       const { data: profile, error: profileError } = await supabase
