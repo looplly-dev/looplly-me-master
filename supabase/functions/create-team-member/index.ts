@@ -146,8 +146,6 @@ Deno.serve(async (req) => {
         company_name: team_name,
         company_role: job_title,
         must_change_password: true,
-        invited_by: caller.id,
-        invitation_sent_at: new Date().toISOString(),
         temp_password_expires_at: expiresAt.toISOString()
       });
 
