@@ -39,7 +39,15 @@ export interface LoginParams {
  */
 export const registerUser = async (params: RegistrationParams): Promise<{ success: boolean; error?: any }> => {
   try {
-    console.log('Registering user with email:', params.email);
+    console.log('=== Registration Debug ===');
+    console.log('Email:', params.email);
+    console.log('Mobile (raw):', params.mobile);
+    console.log('Country Code:', params.countryCode);
+    console.log('First Name:', params.firstName);
+    console.log('Last Name:', params.lastName);
+    console.log('Date of Birth:', params.dateOfBirth);
+    console.log('GPS Enabled:', params.gpsEnabled);
+    console.log('Coordinates:', params.latitude, params.longitude);
     
     // Check if country is blocked
     if (BLOCKED_COUNTRY_CODES.includes(params.countryCode)) {
@@ -60,6 +68,21 @@ export const registerUser = async (params: RegistrationParams): Promise<{ succes
     }
     
     const normalizedMobile = mobileValidation.normalized;
+    console.log('Mobile (normalized):', normalizedMobile);
+    
+    // Prepare metadata object
+    const userMetadata = {
+      mobile: normalizedMobile,
+      country_code: params.countryCode,
+      first_name: params.firstName || '',
+      last_name: params.lastName || '',
+      date_of_birth: params.dateOfBirth || null,
+      gps_enabled: params.gpsEnabled || false,
+      latitude: params.latitude || null,
+      longitude: params.longitude || null,
+    };
+    
+    console.log('User Metadata:', JSON.stringify(userMetadata, null, 2));
     
     // Use standard Supabase Auth sign up
     const supabase = getSupabaseClient();
@@ -67,16 +90,7 @@ export const registerUser = async (params: RegistrationParams): Promise<{ succes
       email: params.email,
       password: params.password,
       options: {
-        data: {
-          mobile: normalizedMobile,
-          country_code: params.countryCode,
-          first_name: params.firstName || '',
-          last_name: params.lastName || '',
-          date_of_birth: params.dateOfBirth || null,
-          gps_enabled: params.gpsEnabled || false,
-          latitude: params.latitude || null,
-          longitude: params.longitude || null,
-        },
+        data: userMetadata,
         emailRedirectTo: `${window.location.origin}/auth/callback`
       }
     });
