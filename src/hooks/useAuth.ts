@@ -608,7 +608,9 @@ export const useAuthLogic = () => {
         dateOfBirth: data.dateOfBirth,
         gpsEnabled: data.gpsEnabled,
         latitude: data.latitude,
-        longitude: data.longitude
+        longitude: data.longitude,
+        privacyPolicyAcceptedAt: data.privacyPolicyAcceptedAt,
+        ageVerifiedAt: data.ageVerifiedAt
       });
 
       if (result.success) {
