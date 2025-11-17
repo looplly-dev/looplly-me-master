@@ -362,7 +362,7 @@ export default function Register({ onBack, onSuccess, onOTPRequired }: RegisterP
         setTimeout(() => {
           onBack(); // Go back to login page
         }, 2000);
-      }
+      } else {
         // Track signup failure
         analytics.trackSignup('email', false);
         
