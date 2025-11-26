@@ -1,0 +1,42 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGradient" x1="4" y1="2" x2="60" y2="62" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#182A5A"/>
+      <stop offset="50%" stop-color="#102040"/>
+      <stop offset="100%" stop-color="#241345"/>
+    </linearGradient>
+    <linearGradient id="loopGradient" x1="6" y1="10" x2="58" y2="54" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#24C8FF"/>
+      <stop offset="40%" stop-color="#35FFD2"/>
+      <stop offset="100%" stop-color="#FF7B2F"/>
+    </linearGradient>
+    <radialGradient id="innerGlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(32 16) rotate(90) scale(34 34)">
+      <stop offset="0%" stop-color="#2463C5" stop-opacity="1"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect x="0.8" y="0.8" width="62.4" height="62.4" rx="18" fill="url(#bgGradient)"/>
+  <rect x="0.8" y="0.8" width="62.4" height="62.4" rx="18" fill="url(#innerGlow)"/>
+
+  <g transform="translate(-3 0)">
+    <path
+      d="M10 28 C10 19 16.8 12.5 25.4 12.5 C29.4 12.5 32.8 14.3 35.0 17.3 C37.2 14.3 40.6 12.5 44.6 12.5 C53.2 12.5 60 19 60 28 C60 37.5 53.7 43.5 46.2 48.0 C41.8 50.8 38.0 52.6 35.0 53.8 C32.0 52.6 28.2 50.8 23.8 48.0 C16.3 43.5 10 37.5 10 28Z"
+      fill="none"
+      stroke="#00E6FF"
+      stroke-opacity="0.5"
+      stroke-width="9.5"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+
+    <path
+      d="M10 28 C10 19 16.8 12.5 25.4 12.5 C29.4 12.5 32.8 14.3 35.0 17.3 C37.2 14.3 40.6 12.5 44.6 12.5 C53.2 12.5 60 19 60 28 C60 37.5 53.7 43.5 46.2 48.0 C41.8 50.8 38.0 52.6 35.0 53.8 C32.0 52.6 28.2 50.8 23.8 48.0 C16.3 43.5 10 37.5 10 28Z"
+      fill="none"
+      stroke="url(#loopGradient)"
+      stroke-width="6.3"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+  </g>
+</svg>
