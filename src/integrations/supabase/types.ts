@@ -12,31 +12,6 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "13.0.5"
   }
-  graphql_public: {
-    Tables: {
-      [_ in never]: never
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      graphql: {
-        Args: {
-          extensions?: Json
-          operationName?: string
-          query?: string
-          variables?: Json
-        }
-        Returns: Json
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
   public: {
     Tables: {
       address_components: {
@@ -104,37 +79,37 @@ export type Database = {
           agent_id: string
           config_key: string
           config_value: Json
-          created_at: string | null
+          created_at: string
           data_type: Database["public"]["Enums"]["config_data_type"]
           description: string | null
           id: string
           is_secret: boolean
           tenant_id: string | null
-          updated_at: string | null
+          updated_at: string
         }
         Insert: {
           agent_id: string
           config_key: string
           config_value?: Json
-          created_at?: string | null
+          created_at?: string
           data_type?: Database["public"]["Enums"]["config_data_type"]
           description?: string | null
           id?: string
           is_secret?: boolean
           tenant_id?: string | null
-          updated_at?: string | null
+          updated_at?: string
         }
         Update: {
           agent_id?: string
           config_key?: string
           config_value?: Json
-          created_at?: string | null
+          created_at?: string
           data_type?: Database["public"]["Enums"]["config_data_type"]
           description?: string | null
           id?: string
           is_secret?: boolean
           tenant_id?: string | null
-          updated_at?: string | null
+          updated_at?: string
         }
         Relationships: [
           {
@@ -155,7 +130,7 @@ export type Database = {
       }
       agent_dependencies: {
         Row: {
-          created_at: string | null
+          created_at: string
           dependency_type: Database["public"]["Enums"]["dependency_type"]
           dependent_agent_id: string
           id: string
@@ -163,7 +138,7 @@ export type Database = {
           parent_agent_id: string
         }
         Insert: {
-          created_at?: string | null
+          created_at?: string
           dependency_type: Database["public"]["Enums"]["dependency_type"]
           dependent_agent_id: string
           id?: string
@@ -171,7 +146,7 @@ export type Database = {
           parent_agent_id: string
         }
         Update: {
-          created_at?: string | null
+          created_at?: string
           dependency_type?: Database["public"]["Enums"]["dependency_type"]
           dependent_agent_id?: string
           id?: string
@@ -201,7 +176,7 @@ export type Database = {
           api_calls_made: number | null
           api_cost_usd: number | null
           completed_at: string | null
-          created_at: string | null
+          created_at: string
           error_message: string | null
           error_type: string | null
           execution_id: string
@@ -220,7 +195,7 @@ export type Database = {
           api_calls_made?: number | null
           api_cost_usd?: number | null
           completed_at?: string | null
-          created_at?: string | null
+          created_at?: string
           error_message?: string | null
           error_type?: string | null
           execution_id: string
@@ -239,7 +214,7 @@ export type Database = {
           api_calls_made?: number | null
           api_cost_usd?: number | null
           completed_at?: string | null
-          created_at?: string | null
+          created_at?: string
           error_message?: string | null
           error_type?: string | null
           execution_id?: string
@@ -273,7 +248,7 @@ export type Database = {
       ai_agents: {
         Row: {
           category: string
-          created_at: string | null
+          created_at: string
           description: string
           icon_name: string
           id: string
@@ -283,11 +258,11 @@ export type Database = {
           slug: string
           status: Database["public"]["Enums"]["agent_status"]
           tenant_id: string | null
-          updated_at: string | null
+          updated_at: string
         }
         Insert: {
           category: string
-          created_at?: string | null
+          created_at?: string
           description: string
           icon_name: string
           id?: string
@@ -297,11 +272,11 @@ export type Database = {
           slug: string
           status?: Database["public"]["Enums"]["agent_status"]
           tenant_id?: string | null
-          updated_at?: string | null
+          updated_at?: string
         }
         Update: {
           category?: string
-          created_at?: string | null
+          created_at?: string
           description?: string
           icon_name?: string
           id?: string
@@ -311,55 +286,11 @@ export type Database = {
           slug?: string
           status?: Database["public"]["Enums"]["agent_status"]
           tenant_id?: string | null
-          updated_at?: string | null
+          updated_at?: string
         }
         Relationships: [
           {
             foreignKeyName: "ai_agents_tenant_id_fkey"
-            columns: ["tenant_id"]
-            isOneToOne: false
-            referencedRelation: "tenants"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      app_secrets: {
-        Row: {
-          created_at: string | null
-          description: string | null
-          environment: string
-          id: string
-          is_public: boolean
-          key: string
-          tenant_id: string | null
-          updated_at: string | null
-          value: string
-        }
-        Insert: {
-          created_at?: string | null
-          description?: string | null
-          environment?: string
-          id?: string
-          is_public?: boolean
-          key: string
-          tenant_id?: string | null
-          updated_at?: string | null
-          value: string
-        }
-        Update: {
-          created_at?: string | null
-          description?: string | null
-          environment?: string
-          id?: string
-          is_public?: boolean
-          key?: string
-          tenant_id?: string | null
-          updated_at?: string | null
-          value?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "app_secrets_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
@@ -520,38 +451,108 @@ export type Database = {
           },
         ]
       }
+      cint_survey_sessions: {
+        Row: {
+          actual_reward: number | null
+          cint_session_id: string
+          completed_at: string | null
+          created_at: string | null
+          estimated_duration: number | null
+          estimated_reward: number
+          id: string
+          started_at: string | null
+          status: string | null
+          survey_id: string
+          survey_url: string
+          terminated_reason: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          actual_reward?: number | null
+          cint_session_id: string
+          completed_at?: string | null
+          created_at?: string | null
+          estimated_duration?: number | null
+          estimated_reward: number
+          id?: string
+          started_at?: string | null
+          status?: string | null
+          survey_id: string
+          survey_url: string
+          terminated_reason?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          actual_reward?: number | null
+          cint_session_id?: string
+          completed_at?: string | null
+          created_at?: string | null
+          estimated_duration?: number | null
+          estimated_reward?: number
+          id?: string
+          started_at?: string | null
+          status?: string | null
+          survey_id?: string
+          survey_url?: string
+          terminated_reason?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cint_survey_sessions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       communication_preferences: {
         Row: {
           created_at: string | null
-          email_enabled: boolean | null
+          email_notifications: boolean | null
           id: string
-          push_enabled: boolean | null
-          sms_enabled: boolean | null
+          marketing_emails: boolean | null
+          push_notifications: boolean | null
+          sms_notifications: boolean | null
+          survey_invitations: boolean | null
           updated_at: string | null
           user_id: string
-          whatsapp_enabled: boolean | null
         }
         Insert: {
           created_at?: string | null
-          email_enabled?: boolean | null
+          email_notifications?: boolean | null
           id?: string
-          push_enabled?: boolean | null
-          sms_enabled?: boolean | null
+          marketing_emails?: boolean | null
+          push_notifications?: boolean | null
+          sms_notifications?: boolean | null
+          survey_invitations?: boolean | null
           updated_at?: string | null
           user_id: string
-          whatsapp_enabled?: boolean | null
         }
         Update: {
           created_at?: string | null
-          email_enabled?: boolean | null
+          email_notifications?: boolean | null
           id?: string
-          push_enabled?: boolean | null
-          sms_enabled?: boolean | null
+          marketing_emails?: boolean | null
+          push_notifications?: boolean | null
+          sms_notifications?: boolean | null
+          survey_invitations?: boolean | null
           updated_at?: string | null
           user_id?: string
-          whatsapp_enabled?: boolean | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "communication_preferences_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
       }
       community_posts: {
         Row: {
@@ -824,45 +825,90 @@ export type Database = {
           },
         ]
       }
+      data_export_requests: {
+        Row: {
+          completed_at: string | null
+          export_data: Json | null
+          id: string
+          requested_at: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          export_data?: Json | null
+          id?: string
+          requested_at?: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          export_data?: Json | null
+          id?: string
+          requested_at?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       documentation: {
         Row: {
           audience: string
           category: string
+          change_summary: string | null
+          changed_by: string | null
           content: string
           created_at: string | null
           description: string
           id: string
+          is_published: boolean | null
           parent: string | null
+          previous_version_id: string | null
+          published_at: string | null
           status: string | null
           tags: string[]
           title: string
           updated_at: string | null
+          version: number | null
         }
         Insert: {
           audience: string
           category: string
+          change_summary?: string | null
+          changed_by?: string | null
           content: string
           created_at?: string | null
           description: string
           id: string
+          is_published?: boolean | null
           parent?: string | null
+          previous_version_id?: string | null
+          published_at?: string | null
           status?: string | null
           tags: string[]
           title: string
           updated_at?: string | null
+          version?: number | null
         }
         Update: {
           audience?: string
           category?: string
+          change_summary?: string | null
+          changed_by?: string | null
           content?: string
           created_at?: string | null
           description?: string
           id?: string
+          is_published?: boolean | null
           parent?: string | null
+          previous_version_id?: string | null
+          published_at?: string | null
           status?: string | null
           tags?: string[]
           title?: string
           updated_at?: string | null
+          version?: number | null
         }
         Relationships: []
       }
@@ -970,6 +1016,54 @@ export type Database = {
         }
         Relationships: []
       }
+      documentation_history: {
+        Row: {
+          audience: string
+          category: string
+          change_summary: string | null
+          changed_by: string | null
+          content: string
+          created_at: string | null
+          description: string
+          doc_id: string
+          id: string
+          parent: string | null
+          tags: string[]
+          title: string
+          version: number
+        }
+        Insert: {
+          audience: string
+          category: string
+          change_summary?: string | null
+          changed_by?: string | null
+          content: string
+          created_at?: string | null
+          description: string
+          doc_id: string
+          id?: string
+          parent?: string | null
+          tags: string[]
+          title: string
+          version: number
+        }
+        Update: {
+          audience?: string
+          category?: string
+          change_summary?: string | null
+          changed_by?: string | null
+          content?: string
+          created_at?: string | null
+          description?: string
+          doc_id?: string
+          id?: string
+          parent?: string | null
+          tags?: string[]
+          title?: string
+          version?: number
+        }
+        Relationships: []
+      }
       documentation_questions: {
         Row: {
           created_at: string | null
@@ -1030,16 +1124,11 @@ export type Database = {
           completed_at: string | null
           created_at: string | null
           description: string | null
-          expires_at: string | null
-          external_id: string | null
           id: string
           metadata: Json | null
-          provider: string | null
           reward_amount: number
-          status: string
-          time_estimate: number | null
+          status: string | null
           title: string
-          updated_at: string | null
           user_id: string
         }
         Insert: {
@@ -1047,16 +1136,11 @@ export type Database = {
           completed_at?: string | null
           created_at?: string | null
           description?: string | null
-          expires_at?: string | null
-          external_id?: string | null
           id?: string
           metadata?: Json | null
-          provider?: string | null
           reward_amount: number
-          status?: string
-          time_estimate?: number | null
+          status?: string | null
           title: string
-          updated_at?: string | null
           user_id: string
         }
         Update: {
@@ -1064,19 +1148,22 @@ export type Database = {
           completed_at?: string | null
           created_at?: string | null
           description?: string | null
-          expires_at?: string | null
-          external_id?: string | null
           id?: string
           metadata?: Json | null
-          provider?: string | null
           reward_amount?: number
-          status?: string
-          time_estimate?: number | null
+          status?: string | null
           title?: string
-          updated_at?: string | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "earning_activities_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
       }
       earning_rules: {
         Row: {
@@ -1166,33 +1253,30 @@ export type Database = {
           },
         ]
       }
-      otp_verifications: {
+      looplly_user_auth_mapping: {
         Row: {
+          country_code: string
           created_at: string | null
-          expires_at: string
-          id: string
+          looplly_user_id: string
           mobile: string
-          otp_code: string
-          user_id: string
-          verified: boolean | null
+          supabase_auth_id: string | null
+          updated_at: string | null
         }
         Insert: {
+          country_code: string
           created_at?: string | null
-          expires_at: string
-          id?: string
+          looplly_user_id: string
           mobile: string
-          otp_code: string
-          user_id: string
-          verified?: boolean | null
+          supabase_auth_id?: string | null
+          updated_at?: string | null
         }
         Update: {
+          country_code?: string
           created_at?: string | null
-          expires_at?: string
-          id?: string
+          looplly_user_id?: string
           mobile?: string
-          otp_code?: string
-          user_id?: string
-          verified?: boolean | null
+          supabase_auth_id?: string | null
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -1440,10 +1524,13 @@ export type Database = {
       profiles: {
         Row: {
           address: string | null
+          age_verified_at: string | null
           badge_preview_mode: boolean | null
           company_name: string | null
           company_role: string | null
-          country_code: string
+          cookie_consent_given_at: string | null
+          cookie_consent_preferences: Json | null
+          country_code: string | null
           country_iso: string | null
           created_at: string | null
           date_of_birth: string | null
@@ -1454,33 +1541,39 @@ export type Database = {
           gender: string | null
           gps_enabled: boolean | null
           household_income: string | null
-          id: string
           invitation_sent_at: string | null
           invited_by: string | null
           is_suspended: boolean | null
           is_test_account: boolean | null
+          is_verified: boolean | null
           last_name: string | null
           last_profile_update: string | null
           level_2_complete: boolean | null
-          mobile: string
+          mobile: string | null
           must_change_password: boolean | null
+          password_hash: string | null
           personal_income: string | null
+          privacy_policy_accepted_at: string | null
           profile_complete: boolean | null
           profile_completeness_score: number | null
           profile_level: number | null
           sec: string | null
           short_id: string | null
           temp_password_expires_at: string | null
+          tenant_id: string | null
           updated_at: string | null
           user_id: string
           user_type: Database["public"]["Enums"]["user_type"] | null
         }
         Insert: {
           address?: string | null
+          age_verified_at?: string | null
           badge_preview_mode?: boolean | null
           company_name?: string | null
           company_role?: string | null
-          country_code?: string
+          cookie_consent_given_at?: string | null
+          cookie_consent_preferences?: Json | null
+          country_code?: string | null
           country_iso?: string | null
           created_at?: string | null
           date_of_birth?: string | null
@@ -1491,33 +1584,39 @@ export type Database = {
           gender?: string | null
           gps_enabled?: boolean | null
           household_income?: string | null
-          id?: string
           invitation_sent_at?: string | null
           invited_by?: string | null
           is_suspended?: boolean | null
           is_test_account?: boolean | null
+          is_verified?: boolean | null
           last_name?: string | null
           last_profile_update?: string | null
           level_2_complete?: boolean | null
-          mobile: string
+          mobile?: string | null
           must_change_password?: boolean | null
+          password_hash?: string | null
           personal_income?: string | null
+          privacy_policy_accepted_at?: string | null
           profile_complete?: boolean | null
           profile_completeness_score?: number | null
           profile_level?: number | null
           sec?: string | null
           short_id?: string | null
           temp_password_expires_at?: string | null
+          tenant_id?: string | null
           updated_at?: string | null
           user_id: string
           user_type?: Database["public"]["Enums"]["user_type"] | null
         }
         Update: {
           address?: string | null
+          age_verified_at?: string | null
           badge_preview_mode?: boolean | null
           company_name?: string | null
           company_role?: string | null
-          country_code?: string
+          cookie_consent_given_at?: string | null
+          cookie_consent_preferences?: Json | null
+          country_code?: string | null
           country_iso?: string | null
           created_at?: string | null
           date_of_birth?: string | null
@@ -1528,28 +1627,39 @@ export type Database = {
           gender?: string | null
           gps_enabled?: boolean | null
           household_income?: string | null
-          id?: string
           invitation_sent_at?: string | null
           invited_by?: string | null
           is_suspended?: boolean | null
           is_test_account?: boolean | null
+          is_verified?: boolean | null
           last_name?: string | null
           last_profile_update?: string | null
           level_2_complete?: boolean | null
-          mobile?: string
+          mobile?: string | null
           must_change_password?: boolean | null
+          password_hash?: string | null
           personal_income?: string | null
+          privacy_policy_accepted_at?: string | null
           profile_complete?: boolean | null
           profile_completeness_score?: number | null
           profile_level?: number | null
           sec?: string | null
           short_id?: string | null
           temp_password_expires_at?: string | null
+          tenant_id?: string | null
           updated_at?: string | null
           user_id?: string
           user_type?: Database["public"]["Enums"]["user_type"] | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles_team_backup: {
         Row: {
@@ -1561,17 +1671,18 @@ export type Database = {
           country_iso: string | null
           created_at: string | null
           date_of_birth: string | null
+          email: string | null
           ethnicity: string | null
           first_login_at: string | null
           first_name: string | null
           gender: string | null
           gps_enabled: boolean | null
           household_income: string | null
-          id: string | null
           invitation_sent_at: string | null
           invited_by: string | null
           is_suspended: boolean | null
           is_test_account: boolean | null
+          is_verified: boolean | null
           last_name: string | null
           last_profile_update: string | null
           level_2_complete: boolean | null
@@ -1585,6 +1696,7 @@ export type Database = {
           sec: string | null
           short_id: string | null
           temp_password_expires_at: string | null
+          tenant_id: string | null
           updated_at: string | null
           user_id: string | null
           user_type: Database["public"]["Enums"]["user_type"] | null
@@ -1598,17 +1710,18 @@ export type Database = {
           country_iso?: string | null
           created_at?: string | null
           date_of_birth?: string | null
+          email?: string | null
           ethnicity?: string | null
           first_login_at?: string | null
           first_name?: string | null
           gender?: string | null
           gps_enabled?: boolean | null
           household_income?: string | null
-          id?: string | null
           invitation_sent_at?: string | null
           invited_by?: string | null
           is_suspended?: boolean | null
           is_test_account?: boolean | null
+          is_verified?: boolean | null
           last_name?: string | null
           last_profile_update?: string | null
           level_2_complete?: boolean | null
@@ -1622,6 +1735,7 @@ export type Database = {
           sec?: string | null
           short_id?: string | null
           temp_password_expires_at?: string | null
+          tenant_id?: string | null
           updated_at?: string | null
           user_id?: string | null
           user_type?: Database["public"]["Enums"]["user_type"] | null
@@ -1635,17 +1749,18 @@ export type Database = {
           country_iso?: string | null
           created_at?: string | null
           date_of_birth?: string | null
+          email?: string | null
           ethnicity?: string | null
           first_login_at?: string | null
           first_name?: string | null
           gender?: string | null
           gps_enabled?: boolean | null
           household_income?: string | null
-          id?: string | null
           invitation_sent_at?: string | null
           invited_by?: string | null
           is_suspended?: boolean | null
           is_test_account?: boolean | null
+          is_verified?: boolean | null
           last_name?: string | null
           last_profile_update?: string | null
           level_2_complete?: boolean | null
@@ -1659,6 +1774,7 @@ export type Database = {
           sec?: string | null
           short_id?: string | null
           temp_password_expires_at?: string | null
+          tenant_id?: string | null
           updated_at?: string | null
           user_id?: string | null
           user_type?: Database["public"]["Enums"]["user_type"] | null
@@ -1753,75 +1869,39 @@ export type Database = {
           },
         ]
       }
-      referrals: {
-        Row: {
-          created_at: string | null
-          id: string
-          qualified_at: string | null
-          referral_code: string
-          referred_id: string
-          referrer_id: string
-          reward_amount: number | null
-          status: string
-          updated_at: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          id?: string
-          qualified_at?: string | null
-          referral_code: string
-          referred_id: string
-          referrer_id: string
-          reward_amount?: number | null
-          status?: string
-          updated_at?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          id?: string
-          qualified_at?: string | null
-          referral_code?: string
-          referred_id?: string
-          referrer_id?: string
-          reward_amount?: number | null
-          status?: string
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
       streak_unlock_config: {
         Row: {
           config_key: string
           config_value: Json
-          created_at: string | null
+          created_at: string
           description: string | null
           id: string
           is_active: boolean
           stage: number
           tenant_id: string | null
-          updated_at: string | null
+          updated_at: string
         }
         Insert: {
           config_key: string
           config_value: Json
-          created_at?: string | null
+          created_at?: string
           description?: string | null
           id?: string
           is_active?: boolean
           stage: number
           tenant_id?: string | null
-          updated_at?: string | null
+          updated_at?: string
         }
         Update: {
           config_key?: string
           config_value?: Json
-          created_at?: string | null
+          created_at?: string
           description?: string | null
           id?: string
           is_active?: boolean
           stage?: number
           tenant_id?: string | null
-          updated_at?: string | null
+          updated_at?: string
         }
         Relationships: [
           {
@@ -1992,73 +2072,128 @@ export type Database = {
         Row: {
           amount: number
           created_at: string | null
-          currency: string
-          description: string
+          currency: string | null
+          description: string | null
           id: string
           metadata: Json | null
-          source: string
-          status: string
+          source: string | null
+          status: string | null
           type: string
-          updated_at: string | null
           user_id: string
         }
         Insert: {
           amount: number
           created_at?: string | null
-          currency?: string
-          description: string
+          currency?: string | null
+          description?: string | null
           id?: string
           metadata?: Json | null
-          source: string
-          status?: string
+          source?: string | null
+          status?: string | null
           type: string
-          updated_at?: string | null
           user_id: string
         }
         Update: {
           amount?: number
           created_at?: string | null
-          currency?: string
-          description?: string
+          currency?: string | null
+          description?: string | null
           id?: string
           metadata?: Json | null
-          source?: string
-          status?: string
+          source?: string | null
+          status?: string | null
           type?: string
-          updated_at?: string | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "transactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      user_badges: {
+        Row: {
+          awarded_at: string | null
+          badge_id: string
+          id: string
+          metadata: Json | null
+          user_id: string
+        }
+        Insert: {
+          awarded_at?: string | null
+          badge_id: string
+          id?: string
+          metadata?: Json | null
+          user_id: string
+        }
+        Update: {
+          awarded_at?: string | null
+          badge_id?: string
+          id?: string
+          metadata?: Json | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_badges_badge_id_fkey"
+            columns: ["badge_id"]
+            isOneToOne: false
+            referencedRelation: "badge_catalog"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_badges_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
       }
       user_balances: {
         Row: {
-          available_balance: number
+          balance: number
           created_at: string | null
-          lifetime_withdrawn: number
-          pending_balance: number
-          total_earned: number
+          currency: string | null
+          id: string
+          lifetime_earnings: number | null
+          pending_balance: number | null
           updated_at: string | null
           user_id: string
         }
         Insert: {
-          available_balance?: number
+          balance?: number
           created_at?: string | null
-          lifetime_withdrawn?: number
-          pending_balance?: number
-          total_earned?: number
+          currency?: string | null
+          id?: string
+          lifetime_earnings?: number | null
+          pending_balance?: number | null
           updated_at?: string | null
           user_id: string
         }
         Update: {
-          available_balance?: number
+          balance?: number
           created_at?: string | null
-          lifetime_withdrawn?: number
-          pending_balance?: number
-          total_earned?: number
+          currency?: string | null
+          id?: string
+          lifetime_earnings?: number | null
+          pending_balance?: number | null
           updated_at?: string | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "user_balances_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
       }
       user_referral_stats: {
         Row: {
@@ -2288,129 +2423,116 @@ export type Database = {
           },
         ]
       }
-      withdrawal_requests: {
-        Row: {
-          amount: number
-          created_at: string | null
-          destination: string
-          fee_amount: number | null
-          id: string
-          method: string
-          processed_at: string | null
-          status: string
-          transaction_id: string | null
-          updated_at: string | null
-          user_id: string
-        }
-        Insert: {
-          amount: number
-          created_at?: string | null
-          destination: string
-          fee_amount?: number | null
-          id?: string
-          method: string
-          processed_at?: string | null
-          status?: string
-          transaction_id?: string | null
-          updated_at?: string | null
-          user_id: string
-        }
-        Update: {
-          amount?: number
-          created_at?: string | null
-          destination?: string
-          fee_amount?: number | null
-          id?: string
-          method?: string
-          processed_at?: string | null
-          status?: string
-          transaction_id?: string | null
-          updated_at?: string | null
-          user_id?: string
-        }
-        Relationships: []
-      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
       admin_adjust_reputation: {
-        Args: { points_to_add: number; reason: string; target_user_id: string }
+        Args: {
+          p_admin_note: string
+          p_points: number
+          p_reason: string
+          p_user_id: string
+        }
         Returns: undefined
       }
+      audit_kyc_access: {
+        Args: {
+          access_reason: string
+          accessor_id: string
+          target_user_id: string
+        }
+        Returns: boolean
+      }
       can_view_user_profile: {
-        Args: { target_user_id: string }
+        Args: { _target_user_id: string; _viewer_id: string }
         Returns: boolean
       }
       find_users_by_criteria: {
-        Args: { search_criteria: Json }
+        Args: { p_country_code: string; p_criteria: Json }
         Returns: {
-          profile_data: Json
+          match_score: number
           user_id: string
         }[]
       }
-      get_app_secrets: { Args: { secret_key: string }; Returns: string }
       get_auth_users_with_phones: {
         Args: never
         Returns: {
-          created_at: string
           email: string
-          id: string
           phone: string
+          user_id: string
         }[]
       }
       get_country_iso_from_dial_code: {
-        Args: { dial_code_input: string }
+        Args: { p_dial_code: string }
         Returns: string
       }
-      get_public_app_secrets: {
-        Args: never
-        Returns: {
-          environment: string
-          key: string
-          value: string
-        }[]
-      }
       get_targeting_values_by_question: {
-        Args: { question_key_input: string }
+        Args: { p_country_code: string; p_question_key: string }
         Returns: {
-          count: number
+          user_count: number
           value: string
         }[]
       }
       get_team_profile: {
-        Args: { user_id_input: string }
+        Args: { p_user_id: string }
         Returns: {
           company_name: string
           company_role: string
+          country_code: string
+          created_at: string
           email: string
           first_name: string
+          id: string
           is_active: boolean
           last_name: string
+          mobile: string
           user_id: string
         }[]
       }
-      get_user_email: { Args: { user_uuid: string }; Returns: string }
+      get_user_tenant_id: { Args: { p_user_id: string }; Returns: string }
       has_role: {
-        Args: { required_role: Database["public"]["Enums"]["app_role"] }
+        Args: { p_role: string; p_user_id: string }
         Returns: boolean
       }
       has_role_or_higher: {
-        Args: { required_role: Database["public"]["Enums"]["app_role"] }
+        Args: {
+          _required_role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
         Returns: boolean
       }
-      is_team_member: { Args: never; Returns: boolean }
+      is_team_member: { Args: { _user_id: string }; Returns: boolean }
+      log_audit_event: {
+        Args: {
+          p_action: string
+          p_metadata?: Json
+          p_resource_id?: string
+          p_resource_type?: string
+          p_tenant_id: string
+          p_user_id: string
+        }
+        Returns: string
+      }
       normalize_mobile_number: {
-        Args: { mobile_input: string }
+        Args: { country_dial_code: string; mobile_number: string }
         Returns: string
       }
       reset_user_journey: {
-        Args: { target_user_id: string }
-        Returns: undefined
+        Args: {
+          p_caller_user_id: string
+          p_stage: Database["public"]["Enums"]["journey_stage"]
+          p_target_user_id: string
+        }
+        Returns: Json
+      }
+      validate_tenant_api_key: {
+        Args: { api_key_input: string }
+        Returns: string
       }
       validate_user_age: {
-        Args: { date_of_birth_input: string; user_id_input: string }
+        Args: { p_date_of_birth: string; p_user_id: string }
         Returns: boolean
       }
     }
@@ -2553,9 +2675,6 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
   public: {
     Enums: {
       agent_status: ["active", "inactive", "testing"],
