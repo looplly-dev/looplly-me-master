@@ -2119,6 +2119,7 @@ export type Database = {
         Row: {
           awarded_at: string | null
           badge_id: string
+          created_at: string | null
           id: string
           metadata: Json | null
           user_id: string
@@ -2126,6 +2127,7 @@ export type Database = {
         Insert: {
           awarded_at?: string | null
           badge_id: string
+          created_at?: string | null
           id?: string
           metadata?: Json | null
           user_id: string
@@ -2133,6 +2135,7 @@ export type Database = {
         Update: {
           awarded_at?: string | null
           badge_id?: string
+          created_at?: string | null
           id?: string
           metadata?: Json | null
           user_id?: string
