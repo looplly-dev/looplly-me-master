@@ -59,7 +59,7 @@ export const registerUser = async (params: RegistrationParams): Promise<{ succes
       return { success: false, error: { message: mobileValidation.error || 'Invalid mobile number' } };
     }
     
-    const normalizedMobile = mobileValidation.normalized;
+    const normalizedMobile = mobileValidation.normalizedNumber;
     
     // Use standard Supabase Auth sign up
     const supabase = getSupabaseClient();
@@ -118,29 +118,17 @@ export const loginUser = async (params: LoginParams): Promise<{ success: boolean
         return { success: false, error: { message: 'Invalid mobile number' } };
       }
       
-      const normalizedMobile = mobileValidation.normalized;
+      const normalizedMobile = mobileValidation.normalizedNumber;
       
-      // Look up user by mobile number in profiles table
+      // Look up user by mobile number in profiles table to get email
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
-        .select('user_id')
+        .select('user_id, email')
         .eq('mobile', normalizedMobile)
         .maybeSingle();
       
-      if (profileError || !profile) {
+      if (profileError || !profile || !profile.email) {
         console.error('[loginUser] Profile lookup error:', profileError);
-        return { 
-          success: false, 
-          error: { message: 'Invalid mobile number or password' } 
-        };
-      }
-      
-      // Get auth user email from auth.users
-      const { data: authUser, error: authError } = await supabase
-        .rpc('get_user_email', { user_uuid: profile.user_id });
-      
-      if (authError || !authUser) {
-        console.error('[loginUser] Auth user lookup error:', authError);
         return { 
           success: false, 
           error: { message: 'Invalid mobile number or password' } 
@@ -150,7 +138,7 @@ export const loginUser = async (params: LoginParams): Promise<{ success: boolean
       // Sign in with email
       console.log('[loginUser] Signing in with email for mobile user');
       const { error: signInError } = await supabase.auth.signInWithPassword({
-        email: authUser,
+        email: profile.email,
         password: params.password
       });
       
